@@ -51,17 +51,17 @@ Hardware: A100
 
 ## Reference repos
 
-Cloned under `../external_repos/` for reading only — do not develop inside them.
+Cloned under `../external_repos/` for reading only — do not develop inside them. See `../external_repos/README.md` and `../external_repos/EXTERNAL_REPOS_REFERENCE.md`.
 
-- [Quantized-Reasoning-Models](https://github.com/ruikangliu/Quantized-Reasoning-Models)
-- [sober-reasoning](https://github.com/bethgelab/sober-reasoning)
-- [Calibrating-LLMs-with-Consistency](https://github.com/veronica320/Calibrating-LLMs-with-Consistency)
-- [Cost-of-Pass](https://github.com/mhamzaerol/Cost-of-Pass)
-- [AbstentionBench](https://github.com/facebookresearch/AbstentionBench)
+**Core paper baselines:** Quantized-Reasoning-Models, sober-reasoning, Calibrating-LLMs-with-Consistency, Cost-of-Pass
+
+**Method/tool references:** gptq, smoothquant, vllm, lm-evaluation-harness, AbstentionBench
 
 ## Docs
 
 - [HPC_STEP_BY_STEP.md](docs/HPC_STEP_BY_STEP.md) — **start here on HPC** (full gate-by-gate guide)
+- [literature/PAPER1_READING_MAP.md](docs/literature/PAPER1_READING_MAP.md) — literature groups + reading order
+- [literature/EXTERNAL_REPOS_INDEX.md](docs/literature/EXTERNAL_REPOS_INDEX.md) — organized clone index
 - [PAPER1_DESIGN.md](docs/PAPER1_DESIGN.md) — scope, models, tasks, metrics, claim
 - [RUNBOOK.md](docs/RUNBOOK.md) — MacBook ↔ HPC workflow
 - [EXPERIMENT_LOG.md](docs/EXPERIMENT_LOG.md) — dated experiment record
