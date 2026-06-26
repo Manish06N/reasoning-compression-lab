@@ -1,0 +1,13 @@
+{
+  "cell_id": "level_a_qwen7b_bf16_math500_seed0",
+  "model_config": "configs/models/deepseek_r1_qwen_7b.json",
+  "task_config": "configs/tasks/math500.json",
+  "quant_config": "bf16",
+  "seed": 0,
+  "decoding": {
+    "temperature": 0.6,
+    "top_p": 0.95,
+    "max_tokens": 32768
+  },
+  "notes": "Level A reproduction gate. Match Quantized-Reasoning-Models protocol for first reproduction."
+}

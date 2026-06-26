@@ -61,6 +61,20 @@ Cloned under `../external_repos/` for reading only — do not develop inside the
 
 ## Docs
 
+- [HPC_STEP_BY_STEP.md](docs/HPC_STEP_BY_STEP.md) — **start here on HPC** (full gate-by-gate guide)
 - [PAPER1_DESIGN.md](docs/PAPER1_DESIGN.md) — scope, models, tasks, metrics, claim
 - [RUNBOOK.md](docs/RUNBOOK.md) — MacBook ↔ HPC workflow
 - [EXPERIMENT_LOG.md](docs/EXPERIMENT_LOG.md) — dated experiment record
+
+## HPC quick commands
+
+```bash
+export QR=/scratch/$USER/reasoning-compression-lab
+cd $QR && conda activate qreason
+bash scripts/hpc/01_gpu_check.sh          # Gate 1
+bash scripts/hpc/02_download_model.sh     # Gate 2
+bash scripts/hpc/03_smoke_test.sh         # Gate 3
+bash scripts/hpc/04_run_level_a_bf16.sh 10  # Gate 4 debug
+bash scripts/hpc/05_score_level_a.sh
+sbatch slurm/run_level_a_bf16.slurm       # Gate 4 full
+```

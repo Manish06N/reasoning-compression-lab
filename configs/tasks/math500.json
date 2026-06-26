@@ -1,0 +1,6 @@
+{
+  "task_name": "math500",
+  "dataset_id": "HuggingFaceH4/MATH-500",
+  "split": "test",
+  "prompt_template_file": "prompts/math500.txt"
+}

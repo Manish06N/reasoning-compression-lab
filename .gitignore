@@ -7,6 +7,7 @@ __pycache__/
 # Experiments
 runs/
 results/
+logs/
 paper_figures/*.png
 paper_figures/*.pdf
 
