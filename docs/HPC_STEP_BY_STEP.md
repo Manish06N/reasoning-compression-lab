@@ -276,11 +276,19 @@ ls $QREASON_MODEL_QWEN7B | head
 
 You should see `config.json`, tokenizer files, and `.safetensors` shards.
 
+### 6b. Validate MATH-500 dataset (recommended)
+
+```bash
+bash scripts/hpc/02b_validate_dataset.sh
+```
+
+`run_inference.py` auto-downloads `HuggingFaceH4/MATH-500` on first run — this catches HF auth/network issues early.
+
 ---
 
 ## Section 7 — Tiny generation smoke test (Gate 3)
 
-This runs **3 simple math questions**, not full MATH-500.
+This runs **3 simple math questions**, not full MATH-500. Uses **max_tokens=1024** (`configs/decoding/smoke_debug.yaml`) — not 32768.
 
 Request GPU again:
 
