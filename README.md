@@ -61,6 +61,7 @@ Cloned under `../external_repos/` for reading only — do not develop inside the
 
 - [HPC_STEP_BY_STEP.md](docs/HPC_STEP_BY_STEP.md) — **start here on HPC** (full gate-by-gate guide)
 - [literature/PAPER1_READING_MAP.md](docs/literature/PAPER1_READING_MAP.md) — literature groups + reading order
+- [literature/EXTERNAL_REPOS_INDEX.md](docs/literature/EXTERNAL_REPOS_INDEX.md) — organized clone index
 - [reference_notes/COPY_ADAPT_CHECKLIST.md](docs/reference_notes/COPY_ADAPT_CHECKLIST.md) — what was adapted from external repos
 - [PAPER1_DESIGN.md](docs/PAPER1_DESIGN.md) — scope, models, tasks, metrics, claim
 - [RUNBOOK.md](docs/RUNBOOK.md) — MacBook ↔ HPC workflow
