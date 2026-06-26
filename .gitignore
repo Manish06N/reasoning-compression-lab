@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+.env
+
+# Experiments
+runs/
+results/
+paper_figures/*.png
+paper_figures/*.pdf
+
+# Large files
+models/
+quant/
+*.safetensors
+*.bin
+*.pt
+*.gguf
+
+# Cache
+.cache/
+hf_cache/
+wandb/
+
+# Mac
+.DS_Store

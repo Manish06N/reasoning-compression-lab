@@ -1,0 +1,15 @@
+torch
+transformers
+accelerate
+datasets
+huggingface_hub
+vllm
+pandas
+numpy
+scipy
+scikit-learn
+statsmodels
+pyarrow
+tqdm
+pynvml
+math-verify
