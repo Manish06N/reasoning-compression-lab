@@ -11,9 +11,9 @@ logs/
 paper_figures/*.png
 paper_figures/*.pdf
 
-# Large files
-models/
-quant/
+# Large files (repo root only)
+/models/
+/quant/
 *.safetensors
 *.bin
 *.pt
