@@ -52,7 +52,7 @@ def main() -> None:
 
     rows = []
     for idx, question in enumerate(SMOKE_QUESTIONS[: args.limit]):
-        prompt = build_prompt(cell["task"]["prompt_template_file"], question)
+        prompt = build_prompt(cell["task"]["prompt_template_file"], question=question)
         print(f"\n[{idx + 1}/{args.limit}] Generating...")
         result = generate_one(
             llm,

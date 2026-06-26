@@ -1,4 +1,7 @@
-"""Extract final answers from math reasoning completions."""
+"""Extract final answers from math reasoning completions.
+
+Adapted from sober-reasoning/lighteval_tasks.py (MATH_QUERY_TEMPLATE + boxed extraction).
+"""
 
 from __future__ import annotations
 

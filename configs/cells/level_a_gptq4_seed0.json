@@ -3,12 +3,8 @@
   "model_config": "configs/models/deepseek_r1_qwen_7b.json",
   "task_config": "configs/tasks/math500.json",
   "quant_config": "gptq4",
+  "decoding_config": "configs/decoding/repro_qrm.yaml",
   "seed": 0,
-  "decoding": {
-    "temperature": 0.6,
-    "top_p": 0.95,
-    "max_tokens": 32768
-  },
   "model_path_override_env": "QREASON_MODEL_QWEN7B_GPTQ4",
   "model_path_override_default": "models/DeepSeek-R1-Distill-Qwen-7B-GPTQ-4",
   "prerequisite": "BF16 Level A done AND scripts/hpc/06_verify_gptq4_model.sh passes",

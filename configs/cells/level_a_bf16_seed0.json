@@ -3,11 +3,7 @@
   "model_config": "configs/models/deepseek_r1_qwen_7b.json",
   "task_config": "configs/tasks/math500.json",
   "quant_config": "bf16",
+  "decoding_config": "configs/decoding/repro_qrm.yaml",
   "seed": 0,
-  "decoding": {
-    "temperature": 0.6,
-    "top_p": 0.95,
-    "max_tokens": 32768
-  },
   "notes": "Level A reproduction gate. Match Quantized-Reasoning-Models protocol for first reproduction."
 }

@@ -57,7 +57,7 @@ def main() -> None:
     total = len(dataset)
     for idx, example in enumerate(dataset):
         problem = example["problem"]
-        prompt = build_prompt(task["prompt_template_file"], problem)
+        prompt = build_prompt(task["prompt_template_file"], question=problem.strip())
         print(f"[{idx + 1}/{total}] generating...")
         result = generate_one(
             llm,

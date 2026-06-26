@@ -1,0 +1,8 @@
+# Reproduction decoding protocol from Quantized-Reasoning-Models (inference.py defaults).
+# Used for Level A reproduction before pilot grid changes.
+
+temperature: 0.6
+top_p: 0.95
+max_tokens: 32768
+seed: 0
+notes: Match QRM paper for first BF16/GPTQ-4 reproduction cell.

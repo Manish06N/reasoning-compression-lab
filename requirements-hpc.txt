@@ -12,4 +12,5 @@ statsmodels
 pyarrow
 tqdm
 pynvml
+pyyaml
 math-verify
