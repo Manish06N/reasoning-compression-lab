@@ -11,6 +11,7 @@ export QREASON_MODEL_QWEN7B="${QREASON_MODEL_QWEN7B:-$QR/models/DeepSeek-R1-Dist
 
 python scripts/smoke_test.py \
   --cell-config configs/cells/level_a_bf16_seed0.json \
+  --decoding-config configs/decoding/smoke_debug.yaml \
   --limit 3 \
   --output runs/raw/smoke_test.jsonl
 

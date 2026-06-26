@@ -40,9 +40,36 @@ def main() -> None:
         default="runs/raw/smoke_test.jsonl",
         help="Output JSONL path relative to repo root.",
     )
+    parser.add_argument(
+        "--decoding-config",
+        default="configs/decoding/smoke_debug.yaml",
+        help="Decoding YAML for smoke test (default: 1024 max tokens).",
+    )
+    parser.add_argument(
+        "--max-tokens",
+        type=int,
+        default=None,
+        help="Optional override for max_tokens.",
+    )
     args = parser.parse_args()
 
     cell = load_cell_config(args.cell_config)
+    if args.decoding_config:
+        from src.runners.config_utils import load_yaml
+
+        cell["decoding"] = {
+            "temperature": 0.6,
+            "top_p": 0.95,
+            "max_tokens": 1024,
+        }
+        loaded = load_yaml(args.decoding_config)
+        cell["decoding"].update(
+            {k: loaded[k] for k in ("temperature", "top_p", "max_tokens") if k in loaded}
+        )
+    if args.max_tokens is not None:
+        cell["decoding"]["max_tokens"] = args.max_tokens
+
+    print(f"Smoke decoding: max_tokens={cell['decoding']['max_tokens']}")
     model_path = cell["model_path"]
     print(f"Loading model from: {model_path}")
     llm = build_llm(model_path, cell["model"])

@@ -22,7 +22,12 @@ paper_figures/*.pdf
 # Cache
 .cache/
 hf_cache/
+.wandb/
 wandb/
+
+# Secrets
+.env
+*.pem
 
 # Mac
 .DS_Store
