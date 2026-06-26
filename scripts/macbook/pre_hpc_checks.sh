@@ -21,7 +21,7 @@ echo "Permissions set."
 
 echo ""
 echo "=== 3. Shell syntax check ==="
-for f in scripts/hpc/*.sh slurm/run_grid.sh; do
+for f in scripts/hpc/*.sh scripts/macbook/*.sh slurm/run_grid.sh; do
   bash -n "$f" && echo "OK: $f"
 done
 

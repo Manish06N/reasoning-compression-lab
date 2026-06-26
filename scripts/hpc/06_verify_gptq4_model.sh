@@ -2,7 +2,10 @@
 # Gate check: GPTQ-4 model must exist before running level_a_gptq4_seed0.
 set -euo pipefail
 
-export QR="${QR:-/scratch/$USER/reasoning-compression-lab}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=param_rudra_env.sh
+source "${SCRIPT_DIR}/param_rudra_env.sh"
+
 cd "$QR"
 
 MODEL_PATH="${QREASON_MODEL_QWEN7B_GPTQ4:-$QR/models/DeepSeek-R1-Distill-Qwen-7B-GPTQ-4}"

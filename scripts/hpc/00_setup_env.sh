@@ -2,20 +2,18 @@
 # Run on HPC login node (or inside an interactive GPU session after modules load).
 set -euo pipefail
 
-export QR="${QR:-/scratch/$USER/reasoning-compression-lab}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=param_rudra_env.sh
+source "${SCRIPT_DIR}/param_rudra_env.sh"
+
 cd "$QR"
-
 echo "Workspace: $QR"
+echo "HF cache: $HF_HOME"
 
-if command -v module >/dev/null 2>&1; then
-  module avail cuda 2>&1 | head -20 || true
-  echo "Edit this script to uncomment the correct CUDA module for your cluster."
-  # module load cuda/12.1
-  # module load anaconda
-fi
+param_rudra_load_modules
 
 if ! command -v conda >/dev/null 2>&1; then
-  echo "ERROR: conda not found. Load anaconda module or install miniconda first."
+  echo "ERROR: conda not found. Run: module load mldl/Miniconda"
   exit 1
 fi
 
@@ -25,8 +23,7 @@ else
   conda create -n qreason python=3.11 -y
 fi
 
-source "$(conda info --base)/etc/profile.d/conda.sh"
-conda activate qreason
+param_rudra_activate_conda
 
 pip install --upgrade pip
 pip install -r requirements-hpc.txt

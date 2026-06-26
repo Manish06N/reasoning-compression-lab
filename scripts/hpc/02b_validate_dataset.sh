@@ -2,11 +2,12 @@
 # Validate MATH-500 dataset access before long inference jobs.
 set -euo pipefail
 
-export QR="${QR:-/scratch/$USER/reasoning-compression-lab}"
-cd "$QR"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=param_rudra_env.sh
+source "${SCRIPT_DIR}/param_rudra_env.sh"
 
-source "$(conda info --base)/etc/profile.d/conda.sh"
-conda activate qreason
+cd "$QR"
+param_rudra_activate_conda
 
 python - <<'PY'
 from datasets import load_dataset
