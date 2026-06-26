@@ -51,7 +51,7 @@ Notes:        First truth test. Must pass before GPTQ-4 or pilot grid.
 
 ---
 
-## Level A — GPTQ-4 reproduction (pending)
+## Level A — GPTQ-4 reproduction (blocked until prep)
 
 ```text
 Date:
@@ -61,6 +61,8 @@ Quant config: GPTQ-4
 Task:         MATH-500
 Seed(s):      0
 Hardware:     A100
-Status:       planned
-Notes:        Run only after BF16 baseline completes.
+Status:       blocked
+Notes:        Requires BF16 Level A done first.
+              Then: download/quantize GPTQ-4 → 06_verify_gptq4_model.sh → inference.
+              See docs/GPTQ4_PREP.md.
 ```

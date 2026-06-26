@@ -70,6 +70,18 @@ This copies code to `/scratch/$USER/reasoning-compression-lab` on HPC.
 
 ---
 
+## Section 0 — MacBook: push to GitHub first
+
+Before deep HPC work, protect your repo. See [GITHUB_PUSH.md](GITHUB_PUSH.md).
+
+```bash
+cd "/Users/manish/Projects/2026/paper 1/reasoning-compression-lab"
+git remote add origin https://github.com/YOUR_USERNAME/reasoning-compression-lab.git
+git push -u origin main
+```
+
+---
+
 ## Section 1 — SSH and persistent session
 
 From MacBook terminal:
@@ -403,20 +415,34 @@ Update `docs/EXPERIMENT_LOG.md` on MacBook with pass@1, latency, VRAM.
 
 ---
 
-## Section 10 — GPTQ-4 (Gate 5 — only after BF16 works)
+## Section 10 — GPTQ-4 (Gate 6 — only after BF16 + model prep)
 
-BF16 must complete first. Then obtain GPTQ-4 weights by either:
+**Do not run inference until weights exist.** Full guide: [GPTQ4_PREP.md](GPTQ4_PREP.md).
 
-1. **Download pre-quantized** from HuggingFace (Quantized-Reasoning-Models model zoo), or
-2. **Quantize yourself** using reference repo on HPC (heavier)
+True order:
 
-Set path:
+```text
+BF16 smoke → BF16 MATH-500 seed 0 → prepare GPTQ-4 weights → verify → GPTQ-4 inference
+```
+
+### 10a. Obtain GPTQ-4 weights (pick one)
+
+| Option | Action |
+|--------|--------|
+| A — Download | Pre-quantized from HF model zoo (see GPTQ4_PREP.md) |
+| B — Quantize | Reference repo `real_quantization/gptq.sh` or `auto-gptq` |
+| C — AWQ first | If GPTQ install blocked, try AWQ checkpoint |
+
+### 10b. Verify path before inference
 
 ```bash
 export QREASON_MODEL_QWEN7B_GPTQ4=$QR/models/DeepSeek-R1-Distill-Qwen-7B-GPTQ-4
+bash scripts/hpc/06_verify_gptq4_model.sh
 ```
 
-Run with GPTQ cell config:
+Must print `OK: GPTQ-4 model path verified.`
+
+### 10c. Run GPTQ-4 cell
 
 ```bash
 python scripts/run_inference.py \
