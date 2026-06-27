@@ -13,8 +13,8 @@
 export QR=/scratch/$USER/reasoning-compression-lab
 export QREASON_MODEL_QWEN7B=$QR/models/DeepSeek-R1-Distill-Qwen-7B
 cd $QR
-module load mldl/Miniconda
-source "$(conda info --base)/etc/profile.d/conda.sh"
+CONDA_ROOT=/home/apps/MSCC/miniconda3
+source "$CONDA_ROOT/etc/profile.d/conda.sh"
 conda activate qreason
 ```
 
@@ -33,12 +33,12 @@ HF cache lives on scratch (set automatically by `scripts/hpc/param_rudra_env.sh`
 | GPU partition | `--partition=gpu` |
 | GPU request | `--gres=gpu:1` (not `gpu:a100:1`) |
 | Typical CPU | `--cpus-per-task=8` |
-| Typical RAM | `--mem=80G` for GPU inference jobs |
+| Memory | Do **not** use `#SBATCH --mem=...` in job scripts |
 
 Interactive GPU session:
 
 ```bash
-srun --partition=gpu --gres=gpu:1 --cpus-per-task=8 --mem=80G --time=04:00:00 --pty bash
+srun --partition=gpu --gres=gpu:1 --cpus-per-task=8 --time=04:00:00 --pty bash
 ```
 
 Submit smoke test:

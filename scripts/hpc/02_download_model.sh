@@ -14,8 +14,11 @@ mkdir -p "$MODEL_DIR"
 echo "Downloading DeepSeek-R1-Distill-Qwen-7B to $MODEL_DIR"
 echo "This can take 20-60 minutes depending on cluster network speed."
 
-huggingface-cli download deepseek-ai/DeepSeek-R1-Distill-Qwen-7B \
-  --local-dir "$MODEL_DIR"
+if command -v hf >/dev/null 2>&1; then
+  hf download deepseek-ai/DeepSeek-R1-Distill-Qwen-7B --local-dir "$MODEL_DIR"
+else
+  huggingface-cli download deepseek-ai/DeepSeek-R1-Distill-Qwen-7B --local-dir "$MODEL_DIR"
+fi
 
 echo "Download complete."
 echo "Set model path with:"

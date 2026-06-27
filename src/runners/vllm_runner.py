@@ -16,6 +16,7 @@ def build_llm(model_path: str, model_cfg: Dict[str, Any]):
         max_model_len=model_cfg.get("max_model_len", 32768),
         tensor_parallel_size=model_cfg.get("tensor_parallel_size", 1),
         trust_remote_code=model_cfg.get("trust_remote_code", True),
+        enforce_eager=model_cfg.get("enforce_eager", True),
     )
 
 
