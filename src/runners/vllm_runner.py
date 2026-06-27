@@ -7,7 +7,23 @@ from typing import Any, Dict, List, Optional
 from src.profiling.gpu_stats import snapshot_vram_bytes, track_gpu
 
 
+def _ensure_tokenizer_compatibility() -> None:
+    """Bridge vLLM 0.8.x with Transformers versions that dropped this property."""
+    from transformers import PreTrainedTokenizerBase
+
+    if hasattr(PreTrainedTokenizerBase, "all_special_tokens_extended"):
+        return
+
+    @property
+    def all_special_tokens_extended(self: PreTrainedTokenizerBase) -> list[str]:
+        return self.all_special_tokens
+
+    PreTrainedTokenizerBase.all_special_tokens_extended = all_special_tokens_extended
+
+
 def build_llm(model_path: str, model_cfg: Dict[str, Any]):
+    _ensure_tokenizer_compatibility()
+
     from vllm import LLM
 
     return LLM(
@@ -15,8 +31,8 @@ def build_llm(model_path: str, model_cfg: Dict[str, Any]):
         dtype=model_cfg.get("dtype", "bfloat16"),
         max_model_len=model_cfg.get("max_model_len", 32768),
         tensor_parallel_size=model_cfg.get("tensor_parallel_size", 1),
-        trust_remote_code=model_cfg.get("trust_remote_code", True),
         enforce_eager=model_cfg.get("enforce_eager", True),
+        trust_remote_code=model_cfg.get("trust_remote_code", True),
     )
 
 
@@ -31,6 +47,7 @@ def generate_one(
     from vllm import SamplingParams
     from transformers import AutoTokenizer
 
+    _ensure_tokenizer_compatibility()
     tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
     if use_chat_template and getattr(tokenizer, "chat_template", None):
         messages = [{"role": "user", "content": prompt}]

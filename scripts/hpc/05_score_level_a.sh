@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-# shellcheck source=param_rudra_env.sh
-source "${SCRIPT_DIR}/param_rudra_env.sh"
-
+export QR="${QR:-/scratch/$USER/reasoning-compression-lab}"
 cd "$QR"
-param_rudra_activate_conda
+
+CONDA_ROOT="${CONDA_ROOT:-/home/apps/MSCC/miniconda3}"
+source "$CONDA_ROOT/etc/profile.d/conda.sh"
+conda activate qreason
 
 python scripts/score_run.py \
   --input runs/raw/level_a_qwen7b_bf16_math500_seed0.jsonl

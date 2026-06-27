@@ -44,26 +44,9 @@ Model:        DeepSeek-R1-Distill-Qwen-7B
 Quant config: BF16
 Task:         MATH-500
 Seed(s):      0
-Hardware:     A100 (PARAM Rudra, IIT Patna)
-Status:       running
-Notes:        HPC setup complete through Gate 2b. Smoke test submitted (check slurm logs).
-              Next: Gate 3 pass → 10-question debug → full MATH-500.
-```
-
----
-
-## 2026-06-26 — HPC setup (PARAM Rudra)
-
-```text
-Date:         2026-06-26
-Level:        setup
-Hardware:     PARAM Rudra — /scratch/manishn_iitp/reasoning-compression-lab
-Status:       in progress
-Gate 1:       PASSED — GPU + torch + vLLM
-Gate 2:       DONE — Qwen-7B downloaded
-Gate 2b:      DONE — MATH-500 validated (500 examples)
-Gate 3:       SUBMITTED — sbatch slurm/smoke_test.slurm
-Notes:        HF auth + hf_cache on scratch. HPC commit synced via GitHub from MacBook.
+Hardware:     A100
+Status:       planned
+Notes:        First truth test. Must pass before GPTQ-4 or pilot grid.
 ```
 
 ---

@@ -2,12 +2,18 @@
 # Validate MATH-500 dataset access before long inference jobs.
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-# shellcheck source=param_rudra_env.sh
-source "${SCRIPT_DIR}/param_rudra_env.sh"
-
+export QR="${QR:-/scratch/$USER/reasoning-compression-lab}"
 cd "$QR"
-param_rudra_activate_conda
+
+export HF_HOME="${HF_HOME:-$QR/hf_cache}"
+export HF_HUB_CACHE="${HF_HUB_CACHE:-$HF_HOME/hub}"
+export TRANSFORMERS_CACHE="${TRANSFORMERS_CACHE:-$HF_HOME/transformers}"
+export HF_DATASETS_CACHE="${HF_DATASETS_CACHE:-$HF_HOME/datasets}"
+mkdir -p "$HF_HOME" "$HF_HUB_CACHE" "$TRANSFORMERS_CACHE" "$HF_DATASETS_CACHE"
+
+CONDA_ROOT="${CONDA_ROOT:-/home/apps/MSCC/miniconda3}"
+source "$CONDA_ROOT/etc/profile.d/conda.sh"
+conda activate qreason
 
 python - <<'PY'
 from datasets import load_dataset
