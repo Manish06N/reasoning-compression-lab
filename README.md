@@ -2,19 +2,164 @@
 
 Deployment-science evaluation harness for compressed reasoning LLMs.
 
+**GitHub:** https://github.com/Manish06N/reasoning-compression-lab  
 **Paper 1:** *Beyond Accuracy: Reliability, Calibration, Seed Variance, and Cost-per-Correct of Quantized Reasoning LLMs*
 
 ## Publication goal (journal)
 
-> **Split execution:** quants + 1.5B on **RTX 5080**; BF16 7B/8B + GPQA on **HPC 2× A100** (≤48 h SLURM blocks).  
+> **Split execution:** 5080 = **≤24 h/cell only** (Qwen-1.5B); **all 7B/8B + GSM8K + GPQA** on **HPC 2× A100** (≤48 h SLURM blocks).  
 > Full plan: [HPC_2A100_PLAN.md](docs/HPC_2A100_PLAN.md)
 
 | Machine | Entry script | What runs there |
 |---------|--------------|-----------------|
-| **RTX 5080** | `scripts/local/run_5080_publication.sh` | 13 quant cells + 1.5B BF16 (fits 16 GB) |
-| **HPC 2× A100** | `scripts/hpc/run_hpc_2a100_publication.sh` | BF16 Qwen-7B + Llama-8B anchors; GPQA |
+| **RTX 5080** | `scripts/local/run_5080_publication.sh` | Qwen-1.5B × 4 quants × MATH-500 (~4 days total) |
+| **HPC 2× A100** | `scripts/hpc/run_hpc_2a100_publication.sh` | 7B/8B all quants, BF16 anchors, GSM8K, GPQA |
 
 **Protocol (both):** `repro_qrm.yaml`, batch_size=1, full n, seed 0.
+
+### HPC block grid (seed 0)
+
+| Block | GPUs | Est. time | Cells |
+|-------|------|-----------|-------|
+| b01 | 2× A100 | ~12–24 h | BF16 Qwen-7B + BF16 Llama-8B MATH-500 |
+| b02 | 2× A100 | ~12–24 h | FP8 Qwen-7B + FP8 Llama-8B MATH-500 |
+| b03 | 2× A100 | ~12–24 h | AWQ-4 Qwen-7B + AWQ-4 Llama-8B MATH-500 |
+| b04 | 2× A100 | ~12–24 h | GPTQ-4 Qwen-7B + GPTQ-4 Llama-8B MATH-500 |
+| b05 | 1× A100 | ~12–20 h | GPTQ-3 Qwen-7B MATH-500 |
+| b06 | 1× A100 | ~20–40 h | FP8 Qwen-7B GSM8K (n=1319) |
+| b07 | 1× A100 | ~8–20 h | GPQA-Diamond (after Hugging Face gate) |
+
+**Do not run on 5080:** any 7B/8B cell, GSM8K, or BF16 anchors — they OOM or take weeks at batch_size=1.
+
+## Push code to GitHub (Windows)
+
+Your local repo: `G:\ALL MY Projects\2026\03-paper1-experiments`  
+Remote: `https://github.com/Manish06N/reasoning-compression-lab.git`
+
+### Step 1 — Open PowerShell in the project folder
+
+```powershell
+cd "G:\ALL MY Projects\2026\03-paper1-experiments"
+git status
+```
+
+You should see modified files and/or `ahead 1` (unpushed commit).
+
+### Step 2 — Stage and commit (if you have uncommitted changes)
+
+```powershell
+git add -A
+git status
+git commit -m "Revise split: 5080 ≤24h (1.5B only); full 7B/8B grid on HPC b01-b07."
+```
+
+Skip this step if `git status` shows a clean working tree and only says `ahead N`.
+
+### Step 3 — Authenticate (pick one method)
+
+#### Option A — GitHub CLI (recommended)
+
+1. Install: https://cli.github.com/ (or `winget install GitHub.cli`)
+2. Log in once:
+
+```powershell
+gh auth login
+```
+
+Choose: **GitHub.com** → **HTTPS** → **Login with a web browser** → follow the browser prompt.
+
+3. Push:
+
+```powershell
+git push origin main
+```
+
+#### Option B — Personal Access Token (HTTPS)
+
+GitHub no longer accepts account passwords for `git push`. Use a **Personal Access Token (PAT)** instead.
+
+1. Open: https://github.com/settings/tokens
+2. **Generate new token (classic)** → name it e.g. `reasoning-compression-lab`
+3. Scopes: check **`repo`** (full control of private repositories)
+4. Copy the token (you only see it once)
+
+5. Push:
+
+```powershell
+git push origin main
+```
+
+When prompted:
+- **Username:** `Manish06N`
+- **Password:** paste the **token** (not your GitHub password)
+
+To avoid re-entering the token, use Git Credential Manager (usually installed with Git for Windows):
+
+```powershell
+git config --global credential.helper manager
+git push origin main
+```
+
+#### Option C — SSH key
+
+1. Generate a key (if you don't have one):
+
+```powershell
+ssh-keygen -t ed25519 -C "your-email@example.com"
+```
+
+Press Enter to accept the default path (`C:\Users\manis\.ssh\id_ed25519`).
+
+2. Copy the public key:
+
+```powershell
+Get-Content $env:USERPROFILE\.ssh\id_ed25519.pub
+```
+
+3. Add it at: https://github.com/settings/keys → **New SSH key**
+
+4. Switch remote to SSH and push:
+
+```powershell
+git remote set-url origin git@github.com:Manish06N/reasoning-compression-lab.git
+git push origin main
+```
+
+### Step 4 — Verify on GitHub
+
+Open https://github.com/Manish06N/reasoning-compression-lab and confirm you see:
+
+- `scripts/hpc/submit_hpc_blocks.sh`
+- `configs/machine_split/5080_cells.sh` (4 cells)
+- `configs/machine_split/hpc_blocks/b01`–`b06`
+- Updated `README.md` with the split table above
+
+### Step 5 — Pull on HPC (after push succeeds)
+
+```bash
+ssh manishn_iitp@paramrudra.iitp.ac.in -p 4422
+export QR=/scratch/$USER/reasoning-compression-lab
+cd $QR
+git pull origin main
+bash scripts/hpc/submit_hpc_blocks.sh
+squeue -u $USER
+```
+
+If the HPC folder does not exist yet, clone once:
+
+```bash
+cd /scratch/$USER
+git clone https://github.com/Manish06N/reasoning-compression-lab.git
+```
+
+### Troubleshooting
+
+| Error | Fix |
+|-------|-----|
+| `Authentication failed` | Use PAT or `gh auth login`, not your GitHub password |
+| `rejected (fetch first)` | Someone else pushed first: `git pull origin main` then `git push origin main` |
+| `Permission denied (publickey)` | SSH key not added to GitHub, or use HTTPS + PAT instead |
+| Large files rejected | Outputs are gitignored; never commit `outputs-*` or model weights |
 
 ## Research question
 
@@ -25,8 +170,8 @@ When reasoning LLMs are compressed, do they remain **accurate, calibrated, stabl
 | Machine | Role |
 |---------|------|
 | **MacBook** | Design docs, scripts, configs, writing, plotting from CSVs, log review |
-| **Windows 5080 (WSL2)** | **Primary:** quant grid + 1.5B (`run_5080_publication.sh`) |
-| **HPC 2× A100** | **BF16 anchors** + GPQA; ≤48 h SLURM blocks (`run_hpc_2a100_publication.sh`) |
+| **Windows 5080 (WSL2)** | **Short jobs only:** Qwen-1.5B grid (`run_5080_publication.sh`) |
+| **HPC 2× A100** | **Main grid:** 7B/8B, GSM8K, GPQA; ≤48 h SLURM blocks (`run_hpc_2a100_publication.sh`) |
 
 ## Repository layout
 
@@ -73,6 +218,7 @@ Cloned under `../external_repos/` for reading only — do not develop inside the
 ## Docs
 
 - [HPC_2A100_PLAN.md](docs/HPC_2A100_PLAN.md) — **5080 vs HPC split + 48 h SLURM blocks**
+- [GIT_CREDENTIALS.md](docs/GIT_CREDENTIALS.md) — **store GitHub PAT safely (Credential Manager)**
 - [RTX5080_EXECUTION_PLAN.md](docs/RTX5080_EXECUTION_PLAN.md) — 5080 local runs
 - [MODEL_ROSTER.md](docs/MODEL_ROSTER.md) — canonical HF IDs and machine assignment
 - [HPC_STEP_BY_STEP.md](docs/HPC_STEP_BY_STEP.md) — HPC gate-by-gate guide
@@ -107,7 +253,8 @@ Archive: `outputs-win5080-main-YYYY-MM-DD/`
 ```bash
 export QR=/scratch/$USER/reasoning-compression-lab
 cd $QR && git pull
-bash scripts/hpc/submit_hpc_blocks.sh b01
+bash scripts/hpc/submit_hpc_blocks.sh        # b01–b06
+# GPQA after HF gate: sbatch slurm/hpc_2a100_b07_gpqa.slurm
 ```
 
 Archive: `outputs-hpc-2a100-main-YYYY-MM-DD/`  

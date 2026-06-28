@@ -8,14 +8,14 @@ Single source of truth for Hugging Face IDs, local paths, env vars, and machine 
 
 | Machine | Role |
 |---------|------|
-| **RTX 5080 (16 GB)** | **Primary** — publication main grid (`repro_qrm.yaml`, batch=1, full n) for all quants that fit |
-| **HPC A100 (80 GB)** | **Overflow** — BF16 7B/8B, 14B+, GPQA after gated access; same protocol as 5080 main |
+| **RTX 5080 (16 GB)** | **Short jobs only** — Qwen-1.5B × 4 quants × MATH-500 (~≤24 h/cell) |
+| **HPC 2× A100 (80 GB)** | **Main grid** — all 7B/8B quants, BF16 anchors, GSM8K, GPQA (≤48 h SLURM blocks) |
 
 **Decoding (paper runs):**
 
 | Config | Use | max_tokens | batch |
 |--------|-----|------------|-------|
-| `configs/decoding/repro_qrm.yaml` | **5080 main + HPC overflow** | 32768 | 1 |
+| `configs/decoding/repro_qrm.yaml` | **5080 + HPC publication** | 32768 | 1 |
 | `configs/decoding/pilot_5080.yaml` | Optional 5080 debug pilot | 8192 | 4/2/1 |
 
 ---

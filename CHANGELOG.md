@@ -2,28 +2,78 @@
 
 Detailed running log for project setup, HPC runs, code fixes, and operational decisions.
 
-## 2026-06-28 (5080 + HPC 2×A100 split — publication scripts)
+## 2026-06-28 (5080 ≤24h rule + full HPC block grid)
 
-### Policy
+### Policy (revised)
 
-- **5080:** all quants + Qwen-1.5B BF16 (`configs/machine_split/5080_cells.sh`)
-- **HPC 2× A100:** BF16 Qwen-7B + Llama-8B in parallel block b01 (≤47 h); GPQA in b02
-- **Journal protocol** on both: `repro_qrm.yaml`, batch_size=1, full datasets
+- **5080:** **only** Qwen-1.5B × 4 quants × MATH-500 (~≤24 h/cell, ~4 days total) — `configs/machine_split/5080_cells.sh`
+- **HPC 2× A100:** **all** 7B/8B quants, BF16 anchors, GSM8K (b01–b06); GPQA in b07
+- **Rule:** if a cell exceeds ~1 day on 5080, it must run on HPC
+- **Journal protocol** on both: `repro_qrm.yaml`, batch_size=1, full datasets, seed 0
+- **GitHub:** https://github.com/Manish06N/reasoning-compression-lab
+
+### Why the split changed
+
+Earlier plan ran 13 cells on 5080 (7B/8B quants + GSM8K). At publication settings (`batch_size=1`, full MATH-500), that would take **weeks** on a 5080. User policy: **5080 only for jobs ≤ ~1 day per cell**; everything else on 2× A100 (160 GB VRAM, 48 h SLURM max).
+
+### HPC blocks (seed 0)
+
+| Block | GPUs | Est. | Content |
+|-------|------|------|---------|
+| b01 | 2× A100 | 12–24 h | BF16 Qwen-7B + BF16 Llama-8B MATH-500 (parallel) |
+| b02 | 2× A100 | 12–24 h | FP8 Qwen-7B + FP8 Llama-8B MATH-500 |
+| b03 | 2× A100 | 12–24 h | AWQ-4 Qwen-7B + AWQ-4 Llama-8B MATH-500 |
+| b04 | 2× A100 | 12–24 h | GPTQ-4 Qwen-7B + GPTQ-4 Llama-8B MATH-500 |
+| b05 | 1× A100 | 12–20 h | GPTQ-3 Qwen-7B MATH-500 |
+| b06 | 1× A100 | 20–40 h | FP8 Qwen-7B GSM8K (n=1319) |
+| b07 | 1× A100 | 8–20 h | GPQA-Diamond (after HF gate) |
+
+Submit on HPC: `bash scripts/hpc/submit_hpc_blocks.sh` (b01–b06); GPQA: `sbatch slurm/hpc_2a100_b07_gpqa.slurm`
+
+### 5080 cells (seed 0)
+
+| # | Cell | Model | Task | n |
+|---|------|-------|------|---|
+| 1 | level_c_qwen15b_bf16 | Qwen-1.5B BF16 | MATH-500 | 500 |
+| 2 | level_c_qwen15b_fp8 | Qwen-1.5B FP8 | MATH-500 | 500 |
+| 3 | level_c_qwen15b_awq4 | Qwen-1.5B AWQ-4 | MATH-500 | 500 |
+| 4 | level_c_qwen15b_gptq4 | Qwen-1.5B GPTQ-4 | MATH-500 | 500 |
+
+Run on 5080: `bash scripts/local/run_5080_publication.sh --skip-download`
 
 ### Added
 
-- **`scripts/local/run_5080_publication.sh`** — canonical 5080 entry point
-- **`scripts/hpc/run_hpc_2a100_publication.sh`** — HPC block runner (parallel 2-GPU b01)
-- **`scripts/hpc/submit_hpc_blocks.sh`** — SLURM submit helper
-- **`configs/machine_split/`** — 5080 cell queue + HPC block definitions
-- **`slurm/hpc_2a100_b01_parallel.slurm`**, **`hpc_2a100_b02_gpqa.slurm`**
+- **`scripts/local/run_5080_publication.sh`** — canonical 5080 entry point (4-cell queue)
+- **`scripts/hpc/run_hpc_2a100_publication.sh`** — HPC block runner (b01–b07)
+- **`scripts/hpc/submit_hpc_blocks.sh`** — SLURM submit b01–b06 (2-GPU / 1-GPU auto)
+- **`configs/machine_split/5080_cells.sh`** — 4-cell 5080 queue (1.5B only)
+- **`configs/machine_split/hpc_blocks/`** — b01–b06 block definitions + b07 GPQA
+- **`slurm/hpc_2a100_b01_parallel.slurm`**, **`slurm/hpc_2a100_b07_gpqa.slurm`**
 - **`docs/HPC_2A100_PLAN.md`** — full split table + HPC pull/run instructions
+- **README.md** — GitHub push guide (PAT / `gh` / SSH) + block grid table
 
 ### Changed
 
 - **`run_5080_main.sh`** → delegates to `run_5080_publication.sh`
 - **`run_all_5080_phases.sh`** — loads `QREASON_CELL_QUEUE` from machine_split config
 - **`param_rudra_env.sh`** — Llama-8B path exports for HPC BF16 block
+- **`docs/RTX5080_EXECUTION_PLAN.md`**, **`docs/MODEL_ROSTER.md`** — 5080 = 1.5B only
+
+### Git / deploy status
+
+- Local commit `30c8c08` (+ doc updates pending commit) **not yet pushed** — `git push` failed with `Authentication failed` from agent environment
+- **User action:** push from Windows (see README § Push code to GitHub), then on HPC: `git pull origin main && bash scripts/hpc/submit_hpc_blocks.sh`
+
+### Operational next steps
+
+1. Push to GitHub from Windows PowerShell
+2. HPC: `git pull` → `submit_hpc_blocks.sh` (b01–b06)
+3. 5080: stop any old 13-cell run; restart with 4-cell queue only
+4. Merge `outputs-win5080-main-*` + `outputs-hpc-2a100-main-*` summaries for paper tables
+
+### Supersedes (same day, earlier entry below)
+
+The entry *"5080 as primary machine"* (13-cell grid on 5080) is **obsolete** — replaced by this ≤24h rule.
 
 ---
 

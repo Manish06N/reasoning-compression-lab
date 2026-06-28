@@ -29,6 +29,8 @@ wandb/
 
 # Secrets
 .env
+.env.local
+.github-token
 *.pem
 
 # Mac

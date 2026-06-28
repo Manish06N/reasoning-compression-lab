@@ -11,8 +11,10 @@
 
 | Where | When |
 |-------|------|
-| **RTX 5080** | **Default** — all quants that fit 16 GB; publication protocol |
-| **HPC** | **Only when** BF16 7B/8B, 14B+, or other >16 GB VRAM cells are needed |
+| **RTX 5080** | **Only** cells expected to finish in **≤24 h each** — Qwen-1.5B × 4 quants × MATH-500 |
+| **HPC 2× A100** | **Everything else** — all 7B/8B quants, BF16 anchors, GSM8K, GPQA (≤48 h SLURM blocks) |
+
+See [HPC_2A100_PLAN.md](HPC_2A100_PLAN.md) for the full block grid.
 
 ---
 
@@ -51,9 +53,9 @@ Use **one HF ID per quant slot**. Prefer **DeepSeek official** for BF16 and **Re
 
 ---
 
-## Full 5080 roster (14 experiment cells)
+## Full 5080 roster (4 inference cells + smoke)
 
-Sequential order — **one model loaded at a time**, scored, then unloaded:
+Queue: `configs/machine_split/5080_cells.sh` — sequential, one model at a time:
 
 | # | Phase | Cell | Model × Quant | Task |
 |---|-------|------|---------------|------|
@@ -62,15 +64,8 @@ Sequential order — **one model loaded at a time**, scored, then unloaded:
 | 2 | C | `level_c_qwen15b_fp8_math500_seed0` | Qwen-1.5B FP8 | MATH-500 |
 | 3 | C | `level_c_qwen15b_awq4_math500_seed0` | Qwen-1.5B AWQ-4 | MATH-500 |
 | 4 | C | `level_c_qwen15b_gptq4_math500_seed0` | Qwen-1.5B GPTQ-4 | MATH-500 |
-| 5 | A | `level_a_gptq4_seed0` | Qwen-7B GPTQ-4 | MATH-500 |
-| 6 | B | `level_b_qwen7b_fp8_math500_seed0` | Qwen-7B FP8 | MATH-500 |
-| 7 | B | `level_b_qwen7b_awq4_math500_seed0` | Qwen-7B AWQ-4 | MATH-500 |
-| 8 | B | `level_b_qwen7b_gptq4_math500_seed0` | Qwen-7B GPTQ-4 | MATH-500 |
-| 9 | B | `level_b_qwen7b_gptq3_math500_seed0` | Qwen-7B GPTQ-3 | MATH-500 |
-| 10 | B | `level_b_qwen7b_fp8_gsm8k_seed0` | Qwen-7B FP8 | GSM8K |
-| 11 | C | `level_c_llama8b_fp8_math500_seed0` | Llama-8B FP8 | MATH-500 |
-| 12 | C | `level_c_llama8b_awq4_math500_seed0` | Llama-8B AWQ-4 | MATH-500 |
-| 13 | C | `level_c_llama8b_gptq4_math500_seed0` | Llama-8B GPTQ-4 | MATH-500 |
+
+**7B/8B cells (rows 5–13 in older plans) → HPC blocks b01–b06**, not 5080.
 
 Decoding (full repro): `configs/decoding/repro_qrm.yaml` — temp 0.6, top_p 0.95, max_tokens 32768, seed 0.
 
@@ -78,7 +73,7 @@ Decoding (full repro): `configs/decoding/repro_qrm.yaml` — temp 0.6, top_p 0.9
 
 ## Publication main mode (default — journal results)
 
-Run the **full 13-cell grid** at QRM reproduction standard:
+Run the **4-cell 1.5B grid** at QRM reproduction standard (~4 days total):
 
 | Setting | Main (publication) | Pilot (optional debug) |
 |---------|-------------------|------------------------|

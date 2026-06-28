@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # HPC 2× A100 (80 GB) publication blocks — journal protocol, ≤48 h SLURM jobs.
 #
-# Large models (BF16 7B/8B, GPQA) run here. Quants + 1.5B → RTX 5080.
+# All 7B/8B cells, GSM8K, GPQA run here. 5080 = Qwen-1.5B only (≤24 h/cell).
 #
 # Usage:
 #   bash scripts/hpc/run_hpc_2a100_publication.sh list
@@ -121,16 +121,17 @@ run_block() {
 }
 
 list_blocks() {
-  echo "HPC publication blocks (each designed for SLURM --time=47:00:00):"
+  echo "HPC publication blocks (SLURM --time=47:00:00 max):"
   echo ""
-  echo "  b01_parallel_bf16_anchors  — 2×A100 parallel (~12–24h)"
-  echo "      GPU0: Qwen-7B BF16 × MATH-500 (Level A anchor)"
-  echo "      GPU1: Llama-8B BF16 × MATH-500"
+  echo "  b01_parallel_bf16_anchors  2×A100  ~12–24h  BF16 Qwen-7B + Llama-8B MATH"
+  echo "  b02_parallel_fp8           2×A100  ~12–24h  FP8 Qwen-7B + Llama-8B MATH"
+  echo "  b03_parallel_awq4          2×A100  ~12–24h  AWQ Qwen-7B + Llama-8B MATH"
+  echo "  b04_parallel_gptq4         2×A100  ~12–24h  GPTQ-4 Qwen-7B + Llama-8B MATH"
+  echo "  b05_single_gptq3           1×A100  ~12–20h  GPTQ-3 Qwen-7B MATH"
+  echo "  b06_single_gsm8k           1×A100  ~20–40h  FP8 Qwen-7B GSM8K (n=1319)"
+  echo "  b07_gpqa_fp8               1×A100  ~8–20h   GPQA (after HF gate)"
   echo ""
-  echo "  b02_gpqa_fp8               — 1×A100 (~8–20h, after HF gate approval)"
-  echo "      GPU0: Qwen-7B FP8 × GPQA-Diamond"
-  echo ""
-  echo "5080 runs quants + 1.5B: bash scripts/local/run_5080_publication.sh"
+  echo "5080 (~≤24h/cell): Qwen-1.5B only — bash scripts/local/run_5080_publication.sh"
 }
 
 BLOCK="${1:-list}"
@@ -143,7 +144,22 @@ case "$BLOCK" in
   b01|b01_parallel_bf16_anchors)
     run_block "$BLOCK_DIR/b01_parallel_bf16_anchors.sh"
     ;;
-  b02|b02_gpqa_fp8)
+  b02|b02_parallel_fp8)
+    run_block "$BLOCK_DIR/b02_parallel_fp8.sh"
+    ;;
+  b03|b03_parallel_awq4)
+    run_block "$BLOCK_DIR/b03_parallel_awq4.sh"
+    ;;
+  b04|b04_parallel_gptq4)
+    run_block "$BLOCK_DIR/b04_parallel_gptq4.sh"
+    ;;
+  b05|b05_single_gptq3)
+    run_block "$BLOCK_DIR/b05_single_gptq3.sh"
+    ;;
+  b06|b06_single_gsm8k)
+    run_block "$BLOCK_DIR/b06_single_gsm8k.sh"
+    ;;
+  b07|b07_gpqa_fp8|b02_gpqa_fp8)
     run_block "$BLOCK_DIR/b02_gpqa_fp8.sh"
     ;;
   *)
