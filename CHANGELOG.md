@@ -6,6 +6,12 @@ Detailed running log for project setup, HPC runs, code fixes, and operational de
 
 ### HPC preflight follow-up
 
+- Added `/home/manishn_iitp/.codex/CODEX.md` for future Codex sessions.
+  - Records the HPC vs 5080 split.
+  - Records the CPU preflight and GPU smoke gate before b01-b06 submission.
+  - Records that GitHub tokens must not be stored in repo files or persistent config.
+- Push to GitHub remains pending because HPC lacks safe GitHub auth in the current non-interactive environment.
+
 - Pulled `origin/main` on PARAM Rudra scratch repo and fast-forwarded to
   `03c3766`.
 - Added `progress.md` as the detailed operational record for HPC and 5080

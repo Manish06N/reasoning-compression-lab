@@ -405,3 +405,28 @@ Current answer to "why smoke instead of the whole experiment":
 - The exclusive quick smoke job tests that path with one question before b01-b06 are submitted.
 
 Current smoke state remains pending under scheduler priority; no b01-b06 publication jobs have been submitted.
+
+
+## 2026-06-28 Update 7 — Codex Notes and Credential Boundary
+
+Created `/home/manishn_iitp/.codex/CODEX.md` for future Codex sessions. It records:
+
+- HPC vs 5080 machine split.
+- Required CPU preflight command.
+- Required GPU smoke gate before b01-b06 submission.
+- Current local-ahead commit state.
+- Credential rule: never store GitHub tokens in repo files or persistent config.
+
+Push status remains blocked by missing safe GitHub credentials on HPC:
+
+- HTTPS push prompts cannot read username/password in this non-interactive environment.
+- `gh` is not configured on HPC.
+- SSH to GitHub on port 22 timed out.
+- Codex will not write the pasted PAT to repo files or persistent credential storage.
+
+Safe push options:
+
+1. Run `git push origin main` from a terminal where Git can prompt for credentials.
+2. Configure `gh auth login` on HPC or another machine, then push.
+3. Add an SSH key with GitHub access and switch the remote to SSH.
+4. Provide a one-time token through a secure credential prompt or environment mechanism, not committed files.
