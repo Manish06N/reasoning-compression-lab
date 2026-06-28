@@ -2,6 +2,67 @@
 
 Detailed running log for project setup, HPC runs, code fixes, and operational decisions.
 
+## 2026-06-28 (5080 run stopped — HPC-only policy)
+
+### Decision
+
+- User stopped 5080 publication run at ~Q12/500 on cell 1 (~10 rows checkpointed)
+- **Reason:** ~15 min/question → ~3 weeks for 4-cell 1.5B grid; PC cannot run continuously
+- **New policy:** all publication experiments on **HPC only** (5080 for smoke/debug if needed)
+
+### Actions
+
+- Ran `clean_5080_run.sh` — killed `run_all_5080_phases`, `run_inference`, vLLM; GPU back to idle
+- Background WSL task exited (code 15) — expected after manual stop
+- Partial archive preserved: `outputs-win5080-main-2026-06-28/` (10/500 rows — not for paper tables)
+- Updated **`docs/PROGRESS.md`**, **`README.md`**, **`CHANGELOG.md`**
+- Pushed to GitHub: HPC-only policy + progress tracker
+
+### Next (HPC)
+
+```bash
+ssh manishn_iitp@paramrudra.iitp.ac.in -p 4422
+export QR=/scratch/$USER/reasoning-compression-lab
+cd $QR && git pull origin main
+bash scripts/hpc/submit_hpc_blocks.sh   # b01–b06
+```
+
+- **1.5B cells:** not in b01–b06 yet — extend HPC blocks or run ad-hoc on A100
+- **GPQA:** b07 after Hugging Face gate
+
+---
+
+## 2026-06-28 (end of day — GitHub push + 5080 run started)
+
+### GitHub
+
+- Pushed commits `30c8c08` and `03c3766` to https://github.com/Manish06N/reasoning-compression-lab (`main` synced)
+- Added **`docs/GIT_CREDENTIALS.md`** — PAT via Windows Credential Manager (never commit tokens)
+- Updated **`.gitignore`** — `.env.local`, `.github-token`
+
+### 5080 publication run started
+
+- Archive: **`outputs-win5080-main-2026-06-28/`**
+- Launcher: `start_5080_main.sh` → `run_5080_publication.sh` with 4-cell queue (`5080_cells.sh`)
+- Smoke: `smoke_qwen15b_bf16` completed
+- **Cell 1 running:** `level_c_qwen15b_bf16_math500_seed0` (MATH-500 n=500)
+- Observed timing: Q1 ~50 s; Q2 ~21 min (long reasoning at max_tokens=32768)
+- Revised ETA: **~4–7 days** for all 4 cells (variable per question); monitor after Q10 checkpoint
+- Lesson: background runs must stay in a **persistent WSL session** — short `wsl bash -lc` invocations kill detached jobs
+
+### HPC (not started yet)
+
+- User to run: `git pull` → download 7B/8B models → `bash scripts/hpc/submit_hpc_blocks.sh`
+- Blocks b01–b06 ready in repo; b07 GPQA after HF gate
+
+### Docs added/updated today
+
+- **`docs/PROGRESS.md`** — live status tracker (new)
+- **`README.md`** — current status banner, push complete, PROGRESS link
+- **`docs/HPC_2A100_PLAN.md`**, **`RTX5080_EXECUTION_PLAN.md`**, **`MODEL_ROSTER.md`**
+
+---
+
 ## 2026-06-28 (5080 ≤24h rule + full HPC block grid)
 
 ### HPC preflight follow-up
@@ -92,17 +153,16 @@ Run on 5080: `bash scripts/local/run_5080_publication.sh --skip-download`
 - **`param_rudra_env.sh`** — Llama-8B path exports for HPC BF16 block
 - **`docs/RTX5080_EXECUTION_PLAN.md`**, **`docs/MODEL_ROSTER.md`** — 5080 = 1.5B only
 
-### Git / deploy status
+### Git / deploy status (superseded by end-of-day entry above)
 
-- Local commit `30c8c08` (+ doc updates pending commit) **not yet pushed** — `git push` failed with `Authentication failed` from agent environment
-- **User action:** push from Windows (see README § Push code to GitHub), then on HPC: `git pull origin main && bash scripts/hpc/submit_hpc_blocks.sh`
+- Initial push failed from agent; later pushed successfully on 2026-06-28
 
-### Operational next steps
+### Operational next steps (partially done)
 
-1. Push to GitHub from Windows PowerShell
-2. HPC: `git pull` → `submit_hpc_blocks.sh` (b01–b06)
-3. 5080: stop any old 13-cell run; restart with 4-cell queue only
-4. Merge `outputs-win5080-main-*` + `outputs-hpc-2a100-main-*` summaries for paper tables
+1. ~~Push to GitHub~~ — done
+2. HPC: `git pull` → `submit_hpc_blocks.sh` (b01–b06) — **pending**
+3. ~~5080: restart with 4-cell queue~~ — **running**
+4. Merge `outputs-win5080-main-*` + `outputs-hpc-2a100-main-*` summaries — **after runs complete**
 
 ### Supersedes (same day, earlier entry below)
 

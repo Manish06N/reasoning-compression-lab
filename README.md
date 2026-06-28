@@ -5,6 +5,16 @@ Deployment-science evaluation harness for compressed reasoning LLMs.
 **GitHub:** https://github.com/Manish06N/reasoning-compression-lab  
 **Paper 1:** *Beyond Accuracy: Reliability, Calibration, Seed Variance, and Cost-per-Correct of Quantized Reasoning LLMs*
 
+## Current status (2026-06-28)
+
+| Machine | Status | Details |
+|---------|--------|---------|
+| **5080** | **Stopped** | Partial test run only — all publication work → **HPC** |
+| **HPC** | **Next** | Pull repo + download models + `submit_hpc_blocks.sh` |
+| **GitHub** | Synced | `main` pushed (`30c8c08`, `03c3766`) |
+
+Full live tracker: [docs/PROGRESS.md](docs/PROGRESS.md)
+
 ## Publication goal (journal)
 
 > **Split execution:** 5080 = **≤24 h/cell only** (Qwen-1.5B); **all 7B/8B + GSM8K + GPQA** on **HPC 2× A100** (≤48 h SLURM blocks).  
@@ -12,7 +22,7 @@ Deployment-science evaluation harness for compressed reasoning LLMs.
 
 | Machine | Entry script | What runs there |
 |---------|--------------|-----------------|
-| **RTX 5080** | `scripts/local/run_5080_publication.sh` | Qwen-1.5B × 4 quants × MATH-500 (~4 days total) |
+| **RTX 5080** | `scripts/local/run_5080_publication.sh` | Qwen-1.5B × 4 quants × MATH-500 (~4–7 days est.; see PROGRESS.md) |
 | **HPC 2× A100** | `scripts/hpc/run_hpc_2a100_publication.sh` | 7B/8B all quants, BF16 anchors, GSM8K, GPQA |
 
 **Protocol (both):** `repro_qrm.yaml`, batch_size=1, full n, seed 0.
@@ -36,6 +46,9 @@ Deployment-science evaluation harness for compressed reasoning LLMs.
 Your local repo: `G:\ALL MY Projects\2026\03-paper1-experiments`  
 Remote: `https://github.com/Manish06N/reasoning-compression-lab.git`
 
+**Status (2026-06-28):** Pushed successfully. Future updates: `git add -A && git commit -m "..." && git push origin main`.  
+See [docs/GIT_CREDENTIALS.md](docs/GIT_CREDENTIALS.md) for PAT / Credential Manager setup.
+
 ### Step 1 — Open PowerShell in the project folder
 
 ```powershell
@@ -43,7 +56,7 @@ cd "G:\ALL MY Projects\2026\03-paper1-experiments"
 git status
 ```
 
-You should see modified files and/or `ahead 1` (unpushed commit).
+You should see a clean tree or local changes to commit.
 
 ### Step 2 — Stage and commit (if you have uncommitted changes)
 
@@ -217,6 +230,7 @@ Cloned under `../external_repos/` for reading only — do not develop inside the
 
 ## Docs
 
+- [PROGRESS.md](docs/PROGRESS.md) — **live status, ETAs, next actions**
 - [HPC_2A100_PLAN.md](docs/HPC_2A100_PLAN.md) — **5080 vs HPC split + 48 h SLURM blocks**
 - [GIT_CREDENTIALS.md](docs/GIT_CREDENTIALS.md) — **store GitHub PAT safely (Credential Manager)**
 - [RTX5080_EXECUTION_PLAN.md](docs/RTX5080_EXECUTION_PLAN.md) — 5080 local runs
@@ -241,12 +255,12 @@ sbatch slurm/run_level_a_bf16.slurm       # Gate 4 full
 
 ## Windows RTX 5080
 
-```bash
-bash scripts/local/run_5080_publication.sh --skip-download
-bash scripts/local/start_5080_main.sh
-```
+**Local long runs disabled (2026-06-28).** Publication grid runs on **HPC only**. Partial archive `outputs-win5080-main-2026-06-28/` (10/500 rows) — not for paper.
 
-Archive: `outputs-win5080-main-YYYY-MM-DD/`
+For debug/smoke only:
+```bash
+bash scripts/local/run_5080_publication.sh --skip-download  # do not use for main grid
+```
 
 ## HPC 2× A100 (PARAM Rudra)
 
