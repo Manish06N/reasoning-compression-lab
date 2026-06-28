@@ -4,6 +4,33 @@ Detailed running log for project setup, HPC runs, code fixes, and operational de
 
 ## 2026-06-28 (5080 ≤24h rule + full HPC block grid)
 
+### HPC preflight follow-up
+
+- Pulled `origin/main` on PARAM Rudra scratch repo and fast-forwarded to
+  `03c3766`.
+- Added `progress.md` as the detailed operational record for HPC and 5080
+  handoff notes.
+- Added `scripts/hpc/07_preflight_publication.py`.
+  - Runs CPU-side checks before expensive SLURM publication jobs.
+  - Checks shell syntax for HPC submit/run scripts and SLURM wrappers.
+  - Runs `python -m compileall -q scripts src`.
+  - Verifies `prompts/math500.txt` formatting keeps literal `{ANSWER}`.
+  - Verifies b01-b06 only contain HPC-scope 7B/8B/GSM8K cells, not Qwen-1.5B
+    5080 cells.
+  - Resolves every b01-b06 cell through `load_cell_config()`.
+  - Checks every resolved model folder has `config.json`, tokenizer files, and
+    weights.
+  - Loads MATH-500 and GSM8K through the repo task configs and verifies row
+    counts (`500` and `1319`).
+- Ran the new preflight successfully on HPC after model downloads completed.
+- Submitted only the exclusive quick smoke gate, job `85306`.
+  - Purpose: verify the actual GPU/vLLM path before launching 47-hour
+    publication jobs.
+  - State when recorded: `PENDING`, reason `(Priority)`.
+  - Estimated start from SLURM: `2026-06-29T02:21:03`.
+- No b01-b06 publication jobs were submitted yet. They should wait for the
+  smoke result unless explicitly overridden.
+
 ### Policy (revised)
 
 - **5080:** **only** Qwen-1.5B × 4 quants × MATH-500 (~≤24 h/cell, ~4 days total) — `configs/machine_split/5080_cells.sh`

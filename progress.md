@@ -377,3 +377,31 @@ Operational rule from this point:
 
 - Wait for smoke job `85306` to pass before submitting b01-b06.
 - If smoke fails, inspect `logs/smoke_quick_85306.out` and `logs/smoke_quick_85306.err`, update this file, and fix the root cause before publication submission.
+
+## 2026-06-28 Update 6 — Repeatable Preflight Added
+
+Added `scripts/hpc/07_preflight_publication.py` so the HPC preflight is no longer just terminal history.
+
+The script checks:
+
+- HPC shell scripts and SLURM wrapper syntax.
+- Python compile for `scripts` and `src`.
+- Math prompt formatting, including literal `{ANSWER}` preservation.
+- b01-b06 block presence.
+- No Qwen-1.5B 5080 cells in b01-b06 HPC blocks.
+- Cell config resolution through `load_cell_config()`.
+- Local model folder existence plus `config.json`, tokenizer, and weights.
+- MATH-500 row count equals `500`.
+- GSM8K test row count equals `1319`.
+
+Result on HPC: passed.
+
+Current answer to "why smoke instead of the whole experiment":
+
+- The full jobs are expensive 47-hour SLURM allocations.
+- Prior failures occurred before useful experiment work completed: tokenizer compatibility, GPU OOM on a shared node, and prompt formatting.
+- CPU preflight now covers config/dataset/model/prompt/compile failures.
+- The remaining untested part is the real GPU/vLLM engine path, which requires a GPU allocation.
+- The exclusive quick smoke job tests that path with one question before b01-b06 are submitted.
+
+Current smoke state remains pending under scheduler priority; no b01-b06 publication jobs have been submitted.
