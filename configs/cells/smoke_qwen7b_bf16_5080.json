@@ -1,0 +1,9 @@
+{
+  "cell_id": "smoke_qwen7b_bf16_5080",
+  "model_config": "configs/models/deepseek_r1_qwen_7b_smoke_5080.json",
+  "task_config": "configs/tasks/math500.json",
+  "quant_config": "bf16",
+  "decoding_config": "configs/decoding/smoke_debug.yaml",
+  "seed": 0,
+  "notes": "RTX 5080 smoke only — max_model_len=2048, limit=1, max_tokens=64."
+}

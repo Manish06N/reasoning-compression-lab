@@ -13,8 +13,26 @@ sys.path.insert(0, str(ROOT))
 
 from datasets import load_dataset
 
-from src.runners.config_utils import build_prompt, load_cell_config
-from src.runners.vllm_runner import build_llm, generate_one
+from src.runners.checkpoint_utils import (
+    atomic_write_jsonl,
+    backup_file,
+    load_jsonl,
+    recover_jsonl_from_backup,
+    update_state,
+    validate_jsonl,
+    write_progress,
+)
+from src.runners.config_utils import build_prompt, load_cell_config, load_decoding_from_file
+from src.runners.vllm_runner import build_llm, generate_chunk
+
+CHECKPOINT_EVERY = 10
+
+
+def _output_root_for(out_path: Path) -> Path | None:
+    """Infer archive root (parent of raw/) when output lives under .../raw/."""
+    if out_path.parent.name == "raw":
+        return out_path.parent.parent
+    return None
 
 
 def main() -> None:
@@ -35,63 +53,174 @@ def main() -> None:
         default=None,
         help="Output JSONL path. Default: runs/raw/{cell_id}.jsonl",
     )
+    parser.add_argument(
+        "--decoding-config",
+        default=None,
+        help="Override cell decoding (YAML), e.g. configs/decoding/pilot_5080.yaml",
+    )
+    parser.add_argument(
+        "--max-model-len",
+        type=int,
+        default=None,
+        help="Override model max_model_len for this run (pilot: 8192).",
+    )
+    parser.add_argument(
+        "--batch-size",
+        type=int,
+        default=1,
+        help="Prompts per vLLM.generate() call (5080 pilot: 4 for 1.5B, 2 for 7B/8B).",
+    )
+    parser.add_argument(
+        "--checkpoint-every",
+        type=int,
+        default=CHECKPOINT_EVERY,
+        help="Atomic checkpoint + backup every N completed rows.",
+    )
     args = parser.parse_args()
 
     cell = load_cell_config(args.cell_config)
     cell_id = cell["cell_id"]
-    out_rel = args.output or f"runs/raw/{cell_id}.jsonl"
-    out_path = ROOT / out_rel
+    if args.output:
+        out_path = Path(args.output)
+        if not out_path.is_absolute():
+            out_path = ROOT / out_path
+    else:
+        out_path = ROOT / f"runs/raw/{cell_id}.jsonl"
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
+    archive_root = _output_root_for(out_path)
+    backup_root = (archive_root / "_backup") if archive_root else None
+
+    if args.decoding_config:
+        cell["decoding"] = load_decoding_from_file(args.decoding_config)
+    if args.max_model_len is not None:
+        cell["model"] = dict(cell["model"])
+        cell["model"]["max_model_len"] = args.max_model_len
+    elif cell["decoding"].get("max_model_len"):
+        cell["model"] = dict(cell["model"])
+        cell["model"]["max_model_len"] = int(cell["decoding"]["max_model_len"])
+
     task = cell["task"]
+    problem_field = task.get("problem_field", "problem")
+    solution_field = task.get("solution_field", "solution")
     print(f"Loading dataset: {task['dataset_id']} [{task['split']}]")
-    dataset = load_dataset(task["dataset_id"], split=task["split"])
+    if task.get("config_name"):
+        dataset = load_dataset(task["dataset_id"], task["config_name"], split=task["split"])
+    else:
+        dataset = load_dataset(task["dataset_id"], split=task["split"])
     if args.limit is not None:
         dataset = dataset.select(range(min(args.limit, len(dataset))))
 
-    model_path = cell["model_path"]
-    print(f"Loading model from: {model_path}")
-    llm = build_llm(model_path, cell["model"])
+    ok, _ = validate_jsonl(out_path)
+    if not ok:
+        print(f"WARN: corrupt JSONL {out_path} — attempting restore from backup")
+        if backup_root and recover_jsonl_from_backup(out_path, backup_root):
+            print(f"Restored {out_path} from _backup/latest/raw/")
+        else:
+            corrupt = out_path.with_suffix(out_path.suffix + ".corrupt")
+            out_path.replace(corrupt)
+            print(f"Moved corrupt file → {corrupt}; starting fresh")
 
-    rows = []
+    rows = load_jsonl(out_path)
+    start_idx = len(rows)
     total = len(dataset)
-    for idx, example in enumerate(dataset):
-        problem = example["problem"]
-        prompt = build_prompt(task["prompt_template_file"], question=problem.strip())
-        print(f"[{idx + 1}/{total}] generating...")
-        result = generate_one(
+    if start_idx:
+        print(f"Resuming {cell_id}: {start_idx}/{total} rows already in {out_path}")
+    if start_idx >= total:
+        print(f"Already complete ({start_idx}/{total} rows).")
+        if archive_root:
+            write_progress(archive_root, cell_id, start_idx, total, status="completed")
+        return
+
+    model_path = cell["model_path"]
+    batch_size = max(1, args.batch_size)
+    print(f"Loading model from: {model_path}")
+    print(
+        f"Decoding: max_tokens={cell['decoding'].get('max_tokens')}, "
+        f"max_model_len={cell['model'].get('max_model_len')}, batch_size={batch_size}"
+    )
+    if archive_root:
+        update_state(
+            archive_root,
+            last_cell_id=cell_id,
+            last_phase="inference",
+            rows_done=start_idx,
+            rows_total=total,
+        )
+        write_progress(archive_root, cell_id, start_idx, total, status="in_progress")
+
+    llm = build_llm(model_path, cell["model"])
+    use_chat = cell["model"].get("use_chat_template", True)
+    checkpoint_every = max(1, args.checkpoint_every)
+
+    idx = start_idx
+    while idx < total:
+        batch_end = min(idx + batch_size, total)
+        batch_examples = [dataset[i] for i in range(idx, batch_end)]
+        problems = [ex[problem_field].strip() for ex in batch_examples]
+        prompts = [
+            build_prompt(task["prompt_template_file"], question=problem) for problem in problems
+        ]
+        print(f"[{idx + 1}-{batch_end}/{total}] generating batch of {len(prompts)}...")
+        results = generate_chunk(
             llm,
-            prompt,
+            prompts,
             decoding=cell["decoding"],
             seed=cell["seed"],
             model_path=model_path,
-            use_chat_template=cell["model"].get("use_chat_template", True),
+            use_chat_template=use_chat,
         )
-        row = {
-            "id": example.get("unique_id", str(idx)),
-            "problem": problem,
-            "gold_solution": example["solution"],
-            "subject": example.get("subject"),
-            "level": example.get("level"),
-            "prompt": result["prompt"],
-            "completion": result["completion"],
-            "latency_sec": result["latency_sec"],
-            "peak_vram_gb": result["peak_vram_gb"],
-            "prompt_tokens": result["prompt_tokens"],
-            "completion_tokens": result["completion_tokens"],
-            "cell_id": cell_id,
-            "model_path": model_path,
-            "quant_config": cell["quant_config"],
-            "task": task["task_name"],
-            "seed": cell["seed"],
-        }
-        rows.append(row)
+        for local_i, (example, result) in enumerate(zip(batch_examples, results)):
+            global_i = idx + local_i
+            problem = example[problem_field]
+            row = {
+                "id": example.get("unique_id", str(global_i)),
+                "problem": problem,
+                "gold_solution": example[solution_field],
+                "subject": example.get("subject"),
+                "level": example.get("level"),
+                "prompt": result["prompt"],
+                "completion": result["completion"],
+                "latency_sec": result["latency_sec"],
+                "peak_vram_gb": result["peak_vram_gb"],
+                "prompt_tokens": result["prompt_tokens"],
+                "completion_tokens": result["completion_tokens"],
+                "cell_id": cell_id,
+                "model_path": model_path,
+                "quant_config": cell["quant_config"],
+                "task": task["task_name"],
+                "seed": cell["seed"],
+                "batch_size": batch_size,
+            }
+            if args.decoding_config:
+                row["decoding_config"] = args.decoding_config
+            rows.append(row)
 
-        if (idx + 1) % 10 == 0 or idx + 1 == total:
-            with out_path.open("w", encoding="utf-8") as f:
-                for partial in rows:
-                    f.write(json.dumps(partial, ensure_ascii=False) + "\n")
+        idx = batch_end
+        if len(rows) % checkpoint_every == 0 or idx == total:
+            atomic_write_jsonl(out_path, rows)
             print(f"checkpoint saved: {out_path} ({len(rows)} rows)")
+            if backup_root:
+                backup_file(out_path, backup_root, "raw")
+                if archive_root:
+                    write_progress(archive_root, cell_id, len(rows), total, status="in_progress")
+                    update_state(
+                        archive_root,
+                        last_cell_id=cell_id,
+                        last_phase="inference",
+                        rows_done=len(rows),
+                        rows_total=total,
+                    )
+
+    if archive_root:
+        write_progress(archive_root, cell_id, len(rows), total, status="completed")
+        update_state(
+            archive_root,
+            last_cell_id=cell_id,
+            last_phase="inference_complete",
+            rows_done=len(rows),
+            rows_total=total,
+        )
 
     print(f"Inference complete. Wrote {len(rows)} rows to {out_path}")
 

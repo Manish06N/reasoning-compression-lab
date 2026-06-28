@@ -14,6 +14,29 @@ Use for: reading papers, writing, repo structure, Python scripts, configs, VS Co
 
 Use for: model download, vLLM, BF16/FP8/GPTQ/AWQ inference, quantization, benchmark generation, latency/VRAM profiling, final paper numbers.
 
+## Windows RTX 5080 (WSL2 pilot lab)
+
+Use for: quant grid pilots, pipeline smoke, 1.5B verifier, 7B/8B **quantized** runs that fit 16 GB VRAM.
+
+**Project root (WSL):**
+
+```bash
+cd "/mnt/g/ALL MY Projects/2026/03-paper1-experiments"
+source scripts/local/env.sh
+```
+
+**Recommended first pass:**
+
+```bash
+bash scripts/local/start_5080_pilot.sh      # background
+bash scripts/local/resume_5080_pilot.sh     # foreground / after reboot
+bash scripts/local/backup_5080_archive.sh --snapshot
+```
+
+Full repro (days) or HPC for BF16 anchors — see [RTX5080_EXECUTION_PLAN.md](RTX5080_EXECUTION_PLAN.md).
+
+---
+
 **Scratch workspace (HPC):**
 
 ```bash

@@ -1,0 +1,9 @@
+{
+  "cell_id": "level_b_qwen7b_awq4_math500_seed0",
+  "model_config": "configs/models/deepseek_r1_qwen_7b_awq4.json",
+  "task_config": "configs/tasks/math500.json",
+  "quant_config": "awq4",
+  "decoding_config": "configs/decoding/repro_qrm.yaml",
+  "seed": 0,
+  "notes": "Level B pilot — AWQ-4 on 5080 or HPC."
+}

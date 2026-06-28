@@ -2,6 +2,358 @@
 
 Detailed running log for project setup, HPC runs, code fixes, and operational decisions.
 
+## 2026-06-28 (5080 + HPC 2×A100 split — publication scripts)
+
+### Policy
+
+- **5080:** all quants + Qwen-1.5B BF16 (`configs/machine_split/5080_cells.sh`)
+- **HPC 2× A100:** BF16 Qwen-7B + Llama-8B in parallel block b01 (≤47 h); GPQA in b02
+- **Journal protocol** on both: `repro_qrm.yaml`, batch_size=1, full datasets
+
+### Added
+
+- **`scripts/local/run_5080_publication.sh`** — canonical 5080 entry point
+- **`scripts/hpc/run_hpc_2a100_publication.sh`** — HPC block runner (parallel 2-GPU b01)
+- **`scripts/hpc/submit_hpc_blocks.sh`** — SLURM submit helper
+- **`configs/machine_split/`** — 5080 cell queue + HPC block definitions
+- **`slurm/hpc_2a100_b01_parallel.slurm`**, **`hpc_2a100_b02_gpqa.slurm`**
+- **`docs/HPC_2A100_PLAN.md`** — full split table + HPC pull/run instructions
+
+### Changed
+
+- **`run_5080_main.sh`** → delegates to `run_5080_publication.sh`
+- **`run_all_5080_phases.sh`** — loads `QREASON_CELL_QUEUE` from machine_split config
+- **`param_rudra_env.sh`** — Llama-8B path exports for HPC BF16 block
+
+---
+
+## 2026-06-28 (5080 — publication main grid; 5080 as primary machine)
+
+### Policy change (journal)
+
+- **RTX 5080 is the primary experiment machine** — main grid runs at publication standard locally.
+- **HPC only for overflow** — BF16 7B/8B, 14B+, or other models that exceed 16 GB VRAM.
+- **Pilot mode demoted** to optional debug (`--pilot`); not for paper tables.
+
+### Publication protocol (main grid)
+
+| Setting | Value |
+|---------|--------|
+| Archive | `outputs-win5080-main-2026-06-28/` |
+| Decoding | `configs/decoding/repro_qrm.yaml` |
+| batch_size | **1** (sequential, QRM-compatible) |
+| Sample sizes | MATH-500 n=500, GSM8K n=1319 |
+| Reproducibility | `VLLM_BATCH_INVARIANT=1` |
+| Checkpoints | every 10 rows |
+
+### Added
+
+- **`scripts/local/run_5080_main.sh`**, **`resume_5080_main.sh`**, **`start_5080_main.sh`**
+- **`scripts/local/clean_5080_run.sh`** — generalized clean (main or pilot)
+- **`outputs-win5080-main-2026-06-28/README.md`**
+
+### Changed
+
+- **`scripts/local/run_all_5080_phases.sh`** — non-pilot defaults: `repro_qrm.yaml`, batch=1, `outputs-win5080-main-*`, `publication_mode` in manifest
+- **`README.md`**, **`docs/RTX5080_EXECUTION_PLAN.md`**, **`docs/MODEL_ROSTER.md`**, **`2026/CLAUDE.md`**
+
+### Start
+
+```bash
+bash scripts/local/clean_5080_run.sh pilot   # stop old pilot
+bash scripts/local/start_5080_main.sh --skip-download
+```
+
+Monitor: `outputs-win5080-main-2026-06-28/logs/orchestrator.log`
+
+---
+
+## 2026-06-28 (Windows 5080 — pilot pipeline started)
+
+> **Session reference — keep this updated.** Mirrors `README.md` → "Current session — Windows RTX 5080 pilot".
+
+### Operational status (as of 2026-06-28)
+
+| Item | Status |
+|------|--------|
+| **Repo (Windows)** | `G:\ALL MY Projects\2026\03-paper1-experiments` |
+| **Repo (WSL)** | `/mnt/g/ALL MY Projects/2026/03-paper1-experiments` |
+| **Models on disk** | 12 checkpoints (~62 GB) — all 5080 quants + BF16 1.5B/7B |
+| **Missing model** | Llama-8B BF16 (HPC only — run `download_models.sh levelc` later) |
+| **Pilot archive** | `outputs-win5080-pilot-2026-06-28/` |
+| **Aborted full run** | `outputs-win5080-2026-06-28/` — superseded, do not merge |
+| **Stack** | `torch 2.11.0+cu128`, `vllm 0.23.0`, conda `qreason` |
+| **Mode** | Pilot — n=50, `pilot_5080.yaml`, max_tokens 8192, batch 4/2/1 |
+| **Pipeline** | `run_all_5080_phases.sh --pilot --skip-download` |
+| **Smoke** | `smoke_qwen15b_bf16.jsonl` (1 row) — skipped on resume |
+
+### What was superseded
+
+| Old approach | Outcome |
+|--------------|---------|
+| `download_and_run_5080.sh` (full grid) | Killed (exit 9) — downloads done; full MATH-500 too slow on 5080 |
+| `outputs-win5080-2026-06-28/` partial run | Abandoned — pilot archive is canonical for 5080 work |
+
+### Start / monitor / resume
+
+```bash
+wsl -d Ubuntu-22.04
+cd "/mnt/g/ALL MY Projects/2026/03-paper1-experiments"
+source scripts/local/env.sh
+bash scripts/local/start_5080_pilot.sh          # background start
+bash scripts/local/resume_5080_pilot.sh         # foreground / after power cut
+bash scripts/local/backup_5080_archive.sh --snapshot
+```
+
+Monitor: `outputs-win5080-pilot-2026-06-28/logs/orchestrator.log`
+
+PowerShell: `Get-Content "G:\ALL MY Projects\2026\03-paper1-experiments\outputs-win5080-pilot-2026-06-28\logs\orchestrator.log" -Tail 15 -Wait`
+
+### 14-cell pilot queue
+
+1. `smoke_qwen15b_bf16`  
+2–5. Qwen-1.5B BF16 / FP8 / AWQ-4 / GPTQ-4 × MATH-500  
+6. `level_a_gptq4_seed0` (Qwen-7B GPTQ-4)  
+7–10. Qwen-7B FP8 / AWQ-4 / GPTQ-4 / GPTQ-3 × MATH-500  
+11. Qwen-7B FP8 × GSM8K  
+12–14. Llama-8B FP8 / AWQ-4 / GPTQ-4 × MATH-500  
+
+Skipped on 5080: BF16 Qwen-7B/8B full MATH-500, GPQA-Diamond (gated).
+
+### Backup / resume mechanics
+
+- Atomic JSONL every 10 rows → `_backup/latest/raw/` on each checkpoint  
+- Full mirror after each cell; snapshot every 3 cells → `_backup/snapshots/`  
+- Partial cells resume from row count in existing JSONL  
+- Manifest **merged** on restart (cells[] not wiped)  
+- Corrupt JSONL → auto-restore from `_backup/latest/raw/`
+
+### Added this session
+
+- **`scripts/local/start_5080_pilot.sh`** — idempotent background launcher (setsid, stale vLLM cleanup).
+- **Smoke skip fix** — smoke skips on ≥1 row (not pilot `limit=50`).
+
+---
+
+## 2026-06-28 (Windows 5080 — backup + resume / power-cut recovery)
+
+- **`src/runners/checkpoint_utils.py`** — atomic JSONL writes, progress sidecars, `_backup/latest` mirror, timestamped snapshots, corrupt-file recovery.
+- **`scripts/local/backup_5080_archive.sh`** — manual full-archive backup (`--snapshot` for timestamped copy).
+- **`scripts/local/resume_5080_pilot.sh`** — resume pilot after reboot (preserves manifest, skips done cells).
+
+### Changed
+
+- **`scripts/run_inference.py`** — atomic checkpoints every 10 rows; auto-backup to `_backup/latest/raw/`; corrupt JSONL → restore from backup; writes `checkpoints/` + `state.json`.
+- **`scripts/local/run_all_5080_phases.sh`** — manifest **merge on restart** (no longer wipes `cells[]`); auto backup after each cell; snapshot every 3 cells; skip re-scoring if scored file is current; `[resume]` log for partial cells; fixed Windows path in manifest Python block (SyntaxError on startup).
+
+### Recovery paths
+
+| Artifact | Location |
+|----------|----------|
+| Live output | `{archive}/raw/{cell_id}.jsonl` |
+| Backup mirror | `{archive}/_backup/latest/` |
+| Snapshots | `{archive}/_backup/snapshots/YYYYMMDD_HHMMSS/` |
+| Progress | `{archive}/checkpoints/{cell_id}.json`, `state.json` |
+
+After power cut: `bash scripts/local/resume_5080_pilot.sh`
+
+---
+
+## 2026-06-28 (Windows 5080 — pilot mode + batched inference)
+
+### Added
+
+- **`configs/decoding/pilot_5080.yaml`** — 5080 pilot protocol: temp 0.6, top_p 0.95, `max_tokens` / `max_model_len` 8192 (same sampling as repro, capped length).
+- **`scripts/local/run_5080_pilot.sh`** — one-command pilot grid (`--pilot`, n=50 default, separate archive).
+- **`outputs-win5080-pilot-2026-06-28/`** — pilot output archive + `README.md` (do not mix with full repro results).
+
+### Changed
+
+- **`scripts/run_inference.py`** — vLLM-native batching (`--batch-size`), decoding override (`--decoding-config`), `max_model_len` override, resume from partial JSONL checkpoints.
+- **`src/runners/vllm_runner.py`** — `render_prompt`, `generate_chunk` (true multi-prompt `llm.generate`), `generate_batch` uses chunked vLLM calls (no longer sequential one-by-one).
+- **`src/runners/config_utils.py`** — `load_decoding_from_file()`; YAML may include `max_model_len`.
+- **`scripts/local/run_all_5080_phases.sh`** — flags: `--pilot`, `--skip-download`, `--decoding-config`, `--max-model-len`, `--batch-size`; auto batch sizes (4/2/1 by model size); pilot writes to `outputs-win5080-pilot-*`; smoke always `--limit 1`.
+- **`docs/RTX5080_EXECUTION_PLAN.md`**, **`docs/MODEL_ROSTER.md`**, archive READMEs — pilot vs full repro documented.
+
+### Why
+
+Live full-grid run on 5080 showed ~1–4k tokens/question but `max_tokens=32768` and batch-size-1 inference → **days per cell**. Pilot mode targets **~hours for all 14 cells** while preserving quant comparison validity (label `n=50`, separate archive).
+
+### How to run pilot (stop any in-progress full run first)
+
+```bash
+wsl -d Ubuntu-22.04
+cd "/mnt/g/ALL MY Projects/2026/03-paper1-experiments"
+source scripts/local/env.sh
+# Optional: pkill -f run_inference if a full MATH-500 cell is still running
+bash scripts/local/run_5080_pilot.sh --skip-download
+```
+
+Monitor: `outputs-win5080-pilot-2026-06-28/logs/master.log`
+
+---
+
+## 2026-06-28 (Windows 5080 — local-only full phase run)
+
+### Added
+
+- **`outputs-win5080-2026-06-28/`** — dedicated Windows archive for all RTX 5080 outputs (`raw/`, `scored/`, `results/`, `logs/`, `manifest.json`). Windows path: `G:\ALL MY Projects\2026\03-paper1-experiments\outputs-win5080-2026-06-28\`.
+- **`scripts/local/run_all_5080_phases.sh`** — runs every 5080-feasible cell (no HPC); skips BF16 7B/8B and gated GPQA; resumes completed cells.
+- **`scripts/local/download_and_run_5080.sh`** — download all 5080 quants then chain into phase runner.
+- **`download_models.sh` target `5080`** — 10 quant checkpoints (1.5B/7B/Llama-8B FP8/AWQ/GPTQ + 7B GPTQ-3); phase0 BF16 1.5B+7B separate.
+- **Qwen-1.5B quant configs** — `deepseek_r1_qwen_15b_fp8.json`, `_awq4.json`, `_gptq4.json` + Level C cells.
+- **`requirements-local-5080.txt`**, **`scripts/local/check_cuda.py`**.
+
+### Changed
+
+- GPTQ-4 canonical HF ID → `RedHatAI/DeepSeek-R1-Distill-Qwen-7B-quantized.w4a16` (ruikangliu repo gone); same for 1.5B/Llama GPTQ-4.
+- `scripts/run_inference.py` — GSM8K `question`/`answer` fields, `config_name`, absolute `--output` paths.
+- `configs/tasks/gsm8k.json` — `problem_field` / `solution_field`.
+- `prompts/math500.txt` — escaped `{{ANSWER}}` for `.format()`.
+- vLLM stack on 5080: `torch 2.11.0+cu128`, `vllm 0.23.0` (Blackwell sm_120).
+
+### 5080 cells in scope
+
+| Phase | Cells |
+|-------|-------|
+| Phase 0 | `smoke_qwen15b_bf16` |
+| Level A | `level_a_gptq4_seed0` |
+| Level B | FP8/AWQ-4/GPTQ-4/GPTQ-3 MATH-500 + FP8 GSM8K |
+| Level C | Qwen-1.5B BF16/FP8/AWQ/GPTQ-4 + Llama-8B FP8/AWQ/GPTQ-4 MATH-500 |
+
+### Skipped on 5080
+
+- All Qwen-7B / Llama-8B **BF16** full runs (VRAM).
+- GPQA-Diamond (gated).
+- Llama-8B BF16 download deferred to HPC (`download_models.sh levelc`).
+
+### Download status (2026-06-28)
+
+All 12 local model folders present (~62 GB total). Experiments started on full grid before pilot mode was added; use pilot archive for new runs.
+
+---
+
+
+All work below was done on the **home Windows machine** with **NVIDIA GeForce RTX 5080 (16 GB VRAM, Blackwell sm_120)** via **WSL2**. HPC (PARAM Rudra A100) was **not** reached from this session — SSH from WSL failed with `Permission denied (publickey)`.
+
+Repo path (Windows): `G:\ALL MY Projects\2026\03-paper1-experiments`  
+Repo path (WSL): `/mnt/g/ALL MY Projects/2026/03-paper1-experiments`  
+Conda env: `qreason` (Python 3.11)
+
+---
+
+### What worked
+
+| Item | Result |
+|------|--------|
+| **CUDA / PyTorch on Blackwell** | After force-reinstall: `torch 2.11.0+cu128`, CUDA available, sm_120 tensor OK (`scripts/local/check_cuda.py`). |
+| **vLLM import & inference (1.5B)** | Upgraded to `vllm 0.23.0` (0.8.5 incompatible with torch 2.11). Qwen-1.5B BF16 loads and generates on 5080. |
+| **Phase 0 model downloads** | `deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B` and `deepseek-ai/DeepSeek-R1-Distill-Qwen-7B` downloaded to `models/` (~22 min for phase0 batch). |
+| **Phase 0 smoke — Qwen-1.5B BF16** | `bash scripts/local/run_phase0_smoke.sh` → `runs/raw/smoke_qwen15b_local.jsonl` (1 row, limit=1, max_tokens=64). Pipeline verified: download → vLLM → JSONL. |
+| **WSL `.env` loading** | CRLF from Windows editing broke `source .env`; fixed in `scripts/local/env.sh` via `tr -d '\r'` and CR-stripping on path vars. |
+| **Blackwell vLLM env vars** | `VLLM_USE_FLASHINFER_SAMPLER=0` (FlashInfer JIT fails sm_120 check), `VLLM_WORKER_MULTIPROC_METHOD=spawn` (WSL), `LD_LIBRARY_PATH` for pip-shipped CUDA 13 libs (`nvidia/cu13/lib`). |
+| **Prompt template fix** | `prompts/math500.txt`: escaped `{{ANSWER}}` so Python `.format()` no longer raises `KeyError: 'ANSWER'`. |
+
+**Final local stack (5080):**
+
+```
+torch==2.11.0+cu128
+vllm==0.23.0
+GPU: NVIDIA GeForce RTX 5080, capability (12, 0)
+```
+
+**Sample 1.5B smoke output** (`runs/raw/smoke_qwen15b_local.jsonl`):
+
+- Problem: `What is 17 + 28?`
+- peak_vram_gb: ~15.9 (high due to max_model_len=32768 in 1.5B config)
+- latency_sec: ~64 s (first run; WSL + 9P filesystem overhead on model load)
+
+---
+
+### What did not work
+
+| Item | Symptom | Root cause / next step |
+|------|---------|------------------------|
+| **Original stack (torch 2.6 + vLLM 0.8.5)** | `CUDA error: no kernel image is available for execution on the device` | PyTorch cu124 only supports up to sm_90; RTX 5080 is sm_120. |
+| **`upgrade_pytorch_blackwell.sh` (first run)** | No upgrade; torch stayed 2.6.0 | Plain `pip install` saw torch as satisfied. **Fix:** use `--force-reinstall` (now in script). |
+| **vLLM 0.8.5 + torch 2.11** | `undefined symbol: _ZN5torch3jit17parseSchemaOrName...` in `vllm/_C.abi3.so` | vLLM 0.8.5 wheel built against torch 2.6. Upgraded to vLLM 0.23.0. |
+| **vLLM 0.23.0 (first import)** | `libcudart.so.13: cannot open shared object file` | vLLM 0.23 links CUDA 13; added `LD_LIBRARY_PATH` in `env.sh`. |
+| **FlashInfer sampler on 5080** | `RuntimeError: FlashInfer requires GPUs with sm75 or higher` during engine init | sm_120 not recognized by FlashInfer JIT (`SM 12.x requires CUDA >= 12.9`). **Workaround:** `VLLM_USE_FLASHINFER_SAMPLER=0`. |
+| **Phase 0 smoke — Qwen-7B BF16 on 5080** | `ValueError: No available memory for the cache blocks` / KV cache `-2.03 GiB` | BF16 weights alone ~14.32 GiB on 16 GB card; no room for KV cache even with `max_model_len=512`, `kv_cache_dtype=fp8`, `gpu_memory_utilization=0.85`. **Expected per plan:** full 7B BF16 runs on HPC A100 only. |
+| **GPTQ-4 download** | `Error: Model 'ruikangliu/DeepSeek-R1-Distill-Qwen-7B-GPTQ-W4G128' not found` | HF repo missing or renamed. **Next:** try `RedHatAI/DeepSeek-R1-Distill-Qwen-7B-quantized.w4a16` (canonical alternate in `docs/MODEL_ROSTER.md`) and update `download_models.sh`. |
+| **HPC SSH from WSL** | `Permission denied (publickey)` after host key added | No SSH private key in WSL `~/.ssh/`. Phase 1 Gate 3–4 must be run manually via PuTTY or after copying Windows SSH key into WSL. |
+| **PC forced restart** | Interrupted long-running 7B smoke attempt mid-session | Re-ran Phase 0 after reboot; 1.5B smoke passed again; 7B still OOM-deferred. |
+
+**7B BF16 deferral artifact:** `runs/raw/smoke_qwen7b_local_status.json` — status `deferred_to_hpc`, points to `scripts/hpc/03_smoke_test.sh`.
+
+---
+
+### Files added or changed (5080 session)
+
+| File | Change |
+|------|--------|
+| `scripts/local/env.sh` | CUDA 13 `LD_LIBRARY_PATH`, Blackwell vLLM env vars, CRLF-safe `.env` sourcing |
+| `scripts/local/check_cuda.py` | Quick CUDA sanity check for WSL/5080 |
+| `scripts/local/upgrade_pytorch_blackwell.sh` | `--force-reinstall` torch cu128 + upgrade vLLM |
+| `scripts/local/run_phase0_smoke.sh` | 1.5B required; 7B BF16 try with graceful HPC deferral on OOM |
+| `requirements-local-5080.txt` | Local-only deps (torch 2.11+, vllm 0.23+); HPC stays on `requirements-hpc.txt` (vLLM 0.8.5) |
+| `prompts/math500.txt` | Escaped `{{ANSWER}}` for `.format()` |
+| `configs/models/deepseek_r1_qwen_7b_smoke_5080.json` | `max_model_len=512`, `kv_cache_dtype=fp8`, `gpu_memory_utilization=0.85` (still OOM on 5080) |
+
+*(Earlier 2026-06-28 entries below cover repo scaffolding, model roster docs, and HPC-side work.)*
+
+---
+
+### Current next steps (5080 vs HPC)
+
+**On Windows 5080 (WSL):**
+
+```powershell
+wsl -d Ubuntu-22.04
+cd "/mnt/g/ALL MY Projects/2026/03-paper1-experiments"
+source scripts/local/env.sh
+bash scripts/local/run_phase0_smoke.sh   # 1.5B smoke; 7B defers if OOM
+# After GPTQ repo ID fixed:
+bash scripts/local/download_models.sh gptq4
+bash scripts/local/run_gptq4_smoke.sh    # quantized 7B should fit 5080
+```
+
+**On HPC (manual — SSH from WSL blocked):**
+
+```bash
+cd /scratch/manishn_iitp/reasoning-compression-lab   # or synced clone path
+bash scripts/hpc/03_smoke_test.sh                    # Gate 3: 7B BF16 smoke
+bash scripts/hpc/run_level_a_sequence.sh 10          # Gate 4 + score
+# Target: results/level_a_qwen7b_bf16_math500_seed0_summary.json
+```
+
+---
+
+## 2026-06-28
+
+### Added
+
+- Canonical model roster: `docs/MODEL_ROSTER.md`, `docs/GPQA_ACCESS.md`.
+- Model JSON configs for Qwen-1.5B, Qwen-7B (BF16/FP8/AWQ-4/GPTQ-4/GPTQ-3), Llama-8B variants.
+- Level B cell templates (`configs/cells/level_b_*`) and Level C cells (`configs/cells/level_c_*`).
+- Task configs: `gsm8k.json`, `gpqa_diamond.json`.
+- Local scripts: `download_models.sh`, `run_phase0_smoke.sh`, `run_gptq4_smoke.sh`, `upgrade_pytorch_blackwell.sh`.
+- HPC helper: `scripts/hpc/check_hpc_gate_status.sh`, `scripts/hpc/run_level_a_sequence.sh`.
+
+### Changed
+
+- `src/runners/vllm_runner.py`: optional `quantization`, `kv_cache_dtype`, `gpu_memory_utilization`.
+- `level_a_gptq4_seed0.json`: uses `deepseek_r1_qwen_7b_gptq4.json` (vLLM quant flags).
+- `.env.example`: full `QREASON_MODEL_*` path map for WSL and HPC.
+
+## 2026-06-28 (workspace move)
+
+### Changed
+
+- **Moved** from `2026/reasoning-compression-lab` to `2026/03-paper1-experiments`.
+- **Updated** path references in docs and scripts.
+- **Why:** Numbered PhD workspace layout; see `2026/README.md`.
+
 ## 2026-06-27
 
 ### Fixed

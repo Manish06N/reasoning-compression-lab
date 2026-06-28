@@ -1,0 +1,12 @@
+# RTX 5080 pilot grid — same temperature/top_p as paper repro, capped generation length.
+# Use for n=50 quant comparison runs before full MATH-500 on anchors (HPC or overnight).
+
+temperature: 0.6
+top_p: 0.95
+max_tokens: 8192
+max_model_len: 8192
+seed: 0
+notes: >
+  Pilot protocol for 5080. Live 1.5B runs showed ~1–4k completion tokens per problem;
+  8192 preserves long CoT while cutting KV overhead and enabling vLLM batching.
+  Label archives outputs-win5080-pilot-* separately from full repro runs.

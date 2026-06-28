@@ -1,10 +1,9 @@
 {
-  "cell_id": "level_a_qwen7b_gptq4_math500_seed0",
+  "cell_id": "level_b_qwen7b_gptq4_math500_seed0",
   "model_config": "configs/models/deepseek_r1_qwen_7b_gptq4.json",
   "task_config": "configs/tasks/math500.json",
   "quant_config": "gptq4",
   "decoding_config": "configs/decoding/repro_qrm.yaml",
   "seed": 0,
-  "prerequisite": "BF16 Level A done AND scripts/hpc/06_verify_gptq4_model.sh passes",
-  "notes": "Do NOT run until GPTQ-4 weights exist. See docs/GPTQ4_PREP.md."
+  "notes": "Level B pilot — same GPTQ-4 checkpoint as Level A reproduction."
 }

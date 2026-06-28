@@ -1,0 +1,14 @@
+{
+  "model_id": "jakiAJK/DeepSeek-R1-Distill-Qwen-1.5B_AWQ",
+  "local_path_env": "QREASON_MODEL_QWEN15B_AWQ4",
+  "local_path_default": "models/DeepSeek-R1-Distill-Qwen-1.5B-AWQ-4",
+  "dtype": "auto",
+  "quantization": "awq",
+  "max_model_len": 32768,
+  "tensor_parallel_size": 1,
+  "trust_remote_code": true,
+  "use_chat_template": true,
+  "enforce_eager": true,
+  "kv_cache_dtype": "fp8",
+  "gpu_memory_utilization": 0.90
+}

@@ -1,0 +1,9 @@
+{
+  "cell_id": "level_c_qwen15b_bf16_math500_seed0",
+  "model_config": "configs/models/deepseek_r1_qwen_15b.json",
+  "task_config": "configs/tasks/math500.json",
+  "quant_config": "bf16",
+  "decoding_config": "configs/decoding/repro_qrm.yaml",
+  "seed": 0,
+  "notes": "Level C grid — Qwen-1.5B lower bound; runs on 5080 or HPC."
+}

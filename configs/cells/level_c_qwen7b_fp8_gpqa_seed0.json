@@ -1,0 +1,10 @@
+{
+  "cell_id": "level_c_qwen7b_fp8_gpqa_seed0",
+  "model_config": "configs/models/deepseek_r1_qwen_7b_fp8.json",
+  "task_config": "configs/tasks/gpqa_diamond.json",
+  "quant_config": "fp8",
+  "decoding_config": "configs/decoding/repro_qrm.yaml",
+  "seed": 0,
+  "prerequisite": "HF gated access approved for Idavidrein/gpqa",
+  "notes": "Level C — GPQA-Diamond after gated dataset access."
+}

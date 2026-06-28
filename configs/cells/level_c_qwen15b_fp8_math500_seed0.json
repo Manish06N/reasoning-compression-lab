@@ -1,0 +1,8 @@
+{
+  "cell_id": "level_c_qwen15b_fp8_math500_seed0",
+  "model_config": "configs/models/deepseek_r1_qwen_15b_fp8.json",
+  "task_config": "configs/tasks/math500.json",
+  "quant_config": "fp8",
+  "decoding_config": "configs/decoding/repro_qrm.yaml",
+  "seed": 0
+}

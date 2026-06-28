@@ -53,17 +53,22 @@ def build_prompt(template_file: str, **fields: str) -> str:
     return template.format(**fields)
 
 
+def load_decoding_from_file(decoding_file: str | Path) -> Dict[str, Any]:
+    loaded = load_yaml(decoding_file)
+    return {
+        "temperature": loaded.get("temperature", 0.6),
+        "top_p": loaded.get("top_p", 0.95),
+        "max_tokens": loaded.get("max_tokens", 32768),
+        "max_model_len": loaded.get("max_model_len"),
+    }
+
+
 def load_decoding(cell_cfg: Dict[str, Any]) -> Dict[str, Any]:
     if "decoding" in cell_cfg:
         return dict(cell_cfg["decoding"])
     decoding_file = cell_cfg.get("decoding_config")
     if decoding_file:
-        loaded = load_yaml(decoding_file)
-        return {
-            "temperature": loaded.get("temperature", 0.6),
-            "top_p": loaded.get("top_p", 0.95),
-            "max_tokens": loaded.get("max_tokens", 32768),
-        }
+        return load_decoding_from_file(decoding_file)
     return {"temperature": 0.6, "top_p": 0.95, "max_tokens": 32768}
 
 

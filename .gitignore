@@ -8,6 +8,8 @@ __pycache__/
 runs/
 results/
 logs/
+outputs-win5080-*/
+outputs-hpc-*/
 paper_figures/*.png
 paper_figures/*.pdf
 

@@ -1,0 +1,10 @@
+{
+  "task_name": "gsm8k",
+  "dataset_id": "openai/gsm8k",
+  "split": "test",
+  "config_name": "main",
+  "problem_field": "question",
+  "solution_field": "answer",
+  "prompt_template_file": "prompts/math500.txt",
+  "notes": "GSM8K control task — uses same math prompt template as MATH-500."
+}

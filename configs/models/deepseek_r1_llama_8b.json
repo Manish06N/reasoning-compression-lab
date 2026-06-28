@@ -1,0 +1,12 @@
+{
+  "model_id": "deepseek-ai/DeepSeek-R1-Distill-Llama-8B",
+  "local_path_env": "QREASON_MODEL_LLAMA8B",
+  "local_path_default": "models/DeepSeek-R1-Distill-Llama-8B",
+  "dtype": "bfloat16",
+  "max_model_len": 32768,
+  "tensor_parallel_size": 1,
+  "trust_remote_code": true,
+  "use_chat_template": true,
+  "enforce_eager": true,
+  "notes": "HPC A100 only — BF16 weights exceed 16 GB RTX 5080."
+}

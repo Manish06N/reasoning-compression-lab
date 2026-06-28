@@ -1,0 +1,24 @@
+# RTX 5080 (Blackwell sm_120) — WSL local env only.
+# HPC stays on requirements-hpc.txt (vLLM 0.8.5 + torch 2.6 + A100).
+#
+# Install (once):
+#   pip install --upgrade --force-reinstall torch torchvision torchaudio \
+#     --index-url https://download.pytorch.org/whl/cu128
+#   pip install -r requirements-local-5080.txt
+#
+torch>=2.11.0
+transformers
+accelerate
+datasets
+huggingface_hub
+vllm>=0.23.0
+pandas
+numpy<2.4
+scipy
+scikit-learn
+statsmodels
+pyarrow
+tqdm
+nvidia-ml-py
+pyyaml
+math-verify

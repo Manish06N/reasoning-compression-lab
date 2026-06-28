@@ -1,0 +1,9 @@
+{
+  "task_name": "gpqa_diamond",
+  "dataset_id": "Idavidrein/gpqa",
+  "split": "train",
+  "config_name": "gpqa_diamond",
+  "prompt_template_file": "prompts/gpqa_diamond.txt",
+  "gated": true,
+  "notes": "Requires Hugging Face gated access approval before download."
+}

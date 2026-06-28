@@ -4,6 +4,18 @@ Deployment-science evaluation harness for compressed reasoning LLMs.
 
 **Paper 1:** *Beyond Accuracy: Reliability, Calibration, Seed Variance, and Cost-per-Correct of Quantized Reasoning LLMs*
 
+## Publication goal (journal)
+
+> **Split execution:** quants + 1.5B on **RTX 5080**; BF16 7B/8B + GPQA on **HPC 2× A100** (≤48 h SLURM blocks).  
+> Full plan: [HPC_2A100_PLAN.md](docs/HPC_2A100_PLAN.md)
+
+| Machine | Entry script | What runs there |
+|---------|--------------|-----------------|
+| **RTX 5080** | `scripts/local/run_5080_publication.sh` | 13 quant cells + 1.5B BF16 (fits 16 GB) |
+| **HPC 2× A100** | `scripts/hpc/run_hpc_2a100_publication.sh` | BF16 Qwen-7B + Llama-8B anchors; GPQA |
+
+**Protocol (both):** `repro_qrm.yaml`, batch_size=1, full n, seed 0.
+
 ## Research question
 
 When reasoning LLMs are compressed, do they remain **accurate, calibrated, stable, fast, memory-efficient, and economically useful** under real serving conditions?
@@ -13,7 +25,8 @@ When reasoning LLMs are compressed, do they remain **accurate, calibrated, stabl
 | Machine | Role |
 |---------|------|
 | **MacBook** | Design docs, scripts, configs, writing, plotting from CSVs, log review |
-| **HPC / A100** | Model download, vLLM inference, quantization, main experiments, profiling |
+| **Windows 5080 (WSL2)** | **Primary:** quant grid + 1.5B (`run_5080_publication.sh`) |
+| **HPC 2× A100** | **BF16 anchors** + GPQA; ≤48 h SLURM blocks (`run_hpc_2a100_publication.sh`) |
 
 ## Repository layout
 
@@ -59,15 +72,15 @@ Cloned under `../external_repos/` for reading only — do not develop inside the
 
 ## Docs
 
-- [HPC_STEP_BY_STEP.md](docs/HPC_STEP_BY_STEP.md) — **start here on HPC** (full gate-by-gate guide)
-- [literature/PAPER1_READING_MAP.md](docs/literature/PAPER1_READING_MAP.md) — literature groups + reading order
-- [literature/EXTERNAL_REPOS_INDEX.md](docs/literature/EXTERNAL_REPOS_INDEX.md) — organized clone index
-- [reference_notes/COPY_ADAPT_CHECKLIST.md](docs/reference_notes/COPY_ADAPT_CHECKLIST.md) — what was adapted from external repos
+- [HPC_2A100_PLAN.md](docs/HPC_2A100_PLAN.md) — **5080 vs HPC split + 48 h SLURM blocks**
+- [RTX5080_EXECUTION_PLAN.md](docs/RTX5080_EXECUTION_PLAN.md) — 5080 local runs
+- [MODEL_ROSTER.md](docs/MODEL_ROSTER.md) — canonical HF IDs and machine assignment
+- [HPC_STEP_BY_STEP.md](docs/HPC_STEP_BY_STEP.md) — HPC gate-by-gate guide
 - [PAPER1_DESIGN.md](docs/PAPER1_DESIGN.md) — scope, models, tasks, metrics, claim
 - [RUNBOOK.md](docs/RUNBOOK.md) — MacBook ↔ HPC workflow
 - [EXPERIMENT_LOG.md](docs/EXPERIMENT_LOG.md) — dated experiment record
 
-## HPC quick commands
+## HPC quick commands (legacy gates)
 
 ```bash
 export QR=/scratch/$USER/reasoning-compression-lab
@@ -79,3 +92,23 @@ bash scripts/hpc/04_run_level_a_bf16.sh 10  # Gate 4 debug
 bash scripts/hpc/05_score_level_a.sh
 sbatch slurm/run_level_a_bf16.slurm       # Gate 4 full
 ```
+
+## Windows RTX 5080
+
+```bash
+bash scripts/local/run_5080_publication.sh --skip-download
+bash scripts/local/start_5080_main.sh
+```
+
+Archive: `outputs-win5080-main-YYYY-MM-DD/`
+
+## HPC 2× A100 (PARAM Rudra)
+
+```bash
+export QR=/scratch/$USER/reasoning-compression-lab
+cd $QR && git pull
+bash scripts/hpc/submit_hpc_blocks.sh b01
+```
+
+Archive: `outputs-hpc-2a100-main-YYYY-MM-DD/`  
+See [HPC_2A100_PLAN.md](docs/HPC_2A100_PLAN.md).
