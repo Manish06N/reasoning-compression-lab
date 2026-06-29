@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-06-29 (PhD roadmap documentation pack)
+
+### Added
+
+- **`docs/phd-roadmap/`** — structured PhD master roadmap (V5–V7 + stack transfer):
+  - Index, thesis spine, track decision, publication strategy, Paper 1 full spec
+  - Papers 2–3, execution plan, V7 job-first layer, V6 validation pack
+  - GGUF/stack-transfer ambitious extension, appendices (glossary, checklists, rules)
+
+### Changed
+
+- **`README.md`**, **`docs/PAPER1_DESIGN.md`** — links to phd-roadmap index
+
+---
+
 ## 2026-06-29 (Q1 publication analysis utilities)
 
 - Added bootstrap confidence intervals for `pass_at_1` and cost-per-correct summaries.

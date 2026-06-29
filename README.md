@@ -236,7 +236,8 @@ Cloned under `../external_repos/` for reading only — do not develop inside the
 
 ## Docs
 
-- [**progress.md**](progress.md) — **master dated progress log** (MacBook + HPC + 5080 full timeline)
+- [**phd-roadmap/**](phd-roadmap/README.md) — **PhD master roadmap** (thesis spine, tracks, publication strategy, V6/V7, GGUF extension)
+- [**progress.md**](progress.md) — **master dated progress log** (MacBook + HPC + execution timeline)
 - [PROGRESS.md](docs/PROGRESS.md) — **live status**, ETAs, next actions
 - [BEGINNER_HPC_GUIDE.md](docs/BEGINNER_HPC_GUIDE.md) — **start here:** project overview + PARAM Rudra step-by-step
 - [HPC_2A100_PLAN.md](docs/HPC_2A100_PLAN.md) — **5080 vs HPC split + 48 h SLURM blocks**
