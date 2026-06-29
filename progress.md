@@ -27,7 +27,7 @@ Canonical dated record for **Paper 1: Beyond Accuracy** (`reasoning-compression-
 
 **Current blocker for clean HPC paper numbers:** b01 must now run to completion or checkpoint enough rows before the 47h walltime. The state-file race has been fixed and the corrected b01 job is running.
 
-**Current live progress:** corrected job `85394` is running on `ragpu008`. Qwen-7B resumed from `20/500` durable rows; Llama-8B restarted from `0/500`. b02-b06 are released and pending behind the user GPU quota.
+**Current live progress:** corrected job `85394` is running on `ragpu008`. Qwen-7B resumed from `20/500` durable rows; Llama-8B restarted from `0/500`. b02-b06 are released and pending behind the user GPU quota. Future Qwen-1.5B model assets are staged on HPC; no extra experiment jobs were submitted.
 
 ---
 
@@ -49,9 +49,29 @@ Work still left after b01-b06 finish:
 - Score all raw JSONL outputs into scored JSONL files and summary JSON results.
 - Build paper metrics and tables: pass@1, latency, token counts, VRAM, cost-per-correct, and compression tradeoffs.
 - Run GPQA only after Hugging Face gated access is approved. Current check failed with `DatasetNotFoundError` for gated dataset `Idavidrein/gpqa`, so b07 must not be queued yet.
-- Run Qwen-1.5B cells on HPC only if still needed. BF16/FP8/AWQ/GPTQ4 configs exist, but the required model directories are not currently present on HPC and must be downloaded/preflighted before queueing.
+- Qwen-1.5B cells are now HPC-only future work. BF16, FP8, AWQ-4, and GPTQ-4 model directories were downloaded on HPC on 2026-06-29; queue these only after deciding they are needed and after adding/using an HPC block for them.
 - Run multi-seed stability later; current publication jobs are seed0 only.
 - Rerun or resume any cell that times out before completing all rows, especially b01 if BF16 remains slow.
+
+---
+
+## Future Asset Preparation
+
+Prepared on HPC without using GPUs while b01-b06 continued running:
+
+| Asset | Status | Path |
+|------|--------|------|
+| Qwen-1.5B BF16 | Downloaded | `models/DeepSeek-R1-Distill-Qwen-1.5B` |
+| Qwen-1.5B FP8 | Downloaded | `models/DeepSeek-R1-Distill-Qwen-1.5B-FP8` |
+| Qwen-1.5B AWQ-4 | Downloaded | `models/DeepSeek-R1-Distill-Qwen-1.5B-AWQ-4` |
+| Qwen-1.5B GPTQ-4 | Downloaded | `models/DeepSeek-R1-Distill-Qwen-1.5B-GPTQ-4` |
+| MATH-500 | Available | Hugging Face cache/dataset load works |
+| GSM8K | Available | Hugging Face cache/dataset load works |
+| GPQA-Diamond | Blocked | HF gated access for `Idavidrein/gpqa` not approved |
+
+CPU preflight after staging assets: `scripts/hpc/07_preflight_publication.py` passed for the active b01-b06 publication blocks.
+
+No additional jobs were submitted yet. Current recommendation is to let b01-b06 continue, then decide whether to add Qwen-1.5B HPC blocks after the first major 7B/8B results are known.
 
 ---
 
