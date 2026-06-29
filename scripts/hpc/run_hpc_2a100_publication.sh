@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # HPC 2× A100 (80 GB) publication blocks — journal protocol, ≤48 h SLURM jobs.
 #
-# All 7B/8B cells, GSM8K, GPQA run here. 5080 = Qwen-1.5B only (≤24 h/cell).
+# All publication experiments run on HPC. Windows/5080 is retired for publication runs.
+# Qwen-1.5B cells are future HPC-only work after model download/preflight.
 #
 # Usage:
 #   bash scripts/hpc/run_hpc_2a100_publication.sh list
@@ -131,7 +132,7 @@ list_blocks() {
   echo "  b06_single_gsm8k           1×A100  ~20–40h  FP8 Qwen-7B GSM8K (n=1319)"
   echo "  b07_gpqa_fp8               1×A100  ~8–20h   GPQA (after HF gate)"
   echo ""
-  echo "5080 (~≤24h/cell): Qwen-1.5B only — bash scripts/local/run_5080_publication.sh"
+  echo "Qwen-1.5B cells: future HPC-only work after model download/preflight; do not use Windows/5080 for publication."
 }
 
 BLOCK="${1:-list}"

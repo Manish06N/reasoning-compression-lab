@@ -20,7 +20,7 @@ Canonical dated record for **Paper 1: Beyond Accuracy** (`reasoning-compression-
 | HPC CPU preflight | **Passed** — `scripts/hpc/07_preflight_publication.py` |
 | HPC GPU smoke (Gate 3) | **PASSED** — job `85306`, exit `0:0` |
 | First scored paper result | **None** — no `results/*_summary.json` from HPC yet |
-| **Windows 5080 (WSL2)** | **Stopped** — partial 1.5B run (10/500 rows); publication → HPC only |
+| **Windows 5080 (WSL2)** | **Retired for experiments** — too slow; do not schedule publication work there |
 | Publication strategy | **HPC-only** (5080 stopped 2026-06-28 — ~15 min/q too slow for 1.5B grid) |
 | b01 BF16 anchors | **Corrected job running** — old `85342` canceled; new `85394` resumed Qwen from 20/500 and restarted Llama |
 | b02–b06 full grid | **Queued** — pending with `QOSMaxGRESPerUser` until GPUs free |
@@ -48,8 +48,8 @@ Work still left after b01-b06 finish:
 
 - Score all raw JSONL outputs into scored JSONL files and summary JSON results.
 - Build paper metrics and tables: pass@1, latency, token counts, VRAM, cost-per-correct, and compression tradeoffs.
-- Run GPQA: config exists as `level_c_qwen7b_fp8_gpqa_seed0.json`, and the HPC block exists as b07/`b02_gpqa_fp8`, but it is not currently queued.
-- Decide what to do with Qwen-1.5B cells. BF16/FP8/AWQ/GPTQ4 configs exist, but the Windows 5080 run was stopped and these cells are not currently queued on HPC.
+- Run GPQA only after Hugging Face gated access is approved. Current check failed with `DatasetNotFoundError` for gated dataset `Idavidrein/gpqa`, so b07 must not be queued yet.
+- Run Qwen-1.5B cells on HPC only if still needed. BF16/FP8/AWQ/GPTQ4 configs exist, but the required model directories are not currently present on HPC and must be downloaded/preflighted before queueing.
 - Run multi-seed stability later; current publication jobs are seed0 only.
 - Rerun or resume any cell that times out before completing all rows, especially b01 if BF16 remains slow.
 
@@ -62,7 +62,7 @@ Work still left after b01-b06 finish:
 | **MacBook** | `/Users/manish/Projects/2026/paper 1/reasoning-compression-lab` | Design, docs, git push, rsync hub, writing |
 | **GitHub** | `Manish06N/reasoning-compression-lab` | Code backup; HPC pulls from here |
 | **HPC (PARAM Rudra)** | `/scratch/manishn_iitp/reasoning-compression-lab` | A100 inference, model downloads, paper numbers |
-| **Windows 5080 (WSL2)** | `G:\ALL MY Projects\2026\03-paper1-experiments` (WSL: `/mnt/g/ALL MY Projects/2026/03-paper1-experiments`) | Pipeline proof + Qwen-1.5B publication cells only |
+| **Windows 5080 (WSL2)** | `G:\ALL MY Projects\2026\03-paper1-experiments` (WSL: `/mnt/g/ALL MY Projects/2026/03-paper1-experiments`) | Retired for publication experiments; archive/proof only |
 
 **Not in git (any machine):** `models/`, `runs/`, `results/`, `outputs-*`, `hf_cache/`, `logs/`
 
