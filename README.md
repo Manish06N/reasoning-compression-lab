@@ -5,15 +5,15 @@ Deployment-science evaluation harness for compressed reasoning LLMs.
 **GitHub:** https://github.com/Manish06N/reasoning-compression-lab  
 **Paper 1:** *Beyond Accuracy: Reliability, Calibration, Seed Variance, and Cost-per-Correct of Quantized Reasoning LLMs*
 
-## Current status (2026-06-28)
+## Current status (2026-06-29)
 
 | Machine | Status | Details |
 |---------|--------|---------|
-| **5080** | **Stopped** | Partial test run only — all publication work → **HPC** |
-| **HPC** | **Next** | Pull repo + download models + `submit_hpc_blocks.sh` |
-| **GitHub** | Synced | `main` pushed (`30c8c08`, `03c3766`) |
+| **5080** | **Stopped** | Partial test only (10/500 rows) — **HPC-only** for publication |
+| **HPC** | **Next** | GPU smoke gate → `submit_hpc_blocks.sh` (b01–b06) |
+| **GitHub** | Synced | See [progress.md](progress.md) for full timeline |
 
-Full live tracker: [docs/PROGRESS.md](docs/PROGRESS.md)
+**Live tracker:** [docs/PROGRESS.md](docs/PROGRESS.md) · **Full history:** [progress.md](progress.md)
 
 ## Publication goal (journal)
 
@@ -230,7 +230,9 @@ Cloned under `../external_repos/` for reading only — do not develop inside the
 
 ## Docs
 
-- [PROGRESS.md](docs/PROGRESS.md) — **live status, ETAs, next actions**
+- [**progress.md**](progress.md) — **master dated progress log** (MacBook + HPC + 5080 full timeline)
+- [PROGRESS.md](docs/PROGRESS.md) — **live status**, ETAs, next actions
+- [BEGINNER_HPC_GUIDE.md](docs/BEGINNER_HPC_GUIDE.md) — **start here:** project overview + PARAM Rudra step-by-step
 - [HPC_2A100_PLAN.md](docs/HPC_2A100_PLAN.md) — **5080 vs HPC split + 48 h SLURM blocks**
 - [GIT_CREDENTIALS.md](docs/GIT_CREDENTIALS.md) — **store GitHub PAT safely (Credential Manager)**
 - [RTX5080_EXECUTION_PLAN.md](docs/RTX5080_EXECUTION_PLAN.md) — 5080 local runs

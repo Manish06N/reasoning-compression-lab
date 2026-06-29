@@ -29,8 +29,68 @@ Key numbers:
 Date:         2026-06-26
 Level:        setup
 Status:       done
-Notes:        Repo structure created. Design doc and paper skeleton written.
-              Next: HPC env + Qwen-7B download + BF16 MATH-500 seed 0.
+Notes:        Full Level A execution pipeline built on MacBook (not just docs):
+              smoke_test.py, run_inference.py, score_run.py, HPC gates 00–06,
+              SLURM templates, cell configs, metrics/extraction from reference repos.
+              11 commits pushed to GitHub (5cad28f → 7a287d1).
+              External repos organized under paper 1/external_repos/ (read-only).
+              See progress.md § 2026-06-26 for full component list.
+```
+
+---
+
+## 2026-06-26 — HPC bootstrap (PARAM Rudra)
+
+```text
+Date:         2026-06-26
+Level:        setup / gates 1–2b
+Hardware:     PARAM Rudra A100 80GB (node ragpu006 for Gate 1)
+Status:       done (gates 1–2b); Gate 3 submitted, not passed
+Notes:        Repo cloned to /scratch/manishn_iitp/reasoning-compression-lab.
+              PARAM Rudra adaptations: --partition=gpu, --gres=gpu:1, no --mem,
+              conda /home/apps/MSCC/miniconda3, vllm==0.8.5, enforce_eager=true,
+              HF cache on scratch ($QR/hf_cache/).
+              Gate 1 PASSED (job 85013): CUDA + A100 + vLLM OK.
+              Gate 2 PASSED: Qwen-7B ~15 GB downloaded (2 safetensors shards).
+              Gate 2b PASSED: MATH-500 validated (500 examples).
+              Gate 3 SUBMITTED: smoke job 85028; 10-q debug 85030 (afterok).
+              HPC local commit 6d58d9b not pushed; MacBook pushed 7a287d1.
+Key numbers:  Python 3.11.15, torch 2.6.0+cu124, vllm 0.8.5
+```
+
+---
+
+## 2026-06-27 — HPC smoke failures + fixes
+
+```text
+Date:         2026-06-27
+Level:        setup / Gate 3
+Hardware:     PARAM Rudra A100
+Status:       failed (Gate 3 not passed)
+Notes:        Job 85028 FAILED: tokenizer all_special_tokens_extended missing.
+              Job 85092 FAILED: shared-GPU OOM (~24 MiB free on A100).
+              Job 85094 FAILED: KeyError ANSWER in prompt template.
+              Fixes synced at dff36c1: tokenizer shim, memory preflight,
+              quick exclusive smoke SLURM, {{ANSWER}} prompt escape.
+              Job 85030 cancelled (dependency on failed smoke).
+Raw path:     runs/raw/smoke_test.jsonl — missing
+              runs/raw/smoke_test_quick.jsonl — missing
+```
+
+---
+
+## 2026-06-28 — HPC publication preflight + smoke resubmit
+
+```text
+Date:         2026-06-28
+Level:        setup / Gate 3 + publication prep
+Hardware:     PARAM Rudra 2× A100 blocks (b01–b06)
+Status:       running (smoke pending)
+Notes:        Repo fast-forwarded to 03c3766 (5080/HPC machine split).
+              All b01–b06 model folders downloaded (~9 models on scratch).
+              07_preflight_publication.py passed (config/dataset/model wiring).
+              Exclusive quick smoke job 85306 submitted; b01–b06 held until pass.
+              See progress.md for model inventory and block wiring tables.
 ```
 
 ---

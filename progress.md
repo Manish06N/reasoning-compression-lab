@@ -1,17 +1,302 @@
-# Progress Log
+# Progress Log — Master Reference
 
-This file is the shared operational record for the publication runs. Keep it updated with what was changed, checked, submitted, failed, and recovered so future sessions can resume without guessing.
+Canonical dated record for **Paper 1: Beyond Accuracy** (`reasoning-compression-lab`).
 
-## Current Scope
+**Purpose:** Future sessions can resume without guessing what was built, where it runs, which gates passed, and what failed. Update this file after every material change on MacBook, Windows/WSL, or HPC.
 
-- Repo: `/scratch/manishn_iitp/reasoning-compression-lab` on PARAM Rudra HPC.
-- Branch: `main`.
-- Current commit on HPC: `03c3766` (`Revise 5080/HPC split: 1.5B only on 5080; full 7B/8B grid on HPC b01-b07.`).
-- Protocol target: `configs/decoding/repro_qrm.yaml`, `batch_size=1`, full datasets, seed `0`.
-- HPC target: blocks `b01` through `b06` only for now. `b07` GPQA is not to be submitted until the Hugging Face gate is approved.
-- 5080 target: Qwen-1.5B only. User will run and update the 5080 section separately.
+**GitHub:** https://github.com/Manish06N/reasoning-compression-lab  
+**Related logs:** `CHANGELOG.md` (ops detail), `docs/EXPERIMENT_LOG.md` (experiment cells), `paper 1/AGENTS.md` (AI assistant memory)
 
-## 2026-06-28 HPC Session
+---
+
+## Current Status Snapshot (2026-06-29)
+
+| Area | Status |
+|------|--------|
+| MacBook pipeline + docs | **Complete** |
+| GitHub latest commit | `0d5b9ce` (MacBook; verify with `git log -1`) |
+| HPC env (qreason, vLLM 0.8.5, A100) | **Complete** — Gate 1 passed (job 85013) |
+| HPC model + datasets | Qwen-7B BF16 (~15 GB) + all b01–b06 quant models downloaded |
+| HPC CPU preflight | **Passed** — `scripts/hpc/07_preflight_publication.py` |
+| HPC GPU smoke (Gate 3) | **NOT PASSED** — last submitted job `85306` (exclusive quick smoke) |
+| First scored paper result | **None** — no `results/*_summary.json` from HPC yet |
+| **Windows 5080 (WSL2)** | **Stopped** — partial 1.5B run (10/500 rows); publication → HPC only |
+| Publication strategy | **HPC-only** (5080 stopped 2026-06-28 — ~15 min/q too slow for 1.5B grid) |
+| GPTQ-4 / full grid | **Blocked** until HPC smoke passes and BF16 anchor runs |
+
+**Single blocker for HPC paper numbers:** vLLM must load Qwen-7B on an exclusive A100 and write `runs/raw/smoke_test_quick.jsonl` with ≥1 valid row.
+
+**Do not submit b01–b06 publication blocks until smoke job `85306` (or successor) passes.**
+
+---
+
+## Machine Roles
+
+| Machine | Path | Role |
+|---------|------|------|
+| **MacBook** | `/Users/manish/Projects/2026/paper 1/reasoning-compression-lab` | Design, docs, git push, rsync hub, writing |
+| **GitHub** | `Manish06N/reasoning-compression-lab` | Code backup; HPC pulls from here |
+| **HPC (PARAM Rudra)** | `/scratch/manishn_iitp/reasoning-compression-lab` | A100 inference, model downloads, paper numbers |
+| **Windows 5080 (WSL2)** | `G:\ALL MY Projects\2026\03-paper1-experiments` (WSL: `/mnt/g/ALL MY Projects/2026/03-paper1-experiments`) | Pipeline proof + Qwen-1.5B publication cells only |
+
+**Not in git (any machine):** `models/`, `runs/`, `results/`, `outputs-*`, `hf_cache/`, `logs/`
+
+---
+
+## Roadmap Position
+
+```text
+Phase 0  Literature + design          ✅ Complete
+Phase 1  Reproducible harness         ✅ Mostly complete (GPU end-to-end unproven on HPC)
+Phase 2  BF16 baseline                ⏳ Blocked at HPC GPU smoke
+Phase 3  Quantized variants           ❌ Not started (HPC b01–b06 queued after smoke)
+Phase 4  Reliability metrics          📦 Code ready, no real outputs yet
+Phase 5  Multi-seed stability         ❌ Not started
+Phase 6  Paper tables / figures       ❌ Not started
+```
+
+**First target artifact (Level A):** `results/level_a_qwen7b_bf16_math500_seed0_summary.json` (n=10 debug, then n=500 full).
+
+---
+
+## Timeline by Date
+
+### 2026-06-26 — MacBook pipeline build + PARAM Rudra HPC bootstrap
+
+#### MacBook (control room)
+
+Built the full Level A execution pipeline — not just docs:
+
+| Component | Purpose |
+|-----------|---------|
+| `scripts/smoke_test.py` | 3-question vLLM smoke test |
+| `scripts/run_inference.py` | Full MATH-500 inference for one cell |
+| `scripts/score_run.py` | Score raw run → pass@1 + latency/VRAM summary |
+| `scripts/extract_answers.py` | Answer extraction step |
+| `scripts/compute_calibration.py` | Calibration metrics hook |
+| `scripts/hpc/00–06_*.sh` | Ordered HPC shell gates |
+| `scripts/macbook/rsync_to_hpc.sh` | Copy repo to HPC without GitHub |
+| `slurm/*.slurm` | Batch jobs (download, smoke, full BF16) |
+| `configs/cells/level_a_*.json` | BF16 and GPTQ-4 experiment cells |
+
+Adapted patterns (not vendored) from reference repos under `paper 1/external_repos/`:
+
+- **sober-reasoning** — prompts, math/GPQA extractors, seed variance
+- **Quantized-Reasoning-Models** — decoding protocol, trace length
+- **Calibrating-LLMs-with-Consistency** — consistency, calibration (Brier, ECE, AURC)
+- **Cost-of-Pass** — cost-per-correct, local cost model
+
+**Git commits pushed to GitHub (11 commits on `main`):**
+
+| Commit | Summary |
+|--------|---------|
+| `5cad28f` | Initial Paper 1 repo structure |
+| `8e5ca4d` | HPC quick start guide |
+| `0d794ab` | HPC execution pipeline for Level A |
+| `a85096c` | Qwen-7B model config + gitignore fix |
+| `516498a` | Literature map and external repos index |
+| `6f3d2b0` | GitHub push step + GPTQ-4 prep gate |
+| `c7cfe44` | Core prompts, extraction, metrics, SLURM patterns |
+| `38ee34f` | External repos index link in README |
+| `937543e` | Pre-HPC checks, dataset validation, smoke debug decoding |
+| `d1d221a` | Dataset validation + smoke token limit in HPC guide |
+| `7a287d1` | Adapt HPC scripts for PARAM Rudra (IIT Patna) |
+
+#### HPC (PARAM Rudra) — first deployment
+
+**User:** `manishn_iitp` · **Scratch:** `/scratch/manishn_iitp/reasoning-compression-lab`
+
+1. Cloned from GitHub (`Manish06N/reasoning-compression-lab`).
+2. Adapted generic SLURM/HPC scripts for PARAM Rudra:
+
+   | Generic (broken on cluster) | PARAM Rudra fix |
+   |-----------------------------|-----------------|
+   | `#SBATCH --gres=gpu:a100:1` | `#SBATCH --partition=gpu` + `--gres=gpu:1` |
+   | `#SBATCH --mem=80G` | Removed (cluster rule: no `--mem`) |
+   | `$(conda info --base)` | `/home/apps/MSCC/miniconda3` |
+   | Unpinned `vllm` → 0.23.0 + Rust build fail | **`vllm==0.8.5`** |
+   | No eager mode | **`enforce_eager: true`** in model config + vLLM runner |
+   | HF cache in home | **`$QR/hf_cache/`** on scratch |
+
+3. Created conda env **`qreason`**: Python 3.11.15, torch 2.6.0+cu124, vLLM 0.8.5.
+4. **Gate 1 passed** — job **85013** on node `ragpu006`: A100 80GB, CUDA OK, vLLM OK.
+5. **HF auth** — account Manish99; token stored at `$QR/hf_cache/token` (gitignored).
+6. **Gate 2 passed** — Qwen-7B downloaded (~15 GB, 2 safetensors shards).
+7. **Gate 2b passed** — MATH-500 validated (500 examples).
+8. **Gate 3 submitted** — job **85028** (smoke, 3 questions); job **85030** (10-q BF16 debug, `afterok:85028`).
+9. Telegram watchers configured for 85028/85030 (compute nodes cannot reach Telegram — optional only).
+10. Local HPC commit **`6d58d9b`** created but **not pushed** (cluster SSH key not on GitHub). MacBook later pushed equivalent fixes as **`7a287d1`** / **`be49fb5`**.
+
+**End-of-day state (2026-06-26):** Setup complete through Gate 2b; smoke job 85028 pending GPU.
+
+---
+
+### 2026-06-27 — Smoke failures, fixes, MacBook/HPC sync
+
+#### HPC job history
+
+| Job | Purpose | Result | Root cause |
+|-----|---------|--------|------------|
+| 85028 | First smoke (3 Q, max_tokens=1024) | **FAILED** | Tokenizer: `all_special_tokens_extended` missing |
+| 85030 | 10-q BF16 debug (`afterok:85028`) | **CANCELLED** | Dependency never satisfied |
+| 85031/85032 | Telegram watchers | **FAILED** | Compute nodes can't reach api.telegram.org |
+| 85092 | Smoke after tokenizer shim | **FAILED** | Shared-GPU OOM — only ~24 MiB free on A100 |
+| 85094 | Exclusive quick smoke (1 Q, 64 tokens) | **FAILED** (later) | Prompt `KeyError: 'ANSWER'` — fixed in repo |
+
+#### Fixes applied (synced to GitHub at `dff36c1`)
+
+- **Tokenizer shim** in `src/runners/vllm_runner.py` for vLLM 0.8.5 + Transformers 5.12.1.
+- **GPU memory preflight** — `SMOKE_MIN_FREE_GPU_MB=30000` → exit 75 if GPU too full.
+- **`slurm/smoke_test_quick_exclusive.slurm`** — 1 question, 64 tokens, exclusive node.
+- **`scripts/hpc/03a_preflight_cpu.sh`** — CPU gate (passed on HPC; synced later).
+- **Prompt fix** — `prompts/math500.txt`: `{{ANSWER}}` so `.format()` preserves literal `{ANSWER}`.
+
+#### Sync status
+
+MacBook, GitHub, and HPC aligned at **`dff36c1`**: "Sync HPC smoke fixes: tokenizer shim, memory preflight, quick smoke SLURM."
+
+**Gate 3 still not passed** — no `smoke_test_quick.jsonl` yet.
+
+---
+
+### 2026-06-28 — Windows RTX 5080 + publication machine split + HPC block grid
+
+#### Windows 5080 (WSL2 Ubuntu 22.04)
+
+**Hardware:** RTX 5080 16 GB (Blackwell sm_120)
+
+| Step | Result |
+|------|--------|
+| Clone repo | Done — `G:\ALL MY Projects\2026\03-paper1-experiments` |
+| Conda env `qreason` | Python 3.11 |
+| CUDA stack | `torch 2.11.0+cu128` (Blackwell requires cu128; HPC stays on cu124) |
+| vLLM | **0.23.0** (0.8.5 incompatible with torch 2.11 on sm_120) |
+| Phase 0 smoke — Qwen-1.5B BF16 | **PASSED** — pipeline verified end-to-end |
+| Phase 0 smoke — Qwen-7B BF16 | **OOM** (expected — ~14 GB weights, no KV cache room) |
+| Model downloads | 12 checkpoints (~62 GB) for 5080-feasible quants |
+| Pilot mode | 14-cell grid, n=50, batched inference — then superseded |
+| Publication main grid | Started, then **superseded by policy change** |
+
+**Blackwell workarounds in `scripts/local/env.sh`:**
+
+- `VLLM_USE_FLASHINFER_SAMPLER=0` (FlashInfer JIT fails sm_120 check)
+- `VLLM_WORKER_MULTIPROC_METHOD=spawn` (WSL)
+- `LD_LIBRARY_PATH` for pip-shipped CUDA 13 libs
+
+**Added:** checkpoint/resume (`checkpoint_utils.py`), backup scripts, pilot + publication orchestrators, model roster docs, 5080/HPC machine split configs.
+
+#### Policy change — machine split (commits `30c8c08`, `03c3766`)
+
+| Machine | Scope | Rationale |
+|---------|-------|-----------|
+| **5080** | Qwen-1.5B × 4 quants × MATH-500 only | ≤24 h/cell; 7B/8B at batch_size=1 takes weeks |
+| **HPC 2× A100** | b01–b06: 7B/8B all quants, BF16 anchors, GSM8K | 160 GB VRAM, 48 h SLURM max |
+| **HPC b07** | GPQA-Diamond | After Hugging Face gate approval |
+
+**5080 cells:** `level_c_qwen15b_{bf16,fp8,awq4,gptq4}` × MATH-500  
+**HPC blocks:** b01 BF16 anchors → b02 FP8 → b03 AWQ-4 → b04 GPTQ-4 → b05 GPTQ-3 → b06 GSM8K
+
+#### HPC session (2026-06-28 afternoon)
+
+- Fast-forwarded scratch repo to `03c3766`; stashed local HPC-only changes.
+- Downloaded all b01–b06 model folders (Llama-8B BF16 + all Qwen/Llama quants).
+- Validated block → cell → model wiring via `load_cell_config()`.
+- Validated MATH-500 (500 rows) and GSM8K (1319 rows) through repo task configs.
+- Added **`scripts/hpc/07_preflight_publication.py`** — repeatable CPU preflight (passed).
+- Submitted exclusive quick smoke job **`85306`** — pending at end of session.
+- Created `/home/manishn_iitp/.codex/CODEX.md` for future Codex sessions.
+
+**Git commits (2026-06-28):** `558d004` (progress log), `62ff8ad` (preflight), `0d5b9ce` (Codex notes), `b280a88` (5080 stopped, HPC-only policy).
+
+#### Evening — 5080 publication run stopped (HPC-only policy)
+
+- Started 5080 publication run: `outputs-win5080-main-2026-06-28/`
+- Cell 1 (`level_c_qwen15b_bf16_math500_seed0`) stopped at ~Q12/500; **10 rows saved** (not for paper)
+- Timing: Q1 ~50 s; Q2–Q4 ~21 min each; Q5–Q11 ~15 min each → **~3 weeks for 4-cell grid**
+- **Decision:** stop 5080; all publication experiments on HPC only
+- Partial archive preserved; `clean_5080_run.sh` killed background jobs
+
+---
+
+## HPC Gate Checklist (PARAM Rudra)
+
+| Gate | Command / artifact | Status |
+|------|-------------------|--------|
+| 1 GPU + vLLM | `01_gpu_check.sh` — job 85013 | **PASSED** |
+| 2 Model | Qwen-7B + all b01–b06 models on scratch | **DONE** |
+| 2b Dataset | MATH-500 + GSM8K via task configs | **DONE** |
+| 2c CPU preflight | `07_preflight_publication.py` | **PASSED** |
+| 3 GPU smoke | `smoke_test_quick.jsonl` | **NOT PASSED** — job 85306 |
+| 4 Debug n=10 | `level_a_qwen7b_bf16_math500_seed0_summary.json` (n=10) | Not started |
+| 4b Full n=500 | Same summary (n=500) | Not started |
+| Publication b01–b06 | `submit_hpc_blocks.sh` | Waiting on Gate 3 |
+
+---
+
+## Known Failures and Fixes (reference)
+
+| Issue | Symptom | Fix |
+|-------|---------|-----|
+| Unpinned vLLM on HPC | pip installs 0.23.0, Rust build fails | Pin `vllm==0.8.5` |
+| Tokenizer compat | `all_special_tokens_extended` missing (85028) | Shim in `vllm_runner.py` |
+| Shared GPU OOM | Only ~24 MiB free (85092) | Exclusive smoke + memory preflight |
+| Prompt format | `KeyError: 'ANSWER'` (85094) | `{{ANSWER}}` in `math500.txt` |
+| Blackwell CUDA | no kernel for sm_120 with torch 2.6 | torch 2.11+cu128 on 5080 only |
+| vLLM 0.8.5 + torch 2.11 | ABI mismatch on 5080 | vLLM 0.23.0 on 5080; 0.8.5 on HPC |
+| 7B BF16 on 5080 | KV cache OOM | Defer to HPC A100 (by design) |
+| HPC git push | Permission denied (publickey) | Sync HPC → MacBook → push |
+| Telegram on compute nodes | curl can't reach api.telegram.org | Ignore; use `squeue` / logs |
+
+---
+
+## Sync Workflow (MacBook ↔ GitHub ↔ HPC)
+
+HPC **cannot push** to GitHub. Standard 3-step sync when user says **"sync"**:
+
+1. **MacBook:** `bash scripts/macbook/rsync_from_hpc.sh` (pull HPC-only changes)
+2. **MacBook:** review → `git commit` → `git push origin main`
+3. **HPC:** `cd $QR && git fetch origin && git reset --hard origin/main`
+
+**Results only (separate):** `bash scripts/macbook/sync_results_from_hpc.sh`
+
+**Do not `git pull` on HPC mid-run** while smoke or publication jobs are active.
+
+---
+
+## Immediate Next Actions
+
+### HPC (paper numbers)
+
+```bash
+ssh -p 4422 manishn_iitp@paramrudra.iitp.ac.in
+export QR=/scratch/manishn_iitp/reasoning-compression-lab && cd $QR
+squeue -u manishn_iitp
+sacct -j 85306 --format=JobID,State,ExitCode,Elapsed -P
+ls -l runs/raw/smoke_test_quick.jsonl
+cat logs/smoke_quick_85306.out
+```
+
+1. If smoke **85306** passes → `bash scripts/hpc/submit_hpc_blocks.sh b01` (or full b01–b06).
+2. If smoke **fails** → read `.out`/`.err`, fix, resubmit `sbatch slurm/smoke_test_quick_exclusive.slurm`.
+3. Do **not** start GPTQ-4 or full grid until BF16 anchor (b01) completes cleanly.
+
+### Windows 5080 (1.5B publication)
+
+```bash
+wsl -d Ubuntu-22.04
+cd "/mnt/g/ALL MY Projects/2026/03-paper1-experiments"
+source scripts/local/env.sh
+bash scripts/local/run_5080_publication.sh --skip-download
+```
+
+### MacBook
+
+- Keep docs and `progress.md` updated after each gate.
+- Push code changes; pull results via rsync when HPC has outputs.
+
+---
+
+## Detailed HPC Session Log — 2026-06-28
 
 ### Token Handling
 
@@ -143,18 +428,19 @@ Observed progress:
 - [x] Confirm Hugging Face auth.
 - [x] Run shell syntax checks.
 - [x] Run Python compile checks.
-- [ ] Finish model downloads for all b01-b06 model folders.
-- [ ] Verify every cell config points to an existing task config, model config, and local model path.
-- [ ] Verify MATH-500 and GSM8K dataset access/cache.
-- [ ] Run targeted package checks that do not hang indefinitely on the login node.
-- [ ] Decide whether to submit b01 first or all b01-b06.
-- [ ] Submit selected SLURM jobs.
+- [x] Finish model downloads for all b01-b06 model folders.
+- [x] Verify every cell config points to an existing task config, model config, and local model path.
+- [x] Verify MATH-500 and GSM8K dataset access/cache.
+- [x] Run targeted package checks that do not hang indefinitely on the login node.
+- [x] Add repeatable preflight script (`07_preflight_publication.py`).
+- [ ] GPU smoke passes (`smoke_test_quick.jsonl` exists).
+- [ ] Submit selected SLURM publication jobs (b01–b06).
 - [ ] Record job IDs and output archive path.
 - [ ] Monitor initial SLURM logs for early failures.
 
 ## 5080 Rig Notes
 
-User will update this section while working on the RTX 5080/WSL2 side.
+**Status (2026-06-28):** Environment ready; 12 models on disk (~62 GB); 1.5B smoke passed; publication script ready.
 
 Expected 5080 scope from the runbook:
 
@@ -163,6 +449,8 @@ Expected 5080 scope from the runbook:
 - Qwen-1.5B AWQ-4 on MATH-500.
 - Qwen-1.5B GPTQ-4 on MATH-500.
 - Do not run 7B/8B cells on the 5080.
+
+**Entry point:** `bash scripts/local/run_5080_publication.sh --skip-download`
 
 ## Commands for Resuming HPC Work
 
@@ -181,14 +469,15 @@ Check queue:
 squeue -u $USER
 ```
 
-After downloads finish, verify models and then submit:
+After smoke passes, verify models and then submit:
 
 ```bash
 export QR=/scratch/$USER/reasoning-compression-lab
 cd $QR
 source /home/apps/MSCC/miniconda3/etc/profile.d/conda.sh
 conda activate qreason
-bash scripts/hpc/submit_hpc_blocks.sh b01
+sbatch slurm/smoke_test_quick_exclusive.slurm   # if smoke not yet passed
+bash scripts/hpc/submit_hpc_blocks.sh b01       # after smoke passes
 # or, after confidence is high:
 # bash scripts/hpc/submit_hpc_blocks.sh
 ```
@@ -270,14 +559,6 @@ Validation through the actual repo task configs passed:
 ### Queue State
 
 - `squeue -u $USER` was still empty after downloads and validation.
-
-### Checklist Update
-
-- [x] Finish model downloads for all b01-b06 model folders.
-- [x] Verify every cell config points to an existing task config, model config, and local model path.
-- [x] Verify MATH-500 and GSM8K dataset access/cache.
-- [ ] Finish targeted package/runtime checks.
-- [ ] Submit selected SLURM jobs.
 
 ## 2026-06-28 Update 3 — Runtime Risk Review Before Submission
 
@@ -406,7 +687,6 @@ Current answer to "why smoke instead of the whole experiment":
 
 Current smoke state remains pending under scheduler priority; no b01-b06 publication jobs have been submitted.
 
-
 ## 2026-06-28 Update 7 — Codex Notes and Credential Boundary
 
 Created `/home/manishn_iitp/.codex/CODEX.md` for future Codex sessions. It records:
@@ -430,3 +710,12 @@ Safe push options:
 2. Configure `gh auth login` on HPC or another machine, then push.
 3. Add an SSH key with GitHub access and switch the remote to SSH.
 4. Provide a one-time token through a secure credential prompt or environment mechanism, not committed files.
+
+---
+
+## How to Maintain This File
+
+- Update **Current Status Snapshot** when a gate passes or a new blocker appears.
+- Add a dated section under **Timeline by Date** for each major session.
+- Keep detailed HPC session logs at the bottom for operational replay.
+- Cross-update `CHANGELOG.md` and `docs/EXPERIMENT_LOG.md` for experiment cells and job IDs.

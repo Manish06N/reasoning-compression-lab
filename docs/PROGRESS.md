@@ -134,6 +134,7 @@ Pushed to https://github.com/Manish06N/reasoning-compression-lab on 2026-06-28. 
 
 ## Related docs
 
+- [**progress.md**](../progress.md) — master dated progress log (full MacBook + HPC + 5080 history)
 - [HPC_2A100_PLAN.md](HPC_2A100_PLAN.md)
 - [RTX5080_EXECUTION_PLAN.md](RTX5080_EXECUTION_PLAN.md)
 - [EXPERIMENT_LOG.md](EXPERIMENT_LOG.md)

@@ -2,6 +2,25 @@
 
 Detailed running log for project setup, HPC runs, code fixes, and operational decisions.
 
+## 2026-06-29 (Master progress documentation)
+
+### Added / updated
+
+- **`progress.md`** — rewritten as the **canonical master reference** with:
+  - Current status snapshot (2026-06-29)
+  - Full dated timeline: 2026-06-26 (MacBook pipeline + HPC bootstrap), 2026-06-27 (smoke failures + fixes), 2026-06-28 (5080 + publication split + HPC preflight)
+  - Machine roles, roadmap position, gate checklist, known failures, sync workflow
+  - Preserved detailed 2026-06-28 HPC session logs at bottom
+- **`docs/EXPERIMENT_LOG.md`** — added dated entries for 2026-06-26 HPC bootstrap, 2026-06-27 smoke failures, 2026-06-28 publication preflight
+- **`docs/BEGINNER_HPC_GUIDE.md`** — added to repo (PARAM Rudra beginner guide)
+- **`paper 1/AGENTS.md`** — refreshed snapshot to 2026-06-29 (MacBook workspace, not in git)
+
+### Why
+
+Consolidates MacBook, HPC, and Windows progress from multiple session reports into one dated file for future reference. **`docs/PROGRESS.md`** remains the short live-status tracker; **`progress.md`** is the full historical log.
+
+---
+
 ## 2026-06-28 (5080 run stopped — HPC-only policy)
 
 ### Decision
@@ -60,6 +79,8 @@ bash scripts/hpc/submit_hpc_blocks.sh   # b01–b06
 - **`docs/PROGRESS.md`** — live status tracker (new)
 - **`README.md`** — current status banner, push complete, PROGRESS link
 - **`docs/HPC_2A100_PLAN.md`**, **`RTX5080_EXECUTION_PLAN.md`**, **`MODEL_ROSTER.md`**
+
+---
 
 ---
 
