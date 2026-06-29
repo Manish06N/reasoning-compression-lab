@@ -14,7 +14,7 @@ Canonical dated record for **Paper 1: Beyond Accuracy** (`reasoning-compression-
 | Area | Status |
 |------|--------|
 | MacBook pipeline + docs | **Complete** |
-| GitHub latest commit | `e149159` on origin; HPC is ahead locally pending GitHub push, including `6dc8ed3` |
+| GitHub latest commit | Synced after latest HPC push; see `git log -1` |
 | HPC env (qreason, vLLM 0.8.5, A100) | **Complete** — Gate 1 passed (job 85013) |
 | HPC model + datasets | Qwen-7B BF16 (~15 GB) + all b01–b06 quant models downloaded |
 | HPC CPU preflight | **Passed** — `scripts/hpc/07_preflight_publication.py` |
@@ -22,14 +22,12 @@ Canonical dated record for **Paper 1: Beyond Accuracy** (`reasoning-compression-
 | First scored paper result | **None** — no `results/*_summary.json` from HPC yet |
 | **Windows 5080 (WSL2)** | **Stopped** — partial 1.5B run (10/500 rows); publication → HPC only |
 | Publication strategy | **HPC-only** (5080 stopped 2026-06-28 — ~15 min/q too slow for 1.5B grid) |
-| b01 BF16 anchors | **Partially running** — Qwen-7B branch active; Llama-8B branch failed early from state-file race |
+| b01 BF16 anchors | **Corrected job running** — old `85342` canceled; new `85394` resumed Qwen from 20/500 and restarted Llama |
 | b02–b06 full grid | **Queued** — pending with `QOSMaxGRESPerUser` until GPUs free |
 
-**Current blocker for clean HPC paper numbers:** b01 must complete cleanly. The Llama-8B side of b01 failed from a shared `state.json.tmp` race; `update_state()` has been fixed to serialize state updates and use unique temp files for future job starts.
+**Current blocker for clean HPC paper numbers:** b01 must now run to completion or checkpoint enough rows before the 47h walltime. The state-file race has been fixed and the corrected b01 job is running.
 
-**Current live progress:** job `85342` is running on `ragpu008`; saved checkpoint is `10/500` rows for `level_a_qwen7b_bf16_math500_seed0`. Logs show it had reached generation at row 20, but only checkpointed rows count as durable.
-
-**Current sync note:** HPC is ahead of `origin/main`, including `6dc8ed3` (`Fix concurrent HPC state updates`). Push these commits to GitHub directly from HPC if credentials work; otherwise use the MacBook rsync workflow before any HPC reset/pull.
+**Current live progress:** corrected job `85394` is running on `ragpu008`. Qwen-7B resumed from `20/500` durable rows; Llama-8B restarted from `0/500`. b02-b06 are released and pending behind the user GPU quota.
 
 ---
 
@@ -266,6 +264,23 @@ The already-running Qwen-7B process loaded the old code before this fix, but it 
 - Archive: `outputs-hpc-2a100-main-2026-06-29/`
 - Durable Qwen-7B raw rows: `10/500`
 - Current log had reached generation at row `20/500`; checkpoint interval is 10 rows, so rows after 10 are not durable until the next checkpoint lands.
+
+### 2026-06-29 — Corrected b01 resubmitted after queue check
+
+After checking the broader GPU queue, the pending competition was either blocked by dependencies, group run-minute limits, or user GPU quotas. This made it a reasonable window to repair b01 ordering.
+
+Actions taken:
+
+- Held queued jobs `85343`-`85347`.
+- Canceled old b01 job `85342` after Qwen had checkpointed `20/500` rows and Llama had already failed.
+- Submitted corrected b01 as `85394`; it started on `ragpu008`.
+- Released b02-b06 after `85394` was running.
+
+Current b01 state:
+
+- Qwen-7B BF16 resumed from `20/500` durable rows.
+- Llama-8B BF16 restarted from `0/500` and passed the previous immediate `state.json.tmp` crash point.
+- b02-b06 are pending on `QOSMaxGRESPerUser` behind the running corrected b01.
 
 ## HPC Gate Checklist (PARAM Rudra)
 

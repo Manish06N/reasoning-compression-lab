@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-06-29 (Corrected b01 resubmitted)
+
+- Held queued jobs `85343`-`85347`, canceled half-broken b01 job `85342`, and submitted corrected b01 job `85394`.
+- `85394` started on `ragpu008` and uses the fixed `update_state()` code from GitHub.
+- Qwen-7B BF16 resumed from `20/500` durable rows in `outputs-hpc-2a100-main-2026-06-29/raw/level_a_qwen7b_bf16_math500_seed0.jsonl`.
+- Llama-8B BF16 restarted from `0/500` under the corrected state-locking code; it reached dataset/model loading without the old `state.json.tmp` crash.
+- Released b02-b06 after `85394` started; they are pending on `QOSMaxGRESPerUser` behind the running corrected b01 job.
+
+---
+
 ## 2026-06-29 (HPC b01 running — state race fix committed)
 
 ### HPC status
