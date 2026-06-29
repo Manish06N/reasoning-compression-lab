@@ -20,6 +20,10 @@
 
 ---
 
+## Q1 publication analysis utilities
+
+Post-run analysis now includes bootstrap 95% confidence intervals, explicit failure-rate summaries, task-aware GSM8K/GPQA scoring, paper-table CSV generation, and a reproducibility-bundle script. After each archive is scored, run `scripts/build_paper_tables.py --archive <outputs-hpc-...>` and `scripts/build_repro_bundle.py --archive <outputs-hpc-...>`.
+
 ## Archive metadata
 
 HPC publication archives now include `manifest.json` plus `metadata/<cell_id>.json` per-cell snapshots. These capture the exact cell, model, task, decoding, batch/checkpoint, git, SLURM, raw-output, summary, and row-count metadata needed to reconstruct each run. The backup mirror includes `metadata/` and is locked during full mirror updates.

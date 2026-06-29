@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-06-29 (Q1 publication analysis utilities)
+
+- Added bootstrap confidence intervals for `pass_at_1` and cost-per-correct summaries.
+- Added explicit failure-rate summaries: parse failures, empty completions, truncation, and invalid answers.
+- Future raw rows now include decoding temperature/top-p/max-token metadata and `max_model_len`.
+- Added `scripts/build_paper_tables.py` for main, efficiency, and failure CSV tables.
+- Added `scripts/build_repro_bundle.py` for archive-level reproducibility bundles with manifest, metadata, package versions, git info, CUDA probe, and file hashes.
+- Added task-aware scoring/row support for future GSM8K and GPQA-Diamond runs.
+
+---
+
 ## 2026-06-29 (HPC archive metadata manifest)
 
 - Added HPC archive manifest generation for publication runs.

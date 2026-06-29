@@ -11,7 +11,14 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from src.metrics.scoring import score_math_item, summarize_scored_rows
+from src.metrics.scoring import score_item, summarize_scored_rows
+
+
+def _display_path(path: Path) -> str:
+    try:
+        return str(path.relative_to(ROOT))
+    except ValueError:
+        return str(path)
 
 
 def main() -> None:
@@ -44,10 +51,7 @@ def main() -> None:
 
     scored = []
     for row in rows:
-        if "gold_solution" not in row:
-            scored.append({**row, "correct": None, "pred_answer": None, "gold_answer": None})
-            continue
-        score = score_math_item(row["gold_solution"], row["completion"])
+        score = score_item(row)
         scored.append({**row, **score})
 
     with out_path.open("w", encoding="utf-8") as f:
@@ -55,8 +59,8 @@ def main() -> None:
             f.write(json.dumps(row, ensure_ascii=False) + "\n")
 
     summary = summarize_scored_rows(scored)
-    summary["input"] = str(in_path.relative_to(ROOT))
-    summary["scored_output"] = str(out_path.relative_to(ROOT))
+    summary["input"] = _display_path(in_path)
+    summary["scored_output"] = _display_path(out_path)
     if scored:
         summary["cell_id"] = scored[0].get("cell_id")
         summary["quant_config"] = scored[0].get("quant_config")

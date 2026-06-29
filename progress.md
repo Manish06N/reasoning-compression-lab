@@ -78,6 +78,20 @@ No additional jobs were submitted yet. Current recommendation is to let b01-b06 
 
 ---
 
+## Q1 Publication Analysis Utilities
+
+The codebase now has the core post-run publication tools needed after HPC jobs finish:
+
+- `scripts/score_run.py` summaries include bootstrap 95% confidence intervals for `pass_at_1`, failure rates, and cost-per-correct intervals.
+- Future raw rows include decoding settings needed to detect truncation cleanly.
+- Future GSM8K and GPQA-Diamond cells use task-aware row construction/scoring instead of MATH-only boxed-answer scoring.
+- `scripts/build_paper_tables.py --archive <outputs-hpc-...>` writes main, efficiency, and failure CSV tables under `<archive>/paper_tables/`.
+- `scripts/build_repro_bundle.py --archive <outputs-hpc-...>` writes `<archive>/reproducibility_bundle.json` with configs, metadata, package versions, git info, CUDA probe, and code/config hashes.
+
+Run these after each completed/scored archive before drafting final Q1 journal tables.
+
+---
+
 ## Archive Metadata and Backup Status
 
 HPC publication runs now write a durable archive manifest at `outputs-hpc-2a100-main-YYYY-MM-DD/manifest.json` and per-cell metadata snapshots under `metadata/<cell_id>.json`. Each metadata file records the cell/model/task/decoding configs, batch and checkpoint settings, git commit, SLURM job info, raw output path, summary path, and saved row count.

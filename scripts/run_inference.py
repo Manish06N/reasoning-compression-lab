@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import random
 import sys
 from pathlib import Path
 
@@ -33,6 +34,54 @@ def _output_root_for(out_path: Path) -> Path | None:
     if out_path.parent.name == "raw":
         return out_path.parent.parent
     return None
+
+
+def _get_field(example, *names: str) -> str:
+    for name in names:
+        if name in example and example[name] is not None:
+            return str(example[name])
+    return ""
+
+
+def _prepare_example_row(example, task: dict, cell: dict, global_i: int) -> tuple[dict, dict]:
+    task_name = task["task_name"]
+    if task_name.startswith("gpqa"):
+        question = _get_field(example, "Question", "question", "problem")
+        correct = _get_field(example, "Correct Answer", "correct_answer", "answer")
+        distractors = [
+            _get_field(example, "Incorrect Answer 1", "incorrect_answer_1"),
+            _get_field(example, "Incorrect Answer 2", "incorrect_answer_2"),
+            _get_field(example, "Incorrect Answer 3", "incorrect_answer_3"),
+        ]
+        choices = [(correct, "correct")] + [(d, "incorrect") for d in distractors]
+        rng = random.Random(int(cell.get("seed", 0)) * 1_000_003 + global_i)
+        rng.shuffle(choices)
+        letters = "ABCD"
+        prompt_fields = {"question": question}
+        gold_letter = None
+        for letter, (choice, kind) in zip(letters, choices):
+            prompt_fields[letter.lower()] = choice
+            if kind == "correct":
+                gold_letter = letter
+        row_base = {
+            "id": example.get("Record ID", example.get("unique_id", str(global_i))),
+            "problem": question,
+            "choices": {letter: prompt_fields[letter.lower()] for letter in letters},
+            "gold_letter": gold_letter,
+            "gold_answer": correct,
+        }
+        return prompt_fields, row_base
+
+    problem_field = task.get("problem_field", "problem")
+    solution_field = task.get("solution_field", "solution")
+    problem = str(example[problem_field])
+    return {"question": problem.strip()}, {
+        "id": example.get("unique_id", str(global_i)),
+        "problem": problem,
+        "gold_solution": example[solution_field],
+        "subject": example.get("subject"),
+        "level": example.get("level"),
+    }
 
 
 def main() -> None:
@@ -101,8 +150,6 @@ def main() -> None:
         cell["model"]["max_model_len"] = int(cell["decoding"]["max_model_len"])
 
     task = cell["task"]
-    problem_field = task.get("problem_field", "problem")
-    solution_field = task.get("solution_field", "solution")
     print(f"Loading dataset: {task['dataset_id']} [{task['split']}]")
     if task.get("config_name"):
         dataset = load_dataset(task["dataset_id"], task["config_name"], split=task["split"])
@@ -157,9 +204,13 @@ def main() -> None:
     while idx < total:
         batch_end = min(idx + batch_size, total)
         batch_examples = [dataset[i] for i in range(idx, batch_end)]
-        problems = [ex[problem_field].strip() for ex in batch_examples]
+        prepared = [
+            _prepare_example_row(example, task, cell, global_i)
+            for global_i, example in enumerate(batch_examples, start=idx)
+        ]
         prompts = [
-            build_prompt(task["prompt_template_file"], question=problem) for problem in problems
+            build_prompt(task["prompt_template_file"], **prompt_fields)
+            for prompt_fields, _ in prepared
         ]
         print(f"[{idx + 1}-{batch_end}/{total}] generating batch of {len(prompts)}...")
         results = generate_chunk(
@@ -170,15 +221,9 @@ def main() -> None:
             model_path=model_path,
             use_chat_template=use_chat,
         )
-        for local_i, (example, result) in enumerate(zip(batch_examples, results)):
-            global_i = idx + local_i
-            problem = example[problem_field]
+        for (_, row_base), result in zip(prepared, results):
             row = {
-                "id": example.get("unique_id", str(global_i)),
-                "problem": problem,
-                "gold_solution": example[solution_field],
-                "subject": example.get("subject"),
-                "level": example.get("level"),
+                **row_base,
                 "prompt": result["prompt"],
                 "completion": result["completion"],
                 "latency_sec": result["latency_sec"],
@@ -191,6 +236,10 @@ def main() -> None:
                 "task": task["task_name"],
                 "seed": cell["seed"],
                 "batch_size": batch_size,
+                "decoding_temperature": cell["decoding"].get("temperature"),
+                "decoding_top_p": cell["decoding"].get("top_p"),
+                "decoding_max_tokens": cell["decoding"].get("max_tokens"),
+                "max_model_len": cell["model"].get("max_model_len"),
             }
             if args.decoding_config:
                 row["decoding_config"] = args.decoding_config
