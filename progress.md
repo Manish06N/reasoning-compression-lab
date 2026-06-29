@@ -78,6 +78,14 @@ No additional jobs were submitted yet. Current recommendation is to let b01-b06 
 
 ---
 
+## Archive Metadata and Backup Status
+
+HPC publication runs now write a durable archive manifest at `outputs-hpc-2a100-main-YYYY-MM-DD/manifest.json` and per-cell metadata snapshots under `metadata/<cell_id>.json`. Each metadata file records the cell/model/task/decoding configs, batch and checkpoint settings, git commit, SLURM job info, raw output path, summary path, and saved row count.
+
+For the active 2026-06-29 b01 run, the manifest and metadata files were created manually because job `85394` started before this runner change. Future queued jobs will write and update these automatically. `_backup/latest/` now includes `metadata/` and `manifest.json`; full archive mirrors are protected by a lock for parallel GPU branches.
+
+---
+
 ## Publication Sufficiency Strategy
 
 Current judgement: b01-b09 are enough for the first publishable core result set if they complete cleanly and show interpretable trends. The seed0 grid covers three model families/scales, five compression settings, and three reasoning benchmarks.

@@ -20,6 +20,10 @@
 
 ---
 
+## Archive metadata
+
+HPC publication archives now include `manifest.json` plus `metadata/<cell_id>.json` per-cell snapshots. These capture the exact cell, model, task, decoding, batch/checkpoint, git, SLURM, raw-output, summary, and row-count metadata needed to reconstruct each run. The backup mirror includes `metadata/` and is locked during full mirror updates.
+
 ## Publication sufficiency strategy
 
 The b01-b09 HPC plan is the current minimum publishable core. It is enough to start the paper if the completed results show clean trends. Do not add broad new jobs before scoring b01-b09.

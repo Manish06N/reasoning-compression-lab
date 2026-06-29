@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-06-29 (HPC archive metadata manifest)
+
+- Added HPC archive manifest generation for publication runs.
+- Each HPC cell now records a `metadata/<cell_id>.json` snapshot with cell config, model config, task config, decoding config, batch/checkpoint settings, git commit, SLURM job info, raw path, summary path, and saved row count.
+- `_backup/latest/` now mirrors `metadata/` and uses a lock for full archive mirrors so parallel GPU branches do not race while backing up.
+
+---
+
 ## 2026-06-29 (Publication sufficiency strategy)
 
 - Recorded the current publication-readiness judgement across planning docs.
