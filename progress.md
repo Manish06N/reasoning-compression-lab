@@ -14,19 +14,20 @@ Canonical dated record for **Paper 1: Beyond Accuracy** (`reasoning-compression-
 | Area | Status |
 |------|--------|
 | MacBook pipeline + docs | **Complete** |
-| GitHub latest commit | `0d5b9ce` (MacBook; verify with `git log -1`) |
+| GitHub latest commit | `e149159` on HPC after fast-forward pull; local fix pending commit |
 | HPC env (qreason, vLLM 0.8.5, A100) | **Complete** — Gate 1 passed (job 85013) |
 | HPC model + datasets | Qwen-7B BF16 (~15 GB) + all b01–b06 quant models downloaded |
 | HPC CPU preflight | **Passed** — `scripts/hpc/07_preflight_publication.py` |
-| HPC GPU smoke (Gate 3) | **NOT PASSED** — last submitted job `85306` (exclusive quick smoke) |
+| HPC GPU smoke (Gate 3) | **PASSED** — job `85306`, exit `0:0` |
 | First scored paper result | **None** — no `results/*_summary.json` from HPC yet |
 | **Windows 5080 (WSL2)** | **Stopped** — partial 1.5B run (10/500 rows); publication → HPC only |
 | Publication strategy | **HPC-only** (5080 stopped 2026-06-28 — ~15 min/q too slow for 1.5B grid) |
-| GPTQ-4 / full grid | **Blocked** until HPC smoke passes and BF16 anchor runs |
+| b01 BF16 anchors | **Partially running** — Qwen-7B branch active; Llama-8B branch failed early from state-file race |
+| b02–b06 full grid | **Queued** — pending with `QOSMaxGRESPerUser` until GPUs free |
 
-**Single blocker for HPC paper numbers:** vLLM must load Qwen-7B on an exclusive A100 and write `runs/raw/smoke_test_quick.jsonl` with ≥1 valid row.
+**Current blocker for clean HPC paper numbers:** b01 must complete cleanly. The Llama-8B side of b01 failed from a shared `state.json.tmp` race; `update_state()` has been fixed to serialize state updates and use unique temp files for future job starts.
 
-**Do not submit b01–b06 publication blocks until smoke job `85306` (or successor) passes.**
+**Current live progress:** job `85342` is running on `ragpu008`; saved checkpoint is `10/500` rows for `level_a_qwen7b_bf16_math500_seed0`. Logs show it had reached generation around row 18, but only checkpointed rows count as durable.
 
 ---
 
@@ -218,6 +219,48 @@ MacBook, GitHub, and HPC aligned at **`dff36c1`**: "Sync HPC smoke fixes: tokeni
 
 ---
 
+
+### 2026-06-29 — Smoke passed, b01 submitted, parallel state race fixed
+
+#### HPC job state checked at 2026-06-29 12:26 IST
+
+| Job | Purpose | State | Notes |
+|-----|---------|-------|-------|
+| `85306` | Exclusive quick smoke | **COMPLETED** | Gate 3 passed, exit `0:0` |
+| `85342` | b01 BF16 anchors | **RUNNING** | Qwen-7B branch running on `ragpu008`; Llama-8B branch failed early |
+| `85343` | b02 FP8 | **PENDING** | `QOSMaxGRESPerUser` |
+| `85344` | b03 AWQ-4 | **PENDING** | `QOSMaxGRESPerUser` |
+| `85345` | b04 GPTQ-4 | **PENDING** | `QOSMaxGRESPerUser` |
+| `85346` | b05 GPTQ-3 | **PENDING** | `QOSMaxGRESPerUser` |
+| `85347` | b06 GSM8K | **PENDING** | `QOSMaxGRESPerUser` |
+
+Simple meaning: 1 job is running, 5 jobs are waiting, 1 recent smoke succeeded, and 1 older smoke failed.
+
+#### b01 failure diagnosis
+
+The b01 SLURM block launches two inference processes in parallel against the same archive root:
+
+- `level_a_qwen7b_bf16_math500_seed0`
+- `level_c_llama8b_bf16_math500_seed0`
+
+The Llama-8B process failed immediately while updating shared state:
+
+```text
+FileNotFoundError: state.json.tmp -> state.json
+```
+
+Root cause: `src/runners/checkpoint_utils.py:update_state()` used one shared temporary file name, `state.json.tmp`. In a parallel block, process A can replace/remove that temp file while process B is still trying to replace it.
+
+Fix applied: `update_state()` now uses a `state.json.lock` file plus a unique temporary file from `tempfile.mkstemp()`. This prevents both the missing-temp crash and lost concurrent state writes for future job starts.
+
+The already-running Qwen-7B process loaded the old code before this fix, but it is now the only surviving process in b01, so the specific two-process state race is no longer active inside job `85342`. Queued jobs b02-b06 should load the fixed code when SLURM starts them.
+
+#### Durable output observed
+
+- Archive: `outputs-hpc-2a100-main-2026-06-29/`
+- Durable Qwen-7B raw rows: `10/500`
+- Current log had reached generation around row `18/500`; checkpoint interval is 10 rows, so rows after 10 are not durable until the next checkpoint.
+
 ## HPC Gate Checklist (PARAM Rudra)
 
 | Gate | Command / artifact | Status |
@@ -226,10 +269,10 @@ MacBook, GitHub, and HPC aligned at **`dff36c1`**: "Sync HPC smoke fixes: tokeni
 | 2 Model | Qwen-7B + all b01–b06 models on scratch | **DONE** |
 | 2b Dataset | MATH-500 + GSM8K via task configs | **DONE** |
 | 2c CPU preflight | `07_preflight_publication.py` | **PASSED** |
-| 3 GPU smoke | `smoke_test_quick.jsonl` | **NOT PASSED** — job 85306 |
+| 3 GPU smoke | `smoke_test_quick.jsonl` | **PASSED** — job 85306, exit `0:0` |
 | 4 Debug n=10 | `level_a_qwen7b_bf16_math500_seed0_summary.json` (n=10) | Not started |
 | 4b Full n=500 | Same summary (n=500) | Not started |
-| Publication b01–b06 | `submit_hpc_blocks.sh` | Waiting on Gate 3 |
+| Publication b01–b06 | `submit_hpc_blocks.sh` | b01 running; b02–b06 queued behind GPU QoS |
 
 ---
 
@@ -246,6 +289,7 @@ MacBook, GitHub, and HPC aligned at **`dff36c1`**: "Sync HPC smoke fixes: tokeni
 | 7B BF16 on 5080 | KV cache OOM | Defer to HPC A100 (by design) |
 | HPC git push | Permission denied (publickey) | Sync HPC → MacBook → push |
 | Telegram on compute nodes | curl can't reach api.telegram.org | Ignore; use `squeue` / logs |
+| Parallel state update race | `FileNotFoundError: state.json.tmp -> state.json` in b01 Llama-8B branch | `update_state()` now locks `state.json` and uses unique temp files |
 
 ---
 

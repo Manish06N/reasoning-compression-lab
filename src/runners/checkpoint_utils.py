@@ -5,9 +5,15 @@ from __future__ import annotations
 import json
 import os
 import shutil
+import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+
+try:
+    import fcntl
+except ImportError:  # pragma: no cover - Windows fallback
+    fcntl = None
 
 
 def utc_now_iso() -> str:
@@ -132,12 +138,35 @@ def backup_snapshot(backup_root: Path, output_root: Path, label: str | None = No
 
 
 def update_state(output_root: Path, **fields: Any) -> None:
+    output_root.mkdir(parents=True, exist_ok=True)
     state_path = output_root / "state.json"
+    lock_path = output_root / "state.json.lock"
     state: dict[str, Any] = {}
-    if state_path.exists():
-        state = json.loads(state_path.read_text(encoding="utf-8"))
-    state.update(fields)
-    state["updated_at"] = utc_now_iso()
-    tmp = state_path.with_suffix(".json.tmp")
-    tmp.write_text(json.dumps(state, indent=2), encoding="utf-8")
-    tmp.replace(state_path)
+    with lock_path.open("a", encoding="utf-8") as lock:
+        if fcntl is not None:
+            fcntl.flock(lock.fileno(), fcntl.LOCK_EX)
+        try:
+            if state_path.exists():
+                state = json.loads(state_path.read_text(encoding="utf-8"))
+            state.update(fields)
+            state["updated_at"] = utc_now_iso()
+
+            fd, tmp_name = tempfile.mkstemp(
+                prefix=f"{state_path.name}.",
+                suffix=".tmp",
+                dir=output_root,
+                text=True,
+            )
+            tmp = Path(tmp_name)
+            try:
+                with os.fdopen(fd, "w", encoding="utf-8") as f:
+                    f.write(json.dumps(state, indent=2))
+                    f.flush()
+                    os.fsync(f.fileno())
+                tmp.replace(state_path)
+            finally:
+                if tmp.exists():
+                    tmp.unlink()
+        finally:
+            if fcntl is not None:
+                fcntl.flock(lock.fileno(), fcntl.LOCK_UN)

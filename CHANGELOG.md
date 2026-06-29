@@ -1,5 +1,43 @@
 # Changelog
 
+## 2026-06-29 (HPC b01 started — state race fix)
+
+### HPC status
+
+- Pulled latest GitHub changes on PARAM Rudra scratch repo: `b280a88` -> `e149159`.
+- Smoke job `85306` completed successfully with exit code `0:0`; Gate 3 is now passed.
+- Submitted publication blocks b01-b06:
+  - `85342` / b01 BF16 anchors is running on `ragpu008`.
+  - `85343`-`85347` are pending with `QOSMaxGRESPerUser`, meaning the current running job is using the allowed GPU quota.
+- b01 durable progress at last check: `level_a_qwen7b_bf16_math500_seed0` has `10/500` saved rows; the log had reached around row `18/500`.
+
+### Failure found
+
+- The b01 Llama-8B branch (`level_c_llama8b_bf16_math500_seed0`) failed early while updating archive state:
+
+```text
+FileNotFoundError: state.json.tmp -> state.json
+```
+
+- Root cause: parallel inference processes shared one temp file name in `update_state()`. One process could replace/remove `state.json.tmp` while another process still expected it to exist.
+
+### Fixed
+
+- Updated `src/runners/checkpoint_utils.py:update_state()` to:
+  - create the archive root if needed,
+  - serialize state updates with `state.json.lock` on Unix via `fcntl.flock`,
+  - write through a unique temp file from `tempfile.mkstemp()`,
+  - fsync before replacing `state.json`,
+  - clean up any leftover unique temp file on error.
+
+### Operational note
+
+- The fix protects future job starts, including queued b02-b06 jobs once SLURM launches them.
+- The already-running Qwen-7B process in job `85342` loaded the old code before this edit, but the competing Llama-8B process has already exited, so the two-process state race is no longer active in that job.
+- To recover the missing Llama-8B BF16 b01 result, resubmit that cell or the corrected b01 block after deciding whether to let the current Qwen-7B branch finish first.
+
+---
+
 Detailed running log for project setup, HPC runs, code fixes, and operational decisions.
 
 ## 2026-06-29 (Master progress documentation)
