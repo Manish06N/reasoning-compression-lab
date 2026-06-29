@@ -14,7 +14,7 @@ Canonical dated record for **Paper 1: Beyond Accuracy** (`reasoning-compression-
 | Area | Status |
 |------|--------|
 | MacBook pipeline + docs | **Complete** |
-| GitHub latest commit | `e149159` on HPC after fast-forward pull; local fix pending commit |
+| GitHub latest commit | `e149159` on origin; HPC is ahead locally pending GitHub push, including `6dc8ed3` |
 | HPC env (qreason, vLLM 0.8.5, A100) | **Complete** — Gate 1 passed (job 85013) |
 | HPC model + datasets | Qwen-7B BF16 (~15 GB) + all b01–b06 quant models downloaded |
 | HPC CPU preflight | **Passed** — `scripts/hpc/07_preflight_publication.py` |
@@ -27,7 +27,9 @@ Canonical dated record for **Paper 1: Beyond Accuracy** (`reasoning-compression-
 
 **Current blocker for clean HPC paper numbers:** b01 must complete cleanly. The Llama-8B side of b01 failed from a shared `state.json.tmp` race; `update_state()` has been fixed to serialize state updates and use unique temp files for future job starts.
 
-**Current live progress:** job `85342` is running on `ragpu008`; saved checkpoint is `10/500` rows for `level_a_qwen7b_bf16_math500_seed0`. Logs show it had reached generation around row 18, but only checkpointed rows count as durable.
+**Current live progress:** job `85342` is running on `ragpu008`; saved checkpoint is `10/500` rows for `level_a_qwen7b_bf16_math500_seed0`. Logs show it had reached generation at row 20, but only checkpointed rows count as durable.
+
+**Current sync note:** HPC is ahead of `origin/main`, including `6dc8ed3` (`Fix concurrent HPC state updates`). Push these commits to GitHub directly from HPC if credentials work; otherwise use the MacBook rsync workflow before any HPC reset/pull.
 
 ---
 
@@ -220,9 +222,9 @@ MacBook, GitHub, and HPC aligned at **`dff36c1`**: "Sync HPC smoke fixes: tokeni
 ---
 
 
-### 2026-06-29 — Smoke passed, b01 submitted, parallel state race fixed
+### 2026-06-29 — Smoke passed, b01 submitted, parallel state race fixed and committed
 
-#### HPC job state checked at 2026-06-29 12:26 IST
+#### HPC job state checked at 2026-06-29 12:40 IST
 
 | Job | Purpose | State | Notes |
 |-----|---------|-------|-------|
@@ -253,13 +255,17 @@ Root cause: `src/runners/checkpoint_utils.py:update_state()` used one shared tem
 
 Fix applied: `update_state()` now uses a `state.json.lock` file plus a unique temporary file from `tempfile.mkstemp()`. This prevents both the missing-temp crash and lost concurrent state writes for future job starts.
 
+Validation: an 8-process local concurrency check repeatedly updated one shared `state.json` and passed without stale keys or temp-file failures.
+
+Local commit: `6dc8ed3 Fix concurrent HPC state updates`.
+
 The already-running Qwen-7B process loaded the old code before this fix, but it is now the only surviving process in b01, so the specific two-process state race is no longer active inside job `85342`. Queued jobs b02-b06 should load the fixed code when SLURM starts them.
 
 #### Durable output observed
 
 - Archive: `outputs-hpc-2a100-main-2026-06-29/`
 - Durable Qwen-7B raw rows: `10/500`
-- Current log had reached generation around row `18/500`; checkpoint interval is 10 rows, so rows after 10 are not durable until the next checkpoint.
+- Current log had reached generation at row `20/500`; checkpoint interval is 10 rows, so rows after 10 are not durable until the next checkpoint lands.
 
 ## HPC Gate Checklist (PARAM Rudra)
 

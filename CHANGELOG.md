@@ -1,6 +1,6 @@
 # Changelog
 
-## 2026-06-29 (HPC b01 started — state race fix)
+## 2026-06-29 (HPC b01 running — state race fix committed)
 
 ### HPC status
 
@@ -9,7 +9,8 @@
 - Submitted publication blocks b01-b06:
   - `85342` / b01 BF16 anchors is running on `ragpu008`.
   - `85343`-`85347` are pending with `QOSMaxGRESPerUser`, meaning the current running job is using the allowed GPU quota.
-- b01 durable progress at last check: `level_a_qwen7b_bf16_math500_seed0` has `10/500` saved rows; the log had reached around row `18/500`.
+- b01 durable progress at last check: `level_a_qwen7b_bf16_math500_seed0` has `10/500` saved rows; the log had reached row `20/500`.
+- Local HPC commit `6dc8ed3` records the state-race fix; this changelog/progress update records the latest operational status before the GitHub push attempt.
 
 ### Failure found
 
@@ -29,12 +30,14 @@ FileNotFoundError: state.json.tmp -> state.json
   - write through a unique temp file from `tempfile.mkstemp()`,
   - fsync before replacing `state.json`,
   - clean up any leftover unique temp file on error.
+- Validated the fix with an 8-process local concurrency check that repeatedly updated one shared `state.json`; no stale keys or temp-file failures occurred.
 
 ### Operational note
 
 - The fix protects future job starts, including queued b02-b06 jobs once SLURM launches them.
 - The already-running Qwen-7B process in job `85342` loaded the old code before this edit, but the competing Llama-8B process has already exited, so the two-process state race is no longer active in that job.
 - To recover the missing Llama-8B BF16 b01 result, resubmit that cell or the corrected b01 block after deciding whether to let the current Qwen-7B branch finish first.
+- If GitHub push from HPC fails due to SSH credentials, sync the unpushed HPC commits through the MacBook rsync workflow before resetting or pulling the HPC worktree.
 
 ---
 
