@@ -131,8 +131,10 @@ list_blocks() {
   echo "  b05_single_gptq3           1×A100  ~12–20h  GPTQ-3 Qwen-7B MATH"
   echo "  b06_single_gsm8k           1×A100  ~20–40h  FP8 Qwen-7B GSM8K (n=1319)"
   echo "  b07_gpqa_fp8               1×A100  ~8–20h   GPQA (after HF gate)"
+  echo "  b08_qwen15b_bf16_fp8       2×A100  ~12–24h  Qwen-1.5B BF16 + FP8 MATH"
+  echo "  b09_qwen15b_awq4_gptq4     2×A100  ~12–24h  Qwen-1.5B AWQ-4 + GPTQ-4 MATH"
   echo ""
-  echo "Qwen-1.5B cells: future HPC-only work after model download/preflight; do not use Windows/5080 for publication."
+  echo "b08-b09 are future HPC-only lower-bound jobs; do not submit until current queue strategy allows."
 }
 
 BLOCK="${1:-list}"
@@ -162,6 +164,12 @@ case "$BLOCK" in
     ;;
   b07|b07_gpqa_fp8|b02_gpqa_fp8)
     run_block "$BLOCK_DIR/b02_gpqa_fp8.sh"
+    ;;
+  b08|b08_qwen15b_bf16_fp8)
+    run_block "$BLOCK_DIR/b08_qwen15b_bf16_fp8.sh"
+    ;;
+  b09|b09_qwen15b_awq4_gptq4)
+    run_block "$BLOCK_DIR/b09_qwen15b_awq4_gptq4.sh"
     ;;
   *)
     echo "Unknown block: $BLOCK"

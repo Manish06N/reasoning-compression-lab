@@ -29,9 +29,9 @@ EXPECTED_HPC_BLOCKS = {
     "b04_parallel_gptq4.sh",
     "b05_single_gptq3.sh",
     "b06_single_gsm8k.sh",
+    "b08_qwen15b_bf16_fp8.sh",
+    "b09_qwen15b_awq4_gptq4.sh",
 }
-
-FORBIDDEN_HPC_CELL_FRAGMENTS = ("qwen15b",)
 
 
 def fail(message: str) -> None:
@@ -93,8 +93,6 @@ def check_blocks_and_models() -> None:
             fail(f"{block_name} has no cells")
         print(block_name)
         for cell_rel in cells:
-            if any(fragment in cell_rel for fragment in FORBIDDEN_HPC_CELL_FRAGMENTS):
-                fail(f"5080-only cell appears in HPC block: {cell_rel}")
             cell = load_cell_config(cell_rel)
             model_path = Path(cell["model_path"])
             task_name = cell["task"]["task_name"]

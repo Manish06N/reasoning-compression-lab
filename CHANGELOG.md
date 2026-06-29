@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-06-29 (Future HPC blocks wired)
+
+- Added future HPC-only Qwen-1.5B blocks:
+  - `b08_qwen15b_bf16_fp8` for BF16 + FP8 MATH-500.
+  - `b09_qwen15b_awq4_gptq4` for AWQ-4 + GPTQ-4 MATH-500.
+- Removed the old preflight restriction that treated `qwen15b` cells as 5080-only.
+- Confirmed GPQA-Diamond gated access is now available through the saved HPC Hugging Face token: authenticated request for `gpqa_diamond.csv` returned HTTP 200.
+- CPU preflight passed after adding b08-b09: 14 HPC cell entries checked; MATH-500 and GSM8K dataset checks passed.
+- No new SLURM jobs were submitted; current recommendation remains to let b01-b06 continue before queueing b07-b09.
+
+---
+
 ## 2026-06-29 (Corrected b01 resubmitted)
 
 - Held queued jobs `85343`-`85347`, canceled half-broken b01 job `85342`, and submitted corrected b01 job `85394`.

@@ -43,12 +43,15 @@ The running/queued jobs are the main HPC publication batch b01-b06, not the comp
 | b04 | Qwen-7B GPTQ-4 MATH-500 + Llama-8B GPTQ-4 MATH-500 | Queued as `85345` |
 | b05 | Qwen-7B GPTQ-3 MATH-500 | Queued as `85346` |
 | b06 | Qwen-7B FP8 GSM8K | Queued as `85347` |
+| b07 | Qwen-7B FP8 GPQA-Diamond | Ready after HF gate approval; not queued |
+| b08 | Qwen-1.5B BF16 + FP8 MATH-500 | Wired for future HPC-only submission; not queued |
+| b09 | Qwen-1.5B AWQ-4 + GPTQ-4 MATH-500 | Wired for future HPC-only submission; not queued |
 
 Work still left after b01-b06 finish:
 
 - Score all raw JSONL outputs into scored JSONL files and summary JSON results.
 - Build paper metrics and tables: pass@1, latency, token counts, VRAM, cost-per-correct, and compression tradeoffs.
-- Run GPQA only after Hugging Face gated access is approved. Current check failed with `DatasetNotFoundError` for gated dataset `Idavidrein/gpqa`, so b07 must not be queued yet.
+- GPQA gated access is now approved for the saved HPC Hugging Face token; authenticated Hub check returned HTTP 200 for `gpqa_diamond.csv`. b07 can be queued after current queue strategy allows.
 - Qwen-1.5B cells are now HPC-only future work. BF16, FP8, AWQ-4, and GPTQ-4 model directories were downloaded on HPC on 2026-06-29; queue these only after deciding they are needed and after adding/using an HPC block for them.
 - Run multi-seed stability later; current publication jobs are seed0 only.
 - Rerun or resume any cell that times out before completing all rows, especially b01 if BF16 remains slow.
@@ -67,11 +70,11 @@ Prepared on HPC without using GPUs while b01-b06 continued running:
 | Qwen-1.5B GPTQ-4 | Downloaded | `models/DeepSeek-R1-Distill-Qwen-1.5B-GPTQ-4` |
 | MATH-500 | Available | Hugging Face cache/dataset load works |
 | GSM8K | Available | Hugging Face cache/dataset load works |
-| GPQA-Diamond | Blocked | HF gated access for `Idavidrein/gpqa` not approved |
+| GPQA-Diamond | Access approved | Authenticated HF request returns HTTP 200 for `gpqa_diamond.csv` |
 
 CPU preflight after staging assets: `scripts/hpc/07_preflight_publication.py` passed for the active b01-b06 publication blocks.
 
-No additional jobs were submitted yet. Current recommendation is to let b01-b06 continue, then decide whether to add Qwen-1.5B HPC blocks after the first major 7B/8B results are known.
+No additional jobs were submitted yet. Current recommendation is to let b01-b06 continue. Future jobs are now wired as b07 for GPQA and b08-b09 for Qwen-1.5B lower-bound runs; submit them only after deciding queue strategy.
 
 ---
 

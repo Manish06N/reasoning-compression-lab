@@ -4,8 +4,8 @@
 # Usage (on PARAM Rudra):
 #   export QR=/scratch/$USER/reasoning-compression-lab
 #   cd $QR && git pull
-#   bash scripts/hpc/submit_hpc_blocks.sh        # submit b01–b06
-#   bash scripts/hpc/submit_hpc_blocks.sh b01    # one block
+#   bash scripts/hpc/submit_hpc_blocks.sh        # submit b01-b06 only
+#   bash scripts/hpc/submit_hpc_blocks.sh b08    # optional future Qwen-1.5B block
 set -euo pipefail
 
 QR="${QR:-/scratch/$USER/reasoning-compression-lab}"
@@ -50,6 +50,9 @@ case "$BLOCK" in
     echo ""
     echo "b07_gpqa_fp8 NOT submitted — run after GPQA gate:"
     echo "  sbatch slurm/hpc_2a100_b07_gpqa.slurm"
+    echo "b08-b09 Qwen-1.5B NOT submitted by default — future HPC-only lower-bound jobs:"
+    echo "  bash scripts/hpc/submit_hpc_blocks.sh b08"
+    echo "  bash scripts/hpc/submit_hpc_blocks.sh b09"
     ;;
   b01|b01_parallel_bf16_anchors) submit_2gpu b01_parallel_bf16_anchors ;;
   b02|b02_parallel_fp8) submit_2gpu b02_parallel_fp8 ;;
@@ -58,6 +61,8 @@ case "$BLOCK" in
   b05|b05_single_gptq3) submit_1gpu b05_single_gptq3 ;;
   b06|b06_single_gsm8k) submit_1gpu b06_single_gsm8k ;;
   b07|b07_gpqa_fp8) submit_1gpu b07_gpqa_fp8 ;;
+  b08|b08_qwen15b_bf16_fp8) submit_2gpu b08_qwen15b_bf16_fp8 ;;
+  b09|b09_qwen15b_awq4_gptq4) submit_2gpu b09_qwen15b_awq4_gptq4 ;;
   *)
     echo "Unknown block: $BLOCK"
     bash scripts/hpc/run_hpc_2a100_publication.sh list
