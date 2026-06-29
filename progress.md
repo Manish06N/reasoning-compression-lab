@@ -78,6 +78,22 @@ No additional jobs were submitted yet. Current recommendation is to let b01-b06 
 
 ---
 
+## Publication Sufficiency Strategy
+
+Current judgement: b01-b09 are enough for the first publishable core result set if they complete cleanly and show interpretable trends. The seed0 grid covers three model families/scales, five compression settings, and three reasoning benchmarks.
+
+Do not expand the queue immediately. First finish b01-b09, score all outputs, and build the core tables/figures. After seeing the result quality, decide whether reviewers will need robustness checks.
+
+Recommended expansion only if needed:
+
+- Add seed1/seed2 for the most important subset, not the entire grid.
+- Prioritize Qwen-7B and Llama-8B on MATH-500 for BF16, FP8, AWQ-4, and GPTQ-4.
+- Add more dataset coverage only if MATH-500 trends are unclear or a reviewer-facing claim needs it.
+
+This keeps the paper focused: seed0 b01-b09 for the main claim, then a small stability subset if the result variance or reviewer risk demands it.
+
+---
+
 ## Machine Roles
 
 | Machine | Path | Role |

@@ -110,6 +110,18 @@ sbatch slurm/hpc_2a100_b07_gpqa.slurm
 
 ---
 
+## Publication sufficiency and expansion rule
+
+The b01-b09 seed0 grid is the current first publishable core result set. It covers:
+
+- Qwen-1.5B, Qwen-7B, and Llama-8B.
+- BF16, FP8, AWQ-4, GPTQ-4, and GPTQ-3.
+- MATH-500, GSM8K, and GPQA-Diamond.
+
+Do not add broad new experiments before b01-b09 are scored. If the paper needs robustness, add a small multi-seed subset rather than repeating the full grid: seed1/seed2 for Qwen-7B and Llama-8B on MATH-500 with BF16, FP8, AWQ-4, and GPTQ-4.
+
+---
+
 ## SLURM templates
 
 | File | GPUs | Time | Block |

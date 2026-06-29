@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-06-29 (Publication sufficiency strategy)
+
+- Recorded the current publication-readiness judgement across planning docs.
+- b01-b09 seed0 is treated as the first publishable core result set if it completes cleanly and produces interpretable trends.
+- Expansion rule: do not add broad new jobs before scoring b01-b09; if robustness is needed, add seed1/seed2 only for the key Qwen-7B and Llama-8B MATH-500 BF16/FP8/AWQ-4/GPTQ-4 subset.
+
+---
+
 ## 2026-06-29 (Future HPC blocks wired)
 
 - Added future HPC-only Qwen-1.5B blocks:

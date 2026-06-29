@@ -41,6 +41,12 @@ Deployment-science evaluation harness for compressed reasoning LLMs.
 
 **Do not run on 5080:** any 7B/8B cell, GSM8K, or BF16 anchors — they OOM or take weeks at batch_size=1.
 
+## Publication sufficiency strategy
+
+The current HPC plan is sufficient for a first publishable core result set if b01-b09 complete cleanly and produce clear trends. It covers three model families/scales, five compression settings, and MATH-500/GSM8K/GPQA-Diamond.
+
+Do not expand the queue before seeing seed0 results. First finish b01-b09, score outputs, and build pass@1, trace length, latency, VRAM, cost-per-correct, and calibration/reliability tables. If robustness is needed, add seed1/seed2 only for the key Qwen-7B/Llama-8B MATH-500 cells: BF16, FP8, AWQ-4, and GPTQ-4.
+
 ## Push code to GitHub (Windows)
 
 Your local repo: `G:\ALL MY Projects\2026\03-paper1-experiments`  

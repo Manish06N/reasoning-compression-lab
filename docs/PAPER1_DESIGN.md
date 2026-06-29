@@ -34,3 +34,6 @@ cost-per-correct
 
 Main claim:
 Single-run accuracy is not enough for deployment decisions.
+
+Publication sufficiency plan:
+Use the b01-b09 seed0 HPC grid as the first publishable core if results are clean: Qwen-1.5B, Qwen-7B, Llama-8B across BF16/FP8/AWQ-4/GPTQ-4/GPTQ-3 on MATH-500 plus GSM8K and GPQA checks. Do not expand before scoring this grid. If robustness is required, add seed1/seed2 only for the key Qwen-7B and Llama-8B MATH-500 subset: BF16, FP8, AWQ-4, GPTQ-4.

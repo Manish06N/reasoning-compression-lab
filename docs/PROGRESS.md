@@ -20,6 +20,16 @@
 
 ---
 
+## Publication sufficiency strategy
+
+The b01-b09 HPC plan is the current minimum publishable core. It is enough to start the paper if the completed results show clean trends. Do not add broad new jobs before scoring b01-b09.
+
+After b01-b09 complete:
+
+1. Score all raw outputs and build the main tables.
+2. Check whether trends are stable and interpretable.
+3. If needed, add seed1/seed2 for a small key subset: Qwen-7B and Llama-8B on MATH-500 for BF16, FP8, AWQ-4, and GPTQ-4.
+
 ## Live run — RTX 5080
 
 **Status: STOPPED (2026-06-28)** — user moved all experiments to HPC. Partial run archived; not for paper tables.
