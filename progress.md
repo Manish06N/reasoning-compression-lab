@@ -31,6 +31,30 @@ Canonical dated record for **Paper 1: Beyond Accuracy** (`reasoning-compression-
 
 ---
 
+## Current Experiment Coverage
+
+The running/queued jobs are the main HPC publication batch b01-b06, not the complete final paper package. They cover:
+
+| Block | Coverage | Status |
+|------|----------|--------|
+| b01 | Qwen-7B BF16 MATH-500 + Llama-8B BF16 MATH-500 | Corrected job `85394` running |
+| b02 | Qwen-7B FP8 MATH-500 + Llama-8B FP8 MATH-500 | Queued as `85343` |
+| b03 | Qwen-7B AWQ-4 MATH-500 + Llama-8B AWQ-4 MATH-500 | Queued as `85344` |
+| b04 | Qwen-7B GPTQ-4 MATH-500 + Llama-8B GPTQ-4 MATH-500 | Queued as `85345` |
+| b05 | Qwen-7B GPTQ-3 MATH-500 | Queued as `85346` |
+| b06 | Qwen-7B FP8 GSM8K | Queued as `85347` |
+
+Work still left after b01-b06 finish:
+
+- Score all raw JSONL outputs into scored JSONL files and summary JSON results.
+- Build paper metrics and tables: pass@1, latency, token counts, VRAM, cost-per-correct, and compression tradeoffs.
+- Run GPQA: config exists as `level_c_qwen7b_fp8_gpqa_seed0.json`, and the HPC block exists as b07/`b02_gpqa_fp8`, but it is not currently queued.
+- Decide what to do with Qwen-1.5B cells. BF16/FP8/AWQ/GPTQ4 configs exist, but the Windows 5080 run was stopped and these cells are not currently queued on HPC.
+- Run multi-seed stability later; current publication jobs are seed0 only.
+- Rerun or resume any cell that times out before completing all rows, especially b01 if BF16 remains slow.
+
+---
+
 ## Machine Roles
 
 | Machine | Path | Role |
