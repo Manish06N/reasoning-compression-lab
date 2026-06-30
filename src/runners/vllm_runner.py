@@ -176,6 +176,19 @@ def generate_one(
 
 
 
+def _safe_metric(metrics: Any, name: str) -> Any:
+
+    if metrics is None:
+
+        return None
+
+    if isinstance(metrics, dict):
+
+        return metrics.get(name)
+
+    return getattr(metrics, name, None)
+
+
 def generate_chunk(
 
     llm,
@@ -218,9 +231,15 @@ def generate_chunk(
 
     vram_after = snapshot_vram_bytes()
 
-    peak_vram = max(vram_before, vram_after, stats.peak_vram_bytes) / (1024**3)
+    vram_before_gb = vram_before / (1024**3)
+
+    vram_after_gb = vram_after / (1024**3)
+
+    vram_max_gb = max(vram_before, vram_after, stats.peak_vram_bytes) / (1024**3)
 
     per_latency = stats.latency_sec / len(prompts)
+
+    per_energy = (stats.energy_joules / len(prompts)) if stats.energy_joules is not None else None
 
 
 
@@ -228,7 +247,43 @@ def generate_chunk(
 
     for rendered_prompt, output in zip(rendered, outputs):
 
-        completion = output.outputs[0].text
+        choice = output.outputs[0]
+
+        completion = choice.text
+
+        prompt_tokens = len(output.prompt_token_ids)
+
+        completion_tokens = len(choice.token_ids)
+
+        total_tokens = prompt_tokens + completion_tokens
+
+        metrics = getattr(output, "metrics", None)
+
+        first_token_time = _safe_metric(metrics, "first_token_time")
+
+        arrival_time = _safe_metric(metrics, "arrival_time")
+
+        time_to_first_token = None
+
+        if first_token_time is not None and arrival_time is not None:
+
+            time_to_first_token = max(0.0, float(first_token_time) - float(arrival_time))
+
+        decode_latency = max(per_latency - time_to_first_token, 0.0) if time_to_first_token is not None else per_latency
+
+        decode_tokens_per_second = completion_tokens / decode_latency if decode_latency > 0 else None
+
+        total_tokens_per_second = total_tokens / per_latency if per_latency > 0 else None
+
+        seconds_per_output_token = per_latency / completion_tokens if completion_tokens else None
+
+        tokens_per_joule = (completion_tokens / per_energy) if per_energy and per_energy > 0 else None
+
+        finish_reason = getattr(choice, "finish_reason", None)
+
+        stop_reason = getattr(choice, "stop_reason", None)
+
+        max_tokens = decoding.get("max_tokens", 32768)
 
         results.append(
 
@@ -240,11 +295,47 @@ def generate_chunk(
 
                 "latency_sec": per_latency,
 
-                "peak_vram_gb": peak_vram,
+                "time_to_first_token_sec": time_to_first_token,
 
-                "prompt_tokens": len(output.prompt_token_ids),
+                "peak_vram_gb": vram_max_gb,
 
-                "completion_tokens": len(output.outputs[0].token_ids),
+                "vram_before_gb": vram_before_gb,
+
+                "vram_after_gb": vram_after_gb,
+
+                "vram_max_gb": vram_max_gb,
+
+                "gpu_util_mean": stats.gpu_util_mean,
+
+                "gpu_util_max": stats.gpu_util_max,
+
+                "power_watts_mean": stats.power_watts_mean,
+
+                "power_watts_max": stats.power_watts_max,
+
+                "energy_joules": per_energy,
+
+                "prompt_tokens": prompt_tokens,
+
+                "completion_tokens": completion_tokens,
+
+                "total_tokens": total_tokens,
+
+                "tokens_per_second": total_tokens_per_second,
+
+                "decode_tokens_per_second": decode_tokens_per_second,
+
+                "seconds_per_output_token": seconds_per_output_token,
+
+                "tokens_per_joule": tokens_per_joule,
+
+                "finish_reason": finish_reason,
+
+                "stop_reason": stop_reason,
+
+                "truncated": completion_tokens >= max_tokens,
+
+                "completion_chars": len(completion),
 
             }
 

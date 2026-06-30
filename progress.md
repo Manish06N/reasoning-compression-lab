@@ -9,7 +9,7 @@ Canonical dated record for **Paper 1: Beyond Accuracy** (`reasoning-compression-
 
 ---
 
-## Current Status Snapshot (2026-06-29)
+## Current Status Snapshot (2026-06-30)
 
 | Area | Status |
 |------|--------|
@@ -22,12 +22,12 @@ Canonical dated record for **Paper 1: Beyond Accuracy** (`reasoning-compression-
 | First scored paper result | **None** — no `results/*_summary.json` from HPC yet |
 | **Windows 5080 (WSL2)** | **Retired for experiments** — too slow; do not schedule publication work there |
 | Publication strategy | **HPC-only** (5080 stopped 2026-06-28 — ~15 min/q too slow for 1.5B grid) |
-| b01 BF16 anchors | **Corrected job running** — old `85342` canceled; new `85394` resumed Qwen from 20/500 and restarted Llama |
-| b02–b06 full grid | **Queued** — pending with `QOSMaxGRESPerUser` until GPUs free |
+| b01 BF16 anchors | **Running, slow but checkpointing** — `85394` on `ragpu008`; monitor against 47h walltime |
+| b02–b06 full grid | **Queued** — pending with `QOSMaxGRESPerUser`; will use new telemetry when they start |
 
 **Current blocker for clean HPC paper numbers:** b01 must now run to completion or checkpoint enough rows before the 47h walltime. The state-file race has been fixed and the corrected b01 job is running.
 
-**Current live progress:** corrected job `85394` is running on `ragpu008`. Qwen-7B resumed from `20/500` durable rows; Llama-8B restarted from `0/500`. b02-b06 are released and pending behind the user GPU quota. Future Qwen-1.5B model assets are staged on HPC; no extra experiment jobs were submitted.
+**Current live progress:** corrected job `85394` is running on `ragpu008`; b02-b06 are released and pending behind the user GPU quota. As of the latest queue check, `85394` has been running for more than 31 hours and may need resume/chunking if it reaches the 47h walltime before Qwen finishes. Future Qwen-1.5B model assets are staged on HPC; no extra experiment jobs were submitted.
 
 ---
 
@@ -77,6 +77,12 @@ CPU preflight after staging assets: `scripts/hpc/07_preflight_publication.py` pa
 No additional jobs were submitted yet. Current recommendation is to let b01-b06 continue. Future jobs are now wired as b07 for GPQA and b08-b09 for Qwen-1.5B lower-bound runs; submit them only after deciding queue strategy.
 
 ---
+
+## GPU Telemetry Added 2026-06-30
+
+Future inference rows now record sampled runtime telemetry and efficiency fields: `vram_before_gb`, `vram_after_gb`, `vram_max_gb`, `gpu_util_mean`, `gpu_util_max`, `power_watts_mean`, `power_watts_max`, `energy_joules`, `tokens_per_second`, `decode_tokens_per_second`, `seconds_per_output_token`, `tokens_per_joule`, `finish_reason`, `stop_reason`, `truncated`, `completion_chars`, and optional `time_to_first_token_sec` when vLLM exposes timing metrics. Scored rows also include `answer_parse_success` and MATH `boxed_answer_present`.
+
+This change will not affect already-running `85394` until that job exits/resumes, but pending b02-b06 jobs should use it when Slurm starts them. Current recommendation remains: do not add the full GSM8K/GPQA grid yet. First learn whether b01 completes under walltime or needs chunking/reduced generation settings.
 
 ## Q1 Publication Analysis Utilities
 

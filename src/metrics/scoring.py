@@ -29,6 +29,8 @@ def score_math_item(gold_solution: str, completion: str) -> Dict[str, Any]:
         "pred_answer": pred,
         "gold_answer": gold,
         "correct": correct,
+        "boxed_answer_present": bool(pred),
+        "answer_parse_success": bool(pred),
         **trace_stats(completion),
     }
 
@@ -57,6 +59,7 @@ def score_gsm8k_item(gold_solution: str, completion: str) -> Dict[str, Any]:
         "pred_answer": pred,
         "gold_answer": gold,
         "correct": bool(pred_norm and gold_norm and pred_norm == gold_norm),
+        "answer_parse_success": bool(pred),
         **trace_stats(completion),
     }
 
@@ -69,6 +72,7 @@ def score_gpqa_item(gold_letter: str, completion: str) -> Dict[str, Any]:
         "pred_answer": pred,
         "gold_answer": gold_norm or None,
         "correct": bool(pred_norm and gold_norm and pred_norm == gold_norm),
+        "answer_parse_success": bool(pred_norm),
         **trace_stats(completion),
     }
 
@@ -174,9 +178,13 @@ def summarize_failure_rates(rows: list[dict]) -> dict:
     trunc = sum(
         1
         for row in rows
-        if row.get("completion_tokens") is not None
-        and row.get("decoding_max_tokens") is not None
-        and row["completion_tokens"] >= row["decoding_max_tokens"]
+        if row.get("truncated") is True
+        or (
+            row.get("truncated") is None
+            and row.get("completion_tokens") is not None
+            and row.get("decoding_max_tokens") is not None
+            and row["completion_tokens"] >= row["decoding_max_tokens"]
+        )
     )
     invalid = sum(1 for row in rows if not row.get("pred_answer") or row.get("correct") is None)
     return {
@@ -190,6 +198,19 @@ def summarize_failure_rates(rows: list[dict]) -> dict:
         "num_invalid_answers": invalid,
     }
 
+
+
+def _summarize_numeric(rows: list[dict], field: str, *, include_max: bool = False) -> dict:
+    values = [float(row[field]) for row in rows if row.get(field) is not None]
+    if not values:
+        return {}
+    out = {
+        f"{field}_mean": sum(values) / len(values),
+        f"{field}_p50": statistics.median(values),
+    }
+    if include_max:
+        out[f"{field}_max"] = max(values)
+    return out
 
 def _cost_per_correct_stat(latencies_and_flags: Sequence[tuple[float, float]]) -> float:
     total_latency = sum(latency for latency, _ in latencies_and_flags)
@@ -231,6 +252,27 @@ def summarize_scored_rows(rows: list[dict]) -> dict:
     if completion_tokens:
         summary["completion_tokens_mean"] = sum(completion_tokens) / len(completion_tokens)
         summary["completion_tokens_p50"] = statistics.median(completion_tokens)
+
+    summary.update(_summarize_numeric(rows, "time_to_first_token_sec"))
+    summary.update(_summarize_numeric(rows, "tokens_per_second"))
+    summary.update(_summarize_numeric(rows, "decode_tokens_per_second"))
+    summary.update(_summarize_numeric(rows, "seconds_per_output_token"))
+    summary.update(_summarize_numeric(rows, "vram_before_gb"))
+    summary.update(_summarize_numeric(rows, "vram_after_gb"))
+    summary.update(_summarize_numeric(rows, "vram_max_gb", include_max=True))
+    summary.update(_summarize_numeric(rows, "gpu_util_mean"))
+    summary.update(_summarize_numeric(rows, "gpu_util_max", include_max=True))
+    summary.update(_summarize_numeric(rows, "power_watts_mean"))
+    summary.update(_summarize_numeric(rows, "power_watts_max", include_max=True))
+    summary.update(_summarize_numeric(rows, "tokens_per_joule"))
+
+    energies = [row["energy_joules"] for row in rows if row.get("energy_joules") is not None]
+    if energies:
+        summary["energy_joules_total"] = sum(energies)
+        summary["energy_joules_mean"] = sum(energies) / len(energies)
+    finish_reasons = Counter(str(row.get("finish_reason")) for row in rows if row.get("finish_reason") is not None)
+    if finish_reasons:
+        summary["finish_reason_counts"] = dict(finish_reasons)
 
     summary.update(summarize_failure_rates(rows))
     summary.update(summarize_trace_rows(rows))

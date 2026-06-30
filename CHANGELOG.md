@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-06-30 (GPU telemetry and efficiency metrics)
+
+- Added sampled NVML telemetry during each `vLLM.generate()` call: true observed max VRAM, mean/max GPU utilization, mean/max power draw, and per-query energy estimates.
+- Raw inference rows now include throughput and completion-health fields: total/decode tokens per second, seconds per output token, tokens per joule, finish/stop reasons, truncation flag, completion character count, VRAM before/after/max, and optional time-to-first-token when vLLM exposes timing metrics.
+- Scored rows now record explicit answer parse success and MATH boxed-answer presence.
+- Summary JSON now aggregates throughput, VRAM, utilization, power, energy, tokens-per-joule, finish-reason counts, and the new sampled telemetry fields while staying compatible with old raw rows.
+- Queue judgement at implementation time: `85394` b01 is still running on `ragpu008`; `85343`-`85347` b02-b06 remain pending behind `QOSMaxGRESPerUser`. Do not submit broader GSM8K/GPQA grids until b01 walltime behavior is clear. Pending jobs will pick up this instrumentation when they start.
+
+---
+
 ## 2026-06-29 (PhD roadmap — single file)
 
 - Replaced split `docs/phd-roadmap/` with one document: **`docs/PHD_ROADMAP.md`** (V5 + V6 + V7 + stack-transfer extension, appendices, execution plan).
