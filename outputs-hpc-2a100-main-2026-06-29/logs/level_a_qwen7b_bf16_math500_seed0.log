@@ -115,4 +115,8 @@ checkpoint saved: /scratch/manishn_iitp/reasoning-compression-lab/outputs-hpc-2a
 [462-462/500] generating batch of 1...
 Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:01<00:00, 421.39s/it, est. speed input: 0.41 toks/s, output: 77.35 toks/s]Processed prompts: 100%|██████████| 1/1 [07:01<00:00, 421.39s/it, est. speed input: 0.41 toks/s, output: 77.35 toks/s]
 [463-463/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [06:59<00:00, 419.33s/it, est. speed input: 0.43 toks/s, output: 77.71 toks/s]Processed prompts: 100%|██████████| 1/1 [06:59<00:00, 419.33s/it, est. speed input: 0.43 toks/s, output: 77.71 toks/s]
+[464-464/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [00:07<00:00,  7.39s/it, est. speed input: 13.81 toks/s, output: 83.26 toks/s]Processed prompts: 100%|██████████| 1/1 [00:07<00:00,  7.39s/it, est. speed input: 13.81 toks/s, output: 83.26 toks/s]
+[465-465/500] generating batch of 1...
 Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]
