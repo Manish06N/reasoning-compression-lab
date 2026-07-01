@@ -90,24 +90,11 @@ PY
 
 expected_rows() {
   local cell_cfg="$1"
-  local task
-  task="$(python -c "
-import json, sys
-from pathlib import Path
-root = Path('$QR')
-cell = json.loads((root / '$cell_cfg').read_text())
-task = json.loads((root / cell['task_config']).read_text())
-print(task['task_name'])
-")"
+  local limit_args=()
   if [[ -n "$LIMIT" ]]; then
-    echo "$LIMIT"
-    return
+    limit_args=(--limit "$LIMIT")
   fi
-  case "$task" in
-    math500) echo 500 ;;
-    gsm8k) echo 1319 ;;
-    *) echo 1 ;;
-  esac
+  python scripts/expected_rows.py --cell-config "$cell_cfg" "${limit_args[@]}"
 }
 
 cell_done() {

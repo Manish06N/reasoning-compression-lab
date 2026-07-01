@@ -46,6 +46,12 @@ def cost_per_correct(
     return total_cost / len(correct_rows)
 
 
+def _json_safe_cost(value: float) -> float | None:
+    if value == float("inf") or value == float("-inf") or value != value:
+        return None
+    return value
+
+
 def summarize_cost_metrics(
     records: Sequence[dict],
     gpu_hour_rate: Optional[float] = None,
@@ -54,7 +60,7 @@ def summarize_cost_metrics(
     num_correct = sum(1 for r in records if r.get("correct"))
     return {
         "total_gpu_seconds": total_latency,
-        "cost_per_correct_seconds": cost_per_correct(records, gpu_hour_rate=None),
-        "cost_of_pass_seconds": cost_of_pass(records, gpu_hour_rate=None),
+        "cost_per_correct_seconds": _json_safe_cost(cost_per_correct(records, gpu_hour_rate=None)),
+        "cost_of_pass_seconds": _json_safe_cost(cost_of_pass(records, gpu_hour_rate=None)),
         "num_correct": num_correct,
     }

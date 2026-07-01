@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import threading
 import time
 from contextlib import contextmanager
@@ -37,11 +38,21 @@ class GpuStats:
         return self.power_watts_sum / self.samples
 
 
+def nvml_device_index(default: int = 0) -> int:
+    """Map CUDA_VISIBLE_DEVICES to the physical NVML index for this process."""
+    visible = os.environ.get("CUDA_VISIBLE_DEVICES")
+    if visible is not None and visible.strip():
+        parts = [part.strip() for part in visible.split(",") if part.strip()]
+        if len(parts) == 1 and parts[0].isdigit():
+            return int(parts[0])
+    return default
+
+
 @contextmanager
 def track_gpu(sample_interval_sec: float = 0.5) -> Iterator[GpuStats]:
     stats = GpuStats()
     pynvml = _load_pynvml()
-    handle = pynvml.nvmlDeviceGetHandleByIndex(0)
+    handle = pynvml.nvmlDeviceGetHandleByIndex(nvml_device_index())
     stop = threading.Event()
     lock = threading.Lock()
 
@@ -92,9 +103,10 @@ def track_gpu(sample_interval_sec: float = 0.5) -> Iterator[GpuStats]:
             stats.peak_vram_bytes = max(stats.peak_vram_bytes, mem.used)
 
 
-def snapshot_vram_bytes(device_index: int = 0) -> int:
+def snapshot_vram_bytes(device_index: int | None = None) -> int:
     pynvml = _load_pynvml()
-    handle = pynvml.nvmlDeviceGetHandleByIndex(device_index)
+    index = nvml_device_index() if device_index is None else device_index
+    handle = pynvml.nvmlDeviceGetHandleByIndex(index)
     return pynvml.nvmlDeviceGetMemoryInfo(handle).used
 
 

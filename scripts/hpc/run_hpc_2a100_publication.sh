@@ -209,23 +209,25 @@ run_one_cell() {
   summary="$RESULTS/${cell_id}_summary.json"
 
   if [[ -f "$out" ]]; then
-    local got want task
+    local got want
     got="$(wc -l < "$out" | tr -d ' ')"
-    task="$(python -c "
-import json
-from pathlib import Path
-cell = json.loads(Path('$cell_cfg').read_text())
-task = json.loads(Path(cell['task_config']).read_text())
-print(task['task_name'])
-")"
-    case "$task" in
-      math500) want=500 ;;
-      gsm8k) want=1319 ;;
-      *) want=1 ;;
-    esac
+    want="$(python scripts/expected_rows.py --cell-config "$cell_cfg")"
     if [[ "$got" -ge "$want" ]]; then
-      echo "[gpu $gpu_id][skip] $cell_id complete ($got rows)"
-      write_cell_metadata "$cell_id" "$cell_cfg" "$gpu_id" "completed" "$out" "$summary"
+      if [[ ! -f "$summary" || ! -f "$scored" ]]; then
+        echo "[gpu $gpu_id][score-only] $cell_id raw complete ($got/$want rows), scoring..."
+        rel_raw="${out#"$QR"/}"
+        rel_scored="${scored#"$QR"/}"
+        rel_summary="${summary#"$QR"/}"
+        python scripts/score_run.py \
+          --input "$rel_raw" \
+          --output "$rel_scored" \
+          --summary "$rel_summary" 2>&1 | tee -a "$log"
+        write_cell_metadata "$cell_id" "$cell_cfg" "$gpu_id" "scored" "$out" "$summary"
+        backup_archive
+        return 0
+      fi
+      echo "[gpu $gpu_id][skip] $cell_id complete ($got/$want rows)"
+      write_cell_metadata "$cell_id" "$cell_cfg" "$gpu_id" "scored" "$out" "$summary"
       backup_archive
       return 0
     fi

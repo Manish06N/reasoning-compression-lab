@@ -7,15 +7,18 @@ from __future__ import annotations
 
 from typing import Any, Dict, Optional
 
+from src.extraction.math_extractor import normalize_completion_text
+
 
 def count_reasoning_steps(text: str, step_token: str = "\n\n") -> int:
     if not text:
         return 0
-    if step_token in text:
-        return len(text.split(step_token))
-    if "\n" in text:
-        return len([part for part in text.split("\n") if part.strip()])
-    return 1
+    text = normalize_completion_text(text)
+    by_para = len(text.split(step_token))
+    if by_para > 1:
+        return by_para
+    lines = [line for line in text.splitlines() if line.strip()]
+    return max(len(lines), 1) if lines else 0
 
 
 def count_tokens(text: str, tokenizer=None) -> Optional[int]:

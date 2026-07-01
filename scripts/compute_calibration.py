@@ -14,7 +14,14 @@ sys.path.insert(0, str(ROOT))
 
 from src.metrics.calibration import compute_calibration_metrics
 from src.metrics.consistency import calculate_consistency
-from src.metrics.scoring import score_math_item
+from src.metrics.scoring import majority_vote_answer, score_item
+
+
+def _completion_for_majority(row: dict, majority: str) -> str:
+    task = str(row.get("task", "math500")).lower()
+    if task.startswith("gpqa"):
+        return f"Answer: {majority}"
+    return f"\\boxed{{{majority}}}"
 
 
 def main() -> None:
@@ -42,12 +49,16 @@ def main() -> None:
 
     confidences = []
     labels = []
-    for item_id, samples in groups.items():
+    for _item_id, samples in groups.items():
         answers = [s.get("pred_answer") for s in samples if s.get("pred_answer")]
         confidences.append(calculate_consistency([str(a) for a in answers], method=args.method))
-        gold = samples[0].get("gold_solution", "")
-        majority_completion = samples[0].get("completion", "")
-        labels.append(1 if score_math_item(gold, majority_completion)["correct"] else 0)
+        majority = majority_vote_answer([str(a) for a in answers if a])
+        base = dict(samples[0])
+        if majority:
+            base["completion"] = _completion_for_majority(base, majority)
+        else:
+            base["completion"] = ""
+        labels.append(1 if score_item(base)["correct"] else 0)
 
     metrics = compute_calibration_metrics(confidences, labels)
     metrics["n_items"] = len(labels)

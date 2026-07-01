@@ -20,19 +20,16 @@ Quantized-Reasoning-Models releases real GPTQ W4G128 models on HuggingFace:
 
 https://huggingface.co/collections/ruikangliu/deepseek-r1-distill-quantized-68357b2a87b1a76137ad20d0
 
-On HPC:
+On HPC (automated):
 
 ```bash
 export QR=/scratch/$USER/reasoning-compression-lab
-mkdir -p $QR/models/DeepSeek-R1-Distill-Qwen-7B-GPTQ-4
-
-huggingface-cli download ruikangliu/DeepSeek-R1-Distill-Qwen-7B-GPTQ-W4G128 \
-  --local-dir $QR/models/DeepSeek-R1-Distill-Qwen-7B-GPTQ-4
+bash scripts/hpc/08_download_gptq4_models.sh both
 ```
 
-(Use the exact HF repo ID from the model card — name may vary slightly.)
+Manual download:
 
-Then:
+(Use the exact HF repo ID from the model card — override with `QWEN7B_GPTQ4_REPO` if name varies.)
 
 ```bash
 export QREASON_MODEL_QWEN7B_GPTQ4=$QR/models/DeepSeek-R1-Distill-Qwen-7B-GPTQ-4

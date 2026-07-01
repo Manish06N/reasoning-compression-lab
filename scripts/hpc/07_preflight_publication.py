@@ -25,6 +25,7 @@ from src.runners.config_utils import build_prompt, load_cell_config
 EXPECTED_HPC_BLOCKS = {
     "b01_parallel_bf16_anchors.sh",
     "b02_parallel_fp8.sh",
+    "b02_gpqa_fp8.sh",
     "b03_parallel_awq4.sh",
     "b04_parallel_gptq4.sh",
     "b05_single_gptq3.sh",
@@ -116,7 +117,11 @@ def check_blocks_and_models() -> None:
 
 def check_datasets() -> None:
     print("== dataset access ==")
-    for task_rel in ("configs/tasks/math500.json", "configs/tasks/gsm8k.json"):
+    for task_rel in (
+        "configs/tasks/math500.json",
+        "configs/tasks/gsm8k.json",
+        "configs/tasks/gpqa_diamond.json",
+    ):
         task = json.loads((ROOT / task_rel).read_text(encoding="utf-8"))
         if task.get("config_name"):
             dataset = load_dataset(task["dataset_id"], task["config_name"], split=task["split"])
@@ -134,6 +139,8 @@ def check_datasets() -> None:
             fail("MATH-500 row count is not 500")
         if task["task_name"] == "gsm8k" and len(dataset) != 1319:
             fail("GSM8K test row count is not 1319")
+        if task["task_name"] == "gpqa_diamond" and len(dataset) != 198:
+            fail("GPQA-Diamond row count is not 198")
 
 
 def main() -> None:

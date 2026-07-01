@@ -1,0 +1,10 @@
+# Level B pilot: maj@5 multi-sample (same decode as repro + distinct sample seeds).
+# Use with: scripts/run_inference_multisample.py --decoding-config configs/decoding/pilot_maj5.yaml
+
+temperature: 0.6
+top_p: 0.95
+max_tokens: 32768
+seed: 0
+repetition_penalty: 1.05
+n_samples: 5
+notes: maj@5 calibration pilot; each draw uses sample_seed = seed * 1000 + sample_index.

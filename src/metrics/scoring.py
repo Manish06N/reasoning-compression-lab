@@ -13,14 +13,14 @@ from src.extraction.math_extractor import (
     extract_boxed,
     extract_gold_answer,
     normalize_answer,
-    normalize_generated_text,
+    normalize_completion_text,
 )
 from src.metrics.cost_per_correct import summarize_cost_metrics
 from src.metrics.trace_length import summarize_trace_rows, trace_stats
 
 
 def score_math_item(gold_solution: str, completion: str) -> Dict[str, Any]:
-    completion = normalize_generated_text(completion)
+    completion = normalize_completion_text(completion)
     pred = extract_boxed(completion)
     gold = extract_gold_answer(gold_solution)
     pred_norm = normalize_answer(pred)
@@ -57,7 +57,7 @@ def _extract_numeric_answer(text: str) -> Optional[str]:
 
 
 def score_gsm8k_item(gold_solution: str, completion: str) -> Dict[str, Any]:
-    completion = normalize_generated_text(completion)
+    completion = normalize_completion_text(completion)
     pred = _extract_numeric_answer(completion)
     gold = _extract_gsm8k_gold(gold_solution)
     pred_norm = normalize_answer(pred).replace(",", "")
@@ -72,7 +72,7 @@ def score_gsm8k_item(gold_solution: str, completion: str) -> Dict[str, Any]:
 
 
 def score_gpqa_item(gold_letter: str, completion: str) -> Dict[str, Any]:
-    completion = normalize_generated_text(completion)
+    completion = normalize_completion_text(completion)
     pred = extract_gpqa_letter(completion)
     pred_norm = normalize_gpqa_letter(pred)
     gold_norm = normalize_gpqa_letter(gold_letter)
@@ -187,11 +187,12 @@ def summarize_failure_rates(rows: list[dict]) -> dict:
         1
         for row in rows
         if row.get("truncated") is True
+        or row.get("finish_reason") == "length"
         or (
             row.get("truncated") is None
             and row.get("completion_tokens") is not None
-            and row.get("decoding_max_tokens") is not None
-            and row["completion_tokens"] >= int(float(row["decoding_max_tokens"]) * 0.97)
+            and row["completion_tokens"]
+            >= int((row.get("decoding_max_tokens") or row.get("max_tokens") or 32768) * 0.97)
         )
     )
     invalid = sum(1 for row in rows if not row.get("pred_answer") or row.get("correct") is None)

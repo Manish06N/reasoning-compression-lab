@@ -11,20 +11,15 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from src.extraction.gpqa_extractor import extract_gpqa_letter
-from src.extraction.math_extractor import extract_boxed, extract_gold_answer
+from src.extraction.math_extractor import normalize_completion_text
+from src.metrics.scoring import score_item
 
 
 def extract_row(row: dict) -> dict:
-    task = row.get("task", "math500")
-    completion = row.get("completion", "")
-    out = dict(row)
-    if task.startswith("gpqa"):
-        out["pred_answer"] = extract_gpqa_letter(completion)
-        out["gold_answer"] = row.get("gold_letter")
-    else:
-        out["pred_answer"] = extract_boxed(completion)
-        out["gold_answer"] = extract_gold_answer(row.get("gold_solution", ""))
+    row = dict(row)
+    row["completion"] = normalize_completion_text(row.get("completion", ""))
+    score = score_item(row)
+    out = {**row, **score}
     return out
 
 

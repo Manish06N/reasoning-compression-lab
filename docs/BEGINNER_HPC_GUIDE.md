@@ -898,13 +898,13 @@ bash scripts/hpc/check_hpc_gate_status.sh
 
 | Document | Contents |
 |----------|----------|
+| [docs/README.md](README.md) | **Doc index** — what to read / what was archived |
 | [PAPER1_DESIGN.md](PAPER1_DESIGN.md) | Research scope, metrics, claim |
 | [MODEL_ROSTER.md](MODEL_ROSTER.md) | Canonical Hugging Face model IDs |
 | [HPC_2A100_PLAN.md](HPC_2A100_PLAN.md) | Block grid b01–b07 details |
-| [HPC_STEP_BY_STEP.md](HPC_STEP_BY_STEP.md) | Gate-by-gate commands (generic + Rudra) |
 | [HPC_PARAM_RUDRA.md](HPC_PARAM_RUDRA.md) | Rudra-specific env and sync |
 | [GPQA_ACCESS.md](GPQA_ACCESS.md) | Gated dataset steps |
-| [EXPERIMENT_LOG.md](EXPERIMENT_LOG.md) | Dated record template |
+| [progress.md](../progress.md) | Master execution log |
 | [CHANGELOG.md](../CHANGELOG.md) | Ops log of HPC runs and fixes |
 
 ---

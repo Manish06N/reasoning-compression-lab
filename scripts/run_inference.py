@@ -5,7 +5,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import random
 import sys
 from pathlib import Path
 
@@ -24,64 +23,14 @@ from src.runners.checkpoint_utils import (
     write_progress,
 )
 from src.runners.config_utils import build_prompt, load_cell_config, load_decoding_from_file
+from src.runners.dataset_rows import output_root_for, prepare_example_row
 from src.runners.vllm_runner import build_llm, generate_chunk
 
 CHECKPOINT_EVERY = 10
 
 
 def _output_root_for(out_path: Path) -> Path | None:
-    """Infer archive root (parent of raw/) when output lives under .../raw/."""
-    if out_path.parent.name == "raw":
-        return out_path.parent.parent
-    return None
-
-
-def _get_field(example, *names: str) -> str:
-    for name in names:
-        if name in example and example[name] is not None:
-            return str(example[name])
-    return ""
-
-
-def _prepare_example_row(example, task: dict, cell: dict, global_i: int) -> tuple[dict, dict]:
-    task_name = task["task_name"]
-    if task_name.startswith("gpqa"):
-        question = _get_field(example, "Question", "question", "problem")
-        correct = _get_field(example, "Correct Answer", "correct_answer", "answer")
-        distractors = [
-            _get_field(example, "Incorrect Answer 1", "incorrect_answer_1"),
-            _get_field(example, "Incorrect Answer 2", "incorrect_answer_2"),
-            _get_field(example, "Incorrect Answer 3", "incorrect_answer_3"),
-        ]
-        choices = [(correct, "correct")] + [(d, "incorrect") for d in distractors]
-        rng = random.Random(int(cell.get("seed", 0)) * 1_000_003 + global_i)
-        rng.shuffle(choices)
-        letters = "ABCD"
-        prompt_fields = {"question": question}
-        gold_letter = None
-        for letter, (choice, kind) in zip(letters, choices):
-            prompt_fields[letter.lower()] = choice
-            if kind == "correct":
-                gold_letter = letter
-        row_base = {
-            "id": example.get("Record ID", example.get("unique_id", str(global_i))),
-            "problem": question,
-            "choices": {letter: prompt_fields[letter.lower()] for letter in letters},
-            "gold_letter": gold_letter,
-            "gold_answer": correct,
-        }
-        return prompt_fields, row_base
-
-    problem_field = task.get("problem_field", "problem")
-    solution_field = task.get("solution_field", "solution")
-    problem = str(example[problem_field])
-    return {"question": problem.strip()}, {
-        "id": example.get("unique_id", str(global_i)),
-        "problem": problem,
-        "gold_solution": example[solution_field],
-        "subject": example.get("subject"),
-        "level": example.get("level"),
-    }
+    return output_root_for(out_path)
 
 
 def main() -> None:
@@ -183,7 +132,11 @@ def main() -> None:
     batch_size = max(1, args.batch_size)
     print(f"Loading model from: {model_path}")
     print(
-        f"Decoding: max_tokens={cell['decoding'].get('max_tokens')}, "
+        f"Decoding: temperature={cell['decoding'].get('temperature')}, "
+        f"top_p={cell['decoding'].get('top_p')}, "
+        f"max_tokens={cell['decoding'].get('max_tokens')}, "
+        f"repetition_penalty={cell['decoding'].get('repetition_penalty')}, "
+        f"seed={cell['seed']}, "
         f"max_model_len={cell['model'].get('max_model_len')}, batch_size={batch_size}"
     )
     if archive_root:
@@ -205,7 +158,7 @@ def main() -> None:
         batch_end = min(idx + batch_size, total)
         batch_examples = [dataset[i] for i in range(idx, batch_end)]
         prepared = [
-            _prepare_example_row(example, task, cell, global_i)
+            prepare_example_row(example, task, cell, global_i)
             for global_i, example in enumerate(batch_examples, start=idx)
         ]
         prompts = [
@@ -260,6 +213,28 @@ def main() -> None:
                 "decoding_repetition_penalty": cell["decoding"].get("repetition_penalty"),
                 "max_model_len": cell["model"].get("max_model_len"),
             }
+            for field in (
+                "time_to_first_token_sec",
+                "vram_before_gb",
+                "vram_after_gb",
+                "vram_max_gb",
+                "gpu_util_mean",
+                "gpu_util_max",
+                "power_watts_mean",
+                "power_watts_max",
+                "energy_joules",
+                "total_tokens",
+                "tokens_per_second",
+                "decode_tokens_per_second",
+                "seconds_per_output_token",
+                "tokens_per_joule",
+                "finish_reason",
+                "stop_reason",
+                "truncated",
+                "completion_chars",
+            ):
+                if field in result:
+                    row[field] = result[field]
             if args.decoding_config:
                 row["decoding_config"] = args.decoding_config
             rows.append(row)

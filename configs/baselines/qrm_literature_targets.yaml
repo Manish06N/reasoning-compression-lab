@@ -1,0 +1,66 @@
+# Literature / baseline targets for reproduction sanity checks.
+# Sources: Quantized-Reasoning-Models (COLM 2025), DeepSeek-R1 report, sober-reasoning leaderboard.
+# Compare with: scripts/compare_qrm_baseline.py --summary results/<cell>_summary.json
+#
+# Notes:
+# - QRM uses temperature=0.6, top_p=0.95, max_tokens=32768, seeds 42-44 (avg).
+# - Our repro_qrm.yaml uses seed=0 + repetition_penalty=1.05 (vLLM 0.8.x anti-loop; not in QRM code).
+# - sober-reasoning math500 uses temp=0.8 — different protocol; listed separately.
+
+protocols:
+  qrm_repro:
+    temperature: 0.6
+    top_p: 0.95
+    max_tokens: 32768
+    seeds: [42, 43, 44]
+  our_hpc_repro:
+    decoding_config: configs/decoding/repro_qrm.yaml
+    seed: 0
+    repetition_penalty: 1.05
+
+models:
+  DeepSeek-R1-Distill-Qwen-7B:
+    MATH-500:
+      quant_config: bf16
+      pass_at_1_pct:
+        reference: 55.5
+        source: "DeepSeek-R1 tech report; cross-check QRM Table 1"
+        sanity_min: 45.0
+        sanity_max: 65.0
+      truncation_rate_max: 0.30
+      parse_failure_rate_max: 0.40
+      reasoning_steps_mean:
+        sanity_min: 3.0
+        sanity_max: 80.0
+    GSM8K:
+      quant_config: bf16
+      pass_at_1_pct:
+        reference: 88.0
+        sanity_min: 75.0
+        sanity_max: 95.0
+
+  DeepSeek-R1-Distill-Llama-8B:
+    MATH-500:
+      quant_config: bf16
+      pass_at_1_pct:
+        reference: 50.0
+        source: "DeepSeek-R1 report / QRM; verify against paper table"
+        sanity_min: 40.0
+        sanity_max: 60.0
+      truncation_rate_max: 0.30
+      parse_failure_rate_max: 0.40
+
+  DeepSeek-R1-Distill-Qwen-7B-GPTQ-W4G128:
+    MATH-500:
+      quant_config: gptq4
+      pass_at_1_pct:
+        reference: null
+        source: "QRM paper GPTQ W4G128 row — fill after first b04 run"
+        sanity_min: 40.0
+        sanity_max: 60.0
+
+# sober-reasoning leaderboard (temp=0.8, different protocol — not a pass/fail gate)
+sober_reasoning_reference:
+  DeepSeek-R1-Distill-Qwen-7B:
+    math500_pct: 94.1
+    note: "sober-reasoning data.json; protocol differs from QRM repro"

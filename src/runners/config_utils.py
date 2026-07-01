@@ -54,14 +54,14 @@ def build_prompt(template_file: str, **fields: str) -> str:
 
 
 def load_decoding_from_file(decoding_file: str | Path) -> Dict[str, Any]:
-    loaded = load_yaml(decoding_file)
-    return {
-        "temperature": loaded.get("temperature", 0.6),
-        "top_p": loaded.get("top_p", 0.95),
-        "max_tokens": loaded.get("max_tokens", 32768),
-        "max_model_len": loaded.get("max_model_len"),
-        "repetition_penalty": loaded.get("repetition_penalty"),
+    loaded = load_yaml(decoding_file) or {}
+    defaults: Dict[str, Any] = {
+        "temperature": 0.6,
+        "top_p": 0.95,
+        "max_tokens": 32768,
     }
+    merged = {**defaults, **{k: v for k, v in loaded.items() if k != "notes"}}
+    return merged
 
 
 def load_decoding(cell_cfg: Dict[str, Any]) -> Dict[str, Any]:

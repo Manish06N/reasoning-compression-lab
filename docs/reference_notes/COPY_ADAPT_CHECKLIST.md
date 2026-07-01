@@ -15,6 +15,12 @@ This repo contains **adapted logic only**. Full external repos stay in `../exter
 | Calibrating-LLMs-with-Consistency | `consistency.py` | `src/metrics/consistency.py` |
 | Calibrating-LLMs-with-Consistency | `utils.py` | `src/metrics/calibration.py`, `selective_risk.py` |
 | Cost-of-Pass | `estimate.py` | `src/metrics/cost_per_correct.py`, `profiling/local_cost_model.py` |
+| Cost-of-Pass | `FrontierCostofPass` | `src/metrics/pareto_frontier.py`, `scripts/build_pareto_frontier.py` |
+| Calibrating-LLMs | multi-sample predict | `scripts/run_inference_multisample.py`, `scripts/score_multisample.py` |
+| Quantized-Reasoning-Models | `make_stats_table.py` targets | `configs/baselines/qrm_literature_targets.yaml`, `scripts/compare_qrm_baseline.py` |
+| sober-reasoning + vLLM | SamplingParams | `src/runners/sampling_utils.py`, `scripts/verify_decoding_params.py` |
+| lm-evaluation-harness | optional sanity | `scripts/lmeval_sanity_check.sh`, `docs/reference_notes/LMEVAL_SANITY.md` |
+| Quantized-Reasoning-Models | HF GPTQ weights | `scripts/hpc/08_download_gptq4_models.sh` |
 
 ## What was NOT copied
 

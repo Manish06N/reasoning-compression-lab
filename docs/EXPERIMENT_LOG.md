@@ -1,5 +1,7 @@
 # Experiment Log
 
+Optional per-cell notes. **Master log:** [progress.md](../progress.md) and [CHANGELOG.md](../CHANGELOG.md).
+
 Chronological record of runs. One section per experiment cell.
 
 ---

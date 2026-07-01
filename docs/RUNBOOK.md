@@ -33,7 +33,7 @@ bash scripts/local/resume_5080_pilot.sh     # foreground / after reboot
 bash scripts/local/backup_5080_archive.sh --snapshot
 ```
 
-Full repro (days) or HPC for BF16 anchors — see [RTX5080_EXECUTION_PLAN.md](RTX5080_EXECUTION_PLAN.md).
+Full repro (days) or HPC for BF16 anchors — 5080 retired; see [archive/RTX5080_EXECUTION_PLAN.md](archive/RTX5080_EXECUTION_PLAN.md).
 
 ---
 

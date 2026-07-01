@@ -10,8 +10,9 @@ from typing import Any, Dict, List
 
 
 
-from src.extraction.math_extractor import normalize_generated_text
+from src.extraction.math_extractor import normalize_completion_text
 from src.profiling.gpu_stats import snapshot_vram_bytes, track_gpu
+from src.runners.sampling_utils import build_sampling_params_dict
 
 
 
@@ -121,27 +122,8 @@ def _sampling_params(decoding: Dict[str, Any], seed: int):
 
     from vllm import SamplingParams
 
+    return SamplingParams(**build_sampling_params_dict(decoding, seed))
 
-
-    kwargs = {
-
-        "temperature": decoding.get("temperature", 0.6),
-
-        "top_p": decoding.get("top_p", 0.95),
-
-        "max_tokens": decoding.get("max_tokens", 32768),
-
-        "seed": seed,
-
-    }
-
-    if decoding.get("repetition_penalty") is not None:
-
-        kwargs["repetition_penalty"] = decoding["repetition_penalty"]
-
-
-
-    return SamplingParams(**kwargs)
 
 
 
@@ -257,7 +239,7 @@ def generate_chunk(
 
         choice = output.outputs[0]
 
-        completion = normalize_generated_text(choice.text)
+        completion = normalize_completion_text(choice.text)
 
         prompt_tokens = len(output.prompt_token_ids)
 
@@ -341,7 +323,7 @@ def generate_chunk(
 
                 "stop_reason": stop_reason,
 
-                "truncated": completion_tokens >= int(max_tokens * 0.97),
+                "truncated": finish_reason == "length" or completion_tokens >= max_tokens,
 
                 "completion_chars": len(completion),
 

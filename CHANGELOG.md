@@ -1,8 +1,79 @@
 # Changelog
 
-## 2026-06-30 (GPU telemetry and efficiency metrics)
+## 2026-07-01 — External repos plan: tooling wired (MacBook)
 
-- Added sampled NVML telemetry during each `vLLM.generate()` call: true observed max VRAM, mean/max GPU utilization, mean/max power draw, and per-query energy estimates.
+Implemented actionable items from external-repos analysis (HPC-only publication path):
+
+- **Decoding verify:** `scripts/verify_decoding_params.py`, `src/runners/sampling_utils.py` — confirms `repetition_penalty` + seed reach vLLM SamplingParams (sober-reasoning pattern).
+- **QRM baseline gate:** `configs/baselines/qrm_literature_targets.yaml`, `scripts/compare_qrm_baseline.py` — sanity-check pass@1 / truncation after HPC rerun.
+- **GPTQ-4 download:** `scripts/hpc/08_download_gptq4_models.sh` (QRM HF collection); `docs/GPTQ4_PREP.md` updated.
+- **maj@5 pilot:** `scripts/run_inference_multisample.py`, `scripts/score_multisample.py`, `configs/decoding/pilot_maj5.yaml`.
+- **Pareto frontier:** `src/metrics/pareto_frontier.py`, `scripts/build_pareto_frontier.py` (Cost-of-Pass pattern).
+- **lm-eval sanity (optional):** `scripts/lmeval_sanity_check.sh`, `scripts/lmeval_compare_summary.py`, `docs/reference_notes/LMEVAL_SANITY.md`.
+- **Level C clones:** `external_repos/06-later/{livecodebench,OckBench,reasoning-models-confidence}`.
+- Tests: `tests/test_sampling_params.py`, `tests/test_external_repos_integration.py` (17 total pass).
+
+**Pre-HPC rerun:** `python scripts/verify_decoding_params.py`  
+**Post-rerun:** `python scripts/compare_qrm_baseline.py --summary results/<cell>_summary.json`
+
+### Pre-push audit (2026-07-01 evening)
+
+- **17/17 tests pass**; `verify_decoding_params.py` → VERIFY OK.
+- Refactored `prepare_example_row` → `src/runners/dataset_rows.py`.
+- **Docs cleanup:** `docs/README.md` index; redundant guides moved to `docs/archive/`; README shortened.
+- **Push status:** MacBook changes **not pushed yet** (local behind `origin/main` by HPC autopush commits — pull before push).
+
+---
+
+## 2026-07-01 — First HPC scores + pipeline audit (MacBook)
+
+### Results (`outputs-hpc-2a100-main-2026-06-29`, rescored on MacBook)
+
+| Cell | Status | pass@1 | Truncation | Parse fail |
+|------|--------|--------|------------|------------|
+| Qwen-7B BF16 MATH-500 | **500/500 scored** | 7.0% (35/500) | 90% | 86% |
+| Llama-8B BF16 MATH-500 | **500/500 scored** | 21.4% (107/500) | 59% | 60% |
+| Qwen-7B FP8 MATH-500 | **50/500 in progress** | 0% (partial) | 76% | 98% |
+
+Paper tables populated under `outputs-hpc-2a100-main-2026-06-29/paper_tables/`. Absolute pass@1 is depressed by R1 decode loops hitting the 32k token cap (~90% near-max on Qwen). **Existing raw JSONL was generated without `repetition_penalty`** — rerun required for clean numbers, not just rescoring.
+
+### Scoring fixes
+
+- MATH `\boxed{}` extraction: nested braces, skip unclosed trailing boxes (lm-eval style).
+- Llama vLLM 0.8.x SentencePiece artifacts (`Ġ`, `Ċ`) normalized before scoring and at generation time.
+- Truncation rate inferred from `finish_reason == "length"` or completion tokens ≥ 97% of max when legacy rows lack telemetry.
+- New scripts: `scripts/rescore_archive.py`, `scripts/sync_archive_manifest.py`, `scripts/expected_rows.py`.
+- Tests: `tests/test_math_extractor.py`, `tests/test_config_and_tasks.py`, `tests/test_gpu_stats.py` (17 tests total after external-repos additions).
+
+### Critical orchestration / config fixes
+
+- **`load_decoding_from_file()`** now forwards all YAML keys (including `repetition_penalty`) — was silently dropped before every HPC run.
+- Added `repetition_penalty: 1.05` to `configs/decoding/repro_qrm.yaml` for future anti-loop decoding.
+- **GPQA row count:** shared `src/runners/task_utils.py` — MATH-500 (500), GSM8K (1319), GPQA (198); HPC/5080 no longer mark GPQA complete after 1 row.
+- **NVML telemetry:** `CUDA_VISIBLE_DEVICES` mapped to correct physical GPU on parallel 2×A100 blocks (was always GPU 0).
+- HPC skip path runs `score_run.py` when raw is complete but scored/summary missing.
+- `sync_archive_manifest.py` uses task-aware row counts (not hardcoded 500).
+- Preflight adds `b02_gpqa_fp8.sh` block + GPQA-Diamond dataset validation.
+- `extract_answers.py`, `compute_calibration.py` route through `score_item()` / majority vote.
+- `run_inference.py` persists finish/truncation/telemetry fields from `vllm_runner`.
+- `vllm_runner` marks `truncated` when `finish_reason == "length"`.
+- Cost summaries use `null` instead of invalid JSON `Infinity` when `num_correct == 0`.
+
+### HPC action required
+
+1. Push MacBook fixes → `git push origin main`
+2. HPC: `cd $QR && git fetch origin && git reset --hard origin/main`
+3. Stop/restart Level B FP8 (and optionally rerun Level A/C) so cells pick up `repetition_penalty: 1.05`
+4. Do **not** treat current Level A/C pass@1 as publication-ready until rerun completes
+
+### Known remaining gaps (not fixed this session)
+
+- **5080 batch checkpoint** can lose up to `batch_size−1` rows on crash (low risk on HPC where `batch_size=1`).
+- Level B partial (50/500) was generated with old decoding — discard or resume after HPC sync.
+
+---
+
+## 2026-06-30 (GPU telemetry and efficiency metrics)
 - Raw inference rows now include throughput and completion-health fields: total/decode tokens per second, seconds per output token, tokens per joule, finish/stop reasons, truncation flag, completion character count, VRAM before/after/max, and optional time-to-first-token when vLLM exposes timing metrics.
 - Scored rows now record explicit answer parse success and MATH boxed-answer presence.
 - Summary JSON now aggregates throughput, VRAM, utilization, power, energy, tokens-per-joule, finish-reason counts, and the new sampled telemetry fields while staying compatible with old raw rows.

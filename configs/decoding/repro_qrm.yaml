@@ -6,4 +6,6 @@ top_p: 0.95
 max_tokens: 32768
 repetition_penalty: 1.05
 seed: 0
-notes: Match QRM paper for first BF16/GPTQ-4 reproduction cell.
+# R1 models on vLLM 0.8.x can degenerate into token loops before emitting \\boxed{}.
+repetition_penalty: 1.05
+notes: Match QRM paper for first BF16/GPTQ-4 reproduction cell; repetition_penalty reduces decode loops on HPC.

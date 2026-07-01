@@ -9,52 +9,67 @@ Canonical dated record for **Paper 1: Beyond Accuracy** (`reasoning-compression-
 
 ---
 
-## Current Status Snapshot (2026-06-30)
+## Current Status Snapshot (2026-07-01)
 
 | Area | Status |
 |------|--------|
-| MacBook pipeline + docs | **Complete** |
-| GitHub latest commit | Synced after latest HPC push; see `git log -1` |
-| HPC env (qreason, vLLM 0.8.5, A100) | **Complete** — Gate 1 passed (job 85013) |
-| HPC model + datasets | Qwen-7B BF16 (~15 GB) + all b01–b06 quant models downloaded |
-| HPC CPU preflight | **Passed** — `scripts/hpc/07_preflight_publication.py` |
-| HPC GPU smoke (Gate 3) | **PASSED** — job `85306`, exit `0:0` |
-| First scored paper result | **None** — no `results/*_summary.json` from HPC yet |
-| **Windows 5080 (WSL2)** | **Retired for experiments** — too slow; do not schedule publication work there |
-| Publication strategy | **HPC-only** (5080 stopped 2026-06-28 — ~15 min/q too slow for 1.5B grid) |
-| b01 BF16 anchors | **Running, slow but checkpointing** — `85394` on `ragpu008`; monitor against 47h walltime |
-| b02–b06 full grid | **Queued** — pending with `QOSMaxGRESPerUser`; will use new telemetry when they start |
+| MacBook pipeline + docs | **Complete** — fixes + external-repos tooling; **ready to push** |
+| GitHub remote HEAD | `bdaff00` — **MacBook ahead** (unpushed fixes) |
+| HPC env (qreason, vLLM 0.8.5, A100) | **Complete** — Gate 1–3 passed |
+| HPC CPU preflight | **Passed** — `07_preflight_publication.py` |
+| **First scored HPC results** | **Yes** — archive `outputs-hpc-2a100-main-2026-06-29` (**diagnostic only**) |
+| Windows 5080 (WSL2) | **Retired** — HPC-only for publication |
+| Unit tests (MacBook) | **17 pass** — `python -m pytest tests/ -q` |
 
-**Current blocker for clean HPC paper numbers:** b01 must now run to completion or checkpoint enough rows before the 47h walltime. The state-file race has been fixed and the corrected b01 job is running.
+### First scored numbers (seed 0, MATH-500 — **not publication-ready**)
 
-**Current live progress:** corrected job `85394` is running on `ragpu008`; b02-b06 are released and pending behind the user GPU quota. As of the latest queue check, `85394` has been running for more than 31 hours and may need resume/chunking if it reaches the 47h walltime before Qwen finishes. Future Qwen-1.5B model assets are staged on HPC; no extra experiment jobs were submitted.
+| Cell | Rows | pass@1 | Truncation | Notes |
+|------|------|--------|------------|-------|
+| Qwen-7B BF16 | 500/500 | **7.0%** (35) | 90% | Loop-heavy completions; no `repetition_penalty` in raw run |
+| Llama-8B BF16 | 500/500 | **21.4%** (107) | 59% | Best of b01 anchors; still loop/truncation affected |
+| Qwen-7B FP8 | 50/500 | 0% (partial) | 76% | In progress when last synced; old decoding |
+
+Paper tables: `outputs-hpc-2a100-main-2026-06-29/paper_tables/`.
+
+**Current blocker for clean paper numbers:** HPC must sync MacBook fixes (especially `repetition_penalty` actually reaching vLLM) and **rerun or restart** cells. Rescoring alone cannot fix loop-truncated raw completions. Level A/C numbers above are diagnostic only.
+
+**MacBook fixes pending push (2026-07-01):** scoring, decoding passthrough, GPQA row counts, NVML, rescore/sync scripts, **verify_decoding_params**, **compare_qrm_baseline**, **maj@5 multisample**, Pareto frontier, GPTQ download script. See `CHANGELOG.md`.
+
+### Pre-push verification (MacBook)
+
+```bash
+python -m pytest tests/ -q                    # 17 pass
+python scripts/verify_decoding_params.py      # VERIFY OK
+python -m compileall -q src scripts tests
+bash -n scripts/hpc/*.sh
+```
+
+Then: `git commit` → `git push origin main` → HPC `git reset --hard origin/main`.
 
 ---
 
 ## Current Experiment Coverage
 
-The running/queued jobs are the main HPC publication batch b01-b06, not the complete final paper package. They cover:
+Archive `outputs-hpc-2a100-main-2026-06-29` reflects the **b01 BF16 anchor block** (parallel Qwen-7B + Llama-8B) plus partial **b02 FP8** (Qwen-7B only, 10% done):
 
 | Block | Coverage | Status |
 |------|----------|--------|
-| b01 | Qwen-7B BF16 MATH-500 + Llama-8B BF16 MATH-500 | Corrected job `85394` running |
-| b02 | Qwen-7B FP8 MATH-500 + Llama-8B FP8 MATH-500 | Queued as `85343` |
-| b03 | Qwen-7B AWQ-4 MATH-500 + Llama-8B AWQ-4 MATH-500 | Queued as `85344` |
-| b04 | Qwen-7B GPTQ-4 MATH-500 + Llama-8B GPTQ-4 MATH-500 | Queued as `85345` |
-| b05 | Qwen-7B GPTQ-3 MATH-500 | Queued as `85346` |
-| b06 | Qwen-7B FP8 GSM8K | Queued as `85347` |
-| b07 | Qwen-7B FP8 GPQA-Diamond | Ready after HF gate approval; not queued |
-| b08 | Qwen-1.5B BF16 + FP8 MATH-500 | Wired for future HPC-only submission; not queued |
-| b09 | Qwen-1.5B AWQ-4 + GPTQ-4 MATH-500 | Wired for future HPC-only submission; not queued |
+| b01 | Qwen-7B BF16 + Llama-8B BF16 MATH-500 | **Scored** — see table above; rerun recommended |
+| b02 | Qwen-7B FP8 MATH-500 | **50/500** in progress (partial summary only) |
+| b02 | Llama-8B FP8 MATH-500 | Not started in this archive |
+| b03–b06 | AWQ-4, GPTQ-4, GPTQ-3, GSM8K | Queued / not in this archive |
+| b07 | Qwen-7B FP8 GPQA-Diamond | Ready (HF gate approved); not queued |
+| b08–b09 | Qwen-1.5B cells | Wired; not queued |
 
-Work still left after b01-b06 finish:
+Work still left:
 
-- Score all raw JSONL outputs into scored JSONL files and summary JSON results.
-- Build paper metrics and tables: pass@1, latency, token counts, VRAM, cost-per-correct, and compression tradeoffs.
-- GPQA gated access is now approved for the saved HPC Hugging Face token; authenticated Hub check returned HTTP 200 for `gpqa_diamond.csv`. b07 can be queued after current queue strategy allows.
-- Qwen-1.5B cells are now HPC-only future work. BF16, FP8, AWQ-4, and GPTQ-4 model directories were downloaded on HPC on 2026-06-29; queue these only after deciding they are needed and after adding/using an HPC block for them.
-- Run multi-seed stability later; current publication jobs are seed0 only.
-- Rerun or resume any cell that times out before completing all rows, especially b01 if BF16 remains slow.
+- **Push MacBook fixes → HPC `git reset --hard origin/main`**
+- **Restart Level B FP8** (and optionally rerun Level A/C) with `repetition_penalty: 1.05`
+- Complete b02–b06 grid on HPC (fresh rerun recommended for b01)
+- Score all cells and rebuild paper tables
+- Do **not** cite current pass@1 in the paper until post-fix rerun completes
+- **maj@5 pilot wired** — `run_inference_multisample.py` + `score_multisample.py` (after b01 sane)
+- Multi-seed stability later (seed0 only for now)
 
 ---
 
@@ -78,39 +93,90 @@ No additional jobs were submitted yet. Current recommendation is to let b01-b06 
 
 ---
 
+## 2026-07-01 — HPC outputs pulled, scored, pipeline audit
+
+### What happened
+
+- Pulled latest HPC autopush from GitHub (`bdaff00`) into MacBook archive `outputs-hpc-2a100-main-2026-06-29`.
+- b01 BF16 anchors **completed** (500 rows each for Qwen-7B and Llama-8B); b02 Qwen-7B FP8 **partial** (50/500 when last synced).
+- Ran `rescore_archive.py`, `sync_archive_manifest.py`, `build_paper_tables.py` on MacBook.
+
+### Diagnosis: why pass@1 is so low
+
+1. **Decode loops** — ~90% of Qwen completions hit ≥97% of the 32k token budget (`yeah yeah…`, `</think>` spam) before emitting `\boxed{}`.
+2. **`repetition_penalty` never applied** — YAML had `1.05` but `load_decoding_from_file()` stripped it; HPC runs had no anti-loop decoding.
+3. **Llama text artifact** — vLLM 0.8.x leaked SentencePiece markers (`Ġ`, `Ċ`) in completions (fixed for scoring + future inference).
+4. **Boxed extractor** — nested `\boxed{\frac{1}{2}}` and unclosed trailing boxes caused parse failures (fixed).
+
+### Fixes applied on MacBook (pending git push)
+
+| Area | Fix |
+|------|-----|
+| Scoring | `math_extractor.py`, truncation detection, Llama normalization |
+| Decoding | Full YAML passthrough + `repetition_penalty: 1.05` in `repro_qrm.yaml` |
+| Orchestration | GPQA row count (198), HPC score-on-skip, `expected_rows.py` |
+| Telemetry | NVML respects `CUDA_VISIBLE_DEVICES` on parallel blocks |
+| Tooling | `rescore_archive.py`, `sync_archive_manifest.py`, 17 unit tests |
+
+### Re-audit (2026-07-01 evening)
+
+- All unit tests pass; `compileall` + bash `-n` on HPC/5080 orchestrators pass.
+- No remaining hardcoded `want=1` for GPQA in HPC/5080 publication scripts.
+- **Still open:** 5080 batch checkpoint edge case (irrelevant on HPC `batch_size=1`); Level A/C raw data needs HPC rerun for trustworthy pass@1.
+- **Also fixed:** cost summaries wrote invalid JSON `Infinity` when `num_correct == 0` (now `null`).
+
+### Next HPC steps
+
+```bash
+# MacBook: commit + push fixes
+# HPC:
+cd $QR && git fetch origin && git reset --hard origin/main
+# scancel Level B if still on old code; resubmit b02 with fixed decoding
+# Optional: delete + rerun Level A/C raw for clean BF16 anchor numbers
+```
+
+---
+
 ## GPU Telemetry Added 2026-06-30
 
 Future inference rows now record sampled runtime telemetry and efficiency fields: `vram_before_gb`, `vram_after_gb`, `vram_max_gb`, `gpu_util_mean`, `gpu_util_max`, `power_watts_mean`, `power_watts_max`, `energy_joules`, `tokens_per_second`, `decode_tokens_per_second`, `seconds_per_output_token`, `tokens_per_joule`, `finish_reason`, `stop_reason`, `truncated`, `completion_chars`, and optional `time_to_first_token_sec` when vLLM exposes timing metrics. Scored rows also include `answer_parse_success` and MATH `boxed_answer_present`.
 
-This change will not affect already-running `85394` until that job exits/resumes, but pending b02-b06 jobs should use it when Slurm starts them. Current recommendation remains: do not add the full GSM8K/GPQA grid yet. First learn whether b01 completes under walltime or needs chunking/reduced generation settings.
+Legacy note: job `85394` predates full telemetry in raw rows. Archives synced before 2026-07-01 may lack `finish_reason` / `truncated` per row; rescoring infers truncation from token counts. Parallel 2×A100 blocks before the NVML fix logged GPU 0 stats for the Llama branch.
 
 ## Q1 Publication Analysis Utilities
 
 The codebase now has the core post-run publication tools needed after HPC jobs finish:
 
 - `scripts/score_run.py` summaries include bootstrap 95% confidence intervals for `pass_at_1`, failure rates, and cost-per-correct intervals.
-- Future raw rows include decoding settings needed to detect truncation cleanly.
-- Future GSM8K and GPQA-Diamond cells use task-aware row construction/scoring instead of MATH-only boxed-answer scoring.
-- `scripts/build_paper_tables.py --archive <outputs-hpc-...>` writes main, efficiency, and failure CSV tables under `<archive>/paper_tables/`.
-- `scripts/build_repro_bundle.py --archive <outputs-hpc-...>` writes `<archive>/reproducibility_bundle.json` with configs, metadata, package versions, git info, CUDA probe, and code/config hashes.
+- `scripts/rescore_archive.py --archive <outputs-hpc-...>` rescored an entire archive after extractor fixes.
+- `scripts/sync_archive_manifest.py --archive <outputs-hpc-...>` refreshes manifest/state from disk (task-aware row counts).
+- `scripts/expected_rows.py --cell-config <cell.json>` prints dataset size (500 / 1319 / 198).
+- `scripts/verify_decoding_params.py` — pre-HPC decoding preflight.
+- `scripts/compare_qrm_baseline.py` — post-rerun literature sanity gate.
+- `scripts/run_inference_multisample.py` / `score_multisample.py` — maj@5 Level B pilot.
+- `scripts/build_pareto_frontier.py` — cost Pareto across quant configs.
+- Raw rows from post-fix runs include decoding settings and truncation telemetry.
+- GSM8K and GPQA-Diamond cells use task-aware row construction/scoring.
+- `scripts/build_paper_tables.py --archive <outputs-hpc-...>` writes main, efficiency, and failure CSV tables.
+- `scripts/build_repro_bundle.py --archive <outputs-hpc-...>` writes reproducibility bundle JSON.
 
-Run these after each completed/scored archive before drafting final Q1 journal tables.
+Run rescore + paper tables after each archive sync; rerun inference (not just rescore) after decoding fixes.
 
 ---
 
 ## Archive Metadata and Backup Status
 
-HPC publication runs now write a durable archive manifest at `outputs-hpc-2a100-main-YYYY-MM-DD/manifest.json` and per-cell metadata snapshots under `metadata/<cell_id>.json`. Each metadata file records the cell/model/task/decoding configs, batch and checkpoint settings, git commit, SLURM job info, raw output path, summary path, and saved row count.
+HPC publication runs write a durable archive manifest at `outputs-hpc-2a100-main-YYYY-MM-DD/manifest.json` and per-cell metadata under `metadata/<cell_id>.json`.
 
-For the active 2026-06-29 b01 run, the manifest and metadata files were created manually because job `85394` started before this runner change. Future queued jobs will write and update these automatically. `_backup/latest/` now includes `metadata/` and `manifest.json`; full archive mirrors are protected by a lock for parallel GPU branches.
+**Active archive (2026-07-01):** `outputs-hpc-2a100-main-2026-06-29` — autopushed to GitHub; manifest synced via `sync_archive_manifest.py`. b01 cells status `scored`; b02 Qwen FP8 `in_progress` (50 rows). `_backup/latest/` mirrors raw/scored/results/metadata; lock protects parallel GPU backup races.
 
 ---
 
 ## Publication Sufficiency Strategy
 
-Current judgement: b01-b09 are enough for the first publishable core result set if they complete cleanly and show interpretable trends. The seed0 grid covers three model families/scales, five compression settings, and three reasoning benchmarks.
+Current judgement (updated 2026-07-01): b01-b09 seed0 remains the target core grid, but **first b01 numbers are not publishable** until decode-loop fix is deployed on HPC and cells rerun. The partial FP8 run (50 rows, 0% pass@1) confirms the same loop pathology.
 
-Do not expand the queue immediately. First finish b01-b09, score all outputs, and build the core tables/figures. After seeing the result quality, decide whether reviewers will need robustness checks.
+Do not expand the queue until post-fix rerun shows sensible pass@1 (expect ~50%+ range for R1-Distill on MATH-500 per literature, not 7%).
 
 Recommended expansion only if needed:
 
