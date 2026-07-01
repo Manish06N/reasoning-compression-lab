@@ -1,7 +1,7 @@
 {
   "cell_id": "level_a_qwen7b_bf16_math500_seed0",
-  "rows_done": 420,
+  "rows_done": 500,
   "rows_total": 500,
-  "status": "in_progress",
-  "updated_at": "2026-07-01T02:01:35.029023+00:00"
+  "status": "completed",
+  "updated_at": "2026-07-01T11:32:47.247851+00:00"
 }

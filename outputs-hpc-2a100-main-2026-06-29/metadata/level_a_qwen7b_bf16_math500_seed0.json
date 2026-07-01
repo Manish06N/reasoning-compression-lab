@@ -1,11 +1,11 @@
 {
   "cell_id": "level_a_qwen7b_bf16_math500_seed0",
-  "status": "in_progress",
-  "updated_at": "2026-07-01T02:38:21.475168+00:00",
+  "status": "scored",
+  "updated_at": "2026-07-01T11:33:38.308802+00:00",
   "gpu_id": "0",
-  "rows_saved": 420,
+  "rows_saved": 500,
   "raw": "/scratch/manishn_iitp/reasoning-compression-lab/outputs-hpc-2a100-main-2026-06-29/raw/level_a_qwen7b_bf16_math500_seed0.jsonl",
-  "summary": null,
+  "summary": "/scratch/manishn_iitp/reasoning-compression-lab/outputs-hpc-2a100-main-2026-06-29/results/level_a_qwen7b_bf16_math500_seed0_summary.json",
   "cell_config_path": "configs/cells/level_a_bf16_seed0.json",
   "cell_config": {
     "cell_id": "level_a_qwen7b_bf16_math500_seed0",

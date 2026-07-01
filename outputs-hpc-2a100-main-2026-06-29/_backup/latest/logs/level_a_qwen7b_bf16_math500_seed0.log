@@ -1,0 +1,233 @@
+/home/manishn_iitp/.conda/envs/qreason/lib/python3.11/site-packages/torch/cuda/__init__.py:61: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+Loading dataset: HuggingFaceH4/MATH-500 [test]
+Resuming level_a_qwen7b_bf16_math500_seed0: 420/500 rows already in /scratch/manishn_iitp/reasoning-compression-lab/outputs-hpc-2a100-main-2026-06-29/raw/level_a_qwen7b_bf16_math500_seed0.jsonl
+Loading model from: /scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Qwen-7B
+Decoding: max_tokens=32768, max_model_len=32768, batch_size=1
+INFO 07-01 08:10:43 [__init__.py:239] Automatically detected platform cuda.
+[transformers] `torch_dtype` is deprecated! Use `dtype` instead!
+INFO 07-01 08:11:27 [config.py:717] This model supports multiple tasks: {'generate', 'score', 'embed', 'classify', 'reward'}. Defaulting to 'generate'.
+INFO 07-01 08:11:27 [config.py:2003] Chunked prefill is enabled with max_num_batched_tokens=16384.
+WARNING 07-01 08:11:27 [cuda.py:93] To see benefits of async output processing, enable CUDA graph. Since, enforce-eager is enabled, async output processor cannot be used
+INFO 07-01 08:11:32 [core.py:58] Initializing a V1 LLM engine (v0.8.5) with config: model='/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Qwen-7B', speculative_config=None, tokenizer='/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Qwen-7B', skip_tokenizer_init=False, tokenizer_mode=auto, revision=None, override_neuron_config=None, tokenizer_revision=None, trust_remote_code=True, dtype=torch.bfloat16, max_seq_len=32768, download_dir=None, load_format=LoadFormat.AUTO, tensor_parallel_size=1, pipeline_parallel_size=1, disable_custom_all_reduce=False, quantization=None, enforce_eager=True, kv_cache_dtype=auto,  device_config=cuda, decoding_config=DecodingConfig(guided_decoding_backend='auto', reasoning_backend=None), observability_config=ObservabilityConfig(show_hidden_metrics=False, otlp_traces_endpoint=None, collect_model_forward_time=False, collect_model_execute_time=False), seed=None, served_model_name=/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Qwen-7B, num_scheduler_steps=1, multi_step_stream_outputs=True, enable_prefix_caching=True, chunked_prefill_enabled=True, use_async_output_proc=False, disable_mm_preprocessor_cache=False, mm_processor_kwargs=None, pooler_config=None, compilation_config={"splitting_ops":[],"compile_sizes":[],"cudagraph_capture_sizes":[],"max_capture_size":0}
+WARNING 07-01 08:11:44 [utils.py:2522] Methods determine_num_available_blocks,device_config,get_cache_block_size_bytes,initialize_cache not implemented in <vllm.v1.worker.gpu_worker.Worker object at 0x7fa6f3eca710>
+INFO 07-01 08:11:46 [parallel_state.py:1004] rank 0 in world size 1 is assigned as DP rank 0, PP rank 0, TP rank 0
+INFO 07-01 08:11:46 [cuda.py:221] Using Flash Attention backend on V1 engine.
+WARNING 07-01 08:11:46 [topk_topp_sampler.py:69] FlashInfer is not available. Falling back to the PyTorch-native implementation of top-p & top-k sampling. For the best performance, please install FlashInfer.
+INFO 07-01 08:11:46 [gpu_model_runner.py:1329] Starting to load model /scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Qwen-7B...
+Loading safetensors checkpoint shards:   0% Completed | 0/2 [00:00<?, ?it/s]
+Loading safetensors checkpoint shards:  50% Completed | 1/2 [00:07<00:07,  7.61s/it]
+Loading safetensors checkpoint shards: 100% Completed | 2/2 [00:16<00:00,  8.51s/it]
+Loading safetensors checkpoint shards: 100% Completed | 2/2 [00:16<00:00,  8.38s/it]
+
+INFO 07-01 08:12:05 [loader.py:458] Loading weights took 16.87 seconds
+INFO 07-01 08:12:05 [gpu_model_runner.py:1347] Model loading took 14.2717 GiB and 18.667268 seconds
+INFO 07-01 08:12:11 [kv_cache_utils.py:634] GPU KV cache size: 950,240 tokens
+INFO 07-01 08:12:11 [kv_cache_utils.py:637] Maximum concurrency for 32,768 tokens per request: 29.00x
+INFO 07-01 08:12:11 [core.py:159] init engine (profile, create kv cache, warmup model) took 5.41 seconds
+INFO 07-01 08:12:11 [core_client.py:439] Core engine process 0 ready.
+[421-421/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:03<00:00, 423.03s/it, est. speed input: 0.31 toks/s, output: 77.15 toks/s]Processed prompts: 100%|██████████| 1/1 [07:03<00:00, 423.03s/it, est. speed input: 0.31 toks/s, output: 77.15 toks/s]
+[422-422/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.79s/it, est. speed input: 0.43 toks/s, output: 77.44 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.79s/it, est. speed input: 0.43 toks/s, output: 77.44 toks/s]
+[423-423/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.62s/it, est. speed input: 0.44 toks/s, output: 77.47 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.62s/it, est. speed input: 0.44 toks/s, output: 77.47 toks/s]
+[424-424/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:01<00:00, 421.57s/it, est. speed input: 0.31 toks/s, output: 77.42 toks/s]Processed prompts: 100%|██████████| 1/1 [07:01<00:00, 421.57s/it, est. speed input: 0.31 toks/s, output: 77.42 toks/s]
+[425-425/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:01<00:00, 421.63s/it, est. speed input: 0.27 toks/s, output: 77.45 toks/s]Processed prompts: 100%|██████████| 1/1 [07:01<00:00, 421.63s/it, est. speed input: 0.27 toks/s, output: 77.45 toks/s]
+[426-426/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:03<00:00, 423.39s/it, est. speed input: 0.37 toks/s, output: 77.05 toks/s]Processed prompts: 100%|██████████| 1/1 [07:03<00:00, 423.46s/it, est. speed input: 0.37 toks/s, output: 77.05 toks/s]
+[427-427/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.98s/it, est. speed input: 0.52 toks/s, output: 77.32 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.99s/it, est. speed input: 0.52 toks/s, output: 77.32 toks/s]
+[428-428/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:01<00:00, 421.11s/it, est. speed input: 0.29 toks/s, output: 77.52 toks/s]Processed prompts: 100%|██████████| 1/1 [07:01<00:00, 421.11s/it, est. speed input: 0.29 toks/s, output: 77.52 toks/s]
+[429-429/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.97s/it, est. speed input: 0.35 toks/s, output: 77.49 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.99s/it, est. speed input: 0.35 toks/s, output: 77.49 toks/s]
+[430-430/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:05<00:00, 425.95s/it, est. speed input: 0.27 toks/s, output: 76.67 toks/s]Processed prompts: 100%|██████████| 1/1 [07:05<00:00, 425.98s/it, est. speed input: 0.27 toks/s, output: 76.67 toks/s]
+checkpoint saved: /scratch/manishn_iitp/reasoning-compression-lab/outputs-hpc-2a100-main-2026-06-29/raw/level_a_qwen7b_bf16_math500_seed0.jsonl (430 rows)
+[431-431/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [04:27<00:00, 267.10s/it, est. speed input: 0.33 toks/s, output: 79.18 toks/s]Processed prompts: 100%|██████████| 1/1 [04:27<00:00, 267.10s/it, est. speed input: 0.33 toks/s, output: 79.18 toks/s]
+[432-432/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.93s/it, est. speed input: 0.27 toks/s, output: 77.57 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.93s/it, est. speed input: 0.27 toks/s, output: 77.57 toks/s]
+[433-433/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [06:59<00:00, 419.88s/it, est. speed input: 0.36 toks/s, output: 77.68 toks/s]Processed prompts: 100%|██████████| 1/1 [06:59<00:00, 419.88s/it, est. speed input: 0.36 toks/s, output: 77.68 toks/s]
+[434-434/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:02<00:00, 422.75s/it, est. speed input: 0.22 toks/s, output: 77.30 toks/s]Processed prompts: 100%|██████████| 1/1 [07:02<00:00, 422.75s/it, est. speed input: 0.22 toks/s, output: 77.30 toks/s]
+[435-435/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:07<00:00, 427.66s/it, est. speed input: 0.26 toks/s, output: 76.37 toks/s]Processed prompts: 100%|██████████| 1/1 [07:07<00:00, 427.72s/it, est. speed input: 0.26 toks/s, output: 76.37 toks/s]
+[436-436/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:01<00:00, 421.21s/it, est. speed input: 0.26 toks/s, output: 77.53 toks/s]Processed prompts: 100%|██████████| 1/1 [07:01<00:00, 421.21s/it, est. speed input: 0.26 toks/s, output: 77.53 toks/s]
+[437-437/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.32s/it, est. speed input: 0.28 toks/s, output: 77.68 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.32s/it, est. speed input: 0.28 toks/s, output: 77.68 toks/s]
+[438-438/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [06:59<00:00, 419.87s/it, est. speed input: 0.41 toks/s, output: 77.63 toks/s]Processed prompts: 100%|██████████| 1/1 [06:59<00:00, 419.87s/it, est. speed input: 0.41 toks/s, output: 77.63 toks/s]
+[439-439/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.61s/it, est. speed input: 0.25 toks/s, output: 77.66 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.61s/it, est. speed input: 0.25 toks/s, output: 77.66 toks/s]
+[440-440/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.92s/it, est. speed input: 0.23 toks/s, output: 77.62 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.92s/it, est. speed input: 0.23 toks/s, output: 77.62 toks/s]
+checkpoint saved: /scratch/manishn_iitp/reasoning-compression-lab/outputs-hpc-2a100-main-2026-06-29/raw/level_a_qwen7b_bf16_math500_seed0.jsonl (440 rows)
+[441-441/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.99s/it, est. speed input: 0.23 toks/s, output: 77.61 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.99s/it, est. speed input: 0.23 toks/s, output: 77.61 toks/s]
+[442-442/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.54s/it, est. speed input: 0.31 toks/s, output: 77.61 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.54s/it, est. speed input: 0.31 toks/s, output: 77.61 toks/s]
+[443-443/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.91s/it, est. speed input: 0.24 toks/s, output: 77.61 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.91s/it, est. speed input: 0.24 toks/s, output: 77.61 toks/s]
+[444-444/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [00:16<00:00, 16.53s/it, est. speed input: 6.11 toks/s, output: 82.99 toks/s]Processed prompts: 100%|██████████| 1/1 [00:16<00:00, 16.53s/it, est. speed input: 6.11 toks/s, output: 82.99 toks/s]
+[445-445/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [06:58<00:00, 418.83s/it, est. speed input: 0.61 toks/s, output: 77.63 toks/s]Processed prompts: 100%|██████████| 1/1 [06:58<00:00, 418.83s/it, est. speed input: 0.61 toks/s, output: 77.63 toks/s]
+[446-446/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:07<00:00, 427.46s/it, est. speed input: 0.72 toks/s, output: 75.95 toks/s]Processed prompts: 100%|██████████| 1/1 [07:07<00:00, 427.55s/it, est. speed input: 0.72 toks/s, output: 75.95 toks/s]
+[447-447/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:01<00:00, 421.08s/it, est. speed input: 0.33 toks/s, output: 77.49 toks/s]Processed prompts: 100%|██████████| 1/1 [07:01<00:00, 421.08s/it, est. speed input: 0.33 toks/s, output: 77.49 toks/s]
+[448-448/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.69s/it, est. speed input: 0.28 toks/s, output: 77.61 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.69s/it, est. speed input: 0.28 toks/s, output: 77.61 toks/s]
+[449-449/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.68s/it, est. speed input: 0.31 toks/s, output: 77.59 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.68s/it, est. speed input: 0.31 toks/s, output: 77.59 toks/s]
+[450-450/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:01<00:00, 421.22s/it, est. speed input: 0.25 toks/s, output: 77.55 toks/s]Processed prompts: 100%|██████████| 1/1 [07:01<00:00, 421.22s/it, est. speed input: 0.25 toks/s, output: 77.55 toks/s]
+checkpoint saved: /scratch/manishn_iitp/reasoning-compression-lab/outputs-hpc-2a100-main-2026-06-29/raw/level_a_qwen7b_bf16_math500_seed0.jsonl (450 rows)
+[451-451/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:07<00:00, 427.45s/it, est. speed input: 0.26 toks/s, output: 76.40 toks/s]Processed prompts: 100%|██████████| 1/1 [07:07<00:00, 427.52s/it, est. speed input: 0.26 toks/s, output: 76.40 toks/s]
+[452-452/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:01<00:00, 421.35s/it, est. speed input: 0.34 toks/s, output: 77.43 toks/s]Processed prompts: 100%|██████████| 1/1 [07:01<00:00, 421.35s/it, est. speed input: 0.34 toks/s, output: 77.43 toks/s]
+[453-453/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.59s/it, est. speed input: 0.29 toks/s, output: 77.62 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.59s/it, est. speed input: 0.29 toks/s, output: 77.62 toks/s]
+[454-454/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [06:59<00:00, 419.89s/it, est. speed input: 0.33 toks/s, output: 77.71 toks/s]Processed prompts: 100%|██████████| 1/1 [06:59<00:00, 419.89s/it, est. speed input: 0.33 toks/s, output: 77.71 toks/s]
+[455-455/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [06:59<00:00, 419.56s/it, est. speed input: 0.47 toks/s, output: 77.63 toks/s]Processed prompts: 100%|██████████| 1/1 [06:59<00:00, 419.56s/it, est. speed input: 0.47 toks/s, output: 77.63 toks/s]
+[456-456/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [00:09<00:00,  9.11s/it, est. speed input: 10.32 toks/s, output: 82.90 toks/s]Processed prompts: 100%|██████████| 1/1 [00:09<00:00,  9.11s/it, est. speed input: 10.32 toks/s, output: 82.90 toks/s]
+[457-457/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [06:59<00:00, 419.99s/it, est. speed input: 0.28 toks/s, output: 77.74 toks/s]Processed prompts: 100%|██████████| 1/1 [06:59<00:00, 419.99s/it, est. speed input: 0.28 toks/s, output: 77.74 toks/s]
+[458-458/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [00:04<00:00,  4.11s/it, est. speed input: 21.41 toks/s, output: 83.44 toks/s]Processed prompts: 100%|██████████| 1/1 [00:04<00:00,  4.11s/it, est. speed input: 21.41 toks/s, output: 83.44 toks/s]
+[459-459/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [06:59<00:00, 419.15s/it, est. speed input: 0.44 toks/s, output: 77.74 toks/s]Processed prompts: 100%|██████████| 1/1 [06:59<00:00, 419.15s/it, est. speed input: 0.44 toks/s, output: 77.74 toks/s]
+[460-460/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [06:59<00:00, 419.62s/it, est. speed input: 0.37 toks/s, output: 77.72 toks/s]Processed prompts: 100%|██████████| 1/1 [06:59<00:00, 419.62s/it, est. speed input: 0.37 toks/s, output: 77.72 toks/s]
+checkpoint saved: /scratch/manishn_iitp/reasoning-compression-lab/outputs-hpc-2a100-main-2026-06-29/raw/level_a_qwen7b_bf16_math500_seed0.jsonl (460 rows)
+[461-461/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:07<00:00, 427.34s/it, est. speed input: 0.55 toks/s, output: 76.14 toks/s]Processed prompts: 100%|██████████| 1/1 [07:07<00:00, 427.52s/it, est. speed input: 0.55 toks/s, output: 76.14 toks/s]
+[462-462/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:01<00:00, 421.39s/it, est. speed input: 0.41 toks/s, output: 77.35 toks/s]Processed prompts: 100%|██████████| 1/1 [07:01<00:00, 421.39s/it, est. speed input: 0.41 toks/s, output: 77.35 toks/s]
+[463-463/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [06:59<00:00, 419.33s/it, est. speed input: 0.43 toks/s, output: 77.71 toks/s]Processed prompts: 100%|██████████| 1/1 [06:59<00:00, 419.33s/it, est. speed input: 0.43 toks/s, output: 77.71 toks/s]
+[464-464/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [00:07<00:00,  7.39s/it, est. speed input: 13.81 toks/s, output: 83.26 toks/s]Processed prompts: 100%|██████████| 1/1 [00:07<00:00,  7.39s/it, est. speed input: 13.81 toks/s, output: 83.26 toks/s]
+[465-465/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.54s/it, est. speed input: 0.27 toks/s, output: 77.65 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.54s/it, est. speed input: 0.27 toks/s, output: 77.65 toks/s]
+[466-466/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.20s/it, est. speed input: 0.23 toks/s, output: 77.75 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.20s/it, est. speed input: 0.23 toks/s, output: 77.75 toks/s]
+[467-467/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [06:59<00:00, 419.57s/it, est. speed input: 0.38 toks/s, output: 77.72 toks/s]Processed prompts: 100%|██████████| 1/1 [06:59<00:00, 419.57s/it, est. speed input: 0.38 toks/s, output: 77.72 toks/s]
+[468-468/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [06:59<00:00, 419.73s/it, est. speed input: 0.62 toks/s, output: 77.45 toks/s]Processed prompts: 100%|██████████| 1/1 [06:59<00:00, 419.73s/it, est. speed input: 0.62 toks/s, output: 77.45 toks/s]
+[469-469/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:01<00:00, 421.91s/it, est. speed input: 0.26 toks/s, output: 77.41 toks/s]Processed prompts: 100%|██████████| 1/1 [07:01<00:00, 421.91s/it, est. speed input: 0.26 toks/s, output: 77.41 toks/s]
+[470-470/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.23s/it, est. speed input: 0.22 toks/s, output: 77.76 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.23s/it, est. speed input: 0.22 toks/s, output: 77.76 toks/s]
+checkpoint saved: /scratch/manishn_iitp/reasoning-compression-lab/outputs-hpc-2a100-main-2026-06-29/raw/level_a_qwen7b_bf16_math500_seed0.jsonl (470 rows)
+[471-471/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.05s/it, est. speed input: 0.30 toks/s, output: 77.71 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.05s/it, est. speed input: 0.30 toks/s, output: 77.71 toks/s]
+[472-472/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:08<00:00, 428.38s/it, est. speed input: 0.30 toks/s, output: 76.19 toks/s]Processed prompts: 100%|██████████| 1/1 [07:08<00:00, 428.45s/it, est. speed input: 0.30 toks/s, output: 76.19 toks/s]
+[473-473/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:01<00:00, 421.46s/it, est. speed input: 0.26 toks/s, output: 77.49 toks/s]Processed prompts: 100%|██████████| 1/1 [07:01<00:00, 421.46s/it, est. speed input: 0.26 toks/s, output: 77.49 toks/s]
+[474-474/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [06:58<00:00, 418.07s/it, est. speed input: 0.73 toks/s, output: 77.64 toks/s]Processed prompts: 100%|██████████| 1/1 [06:58<00:00, 418.08s/it, est. speed input: 0.73 toks/s, output: 77.64 toks/s]
+[475-475/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.30s/it, est. speed input: 0.31 toks/s, output: 77.65 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.30s/it, est. speed input: 0.31 toks/s, output: 77.65 toks/s]
+[476-476/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [06:58<00:00, 418.94s/it, est. speed input: 0.56 toks/s, output: 77.65 toks/s]Processed prompts: 100%|██████████| 1/1 [06:58<00:00, 418.94s/it, est. speed input: 0.56 toks/s, output: 77.65 toks/s]
+[477-477/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.65s/it, est. speed input: 0.33 toks/s, output: 77.57 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.65s/it, est. speed input: 0.33 toks/s, output: 77.57 toks/s]
+[478-478/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.36s/it, est. speed input: 0.27 toks/s, output: 77.68 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.36s/it, est. speed input: 0.27 toks/s, output: 77.68 toks/s]
+[479-479/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:09<00:00, 429.22s/it, est. speed input: 0.35 toks/s, output: 75.99 toks/s]Processed prompts: 100%|██████████| 1/1 [07:09<00:00, 429.24s/it, est. speed input: 0.35 toks/s, output: 75.99 toks/s]
+[480-480/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [04:27<00:00, 267.18s/it, est. speed input: 0.45 toks/s, output: 76.45 toks/s]Processed prompts: 100%|██████████| 1/1 [04:27<00:00, 267.22s/it, est. speed input: 0.45 toks/s, output: 76.45 toks/s]
+checkpoint saved: /scratch/manishn_iitp/reasoning-compression-lab/outputs-hpc-2a100-main-2026-06-29/raw/level_a_qwen7b_bf16_math500_seed0.jsonl (480 rows)
+[481-481/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.47s/it, est. speed input: 0.32 toks/s, output: 77.61 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.47s/it, est. speed input: 0.32 toks/s, output: 77.61 toks/s]
+[482-482/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [06:59<00:00, 419.76s/it, est. speed input: 0.42 toks/s, output: 77.64 toks/s]Processed prompts: 100%|██████████| 1/1 [06:59<00:00, 419.76s/it, est. speed input: 0.42 toks/s, output: 77.64 toks/s]
+[483-483/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:07<00:00, 427.92s/it, est. speed input: 0.30 toks/s, output: 76.28 toks/s]Processed prompts: 100%|██████████| 1/1 [07:07<00:00, 427.94s/it, est. speed input: 0.30 toks/s, output: 76.28 toks/s]
+[484-484/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.05s/it, est. speed input: 0.30 toks/s, output: 77.71 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.05s/it, est. speed input: 0.30 toks/s, output: 77.71 toks/s]
+[485-485/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.33s/it, est. speed input: 0.26 toks/s, output: 77.69 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.33s/it, est. speed input: 0.26 toks/s, output: 77.69 toks/s]
+[486-486/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [06:58<00:00, 418.66s/it, est. speed input: 0.66 toks/s, output: 77.61 toks/s]Processed prompts: 100%|██████████| 1/1 [06:58<00:00, 418.66s/it, est. speed input: 0.66 toks/s, output: 77.61 toks/s]
+[487-487/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.11s/it, est. speed input: 0.27 toks/s, output: 77.73 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.11s/it, est. speed input: 0.27 toks/s, output: 77.73 toks/s]
+[488-488/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.30s/it, est. speed input: 0.31 toks/s, output: 77.66 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.30s/it, est. speed input: 0.31 toks/s, output: 77.66 toks/s]
+[489-489/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.74s/it, est. speed input: 0.27 toks/s, output: 77.61 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.74s/it, est. speed input: 0.27 toks/s, output: 77.61 toks/s]
+[490-490/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.21s/it, est. speed input: 0.33 toks/s, output: 77.65 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.21s/it, est. speed input: 0.33 toks/s, output: 77.65 toks/s]
+checkpoint saved: /scratch/manishn_iitp/reasoning-compression-lab/outputs-hpc-2a100-main-2026-06-29/raw/level_a_qwen7b_bf16_math500_seed0.jsonl (490 rows)
+[491-491/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:06<00:00, 426.85s/it, est. speed input: 0.39 toks/s, output: 76.38 toks/s]Processed prompts: 100%|██████████| 1/1 [07:07<00:00, 427.04s/it, est. speed input: 0.39 toks/s, output: 76.38 toks/s]
+[492-492/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.91s/it, est. speed input: 0.50 toks/s, output: 77.35 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.91s/it, est. speed input: 0.50 toks/s, output: 77.35 toks/s]
+[493-493/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:02<00:00, 422.05s/it, est. speed input: 0.38 toks/s, output: 77.26 toks/s]Processed prompts: 100%|██████████| 1/1 [07:02<00:00, 422.05s/it, est. speed input: 0.38 toks/s, output: 77.26 toks/s]
+[494-494/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.03s/it, est. speed input: 0.34 toks/s, output: 77.67 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.03s/it, est. speed input: 0.34 toks/s, output: 77.67 toks/s]
+[495-495/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.27s/it, est. speed input: 0.35 toks/s, output: 77.62 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.27s/it, est. speed input: 0.35 toks/s, output: 77.62 toks/s]
+[496-496/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.28s/it, est. speed input: 0.30 toks/s, output: 77.66 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.28s/it, est. speed input: 0.30 toks/s, output: 77.66 toks/s]
+[497-497/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.65s/it, est. speed input: 0.26 toks/s, output: 77.64 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.65s/it, est. speed input: 0.26 toks/s, output: 77.64 toks/s]
+[498-498/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.40s/it, est. speed input: 0.30 toks/s, output: 77.65 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.40s/it, est. speed input: 0.30 toks/s, output: 77.65 toks/s]
+[499-499/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.52s/it, est. speed input: 0.32 toks/s, output: 77.60 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.52s/it, est. speed input: 0.32 toks/s, output: 77.60 toks/s]
+[500-500/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:04<00:00, 424.52s/it, est. speed input: 0.31 toks/s, output: 76.87 toks/s]Processed prompts: 100%|██████████| 1/1 [07:04<00:00, 424.56s/it, est. speed input: 0.31 toks/s, output: 76.87 toks/s]
+checkpoint saved: /scratch/manishn_iitp/reasoning-compression-lab/outputs-hpc-2a100-main-2026-06-29/raw/level_a_qwen7b_bf16_math500_seed0.jsonl (500 rows)
+Inference complete. Wrote 500 rows to /scratch/manishn_iitp/reasoning-compression-lab/outputs-hpc-2a100-main-2026-06-29/raw/level_a_qwen7b_bf16_math500_seed0.jsonl
+{
+  "n": 500,
+  "pass_at_1": 0.064,
+  "num_correct": 32,
+  "pass_at_1_ci95_low": 0.044,
+  "pass_at_1_ci95_high": 0.086,
+  "latency_sec_mean": 385.02603724309057,
+  "latency_sec_p50": 419.88576302304864,
+  "peak_vram_gb_max": 75.56915283203125,
+  "peak_vram_gb_mean": 71.92245446777343,
+  "prompt_tokens_mean": 146.158,
+  "completion_tokens_mean": 29855.542,
+  "completion_tokens_p50": 32635.0,
+  "parse_failure_rate": 0.85,
+  "empty_completion_rate": 0.0,
+  "truncation_rate": 0.0,
+  "invalid_answer_rate": 0.85,
+  "num_parse_failures": 425,
+  "num_empty_completions": 0,
+  "num_truncated": 0,
+  "num_invalid_answers": 425,
+  "reasoning_steps_mean": 280.88,
+  "total_gpu_seconds": 192513.01862154528,
+  "cost_per_correct_seconds": 6016.03183192329,
+  "cost_of_pass_seconds": 6016.03183192329,
+  "cost_per_correct_seconds_ci95_low": 4404.158828147964,
+  "cost_per_correct_seconds_ci95_high": 8912.399951987607,
+  "input": "outputs-hpc-2a100-main-2026-06-29/raw/level_a_qwen7b_bf16_math500_seed0.jsonl",
+  "scored_output": "outputs-hpc-2a100-main-2026-06-29/scored/level_a_qwen7b_bf16_math500_seed0.jsonl",
+  "cell_id": "level_a_qwen7b_bf16_math500_seed0",
+  "quant_config": "bf16",
+  "seed": 0,
+  "task": "math500"
+}
+Scored rows: /scratch/manishn_iitp/reasoning-compression-lab/outputs-hpc-2a100-main-2026-06-29/scored/level_a_qwen7b_bf16_math500_seed0.jsonl
+Summary: /scratch/manishn_iitp/reasoning-compression-lab/outputs-hpc-2a100-main-2026-06-29/results/level_a_qwen7b_bf16_math500_seed0_summary.json

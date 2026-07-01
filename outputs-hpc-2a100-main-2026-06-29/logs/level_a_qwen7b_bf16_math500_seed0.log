@@ -192,4 +192,42 @@ checkpoint saved: /scratch/manishn_iitp/reasoning-compression-lab/outputs-hpc-2a
 [499-499/500] generating batch of 1...
 Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.52s/it, est. speed input: 0.32 toks/s, output: 77.60 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.52s/it, est. speed input: 0.32 toks/s, output: 77.60 toks/s]
 [500-500/500] generating batch of 1...
-Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:04<00:00, 424.52s/it, est. speed input: 0.31 toks/s, output: 76.87 toks/s]Processed prompts: 100%|██████████| 1/1 [07:04<00:00, 424.56s/it, est. speed input: 0.31 toks/s, output: 76.87 toks/s]
+checkpoint saved: /scratch/manishn_iitp/reasoning-compression-lab/outputs-hpc-2a100-main-2026-06-29/raw/level_a_qwen7b_bf16_math500_seed0.jsonl (500 rows)
+Inference complete. Wrote 500 rows to /scratch/manishn_iitp/reasoning-compression-lab/outputs-hpc-2a100-main-2026-06-29/raw/level_a_qwen7b_bf16_math500_seed0.jsonl
+{
+  "n": 500,
+  "pass_at_1": 0.064,
+  "num_correct": 32,
+  "pass_at_1_ci95_low": 0.044,
+  "pass_at_1_ci95_high": 0.086,
+  "latency_sec_mean": 385.02603724309057,
+  "latency_sec_p50": 419.88576302304864,
+  "peak_vram_gb_max": 75.56915283203125,
+  "peak_vram_gb_mean": 71.92245446777343,
+  "prompt_tokens_mean": 146.158,
+  "completion_tokens_mean": 29855.542,
+  "completion_tokens_p50": 32635.0,
+  "parse_failure_rate": 0.85,
+  "empty_completion_rate": 0.0,
+  "truncation_rate": 0.0,
+  "invalid_answer_rate": 0.85,
+  "num_parse_failures": 425,
+  "num_empty_completions": 0,
+  "num_truncated": 0,
+  "num_invalid_answers": 425,
+  "reasoning_steps_mean": 280.88,
+  "total_gpu_seconds": 192513.01862154528,
+  "cost_per_correct_seconds": 6016.03183192329,
+  "cost_of_pass_seconds": 6016.03183192329,
+  "cost_per_correct_seconds_ci95_low": 4404.158828147964,
+  "cost_per_correct_seconds_ci95_high": 8912.399951987607,
+  "input": "outputs-hpc-2a100-main-2026-06-29/raw/level_a_qwen7b_bf16_math500_seed0.jsonl",
+  "scored_output": "outputs-hpc-2a100-main-2026-06-29/scored/level_a_qwen7b_bf16_math500_seed0.jsonl",
+  "cell_id": "level_a_qwen7b_bf16_math500_seed0",
+  "quant_config": "bf16",
+  "seed": 0,
+  "task": "math500"
+}
+Scored rows: /scratch/manishn_iitp/reasoning-compression-lab/outputs-hpc-2a100-main-2026-06-29/scored/level_a_qwen7b_bf16_math500_seed0.jsonl
+Summary: /scratch/manishn_iitp/reasoning-compression-lab/outputs-hpc-2a100-main-2026-06-29/results/level_a_qwen7b_bf16_math500_seed0_summary.json
