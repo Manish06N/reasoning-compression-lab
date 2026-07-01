@@ -13,21 +13,28 @@ Canonical dated record for **Paper 1: Beyond Accuracy** (`reasoning-compression-
 
 | Area | Status |
 |------|--------|
-| **V8.2 codebase** | **Complete on MacBook** — generation/evaluation/schemas, J1–J3 protocols, 31 tests |
+| **V8.2 codebase** | **Complete and pushed** — GitHub `main` at `9ca0ec1` |
 | **MacBook pipeline + docs** | **Complete** — KNOWN_ISSUES, REPO_MAP, V8_2_ARCHITECTURE, preflight hardened |
-| **GitHub** | Push when ready — HPC should `git reset --hard origin/main` after pull |
-| **HPC env (qreason, vLLM 0.8.5, A100)** | **Complete** — Gate 1–3 passed |
-| **First scored HPC results** | Archive `outputs-hpc-2a100-main-2026-06-29` — **diagnostic only, discard for paper** |
-| **Publication numbers** | **Blocked** — fresh b01 rerun with new archive + `repetition_penalty` |
+| **HPC sync** | **Complete** — scratch repo reset to `9ca0ec1` |
+| **HPC env (qreason, vLLM 0.8.5, A100)** | **Ready** — decoding verify + publication CPU preflight passed |
+| **Old HPC results** | Archive `outputs-hpc-2a100-main-2026-06-29` — **diagnostic only; deleted from scratch before rerun** |
+| **Active publication archive** | `outputs-hpc-2a100-main-2026-07-01-rerun` — fresh, guard passed, no raw rows at submission |
+| **Publication run** | **b01 submitted** — Slurm job `86010`, pending for 2×A100 resources |
 | **5080** | **Retired** — HPC-only for publication |
-| **Unit tests (MacBook)** | **34 tests** — `python -m pytest tests/ -q` |
+| **Unit tests (MacBook)** | V8.2 tests maintained on MacBook; HPC gates are `verify_decoding_params.py` + `07_preflight_publication.py` |
 
-### Critical before HPC rerun
+### Current HPC Gate State
 
-1. **Delete** old archive on scratch (prevents resume): `rm -rf outputs-hpc-2a100-main-2026-06-29`
-2. **New** output root: `export QREASON_OUTPUT_ROOT=$QR/outputs-hpc-2a100-main-$(date +%Y-%m-%d)-rerun`
-3. **Sync code:** `git fetch origin && git reset --hard origin/main`
-4. **Preflight:** `python scripts/hpc/07_preflight_publication.py` (now checks all cells + QRM prompts + decoding verify)
+Completed on HPC after syncing `9ca0ec1`:
+
+1. Stopped stale output autopush/tmux.
+2. Hard reset: `git fetch origin && git reset --hard origin/main`.
+3. Removed invalid old archive: `rm -rf outputs-hpc-2a100-main-2026-06-29`.
+4. Confirmed `prompts/gsm8k.txt` exists and Qwen-1.5B JSON trailing commas are fixed.
+5. `python scripts/verify_decoding_params.py` passed with `VERIFY OK`; `repetition_penalty: 1.05` reaches vLLM `SamplingParams`.
+6. `python scripts/hpc/07_preflight_publication.py` passed: static checks, prompt formatting, all 25 cell configs, block wiring, and dataset access.
+7. Fresh archive guard passed for `outputs-hpc-2a100-main-2026-07-01-rerun`.
+8. Submitted `sbatch --export=ALL slurm/hpc_2a100_b01_parallel.slurm` as job `86010`.
 
 See [docs/KNOWN_ISSUES.md](docs/KNOWN_ISSUES.md) for full trap list.
 
@@ -41,9 +48,9 @@ See [docs/KNOWN_ISSUES.md](docs/KNOWN_ISSUES.md) for full trap list.
 
 Paper tables: `outputs-hpc-2a100-main-2026-06-29/paper_tables/`.
 
-**Current blocker for clean paper numbers:** HPC must sync MacBook fixes (especially `repetition_penalty` actually reaching vLLM) and **rerun or restart** cells. Rescoring alone cannot fix loop-truncated raw completions. Level A/C numbers above are diagnostic only.
+**Current publication gate:** the old June-29 numbers above are diagnostic only. The fixed pipeline is deployed on HPC at `9ca0ec1`, and clean b01 rerun job `86010` is queued on `outputs-hpc-2a100-main-2026-07-01-rerun`. Rescoring alone cannot fix loop-truncated raw completions; trust only post-fix rerun numbers.
 
-**MacBook fixes pending push (2026-07-01):** scoring, decoding passthrough, GPQA row counts, NVML, rescore/sync scripts, **verify_decoding_params**, **compare_qrm_baseline**, **maj@5 multisample**, Pareto frontier, GPTQ download script. See `CHANGELOG.md`.
+**MacBook/GitHub status (2026-07-01):** fixes are pushed through `9ca0ec1`, including scoring, decoding passthrough, GPQA row counts, NVML, rescore/sync scripts, `verify_decoding_params`, `compare_qrm_baseline`, maj@5 multisample tooling, Pareto frontier, GSM8K prompt, and JSON/preflight fixes. See `CHANGELOG.md`.
 
 ### Pre-push verification (MacBook)
 
@@ -56,7 +63,7 @@ python scripts/j2/run_method_pilot.py           # J2 manifest (optional)
 python scripts/j3/preflight_indic.py            # J3 manifest (optional)
 ```
 
-Then: `git commit` → `git push origin main` → HPC `git reset --hard origin/main`.
+Current state: pushed to GitHub and HPC reset to `origin/main` at `9ca0ec1`. Future MacBook changes should repeat `git commit` -> `git push origin main` -> HPC `git fetch origin && git reset --hard origin/main`.
 
 ### V8.2 architecture (2026-07-01)
 
@@ -69,26 +76,30 @@ Then: `git commit` → `git push origin main` → HPC `git reset --hard origin/m
 
 ## Current Experiment Coverage
 
-Archive `outputs-hpc-2a100-main-2026-06-29` reflects the **b01 BF16 anchor block** (parallel Qwen-7B + Llama-8B) plus partial **b02 FP8** (Qwen-7B only, 10% done):
+Active archive `outputs-hpc-2a100-main-2026-07-01-rerun` is the first clean publication rerun archive after the decoding/scoring fixes. At submission time it contained no raw JSONL rows.
 
 | Block | Coverage | Status |
 |------|----------|--------|
-| b01 | Qwen-7B BF16 + Llama-8B BF16 MATH-500 | **Scored** — see table above; rerun recommended |
-| b02 | Qwen-7B FP8 MATH-500 | **50/500** in progress (partial summary only) |
-| b02 | Llama-8B FP8 MATH-500 | Not started in this archive |
-| b03–b06 | AWQ-4, GPTQ-4, GPTQ-3, GSM8K | Queued / not in this archive |
-| b07 | Qwen-7B FP8 GPQA-Diamond | Ready (HF gate approved); not queued |
-| b08–b09 | Qwen-1.5B cells | Wired; not queued |
+| b01 | Qwen-7B BF16 + Llama-8B BF16 MATH-500 | **Submitted** as Slurm job `86010`; pending for 2×A100 resources |
+| b02 | Qwen-7B FP8 + Llama-8B FP8 MATH-500 | **Hold** until b01 Qwen gate passes |
+| b03 | AWQ-4 pair MATH-500 | Hold until b01 Qwen gate passes |
+| b04 | GPTQ-4 pair MATH-500 | Hold until b01 Qwen gate passes |
+| b05 | Qwen-7B GPTQ-3 MATH-500 | Hold until b01 Qwen gate passes |
+| b06 | Qwen-7B FP8 GSM8K | Hold until b01 Qwen gate passes |
+| b07 | Qwen-7B FP8 GPQA-Diamond | Ready after HF gate; submit only after main MATH grid decision |
+| b08–b09 | Qwen-1.5B lower-bound cells | Wired; optional expansion after b01/b02 signal |
 
-Work still left:
+Immediate work still left:
 
-- **Push MacBook fixes → HPC `git reset --hard origin/main`**
-- **Restart Level B FP8** (and optionally rerun Level A/C) with `repetition_penalty: 1.05`
-- Complete b02–b06 grid on HPC (fresh rerun recommended for b01)
-- Score all cells and rebuild paper tables
-- Do **not** cite current pass@1 in the paper until post-fix rerun completes
-- **maj@5 pilot wired** — `run_inference_multisample.py` + `score_multisample.py` (after b01 sane)
-- Multi-seed stability later (seed0 only for now)
+- Monitor job `86010` with `squeue -u $USER -l`.
+- Once running, watch `logs/slurm/b01_parallel_bf16_86010.out` and per-cell archive logs.
+- Confirm raw rows include `decoding_repetition_penalty` and counts grow toward 500 each.
+- When b01 finishes, validate Qwen-7B BF16 with `scripts/compare_qrm_baseline.py`.
+- Do **not** submit b02–b06 until Qwen b01 pass@1 is in the expected ~45–65% range and truncation is low.
+- If job `86010` fails mid-run, resume the same archive with `unset QREASON_FRESH_RUN` before resubmitting b01.
+- After b01 passes, keep the same archive, unset fresh mode, and submit `bash scripts/hpc/submit_hpc_blocks.sh b02`; continue b03–b06 sequentially by gate.
+- **maj@5 pilot wired** — `run_inference_multisample.py` + `score_multisample.py` (after b01 sane).
+- Multi-seed stability later (seed0 only for now).
 
 ---
 
@@ -106,9 +117,9 @@ Prepared on HPC without using GPUs while b01-b06 continued running:
 | GSM8K | Available | Hugging Face cache/dataset load works |
 | GPQA-Diamond | Access approved | Authenticated HF request returns HTTP 200 for `gpqa_diamond.csv` |
 
-CPU preflight after staging assets: `scripts/hpc/07_preflight_publication.py` passed for the active b01-b06 publication blocks.
+CPU preflight after syncing `9ca0ec1`: `scripts/hpc/07_preflight_publication.py` passed for all configured publication blocks and datasets.
 
-No additional jobs were submitted yet. Current recommendation is to let b01-b06 continue. Future jobs are now wired as b07 for GPQA and b08-b09 for Qwen-1.5B lower-bound runs; submit them only after deciding queue strategy.
+Current recommendation: let b01 job `86010` run first and do not submit b02-b06 until the Qwen-7B BF16 anchor validates. Future jobs remain wired as b07 for GPQA and b08-b09 for Qwen-1.5B lower-bound runs; submit them only after the main b01/b02 signal is clear.
 
 ---
 
@@ -156,6 +167,51 @@ cd $QR && git fetch origin && git reset --hard origin/main
 
 ---
 
+## 2026-07-01 — Clean b01 publication rerun queued
+
+### What happened
+
+- MacBook/GitHub source of truth advanced through:
+  - `9933241` — added missing sober GSM8K prompt and preflight coverage.
+  - `9ca0ec1` — fixed invalid trailing commas in Qwen-1.5B cell JSON and added McNemar test fix.
+- HPC scratch repo was hard-reset to `origin/main` at `9ca0ec1`.
+- Invalid June-29 archive was removed from scratch again after reset restored tracked output files.
+- CPU gates passed in `qreason`:
+  - `python scripts/verify_decoding_params.py` -> `VERIFY OK`.
+  - `python scripts/hpc/07_preflight_publication.py` -> passed static checks, prompt formatting, 25 cell configs, block/model wiring, and dataset access.
+- Fresh archive guard passed for `outputs-hpc-2a100-main-2026-07-01-rerun` with 0 raw JSONL files.
+- Submitted clean b01 rerun as Slurm job `86010` using `slurm/hpc_2a100_b01_parallel.slurm`.
+
+### Current job
+
+| Job | Block | Archive | State at submit check | Reason |
+|-----|-------|---------|-----------------------|--------|
+| `86010` | b01 BF16 anchors | `outputs-hpc-2a100-main-2026-07-01-rerun` | Pending | Resources |
+
+b01 runs two parallel MATH-500 cells on 2×A100:
+
+| GPU | Cell | Gate role |
+|-----|------|-----------|
+| 0 | `level_a_qwen7b_bf16_math500_seed0` | Primary Qwen anchor; must recover from old 7% pass@1 |
+| 1 | `level_c_llama8b_bf16_math500_seed0` | BF16 Llama anchor |
+
+### Next plan
+
+1. Monitor job `86010` until it starts:
+   `squeue -u $USER -l`.
+2. Once running, monitor:
+   `tail -f logs/slurm/b01_parallel_bf16_86010.out` and per-cell logs under `$QREASON_OUTPUT_ROOT/logs/`.
+3. Confirm raw row counts grow under `$QREASON_OUTPUT_ROOT/raw/` and rows include `decoding_repetition_penalty`.
+4. After Qwen b01 finishes, run:
+   `python scripts/compare_qrm_baseline.py --summary $QREASON_OUTPUT_ROOT/results/level_a_qwen7b_bf16_math500_seed0_summary.json`.
+5. Gate criteria: Qwen pass@1 roughly 45–65% and truncation low. If still near 7% or high truncation, stop and inspect decoding/raw rows before any more submissions.
+6. If b01 passes, unset fresh mode and submit b02 on the same archive:
+   `unset QREASON_FRESH_RUN; bash scripts/hpc/submit_hpc_blocks.sh b02`.
+7. Continue b03–b06 only after b02 behaves sensibly. Defer b07 GPQA and b08–b09 Qwen-1.5B until the main MATH-500 quantization signal is clear.
+8. If b01 fails mid-run, resume safely on the same archive by unsetting `QREASON_FRESH_RUN` before resubmitting b01; completed cells should skip or resume from checkpoints.
+
+---
+
 ## GPU Telemetry Added 2026-06-30
 
 Future inference rows now record sampled runtime telemetry and efficiency fields: `vram_before_gb`, `vram_after_gb`, `vram_max_gb`, `gpu_util_mean`, `gpu_util_max`, `power_watts_mean`, `power_watts_max`, `energy_joules`, `tokens_per_second`, `decode_tokens_per_second`, `seconds_per_output_token`, `tokens_per_joule`, `finish_reason`, `stop_reason`, `truncated`, `completion_chars`, and optional `time_to_first_token_sec` when vLLM exposes timing metrics. Scored rows also include `answer_parse_success` and MATH `boxed_answer_present`.
@@ -187,15 +243,17 @@ Run rescore + paper tables after each archive sync; rerun inference (not just re
 
 HPC publication runs write a durable archive manifest at `outputs-hpc-2a100-main-YYYY-MM-DD/manifest.json` and per-cell metadata under `metadata/<cell_id>.json`.
 
-**Active archive (2026-07-01):** `outputs-hpc-2a100-main-2026-06-29` — autopushed to GitHub; manifest synced via `sync_archive_manifest.py`. b01 cells status `scored`; b02 Qwen FP8 `in_progress` (50 rows). `_backup/latest/` mirrors raw/scored/results/metadata; lock protects parallel GPU backup races.
+**Active archive (2026-07-01):** `outputs-hpc-2a100-main-2026-07-01-rerun` — fresh publication rerun archive. `09_assert_fresh_archive.sh` passed with 0 raw JSONL files before b01 submission. Job `86010` will write b01 raw/scored/results here.
+
+**Invalid archive:** `outputs-hpc-2a100-main-2026-06-29` — diagnostic only, deleted from scratch before rerun. If restored by Git reset or output sync, delete again before fresh publication jobs.
 
 ---
 
 ## Publication Sufficiency Strategy
 
-Current judgement (updated 2026-07-01): b01-b09 seed0 remains the target core grid, but **first b01 numbers are not publishable** until decode-loop fix is deployed on HPC and cells rerun. The partial FP8 run (50 rows, 0% pass@1) confirms the same loop pathology.
+Current judgement (updated 2026-07-01): b01-b09 seed0 remains the target core grid. The decode-loop fix is now deployed on HPC and b01 rerun job `86010` is queued on a clean archive. The previous June-29 b01/b02 numbers remain diagnostic only.
 
-Do not expand the queue until post-fix rerun shows sensible pass@1 (expect ~50%+ range for R1-Distill on MATH-500 per literature, not 7%).
+Do not expand the queue until the post-fix b01 rerun shows sensible Qwen-7B BF16 pass@1 (expected ~45–65% range for R1-Distill on MATH-500, not 7%) and low truncation.
 
 Recommended expansion only if needed:
 
