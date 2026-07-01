@@ -5,5 +5,6 @@
   "quant_config": "bf16",
   "decoding_config": "configs/decoding/repro_qrm.yaml",
   "seed": 0,
-  "notes": "Level A reproduction gate. Match Quantized-Reasoning-Models protocol for first reproduction."
+  "prompt_profile": "reproduction",
+  "notes": "Level A reproduction gate. QRM prompts + repro_qrm decoding (see papers/j1/protocol.yaml)."
 }

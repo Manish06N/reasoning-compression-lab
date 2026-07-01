@@ -1,0 +1,6 @@
+backend: sglang
+version_pin: "latest_pinned_at_pilot"
+host: 127.0.0.1
+port: 30000
+reference_repo: external_repos/07-j2-serving-acceleration/sglang
+pilot_script: scripts/j2/run_method_pilot.py

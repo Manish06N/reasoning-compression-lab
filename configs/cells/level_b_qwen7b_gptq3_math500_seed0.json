@@ -5,5 +5,6 @@
   "quant_config": "gptq3",
   "decoding_config": "configs/decoding/repro_qrm.yaml",
   "seed": 0,
+  "prompt_profile": "sober",
   "notes": "Level B pilot — experimental 3-bit; run last."
 }

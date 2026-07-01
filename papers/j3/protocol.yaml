@@ -1,0 +1,36 @@
+# Paper 3 — Indic deployment (V8.2 §10)
+paper: j3
+version: "1.0"
+updated: "2026-07-01"
+
+working_title: "Reliable and Efficient Indic Reasoning Deployment"
+
+primary_claim: >
+  Connect language, script, code-mixing, compression, downstream quality, latency, and local hardware.
+
+language_matrix: papers/j3/language_matrix.yaml
+
+benchmarks:
+  indic_ifeval:
+    repo: external_repos/08-j3-indic-deployment/IndicIFEval
+  indic_param:
+    repo: external_repos/08-j3-indic-deployment/IndicParam
+  indic_gen_bench:
+    repo: external_repos/08-j3-indic-deployment/indic-gen-bench
+
+local_transfer:
+  backend: llama.cpp
+  config: configs/serving/llamacpp.yaml
+  hardware: RTX5080_WSL2
+
+layers:
+  breadth: "2 models x 3 configs x all languages x 2 tasks x 1 run"
+  reliability: "3 languages x 2 tasks x 3-5 seeds"
+  human_audit: "75-100 examples per core language"
+  local_transfer: "GGUF quant levels on RTX 5080"
+
+deliverables:
+  - journal_manuscript
+  - indic_dashboard
+  - deployment_recipes
+  - code_mixed_subset

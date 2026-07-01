@@ -1,0 +1,43 @@
+# Paper 2 — benchmark-first acceleration (V8.2 §8)
+paper: j2
+version: "1.0"
+updated: "2026-07-01"
+
+working_title: "From Microbenchmarks to Serving Reality: Cross-Stack Reliability of Long-Reasoning Acceleration"
+
+primary_claim: >
+  Token-level acceleration is insufficient for deployment evidence.
+  Methods must be evaluated end-to-end under batching, queueing, verification, and memory pressure.
+
+method_selection_pilot_weeks: 6
+candidates:
+  eagle:
+    repo: external_repos/07-j2-serving-acceleration/EAGLE
+    priority: high
+  specreason:
+    repo: external_repos/07-j2-serving-acceleration/specreason
+    priority: pilot
+  kivi:
+    repo: external_repos/07-j2-serving-acceleration/KIVI
+    priority: candidate
+  kvquant:
+    repo: external_repos/07-j2-serving-acceleration/KVQuant
+    priority: candidate
+  stack_transfer:
+    backends: [vllm, sglang]
+    config: configs/serving/
+
+selection_rule: "One main mechanism + one reference mechanism after pilot gate"
+
+metrics:
+  primary: [ttft, tpot, p50_latency, p95_latency, p99_latency, throughput, pass_at_1]
+  secondary: [acceptance_rate, peak_vram, timeout_rate, aurc, output_length]
+
+fallback: "Controlled failure-transfer paper with public traces and taxonomy"
+
+deliverables:
+  - journal_manuscript
+  - conference_derivative
+  - cross_stack_benchmark
+  - one_trained_artifact
+  - load_test_report

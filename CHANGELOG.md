@@ -1,5 +1,68 @@
 # Changelog
 
+## 2026-07-01 — Resume guard: block bad-archive rerun (code fix)
+
+**Problem:** Accidental resume into `outputs-hpc-2a100-main-2026-06-29` or pre-fix JSONL kept 7% pass@1.
+
+**Fix:**
+- `src/runners/resume_guard.py` — detects forbidden paths, missing `repetition_penalty`, git/config drift
+- `scripts/run_inference.py` — `--fresh`, `--allow-resume`; exits with error when unsafe
+- `scripts/hpc/09_assert_fresh_archive.{sh,py}` — called at start of `run_hpc_2a100_publication.sh`
+- `QREASON_FRESH_RUN=1` passes `--fresh` to inference
+- Tests: `tests/test_resume_guard.py` (34 tests total)
+
+---
+
+## 2026-07-01 — V8.2 codebase audit, docs, and preflight hardening
+
+Full PhD Roadmap V8.2 architecture landed on MacBook. This entry records **audit findings**, **fixes**, and **documentation** updates.
+
+### Audit summary
+
+| Severity | Issue | Status |
+|----------|-------|--------|
+| **Critical** | Resume from bad archive keeps 7% pass@1 JSONL | **Operational** — delete old archive before rerun ([KNOWN_ISSUES.md](docs/KNOWN_ISSUES.md) §1) |
+| **Critical** | June archive generated without `repetition_penalty` | **Fixed in code** — rerun required; do not cite old numbers |
+| **Fixed** | `score_run.py` broke on absolute `--input` paths | Path resolution matches `run_inference.py` |
+| **Fixed** | Preflight did not validate QRM prompts or all cells | `07_preflight_publication.py` extended |
+| **Important** | Single-sample calibration uses parse-success proxy | Documented — use maj@5 for real calibration |
+| **Important** | Resumed rows lack V8.2 provenance fields | Documented — fresh archive for publication |
+| **Minor** | `lighteval` clone needs git-lfs | Run `external_repos/clone_v82_repos.sh` |
+| **Minor** | J2/J3 SGLang/llama.cpp are pilot stubs | Expected until Paper 2/3 gates |
+
+### V8.2 codebase (new)
+
+- **Packages:** `src/generation/`, `src/evaluation/{correctness,calibration,selective_risk,statistics}/`, `src/schemas/`
+- **Protocols:** `papers/j1|j2|j3/protocol.yaml`, `papers/j3/language_matrix.yaml`
+- **Configs:** `configs/quantization/registry.yaml`, `configs/serving/{vllm,sglang,llamacpp}.yaml`
+- **Schemas:** `schemas/{raw_response,summary,cell_config}.v1.json`
+- **Prompts:** `prompts/qrm_*.txt`; all 25 cell configs have `prompt_profile`
+- **Repro seeds:** Level A cells for seeds 42/43/44 (BF16 + GPTQ4)
+- **Scripts:** `scripts/j1/*`, `scripts/j2/run_method_pilot.py`, `scripts/j3/*`, `export_parquet.py`, `build_dashboard.py`, `record_external_repo_pins.sh`
+- **Scoring:** `score_run.py` adds cluster bootstrap CI, calibration, selective risk, optional Parquet
+- **Tests:** 31 tests (`test_v82_architecture`, `test_v82_statistics`, `test_v82_schemas`)
+
+### Documentation (new/updated)
+
+- [docs/KNOWN_ISSUES.md](docs/KNOWN_ISSUES.md) — critical traps and limitations
+- [docs/REPO_MAP.md](docs/REPO_MAP.md) — directory map and pipeline
+- [docs/V8_2_ARCHITECTURE.md](docs/V8_2_ARCHITECTURE.md) — module layout
+- [docs/plans/2026-07-01-v82-reengineering.md](docs/plans/2026-07-01-v82-reengineering.md) — checklist (complete)
+- [docs/README.md](docs/README.md), [README.md](README.md), [progress.md](progress.md), [docs/PROGRESS.md](docs/PROGRESS.md) — synced 2026-07-01
+
+### Pre-HPC rerun (unchanged but required)
+
+```bash
+python -m pytest tests/ -q
+python scripts/verify_decoding_params.py
+# On HPC after push:
+rm -rf outputs-hpc-2a100-main-2026-06-29
+export QREASON_OUTPUT_ROOT=$QR/outputs-hpc-2a100-main-$(date +%Y-%m-%d)-rerun
+bash scripts/hpc/run_hpc_2a100_publication.sh b01_parallel_bf16_anchors
+```
+
+---
+
 ## 2026-07-01 — External repos plan: tooling wired (MacBook)
 
 Implemented actionable items from external-repos analysis (HPC-only publication path):

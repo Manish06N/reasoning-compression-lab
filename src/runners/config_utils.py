@@ -73,12 +73,38 @@ def load_decoding(cell_cfg: Dict[str, Any]) -> Dict[str, Any]:
     return {"temperature": 0.6, "top_p": 0.95, "max_tokens": 32768}
 
 
+PROMPT_PROFILES: Dict[str, Dict[str, str]] = {
+    "reproduction": {
+        "math500": "prompts/qrm_math500.txt",
+        "gsm8k": "prompts/qrm_gsm8k.txt",
+        "gpqa_diamond": "prompts/gpqa_diamond.txt",
+    },
+    "sober": {
+        "math500": "prompts/math500.txt",
+        "gsm8k": "prompts/gsm8k.txt",
+        "gpqa_diamond": "prompts/gpqa_diamond.txt",
+    },
+}
+
+
+def resolve_prompt_template(task_cfg: Dict[str, Any], cell_cfg: Mapping[str, Any]) -> str:
+    """Pick prompt template from cell prompt_profile or task default."""
+    task_name = str(task_cfg.get("task_name", ""))
+    profile = cell_cfg.get("prompt_profile")
+    if profile and profile in PROMPT_PROFILES:
+        mapped = PROMPT_PROFILES[profile].get(task_name)
+        if mapped:
+            return mapped
+    return str(task_cfg["prompt_template_file"])
+
+
 def load_cell_config(cell_config_path: str | Path) -> Dict[str, Any]:
     cell = load_json(cell_config_path)
     cell["model"] = load_json(cell["model_config"])
     cell["task"] = load_json(cell["task_config"])
     cell["model_path"] = resolve_model_path(cell["model"], cell)
     cell["decoding"] = load_decoding(cell)
+    cell["task"]["prompt_template_file"] = resolve_prompt_template(cell["task"], cell)
     if "seed" not in cell and cell.get("decoding_config"):
         dec = load_yaml(cell["decoding_config"])
         if "seed" in dec and "seed" not in cell:

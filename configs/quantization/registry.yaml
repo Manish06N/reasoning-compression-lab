@@ -1,0 +1,34 @@
+# Quantization method registry (V8.2 configs/quantization)
+# Model-specific paths remain in configs/models/*.json
+
+bf16:
+  method: none
+  dtype: bfloat16
+  notes: "Baseline full precision"
+
+fp8:
+  method: compressed-tensors
+  dtype: auto
+  kv_cache_dtype: fp8
+  notes: "Pre-quantized HF FP8 checkpoints (RedHatAI)"
+
+awq4:
+  method: awq
+  bits: 4
+  group_size: 128
+  symmetric: false
+  notes: "HF AWQ W4G128 weights"
+
+gptq4:
+  method: gptq
+  bits: 4
+  group_size: 128
+  desc_act: true
+  notes: "QRM HF GPTQ collection W4G128"
+
+gptq3:
+  method: gptq
+  bits: 3
+  group_size: 128
+  desc_act: true
+  notes: "Bit-width stress test"

@@ -1,0 +1,10 @@
+{
+  "cell_id": "level_a_qwen7b_bf16_math500_seed44",
+  "model_config": "configs/models/deepseek_r1_qwen_7b.json",
+  "task_config": "configs/tasks/math500.json",
+  "quant_config": "bf16",
+  "decoding_config": "configs/decoding/repro_qrm.yaml",
+  "seed": 44,
+  "prompt_profile": "reproduction",
+  "notes": "QRM reproduction gate seed 44."
+}

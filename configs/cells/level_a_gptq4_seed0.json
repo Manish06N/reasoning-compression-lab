@@ -5,6 +5,7 @@
   "quant_config": "gptq4",
   "decoding_config": "configs/decoding/repro_qrm.yaml",
   "seed": 0,
+  "prompt_profile": "reproduction",
   "prerequisite": "BF16 Level A done AND scripts/hpc/06_verify_gptq4_model.sh passes",
   "notes": "Do NOT run until GPTQ-4 weights exist. See docs/GPTQ4_PREP.md."
 }

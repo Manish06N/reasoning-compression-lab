@@ -61,6 +61,7 @@ def check_static() -> None:
             "-n",
             "scripts/hpc/submit_hpc_blocks.sh",
             "scripts/hpc/run_hpc_2a100_publication.sh",
+            "scripts/hpc/09_assert_fresh_archive.sh",
             "slurm/hpc_2a100_b01_parallel.slurm",
             "slurm/hpc_2a100_b07_gpqa.slurm",
         ]
@@ -75,7 +76,28 @@ def check_prompt() -> None:
         fail("math prompt did not preserve literal {ANSWER}")
     if "2+2?" not in prompt:
         fail("math prompt did not include question")
-    print("prompt formatting ok")
+    qrm = build_prompt("prompts/qrm_math500.txt", question="2+2?")
+    if "\\boxed" not in qrm:
+        fail("QRM math prompt missing \\boxed instruction")
+    print("prompt formatting ok (sober + QRM)")
+
+
+def check_all_cell_configs() -> None:
+    print("== all cell configs ==")
+    cell_dir = ROOT / "configs/cells"
+    for path in sorted(cell_dir.glob("*.json")):
+        cell = load_cell_config(path.relative_to(ROOT).as_posix())
+        if "prompt_profile" not in cell:
+            fail(f"{path.name} missing prompt_profile")
+        tmpl = cell["task"]["prompt_template_file"]
+        if not (ROOT / tmpl).exists():
+            fail(f"{path.name} missing prompt template: {tmpl}")
+    print(f"loaded {len(list(cell_dir.glob('*.json')))} cell configs ok")
+
+
+def check_decoding_verify() -> None:
+    print("== decoding verify ==")
+    run(["python", "scripts/verify_decoding_params.py"])
 
 
 def check_blocks_and_models() -> None:
@@ -146,6 +168,8 @@ def check_datasets() -> None:
 def main() -> None:
     check_static()
     check_prompt()
+    check_all_cell_configs()
+    check_decoding_verify()
     check_blocks_and_models()
     check_datasets()
     print("HPC publication CPU preflight passed.")

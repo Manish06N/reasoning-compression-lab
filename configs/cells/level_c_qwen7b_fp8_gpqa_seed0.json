@@ -5,6 +5,7 @@
   "quant_config": "fp8",
   "decoding_config": "configs/decoding/repro_qrm.yaml",
   "seed": 0,
+  "prompt_profile": "sober",
   "prerequisite": "HF gated access approved for Idavidrein/gpqa",
   "notes": "Level C — GPQA-Diamond after gated dataset access."
 }

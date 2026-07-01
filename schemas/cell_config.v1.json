@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "cell_config.v1.json",
+  "title": "Experiment cell config",
+  "type": "object",
+  "required": ["cell_id", "model_config", "task_config", "quant_config", "seed"],
+  "properties": {
+    "cell_id": { "type": "string", "pattern": "^[a-z0-9_]+$" },
+    "model_config": { "type": "string" },
+    "task_config": { "type": "string" },
+    "quant_config": { "type": "string" },
+    "decoding_config": { "type": "string" },
+    "prompt_profile": {
+      "type": "string",
+      "enum": ["reproduction", "sober", "default"]
+    },
+    "seed": { "type": "integer", "minimum": 0 },
+    "notes": { "type": "string" }
+  },
+  "additionalProperties": true
+}

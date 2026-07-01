@@ -5,17 +5,21 @@ Deployment-science evaluation harness for compressed reasoning LLMs.
 **GitHub:** https://github.com/Manish06N/reasoning-compression-lab  
 **Paper 1:** *Beyond Accuracy: Reliability, Calibration, Seed Variance, and Cost-per-Correct of Quantized Reasoning LLMs*
 
+**Roadmap:** PhD plan V8.2 (1 Jul 2026) — see [docs/plans/2026-07-01-v82-reengineering.md](docs/plans/2026-07-01-v82-reengineering.md) and [papers/j1/protocol.yaml](papers/j1/protocol.yaml).
+
 ## Current status (2026-07-01)
 
 | Machine | Status | Details |
 |---------|--------|---------|
-| **5080** | **Retired** | Historical archive only — **not** used for publication |
-| **HPC** | **Rerun pending** | First b01 scored but **not publication-ready** (7% pass@1 — decode bug) |
-| **MacBook** | **Ready to push** | Fixes + new tooling; **17 tests pass** |
+| **5080** | **Retired** | Not used for publication |
+| **HPC** | **Rerun pending** | Delete old archive; fresh b01 with fixed decoding |
+| **MacBook** | **V8.2 complete** | 31 tests; docs + preflight hardened — push when ready |
 
 **Policy:** **HPC-only** for all paper numbers (7B/8B, GSM8K, GPQA, 1.5B when queued).
 
-**Live tracker:** [docs/PROGRESS.md](docs/PROGRESS.md) · **Full history:** [progress.md](progress.md)
+**Docs:** [docs/REPO_MAP.md](docs/REPO_MAP.md) · [docs/KNOWN_ISSUES.md](docs/KNOWN_ISSUES.md) · [docs/PROGRESS.md](docs/PROGRESS.md) · [progress.md](progress.md)
+
+**Live tracker:** [docs/PROGRESS.md](docs/PROGRESS.md) · **Full history:** [progress.md](progress.md) · **Ops log:** [CHANGELOG.md](CHANGELOG.md)
 
 ### Pre-push / pre-rerun checklist (MacBook → GitHub → HPC)
 
@@ -29,10 +33,17 @@ export QR=/scratch/$USER/reasoning-compression-lab
 cd $QR && git fetch origin && git reset --hard origin/main
 python scripts/verify_decoding_params.py
 python scripts/hpc/07_preflight_publication.py
-bash scripts/hpc/03_smoke_test.sh                   # GPU smoke
+bash scripts/hpc/03_smoke_test.sh
+
+# CRITICAL — fresh archive (see docs/KNOWN_ISSUES.md)
+rm -rf outputs-hpc-2a100-main-2026-06-29
+export QREASON_OUTPUT_ROOT=$QR/outputs-hpc-2a100-main-$(date +%Y-%m-%d)-rerun
+mkdir -p "$QREASON_OUTPUT_ROOT"
+export QREASON_FRESH_RUN=1
+bash scripts/hpc/run_hpc_2a100_publication.sh b01_parallel_bf16_anchors
 
 # After first clean cell
-python scripts/compare_qrm_baseline.py --summary results/<cell>_summary.json
+python scripts/compare_qrm_baseline.py --summary $QREASON_OUTPUT_ROOT/results/<cell>_summary.json
 ```
 
 Do **not** cite archive `outputs-hpc-2a100-main-2026-06-29` pass@1 in the paper — rerun with `repetition_penalty: 1.05` first.
@@ -98,20 +109,25 @@ When reasoning LLMs are compressed, do they remain **accurate, calibrated, stabl
 | **HPC 2× A100** | **All publication runs** — main grid (`run_hpc_2a100_publication.sh`) |
 | **5080** | **Retired** — historical partial archive only |
 
-## Repository layout
+## Repository layout (V8.2)
+
+See **[docs/REPO_MAP.md](docs/REPO_MAP.md)** for the full map.
 
 ```
-configs/          Experiment cell, task, model, and quantization configs
-prompts/          Task prompts and templates
-scripts/          CLI entrypoints and batch helpers
-src/              Runners, metrics, extraction, stats, profiling, quantization
-runs/             Raw → extracted → scored pipeline outputs
-results/          Aggregated CSVs and tables for paper
-paper_figures/    Final publication figures
-paper/            Manuscript draft
-docs/             Design, runbook, experiment log
-slurm/            HPC job scripts
-notebooks/        Analysis dashboards
+configs/          cells, models, tasks, decoding, quantization, serving
+papers/           j1, j2, j3 protocols (V8.2 thesis alignment)
+schemas/          JSON Schema for raw rows and summaries
+src/
+  generation/     vLLM (active), SGLang/llama.cpp (J2/J3 stubs)
+  evaluation/     correctness, calibration, selective risk, statistics
+  runners/        config, vLLM, checkpoints (HPC entrypoints)
+  metrics/        legacy scoring paths (still used)
+prompts/          sober + QRM reproduction templates
+scripts/          run_inference, score_run, j1/j2/j3, hpc/
+tests/            31 unit tests
+docs/             All documentation — start at docs/README.md
+dashboards/       Generated HTML dashboards
+outputs-hpc-*/    Publication archives (git-tracked when autopushed)
 ```
 
 ## Execution gates
@@ -147,20 +163,28 @@ Cloned under `../external_repos/` for reading only — do not develop inside the
 | Read first | Purpose |
 |------------|---------|
 | [BEGINNER_HPC_GUIDE.md](docs/BEGINNER_HPC_GUIDE.md) | HPC workflow (start here) |
+| [docs/KNOWN_ISSUES.md](docs/KNOWN_ISSUES.md) | **Critical bugs and traps** |
+| [docs/REPO_MAP.md](docs/REPO_MAP.md) | Directory map and pipeline |
 | [docs/PROGRESS.md](docs/PROGRESS.md) | Live status + pre-rerun checklist |
+| [docs/V8_2_ARCHITECTURE.md](docs/V8_2_ARCHITECTURE.md) | V8.2 module layout |
 | [progress.md](progress.md) | Full execution history |
 | [CHANGELOG.md](CHANGELOG.md) | Ops log (job IDs, fixes) |
 
-## New tooling (2026-07-01)
+## Tooling (2026-07-01)
 
 | Script | Purpose |
 |--------|---------|
-| `scripts/verify_decoding_params.py` | Preflight: `repetition_penalty` + seed reach vLLM |
-| `scripts/compare_qrm_baseline.py` | Sanity-check pass@1 vs literature bands after rerun |
-| `scripts/run_inference_multisample.py` | maj@5 pilot (Level B calibration) |
-| `scripts/score_multisample.py` | Score maj@k + link to `compute_calibration.py` |
-| `scripts/build_pareto_frontier.py` | Cost-per-correct Pareto across quant configs |
-| `scripts/hpc/08_download_gptq4_models.sh` | Download QRM GPTQ-4 weights for b04 |
+| `scripts/verify_decoding_params.py` | Preflight: decoding reaches vLLM |
+| `scripts/compare_qrm_baseline.py` | pass@1 sanity vs literature |
+| `scripts/j1/compare_configs.py` | McNemar + Holm paired stats |
+| `scripts/j1/sample_audit.py` | Extraction audit sample |
+| `scripts/run_inference_multisample.py` | maj@5 calibration pilot |
+| `scripts/build_pareto_frontier.py` | Cost-per-correct Pareto |
+| `scripts/build_dashboard.py` | HTML archive dashboard |
+| `scripts/export_parquet.py` | Parquet export for analysis |
+| `scripts/j2/run_method_pilot.py` | Paper 2 method gate manifest |
+| `scripts/j3/preflight_indic.py` | Paper 3 Indic preflight |
+| `scripts/hpc/08_download_gptq4_models.sh` | GPTQ-4 weights for b04 |
 
 See [docs/reference_notes/COPY_ADAPT_CHECKLIST.md](docs/reference_notes/COPY_ADAPT_CHECKLIST.md) and `../external_repos/EXTERNAL_REPOS_REFERENCE.md`.
 

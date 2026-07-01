@@ -5,5 +5,6 @@
   "quant_config": "bf16",
   "decoding_config": "configs/decoding/smoke_debug.yaml",
   "seed": 0,
+  "prompt_profile": "sober",
   "notes": "Phase 0 local verifier — always fits on RTX 5080."
 }

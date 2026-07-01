@@ -1,0 +1,6 @@
+backend: llama.cpp
+version_pin: "pinned_at_j3_gate"
+binary: llama-cli
+reference_repo: external_repos/09-local-edge/llama.cpp
+pilot_script: scripts/j3/run_local_transfer.py
+hardware: RTX5080_WSL2

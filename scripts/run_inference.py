@@ -13,6 +13,7 @@ sys.path.insert(0, str(ROOT))
 
 from datasets import load_dataset
 
+from src.schemas.provenance import input_text_hash, provenance_fields
 from src.runners.checkpoint_utils import (
     atomic_write_jsonl,
     backup_file,
@@ -24,6 +25,7 @@ from src.runners.checkpoint_utils import (
 )
 from src.runners.config_utils import build_prompt, load_cell_config, load_decoding_from_file
 from src.runners.dataset_rows import output_root_for, prepare_example_row
+from src.runners.resume_guard import allow_resume_from_env, resume_block_reason
 from src.runners.vllm_runner import build_llm, generate_chunk
 
 CHECKPOINT_EVERY = 10
@@ -74,6 +76,16 @@ def main() -> None:
         default=CHECKPOINT_EVERY,
         help="Atomic checkpoint + backup every N completed rows.",
     )
+    parser.add_argument(
+        "--fresh",
+        action="store_true",
+        help="Delete existing output (and sibling scored/summary if in archive) before run.",
+    )
+    parser.add_argument(
+        "--allow-resume",
+        action="store_true",
+        help="Allow resume even into stale pre-fix rows (same as QREASON_ALLOW_RESUME=1).",
+    )
     args = parser.parse_args()
 
     cell = load_cell_config(args.cell_config)
@@ -106,6 +118,26 @@ def main() -> None:
         dataset = load_dataset(task["dataset_id"], split=task["split"])
     if args.limit is not None:
         dataset = dataset.select(range(min(args.limit, len(dataset))))
+
+    allow_resume = args.allow_resume or allow_resume_from_env()
+
+    if args.fresh and out_path.exists():
+        print(f"--fresh: removing {out_path}")
+        out_path.unlink()
+        if archive_root:
+            for sibling in (
+                archive_root / "scored" / out_path.name,
+                archive_root / "results" / f"{out_path.stem}_summary.json",
+                archive_root / "checkpoints" / f"{out_path.stem}.json",
+            ):
+                if sibling.exists():
+                    print(f"--fresh: removing {sibling}")
+                    sibling.unlink()
+
+    block_reason = resume_block_reason(out_path, cell, allow_resume=allow_resume)
+    if block_reason:
+        print(f"ERROR: {block_reason}", file=sys.stderr)
+        sys.exit(1)
 
     ok, _ = validate_jsonl(out_path)
     if not ok:
@@ -152,6 +184,8 @@ def main() -> None:
     llm = build_llm(model_path, cell["model"])
     use_chat = cell["model"].get("use_chat_template", True)
     checkpoint_every = max(1, args.checkpoint_every)
+    prompt_template_file = task["prompt_template_file"]
+    run_provenance = provenance_fields(cell, prompt_template_file=prompt_template_file)
 
     idx = start_idx
     while idx < total:
@@ -177,6 +211,9 @@ def main() -> None:
         for (_, row_base), result in zip(prepared, results):
             row = {
                 **row_base,
+                **run_provenance,
+                "input_text_hash": input_text_hash(str(row_base.get("problem", ""))),
+                "prompt_template_file": prompt_template_file,
                 "prompt": result["prompt"],
                 "completion": result["completion"],
                 "latency_sec": result["latency_sec"],

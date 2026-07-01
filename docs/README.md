@@ -11,6 +11,11 @@
 | Doc | Purpose |
 |-----|---------|
 | [BEGINNER_HPC_GUIDE.md](BEGINNER_HPC_GUIDE.md) | **Primary** — project overview + HPC step-by-step |
+| [KNOWN_ISSUES.md](KNOWN_ISSUES.md) | **Critical** — resume trap, bad archive, limitations |
+| [REPO_MAP.md](REPO_MAP.md) | Directory map and pipeline flow |
+| [PROGRESS.md](PROGRESS.md) | Live status + pre-rerun checklist |
+| [V8_2_ARCHITECTURE.md](V8_2_ARCHITECTURE.md) | V8.2 module layout (J1–J3) |
+| [plans/2026-07-01-v82-reengineering.md](plans/2026-07-01-v82-reengineering.md) | V8.2 implementation checklist |
 | [HPC_2A100_PLAN.md](HPC_2A100_PLAN.md) | Block grid b01–b09, SLURM timing |
 | [HPC_PARAM_RUDRA.md](HPC_PARAM_RUDRA.md) | Cluster cheat sheet (SSH, conda, SLURM) |
 | [RUNBOOK.md](RUNBOOK.md) | MacBook ↔ GitHub ↔ HPC sync |
@@ -24,6 +29,8 @@
 
 | Doc | Purpose |
 |-----|---------|
+| [V8_2_ARCHITECTURE.md](V8_2_ARCHITECTURE.md) | **V8.2** complete codebase map (J1–J3) |
+| [plans/2026-07-01-v82-reengineering.md](plans/2026-07-01-v82-reengineering.md) | V8.2 implementation checklist (complete) |
 | [PHD_ROADMAP.md](PHD_ROADMAP.md) | Thesis spine (long; not daily ops) |
 | [literature/PAPER1_READING_MAP.md](literature/PAPER1_READING_MAP.md) | Paper reading list |
 | [reference_notes/COPY_ADAPT_CHECKLIST.md](reference_notes/COPY_ADAPT_CHECKLIST.md) | What we ported from external repos |

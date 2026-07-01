@@ -5,5 +5,6 @@
   "quant_config": "fp8",
   "decoding_config": "configs/decoding/repro_qrm.yaml",
   "seed": 0,
+  "prompt_profile": "sober",
   "notes": "Level C grid — Llama-8B on RTX 5080 via FP8."
 }

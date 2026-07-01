@@ -1,0 +1,42 @@
+# J3 language conditions (V8.2 §10.2) — freeze at language gate
+version: "1.0"
+
+core_languages:
+  - id: en
+    name: English
+    script: latin
+    role: reference_baseline
+  - id: hi
+    name: Hindi
+    script: devanagari
+    role: high_resource_indo_aryan
+  - id: bn
+    name: Bengali
+    script: bengali
+    role: eastern_script
+  - id: ta
+    name: Tamil
+    script: tamil
+    role: dravidian_morphological
+  - id: te
+    name: Telugu
+    script: telugu
+    role: dravidian_second
+  - id: ur
+    name: Urdu
+    script: arabic_rtl
+    role: rtl_distinct_script
+
+code_mixed:
+  - id: hi_en
+    name: Hindi-English
+    pattern: hinglish_digital
+  - id: regional_en
+    name: Regional-English
+    pattern: bounded_regional_mix
+
+compression_disparity_layer:
+  languages: [en, hi, ta, ur]
+  configs: [bf16, fp8, awq4]
+
+scope_rule: "Five-six core languages plus bounded code-mixed; no 22-language expansion without collaborators"

@@ -9,17 +9,27 @@ Canonical dated record for **Paper 1: Beyond Accuracy** (`reasoning-compression-
 
 ---
 
-## Current Status Snapshot (2026-07-01)
+## Current Status Snapshot (2026-07-01, evening)
 
 | Area | Status |
 |------|--------|
-| MacBook pipeline + docs | **Complete** — fixes + external-repos tooling; **ready to push** |
-| GitHub remote HEAD | `bdaff00` — **MacBook ahead** (unpushed fixes) |
-| HPC env (qreason, vLLM 0.8.5, A100) | **Complete** — Gate 1–3 passed |
-| HPC CPU preflight | **Passed** — `07_preflight_publication.py` |
-| **First scored HPC results** | **Yes** — archive `outputs-hpc-2a100-main-2026-06-29` (**diagnostic only**) |
-| Windows 5080 (WSL2) | **Retired** — HPC-only for publication |
-| Unit tests (MacBook) | **17 pass** — `python -m pytest tests/ -q` |
+| **V8.2 codebase** | **Complete on MacBook** — generation/evaluation/schemas, J1–J3 protocols, 31 tests |
+| **MacBook pipeline + docs** | **Complete** — KNOWN_ISSUES, REPO_MAP, V8_2_ARCHITECTURE, preflight hardened |
+| **GitHub** | Push when ready — HPC should `git reset --hard origin/main` after pull |
+| **HPC env (qreason, vLLM 0.8.5, A100)** | **Complete** — Gate 1–3 passed |
+| **First scored HPC results** | Archive `outputs-hpc-2a100-main-2026-06-29` — **diagnostic only, discard for paper** |
+| **Publication numbers** | **Blocked** — fresh b01 rerun with new archive + `repetition_penalty` |
+| **5080** | **Retired** — HPC-only for publication |
+| **Unit tests (MacBook)** | **34 tests** — `python -m pytest tests/ -q` |
+
+### Critical before HPC rerun
+
+1. **Delete** old archive on scratch (prevents resume): `rm -rf outputs-hpc-2a100-main-2026-06-29`
+2. **New** output root: `export QREASON_OUTPUT_ROOT=$QR/outputs-hpc-2a100-main-$(date +%Y-%m-%d)-rerun`
+3. **Sync code:** `git fetch origin && git reset --hard origin/main`
+4. **Preflight:** `python scripts/hpc/07_preflight_publication.py` (now checks all cells + QRM prompts + decoding verify)
+
+See [docs/KNOWN_ISSUES.md](docs/KNOWN_ISSUES.md) for full trap list.
 
 ### First scored numbers (seed 0, MATH-500 — **not publication-ready**)
 
@@ -38,13 +48,22 @@ Paper tables: `outputs-hpc-2a100-main-2026-06-29/paper_tables/`.
 ### Pre-push verification (MacBook)
 
 ```bash
-python -m pytest tests/ -q                    # 17 pass
+python -m pytest tests/ -q                    # 31 pass
 python scripts/verify_decoding_params.py      # VERIFY OK
-python -m compileall -q src scripts tests
+python -m compileall -q src scripts tests papers
 bash -n scripts/hpc/*.sh
+python scripts/j2/run_method_pilot.py           # J2 manifest (optional)
+python scripts/j3/preflight_indic.py            # J3 manifest (optional)
 ```
 
 Then: `git commit` → `git push origin main` → HPC `git reset --hard origin/main`.
+
+### V8.2 architecture (2026-07-01)
+
+- Map: [docs/REPO_MAP.md](docs/REPO_MAP.md)
+- Architecture: [docs/V8_2_ARCHITECTURE.md](docs/V8_2_ARCHITECTURE.md)
+- Known issues: [docs/KNOWN_ISSUES.md](docs/KNOWN_ISSUES.md)
+- Plan checklist: [docs/plans/2026-07-01-v82-reengineering.md](docs/plans/2026-07-01-v82-reengineering.md)
 
 ---
 

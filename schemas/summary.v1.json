@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "summary.v1.json",
+  "title": "Scored cell summary (J1)",
+  "type": "object",
+  "required": ["n", "pass_at_1", "cell_id"],
+  "properties": {
+    "cell_id": { "type": "string" },
+    "n": { "type": "integer", "minimum": 0 },
+    "pass_at_1": { "type": "number", "minimum": 0, "maximum": 1 },
+    "pass_at_1_ci95_low": { "type": "number" },
+    "pass_at_1_ci95_high": { "type": "number" },
+    "num_correct": { "type": "integer" },
+    "truncation_rate": { "type": "number" },
+    "parse_failure_rate": { "type": "number" },
+    "cost_of_pass": { "type": "number" },
+    "cost_per_correct_seconds": { "type": "number" },
+    "brier_score": { "type": "number" },
+    "aurc": { "type": "number" },
+    "schema_version": { "type": "string" }
+  },
+  "additionalProperties": true
+}

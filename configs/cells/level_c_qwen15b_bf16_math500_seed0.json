@@ -5,5 +5,6 @@
   "quant_config": "bf16",
   "decoding_config": "configs/decoding/repro_qrm.yaml",
   "seed": 0,
+  "prompt_profile": "sober",
   "notes": "Level C grid — Qwen-1.5B lower bound; runs on 5080 or HPC."
 }

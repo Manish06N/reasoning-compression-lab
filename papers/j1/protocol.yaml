@@ -1,0 +1,74 @@
+# Paper 1 (J1) frozen protocol — V8.2 §6
+# Primary claim: compression can change calibration, selective risk, and run-to-run
+# reliability even when average accuracy looks stable.
+
+paper: j1
+version: "1.0"
+updated: "2026-07-01"
+
+primary_endpoints:
+  - pass_at_1
+  - brier_score
+  - aurc
+  - cost_of_pass_ratio
+
+secondary_endpoints:
+  - adaptive_ece
+  - risk_coverage_at_fixed_risk
+  - seed_rank_reversal_rate
+  - truncation_rate
+  - reasoning_token_mean
+
+decoding:
+  profile_default: repro_qrm
+  config: configs/decoding/repro_qrm.yaml
+  reference_repo: external_repos/01-core-baselines/Quantized-Reasoning-Models/inference.py
+
+prompt_profiles:
+  reproduction:
+    description: Match QRM lighteval_custom/tasks/reasoning.py (COLM 2025 repro gate)
+    math500: prompts/qrm_math500.txt
+    gsm8k: prompts/qrm_gsm8k.txt
+    gpqa_diamond: prompts/gpqa_diamond.txt
+  sober:
+    description: Sober-reasoning multi-seed protocol (C1 extension)
+    math500: prompts/math500.txt
+    gsm8k: prompts/gsm8k.txt
+    gpqa_diamond: prompts/gpqa_diamond.txt
+
+reproduction_gate:
+  models:
+    - deepseek-ai/DeepSeek-R1-Distill-Qwen-7B
+  configs: [bf16, gptq4]
+  tasks: [math500]
+  seeds: [42, 43, 44]
+  prompt_profile: reproduction
+  tolerance_pass_at_1_abs: 0.05
+
+pilot_gate:
+  models: [qwen7b, llama8b]
+  configs: [bf16, fp8, awq4, gptq4]
+  tasks: [math500, gpqa_diamond]
+  seeds: [0, 1, 2, 3, 4]
+  prompt_profile: sober
+
+statistics:
+  paired_correctness: mcnemar
+  metric_uncertainty: cluster_bootstrap_by_item
+  multiple_comparisons: holm
+  cluster_key: id
+
+gates:
+  reproduction:
+    script: scripts/compare_qrm_baseline.py
+  extraction:
+    manual_audit_n: 50
+  pilot:
+    min_reliability_signal: true
+  novelty:
+    recheck_days: 30
+
+schema_versions:
+  raw_response: schemas/raw_response.v1.json
+  summary: schemas/summary.v1.json
+  cell_config: schemas/cell_config.v1.json

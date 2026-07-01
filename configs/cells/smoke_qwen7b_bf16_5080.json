@@ -5,5 +5,6 @@
   "quant_config": "bf16",
   "decoding_config": "configs/decoding/smoke_debug.yaml",
   "seed": 0,
+  "prompt_profile": "sober",
   "notes": "RTX 5080 smoke only — max_model_len=2048, limit=1, max_tokens=64."
 }

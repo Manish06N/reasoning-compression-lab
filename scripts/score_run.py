@@ -11,7 +11,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from src.metrics.scoring import score_item, summarize_scored_rows
+from src.evaluation.correctness.scoring import score_item, summarize_scored_rows
+from src.evaluation.calibration.metrics import calibration_summary_from_rows
+from src.evaluation.selective_risk.curves import selective_risk_from_rows
+from src.evaluation.statistics.bootstrap import cluster_bootstrap_ci
 
 
 def _display_path(path: Path) -> str:
@@ -34,9 +37,16 @@ def main() -> None:
         default=None,
         help="Summary JSON output. Default: results/<input_stem>_summary.json",
     )
+    parser.add_argument(
+        "--parquet",
+        default=None,
+        help="Optional Parquet export path for scored rows",
+    )
     args = parser.parse_args()
 
-    in_path = ROOT / args.input
+    in_path = Path(args.input)
+    if not in_path.is_absolute():
+        in_path = ROOT / in_path
     stem = in_path.stem
     out_path = ROOT / (args.output or f"runs/scored/{stem}.jsonl")
     summary_path = ROOT / (args.summary or f"results/{stem}_summary.json")
@@ -59,6 +69,7 @@ def main() -> None:
             f.write(json.dumps(row, ensure_ascii=False) + "\n")
 
     summary = summarize_scored_rows(scored)
+    summary["schema_version"] = "summary.v1"
     summary["input"] = _display_path(in_path)
     summary["scored_output"] = _display_path(out_path)
     if scored:
@@ -66,6 +77,35 @@ def main() -> None:
         summary["quant_config"] = scored[0].get("quant_config")
         summary["seed"] = scored[0].get("seed")
         summary["task"] = scored[0].get("task")
+        if all(row.get("id") is not None for row in scored):
+            cluster_ci = cluster_bootstrap_ci(scored, cluster_key="id", value_key="correct")
+            summary["pass_at_1_cluster_ci95_low"] = cluster_ci["ci_low"]
+            summary["pass_at_1_cluster_ci95_high"] = cluster_ci["ci_high"]
+            summary["pass_at_1_n_clusters"] = cluster_ci["n_clusters"]
+        cal = calibration_summary_from_rows(scored)
+        if cal:
+            summary["calibration"] = cal
+        risk = selective_risk_from_rows(scored)
+        if risk:
+            summary["selective_risk"] = risk
+
+    if args.parquet:
+        pq = Path(args.parquet)
+        if not pq.is_absolute():
+            pq = ROOT / pq
+        import subprocess
+
+        subprocess.run(
+            [
+                sys.executable,
+                str(ROOT / "scripts/export_parquet.py"),
+                "--input",
+                str(out_path),
+                "--output",
+                str(pq),
+            ],
+            check=True,
+        )
 
     with summary_path.open("w", encoding="utf-8") as f:
         json.dump(summary, f, indent=2)

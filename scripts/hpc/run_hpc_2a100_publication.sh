@@ -33,6 +33,14 @@ METADATA="$QREASON_OUTPUT_ROOT/metadata"
 BACKUP_ROOT="$QREASON_OUTPUT_ROOT/_backup"
 mkdir -p "$RAW" "$SCORED" "$RESULTS" "$LOGS" "$CHECKPOINTS" "$METADATA" "$BACKUP_ROOT"
 
+# Block accidental resume into the bad June-29 archive or stale pre-fix JSONL.
+bash "$SCRIPT_DIR/09_assert_fresh_archive.sh"
+
+FRESH_FLAG=""
+if [[ "${QREASON_FRESH_RUN:-}" == "1" ]]; then
+  FRESH_FLAG="--fresh"
+fi
+
 DECODING="${QREASON_DECODING:-configs/decoding/repro_qrm.yaml}"
 BATCH_SIZE="${QREASON_BATCH_SIZE:-1}"
 CHECKPOINT_EVERY="${QREASON_CHECKPOINT_EVERY:-10}"
@@ -244,6 +252,7 @@ run_one_cell() {
       --decoding-config "$DECODING" \
       --batch-size "$BATCH_SIZE" \
       --checkpoint-every "$CHECKPOINT_EVERY" \
+      $FRESH_FLAG \
       --output "$out"
   ) 2>&1 | tee "$log"
   write_cell_metadata "$cell_id" "$cell_cfg" "$gpu_id" "inference_completed" "$out" ""

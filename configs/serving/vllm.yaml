@@ -1,0 +1,8 @@
+backend: vllm
+version_pin: "0.8.5"
+enforce_eager: true
+gpu_memory_utilization: 0.9
+enable_prefix_caching: false
+enable_chunked_prefill: false
+tensor_parallel_default: 1
+reference_repo: external_repos/04-inference-and-eval-tools/vllm
