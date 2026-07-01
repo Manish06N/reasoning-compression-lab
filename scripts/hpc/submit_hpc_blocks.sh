@@ -14,15 +14,24 @@ mkdir -p logs/slurm
 
 submit_2gpu() {
   local block="$1"
-  echo "Submitting $block (2×A100) ..."
-  sbatch --job-name="qreason-${block}" \
-    --output="logs/slurm/${block}_%j.out" \
-    --error="logs/slurm/${block}_%j.err" \
-    --time=47:00:00 \
-    --partition=gpu \
-    --cpus-per-task=16 \
-    --gres=gpu:2 \
-    --wrap="bash scripts/hpc/run_hpc_2a100_publication.sh ${block}"
+  local block_file="$QR/configs/machine_split/hpc_blocks/${block}.sh"
+  echo "Submitting $block as independent 1-GPU cell jobs ..."
+  # shellcheck disable=SC1090
+  source "$block_file"
+  for entry in "${HPC_BLOCK_CELLS[@]}"; do
+    local cfg="${entry#*:}"
+    local cell_id
+    cell_id="$(python3 -c "import json,sys; print(json.load(open(sys.argv[1]))['cell_id'])" "$cfg")"
+    echo "Submitting $block / $cell_id (1xA100) ..."
+    sbatch --job-name="qreason-${cell_id}" \
+      --output="logs/slurm/${block}_${cell_id}_%j.out" \
+      --error="logs/slurm/${block}_${cell_id}_%j.err" \
+      --time=47:00:00 \
+      --partition=gpu \
+      --cpus-per-task=8 \
+      --gres=gpu:1 \
+      --wrap="bash scripts/hpc/run_hpc_2a100_publication.sh cell ${cfg} ${block}"
+  done
 }
 
 submit_1gpu() {

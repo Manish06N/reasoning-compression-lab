@@ -1,0 +1,49 @@
+{
+  "cell_id": "level_b_qwen7b_fp8_math500_seed0",
+  "status": "in_progress",
+  "updated_at": "2026-07-01T02:38:39.638995+00:00",
+  "gpu_id": "0",
+  "rows_saved": 0,
+  "raw": "/scratch/manishn_iitp/reasoning-compression-lab/outputs-hpc-2a100-main-2026-06-29/raw/level_b_qwen7b_fp8_math500_seed0.jsonl",
+  "summary": null,
+  "cell_config_path": "configs/cells/level_b_qwen7b_fp8_math500_seed0.json",
+  "cell_config": {
+    "cell_id": "level_b_qwen7b_fp8_math500_seed0",
+    "model_config": "configs/models/deepseek_r1_qwen_7b_fp8.json",
+    "task_config": "configs/tasks/math500.json",
+    "quant_config": "fp8",
+    "decoding_config": "configs/decoding/repro_qrm.yaml",
+    "seed": 0,
+    "notes": "Level B pilot \u2014 primary RTX 5080 working quant for Qwen-7B."
+  },
+  "model_config_path": "configs/models/deepseek_r1_qwen_7b_fp8.json",
+  "model_config": {
+    "model_id": "RedHatAI/DeepSeek-R1-Distill-Qwen-7B-FP8-dynamic",
+    "local_path_env": "QREASON_MODEL_QWEN7B_FP8",
+    "local_path_default": "models/DeepSeek-R1-Distill-Qwen-7B-FP8",
+    "dtype": "auto",
+    "quantization": "compressed-tensors",
+    "max_model_len": 32768,
+    "tensor_parallel_size": 1,
+    "trust_remote_code": true,
+    "use_chat_template": true,
+    "enforce_eager": true,
+    "kv_cache_dtype": "fp8",
+    "gpu_memory_utilization": 0.95
+  },
+  "task_config_path": "configs/tasks/math500.json",
+  "task_config": {
+    "task_name": "math500",
+    "dataset_id": "HuggingFaceH4/MATH-500",
+    "split": "test",
+    "prompt_template_file": "prompts/math500.txt"
+  },
+  "decoding_config_path": "configs/decoding/repro_qrm.yaml",
+  "decoding_config_text": "# Reproduction decoding protocol from Quantized-Reasoning-Models (inference.py defaults).\n# Used for Level A reproduction before pilot grid changes.\n\ntemperature: 0.6\ntop_p: 0.95\nmax_tokens: 32768\nseed: 0\nnotes: Match QRM paper for first BF16/GPTQ-4 reproduction cell.\n",
+  "batch_size": 1,
+  "checkpoint_every": 10,
+  "git_commit": null,
+  "slurm_job_id": "85723",
+  "slurm_job_name": "qreason-level_b_qwen7b_fp8_math500_seed0",
+  "slurm_node_list": "racn115"
+}

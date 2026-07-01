@@ -1,0 +1,40 @@
+'[Errno -2] Name or service not known' thrown while requesting HEAD https://huggingface.co/datasets/HuggingFaceH4/MATH-500/resolve/6e4ed1a2a79af7d8630a6b768ec859cb5af4d3be/MATH-500.py
+Retrying in 1s [Retry 1/5].
+Using the latest cached version of the dataset since HuggingFaceH4/MATH-500 couldn't be found on the Hugging Face Hub
+Found the latest cached dataset configuration 'default' at /scratch/manishn_iitp/reasoning-compression-lab/hf_cache/datasets/HuggingFaceH4___math-500/default/0.0.0/6e4ed1a2a79af7d8630a6b768ec859cb5af4d3be (last modified on Fri Jun 26 19:36:57 2026).
+/home/manishn_iitp/.conda/envs/qreason/lib/python3.11/site-packages/torch/cuda/__init__.py:61: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+Loading dataset: HuggingFaceH4/MATH-500 [test]
+Loading model from: /scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Qwen-7B-FP8
+Decoding: max_tokens=32768, max_model_len=32768, batch_size=1
+INFO 07-01 08:10:52 [__init__.py:239] Automatically detected platform cuda.
+[transformers] `torch_dtype` is deprecated! Use `dtype` instead!
+INFO 07-01 08:11:51 [config.py:717] This model supports multiple tasks: {'embed', 'score', 'classify', 'reward', 'generate'}. Defaulting to 'generate'.
+WARNING 07-01 08:12:33 [arg_utils.py:1658] --kv-cache-dtype is not supported by the V1 Engine. Falling back to V0. 
+INFO 07-01 08:12:33 [config.py:1403] Using fp8 data type to store kv cache. It reduces the GPU memory footprint and boosts the performance. Meanwhile, it may cause accuracy drop without a proper scaling factor
+WARNING 07-01 08:12:33 [cuda.py:93] To see benefits of async output processing, enable CUDA graph. Since, enforce-eager is enabled, async output processor cannot be used
+INFO 07-01 08:12:33 [llm_engine.py:240] Initializing a V0 LLM engine (v0.8.5) with config: model='/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Qwen-7B-FP8', speculative_config=None, tokenizer='/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Qwen-7B-FP8', skip_tokenizer_init=False, tokenizer_mode=auto, revision=None, override_neuron_config=None, tokenizer_revision=None, trust_remote_code=True, dtype=torch.bfloat16, max_seq_len=32768, download_dir=None, load_format=LoadFormat.AUTO, tensor_parallel_size=1, pipeline_parallel_size=1, disable_custom_all_reduce=False, quantization=compressed-tensors, enforce_eager=True, kv_cache_dtype=fp8,  device_config=cuda, decoding_config=DecodingConfig(guided_decoding_backend='auto', reasoning_backend=None), observability_config=ObservabilityConfig(show_hidden_metrics=False, otlp_traces_endpoint=None, collect_model_forward_time=False, collect_model_execute_time=False), seed=None, served_model_name=/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Qwen-7B-FP8, num_scheduler_steps=1, multi_step_stream_outputs=True, enable_prefix_caching=None, chunked_prefill_enabled=False, use_async_output_proc=False, disable_mm_preprocessor_cache=False, mm_processor_kwargs=None, pooler_config=None, compilation_config={"splitting_ops":[],"compile_sizes":[],"cudagraph_capture_sizes":[],"max_capture_size":0}, use_cached_outputs=False, 
+INFO 07-01 08:12:34 [cuda.py:273] Cannot use FlashAttention backend for FP8 KV cache.
+WARNING 07-01 08:12:34 [cuda.py:275] Please use FlashInfer backend with FP8 KV Cache for better performance by setting environment variable VLLM_ATTENTION_BACKEND=FLASHINFER
+INFO 07-01 08:12:34 [cuda.py:289] Using XFormers backend.
+INFO 07-01 08:12:37 [parallel_state.py:1004] rank 0 in world size 1 is assigned as DP rank 0, PP rank 0, TP rank 0
+INFO 07-01 08:12:37 [model_runner.py:1108] Starting to load model /scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Qwen-7B-FP8...
+Loading safetensors checkpoint shards:   0% Completed | 0/2 [00:00<?, ?it/s]
+Loading safetensors checkpoint shards:  50% Completed | 1/2 [00:02<00:02,  2.60s/it]
+Loading safetensors checkpoint shards: 100% Completed | 2/2 [00:06<00:00,  3.20s/it]
+Loading safetensors checkpoint shards: 100% Completed | 2/2 [00:06<00:00,  3.11s/it]
+
+INFO 07-01 08:12:45 [loader.py:458] Loading weights took 6.28 seconds
+WARNING 07-01 08:12:45 [marlin_utils_fp8.py:54] Your GPU does not have native support for FP8 computation but FP8 quantization is being used. Weight-only FP8 compression will be used leveraging the Marlin kernel. This may degrade performance for compute-heavy workloads.
+WARNING 07-01 08:12:46 [kv_cache.py:85] Checkpoint does not provide a q scaling factor. Setting it to k_scale. This only matters for the flash-attn backend.
+WARNING 07-01 08:12:46 [kv_cache.py:98] Using KV cache scaling factor 1.0 for fp8_e4m3. This may cause accuracy issues. Please make sure k/v_scale scaling factors are available in the fp8 checkpoint.
+WARNING 07-01 08:12:46 [kv_cache.py:128] Using Q scale 1.0 and prob scale 1.0 with fp8 attention. This may cause accuracy issues. Please make sure Q/prob scaling factors are available in the fp8 checkpoint.
+INFO 07-01 08:12:46 [model_runner.py:1140] Model loading took 8.1648 GiB and 8.455180 seconds
+INFO 07-01 08:12:51 [worker.py:287] Memory profiling takes 5.20 seconds
+INFO 07-01 08:12:51 [worker.py:287] the current vLLM instance can use total_gpu_memory (79.14GiB) x gpu_memory_utilization (0.95) = 75.18GiB
+INFO 07-01 08:12:51 [worker.py:287] model weights take 8.16GiB; non_torch_memory takes 0.09GiB; PyTorch activation peak memory takes 4.34GiB; the rest of the memory reserved for KV Cache is 62.58GiB.
+INFO 07-01 08:12:52 [executor_base.py:112] # cuda blocks: 146474, # CPU blocks: 9362
+INFO 07-01 08:12:52 [executor_base.py:117] Maximum concurrency for 32768 tokens per request: 71.52x
+INFO 07-01 08:12:54 [llm_engine.py:437] init engine (profile, create kv cache, warmup model) took 8.34 seconds
+[1-1/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]

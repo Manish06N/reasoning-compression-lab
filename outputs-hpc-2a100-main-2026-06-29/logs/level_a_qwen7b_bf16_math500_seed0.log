@@ -1,0 +1,30 @@
+/home/manishn_iitp/.conda/envs/qreason/lib/python3.11/site-packages/torch/cuda/__init__.py:61: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+Loading dataset: HuggingFaceH4/MATH-500 [test]
+Resuming level_a_qwen7b_bf16_math500_seed0: 420/500 rows already in /scratch/manishn_iitp/reasoning-compression-lab/outputs-hpc-2a100-main-2026-06-29/raw/level_a_qwen7b_bf16_math500_seed0.jsonl
+Loading model from: /scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Qwen-7B
+Decoding: max_tokens=32768, max_model_len=32768, batch_size=1
+INFO 07-01 08:10:43 [__init__.py:239] Automatically detected platform cuda.
+[transformers] `torch_dtype` is deprecated! Use `dtype` instead!
+INFO 07-01 08:11:27 [config.py:717] This model supports multiple tasks: {'generate', 'score', 'embed', 'classify', 'reward'}. Defaulting to 'generate'.
+INFO 07-01 08:11:27 [config.py:2003] Chunked prefill is enabled with max_num_batched_tokens=16384.
+WARNING 07-01 08:11:27 [cuda.py:93] To see benefits of async output processing, enable CUDA graph. Since, enforce-eager is enabled, async output processor cannot be used
+INFO 07-01 08:11:32 [core.py:58] Initializing a V1 LLM engine (v0.8.5) with config: model='/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Qwen-7B', speculative_config=None, tokenizer='/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Qwen-7B', skip_tokenizer_init=False, tokenizer_mode=auto, revision=None, override_neuron_config=None, tokenizer_revision=None, trust_remote_code=True, dtype=torch.bfloat16, max_seq_len=32768, download_dir=None, load_format=LoadFormat.AUTO, tensor_parallel_size=1, pipeline_parallel_size=1, disable_custom_all_reduce=False, quantization=None, enforce_eager=True, kv_cache_dtype=auto,  device_config=cuda, decoding_config=DecodingConfig(guided_decoding_backend='auto', reasoning_backend=None), observability_config=ObservabilityConfig(show_hidden_metrics=False, otlp_traces_endpoint=None, collect_model_forward_time=False, collect_model_execute_time=False), seed=None, served_model_name=/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Qwen-7B, num_scheduler_steps=1, multi_step_stream_outputs=True, enable_prefix_caching=True, chunked_prefill_enabled=True, use_async_output_proc=False, disable_mm_preprocessor_cache=False, mm_processor_kwargs=None, pooler_config=None, compilation_config={"splitting_ops":[],"compile_sizes":[],"cudagraph_capture_sizes":[],"max_capture_size":0}
+WARNING 07-01 08:11:44 [utils.py:2522] Methods determine_num_available_blocks,device_config,get_cache_block_size_bytes,initialize_cache not implemented in <vllm.v1.worker.gpu_worker.Worker object at 0x7fa6f3eca710>
+INFO 07-01 08:11:46 [parallel_state.py:1004] rank 0 in world size 1 is assigned as DP rank 0, PP rank 0, TP rank 0
+INFO 07-01 08:11:46 [cuda.py:221] Using Flash Attention backend on V1 engine.
+WARNING 07-01 08:11:46 [topk_topp_sampler.py:69] FlashInfer is not available. Falling back to the PyTorch-native implementation of top-p & top-k sampling. For the best performance, please install FlashInfer.
+INFO 07-01 08:11:46 [gpu_model_runner.py:1329] Starting to load model /scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Qwen-7B...
+Loading safetensors checkpoint shards:   0% Completed | 0/2 [00:00<?, ?it/s]
+Loading safetensors checkpoint shards:  50% Completed | 1/2 [00:07<00:07,  7.61s/it]
+Loading safetensors checkpoint shards: 100% Completed | 2/2 [00:16<00:00,  8.51s/it]
+Loading safetensors checkpoint shards: 100% Completed | 2/2 [00:16<00:00,  8.38s/it]
+
+INFO 07-01 08:12:05 [loader.py:458] Loading weights took 16.87 seconds
+INFO 07-01 08:12:05 [gpu_model_runner.py:1347] Model loading took 14.2717 GiB and 18.667268 seconds
+INFO 07-01 08:12:11 [kv_cache_utils.py:634] GPU KV cache size: 950,240 tokens
+INFO 07-01 08:12:11 [kv_cache_utils.py:637] Maximum concurrency for 32,768 tokens per request: 29.00x
+INFO 07-01 08:12:11 [core.py:159] init engine (profile, create kv cache, warmup model) took 5.41 seconds
+INFO 07-01 08:12:11 [core_client.py:439] Core engine process 0 ready.
+[421-421/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]

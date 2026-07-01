@@ -7,6 +7,7 @@
 # Usage:
 #   bash scripts/hpc/run_hpc_2a100_publication.sh list
 #   bash scripts/hpc/run_hpc_2a100_publication.sh b01_parallel_bf16_anchors
+#   bash scripts/hpc/run_hpc_2a100_publication.sh cell configs/cells/level_a_bf16_seed0.json b01_parallel_bf16_anchors
 #   bash scripts/hpc/run_hpc_2a100_publication.sh b02_gpqa_fp8
 #   bash scripts/hpc/submit_hpc_blocks.sh              # sbatch all ready blocks
 #
@@ -289,6 +290,19 @@ run_block() {
   echo "=== Block $HPC_BLOCK_ID finished ==="
 }
 
+run_single_cell() {
+  local cell_cfg="$1"
+  local parent_block="${2:-single_cell}"
+  local cell_id
+  cell_id="$(cell_id_from_cfg "$cell_cfg")"
+  echo "=== HPC cell: $cell_id ==="
+  echo "Archive: $QREASON_OUTPUT_ROOT"
+  write_manifest_header "$parent_block" "$cell_cfg"
+  backup_archive
+  run_one_cell 0 "$cell_cfg"
+  echo "=== Cell $cell_id finished ==="
+}
+
 list_blocks() {
   echo "HPC publication blocks (SLURM --time=47:00:00 max):"
   echo ""
@@ -311,6 +325,13 @@ BLOCK_DIR="$QR/configs/machine_split/hpc_blocks"
 case "$BLOCK" in
   list|--list|-h|--help)
     list_blocks
+    ;;
+  cell|single-cell|single_cell)
+    if [[ $# -lt 2 ]]; then
+      echo "Usage: $0 cell <cell-config.json> [parent-block-id]"
+      exit 1
+    fi
+    run_single_cell "$2" "${3:-single_cell}"
     ;;
   b01|b01_parallel_bf16_anchors)
     run_block "$BLOCK_DIR/b01_parallel_bf16_anchors.sh"

@@ -1,0 +1,47 @@
+{
+  "cell_id": "level_c_llama8b_bf16_math500_seed0",
+  "status": "in_progress",
+  "updated_at": "2026-06-29T11:18:29.310589+00:00",
+  "gpu_id": "1",
+  "rows_saved": 40,
+  "raw": "/scratch/manishn_iitp/reasoning-compression-lab/outputs-hpc-2a100-main-2026-06-29/raw/level_c_llama8b_bf16_math500_seed0.jsonl",
+  "summary": null,
+  "cell_config_path": "configs/cells/level_c_llama8b_bf16_math500_seed0.json",
+  "cell_config": {
+    "cell_id": "level_c_llama8b_bf16_math500_seed0",
+    "model_config": "configs/models/deepseek_r1_llama_8b.json",
+    "task_config": "configs/tasks/math500.json",
+    "quant_config": "bf16",
+    "decoding_config": "configs/decoding/repro_qrm.yaml",
+    "seed": 0,
+    "notes": "Level C grid \u2014 HPC A100 only (BF16 exceeds 16 GB VRAM)."
+  },
+  "model_config_path": "configs/models/deepseek_r1_llama_8b.json",
+  "model_config": {
+    "model_id": "deepseek-ai/DeepSeek-R1-Distill-Llama-8B",
+    "local_path_env": "QREASON_MODEL_LLAMA8B",
+    "local_path_default": "models/DeepSeek-R1-Distill-Llama-8B",
+    "dtype": "bfloat16",
+    "max_model_len": 32768,
+    "tensor_parallel_size": 1,
+    "trust_remote_code": true,
+    "use_chat_template": true,
+    "enforce_eager": true,
+    "notes": "HPC A100 only \u2014 BF16 weights exceed 16 GB RTX 5080."
+  },
+  "task_config_path": "configs/tasks/math500.json",
+  "task_config": {
+    "task_name": "math500",
+    "dataset_id": "HuggingFaceH4/MATH-500",
+    "split": "test",
+    "prompt_template_file": "prompts/math500.txt"
+  },
+  "decoding_config_path": "configs/decoding/repro_qrm.yaml",
+  "decoding_config_text": "# Reproduction decoding protocol from Quantized-Reasoning-Models (inference.py defaults).\n# Used for Level A reproduction before pilot grid changes.\n\ntemperature: 0.6\ntop_p: 0.95\nmax_tokens: 32768\nseed: 0\nnotes: Match QRM paper for first BF16/GPTQ-4 reproduction cell.\n",
+  "batch_size": 1,
+  "checkpoint_every": 10,
+  "git_commit": "e5779d366db01c355a41cb60e300bb9c3bb592eb",
+  "slurm_job_id": "85394",
+  "slurm_job_name": "qreason-hpc-b01",
+  "slurm_node_list": "ragpu008"
+}
