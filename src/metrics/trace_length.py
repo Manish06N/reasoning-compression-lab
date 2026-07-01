@@ -11,7 +11,11 @@ from typing import Any, Dict, Optional
 def count_reasoning_steps(text: str, step_token: str = "\n\n") -> int:
     if not text:
         return 0
-    return len(text.split(step_token))
+    if step_token in text:
+        return len(text.split(step_token))
+    if "\n" in text:
+        return len([part for part in text.split("\n") if part.strip()])
+    return 1
 
 
 def count_tokens(text: str, tokenizer=None) -> Optional[int]:

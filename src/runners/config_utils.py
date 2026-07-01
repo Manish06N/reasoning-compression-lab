@@ -60,6 +60,7 @@ def load_decoding_from_file(decoding_file: str | Path) -> Dict[str, Any]:
         "top_p": loaded.get("top_p", 0.95),
         "max_tokens": loaded.get("max_tokens", 32768),
         "max_model_len": loaded.get("max_model_len"),
+        "repetition_penalty": loaded.get("repetition_penalty"),
     }
 
 
