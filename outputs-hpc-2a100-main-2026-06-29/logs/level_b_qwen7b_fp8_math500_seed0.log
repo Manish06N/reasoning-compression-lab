@@ -142,4 +142,6 @@ checkpoint saved: /scratch/manishn_iitp/reasoning-compression-lab/outputs-hpc-2a
 Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [13:56<00:00, 836.71s/it, est. speed input: 0.12 toks/s, output: 39.05 toks/s]Processed prompts: 100%|██████████| 1/1 [13:56<00:00, 836.87s/it, est. speed input: 0.12 toks/s, output: 39.05 toks/s]
 checkpoint saved: /scratch/manishn_iitp/reasoning-compression-lab/outputs-hpc-2a100-main-2026-06-29/raw/level_b_qwen7b_fp8_math500_seed0.jsonl (50 rows)
 [51-51/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [13:36<00:00, 816.37s/it, est. speed input: 0.21 toks/s, output: 39.93 toks/s]Processed prompts: 100%|██████████| 1/1 [13:36<00:00, 816.50s/it, est. speed input: 0.21 toks/s, output: 39.93 toks/s]
+[52-52/500] generating batch of 1...
 Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]
