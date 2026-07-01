@@ -1,6 +1,6 @@
 # Repository map (V8.2)
 
-Quick navigation for `reasoning-compression-lab`. Read [docs/README.md](README.md) for the doc index.
+Quick navigation for `reasoning-compression-lab`. For the full high-level overview (architecture, papers, gates, status), see **[CODEBASE_OVERVIEW.md](CODEBASE_OVERVIEW.md)**. Read [docs/README.md](README.md) for the doc index.
 
 ---
 
@@ -8,10 +8,12 @@ Quick navigation for `reasoning-compression-lab`. Read [docs/README.md](README.m
 
 | I want to… | Open |
 |------------|------|
+| Understand the whole codebase | [CODEBASE_OVERVIEW.md](CODEBASE_OVERVIEW.md) |
 | Run on HPC | [BEGINNER_HPC_GUIDE.md](BEGINNER_HPC_GUIDE.md) |
 | See current status | [PROGRESS.md](PROGRESS.md) |
 | Avoid known traps | [KNOWN_ISSUES.md](KNOWN_ISSUES.md) |
-| Understand V8.2 layout | [V8_2_ARCHITECTURE.md](V8_2_ARCHITECTURE.md) |
+| Decide which models to add | [MODEL_SCOPE_DECISION.md](MODEL_SCOPE_DECISION.md) |
+| Find HF IDs and env vars | [MODEL_ROSTER.md](MODEL_ROSTER.md) |
 | Full change history | [../CHANGELOG.md](../CHANGELOG.md) |
 
 ---

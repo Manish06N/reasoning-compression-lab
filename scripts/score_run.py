@@ -11,8 +11,12 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from src.evaluation.correctness.scoring import score_item, summarize_scored_rows
+from src.evaluation.calibration.confidence import (
+    calibration_availability,
+    enrich_scored_row,
+)
 from src.evaluation.calibration.metrics import calibration_summary_from_rows
+from src.evaluation.correctness.scoring import score_item, summarize_scored_rows
 from src.evaluation.selective_risk.curves import selective_risk_from_rows
 from src.evaluation.statistics.bootstrap import cluster_bootstrap_ci
 
@@ -42,6 +46,21 @@ def main() -> None:
         default=None,
         help="Optional Parquet export path for scored rows",
     )
+    parser.add_argument(
+        "--skip-calibration",
+        action="store_true",
+        help="Skip calibration and selective-risk (pass@1 / cost only). Default for repro runs.",
+    )
+    parser.add_argument(
+        "--require-calibration",
+        action="store_true",
+        help="Exit with error if valid confidence is unavailable (use before calibration claims).",
+    )
+    parser.add_argument(
+        "--allow-parse-confidence-proxy",
+        action="store_true",
+        help="DEBUG ONLY: use answer_parse_success as confidence (NOT valid for publication).",
+    )
     args = parser.parse_args()
 
     in_path = Path(args.input)
@@ -62,7 +81,10 @@ def main() -> None:
     scored = []
     for row in rows:
         score = score_item(row)
-        scored.append({**row, **score})
+        merged = {**row, **score}
+        scored.append(
+            enrich_scored_row(merged, allow_parse_proxy=args.allow_parse_confidence_proxy)
+        )
 
     with out_path.open("w", encoding="utf-8") as f:
         for row in scored:
@@ -82,12 +104,44 @@ def main() -> None:
             summary["pass_at_1_cluster_ci95_low"] = cluster_ci["ci_low"]
             summary["pass_at_1_cluster_ci95_high"] = cluster_ci["ci_high"]
             summary["pass_at_1_n_clusters"] = cluster_ci["n_clusters"]
-        cal = calibration_summary_from_rows(scored)
-        if cal:
-            summary["calibration"] = cal
-        risk = selective_risk_from_rows(scored)
-        if risk:
-            summary["selective_risk"] = risk
+
+    if not args.skip_calibration:
+        availability = calibration_availability(
+            scored, allow_parse_proxy=args.allow_parse_confidence_proxy
+        )
+        summary["calibration_availability"] = availability
+
+        if args.require_calibration and not availability.get("valid_for_publication"):
+            msg = availability.get("message") or "Calibration unavailable."
+            print(f"ERROR: {msg}", file=sys.stderr)
+            sys.exit(1)
+
+        if availability["available"]:
+            cal = calibration_summary_from_rows(
+                scored, allow_parse_proxy=args.allow_parse_confidence_proxy
+            )
+            if cal and not cal.get("skipped"):
+                summary["calibration"] = cal
+            risk = selective_risk_from_rows(
+                scored, allow_parse_proxy=args.allow_parse_confidence_proxy
+            )
+            if risk and not risk.get("skipped"):
+                summary["selective_risk"] = risk
+        elif args.require_calibration:
+            msg = availability.get("message") or "Calibration unavailable."
+            print(f"ERROR: {msg}", file=sys.stderr)
+            sys.exit(1)
+        else:
+            summary["calibration"] = {"skipped": True, "availability": availability}
+            summary["selective_risk"] = {"skipped": True, "availability": availability}
+            print(
+                "NOTE: Calibration skipped — no valid confidence source. "
+                "Use --skip-calibration to silence this, or maj@5 for real confidence.",
+                file=sys.stderr,
+            )
+    else:
+        summary["calibration"] = {"skipped": True, "reason": "cli_skip_calibration"}
+        summary["selective_risk"] = {"skipped": True, "reason": "cli_skip_calibration"}
 
     if args.parquet:
         pq = Path(args.parquet)

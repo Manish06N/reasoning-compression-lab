@@ -2,6 +2,8 @@
 
 PhD Roadmap V8.2 (1 July 2026) — complete codebase layout.
 
+**Full overview:** [CODEBASE_OVERVIEW.md](CODEBASE_OVERVIEW.md) — thesis alignment, pipeline diagrams, paper status, and script reference.
+
 ## Python packages (`src/`)
 
 | V8.2 module | Path | Status |

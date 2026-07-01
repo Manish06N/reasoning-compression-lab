@@ -10,12 +10,13 @@
 
 | Area | Status |
 |------|--------|
-| **V8.2 codebase** | Complete — J1/J2/J3 protocols, evaluation package, 31 tests |
-| **Policy** | **HPC-only** for all publication experiments |
-| **First HPC scores** | b01 archive scored — **diagnostic only** (7% / 21% — decode bug) |
-| **Blocker** | Fresh b01 rerun after delete old archive + sync code |
-| **5080** | **Retired** |
-| **Tests** | 34 pass (`pytest tests/`) |
+| **J1 engineering** | **MVP complete** — pipeline, stats, provenance, fail-closed calibration |
+| **J1 scientific validation** | **Pending** — fresh b01 BF16 + GPTQ repro on HPC |
+| **Minimum publishable grid** | **15 cells wired** (seed 0, b01–b09) — see `papers/j1/publication_matrix.yaml` |
+| **Full Level C (300 cells)** | **Not generated** — gated after pilot signal |
+| **Policy** | **HPC-only** for J1 paper numbers; RTX for J3 transfer only |
+| **First HPC scores** | b01 archive **diagnostic only** (7% / 21% — decode bug) |
+| **Blocker** | Fresh b01 rerun — see [J1_VALIDATION_RUNBOOK.md](J1_VALIDATION_RUNBOOK.md) |
 
 **Read first if anything looks wrong:** [KNOWN_ISSUES.md](KNOWN_ISSUES.md)
 

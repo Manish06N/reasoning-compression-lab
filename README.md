@@ -9,15 +9,17 @@ Deployment-science evaluation harness for compressed reasoning LLMs.
 
 ## Current status (2026-07-01)
 
+**J1 engineering MVP complete; scientific validation pending fresh HPC rerun.**
+
 | Machine | Status | Details |
 |---------|--------|---------|
-| **5080** | **Retired** | Not used for publication |
+| **5080** | **Not used for J1 publication** | J3 local transfer only — see [HARDWARE_POLICY.md](docs/HARDWARE_POLICY.md) |
 | **HPC** | **Rerun pending** | Delete old archive; fresh b01 with fixed decoding |
-| **MacBook** | **V8.2 complete** | 31 tests; docs + preflight hardened — push when ready |
+| **MacBook** | **Ready to push** | Fail-closed calibration, matrix validator, validation runbook |
 
 **Policy:** **HPC-only** for all paper numbers (7B/8B, GSM8K, GPQA, 1.5B when queued).
 
-**Docs:** [docs/REPO_MAP.md](docs/REPO_MAP.md) · [docs/KNOWN_ISSUES.md](docs/KNOWN_ISSUES.md) · [docs/PROGRESS.md](docs/PROGRESS.md) · [progress.md](progress.md)
+**Docs:** [docs/J1_VALIDATION_RUNBOOK.md](docs/J1_VALIDATION_RUNBOOK.md) · [docs/CODEBASE_OVERVIEW.md](docs/CODEBASE_OVERVIEW.md) · [docs/MODEL_SCOPE_DECISION.md](docs/MODEL_SCOPE_DECISION.md) · [docs/REPO_MAP.md](docs/REPO_MAP.md) · [docs/KNOWN_ISSUES.md](docs/KNOWN_ISSUES.md) · [docs/PROGRESS.md](docs/PROGRESS.md) · [progress.md](progress.md)
 
 **Live tracker:** [docs/PROGRESS.md](docs/PROGRESS.md) · **Full history:** [progress.md](progress.md) · **Ops log:** [CHANGELOG.md](CHANGELOG.md)
 
@@ -162,7 +164,9 @@ Cloned under `../external_repos/` for reading only — do not develop inside the
 
 | Read first | Purpose |
 |------------|---------|
-| [BEGINNER_HPC_GUIDE.md](docs/BEGINNER_HPC_GUIDE.md) | HPC workflow (start here) |
+| [CODEBASE_OVERVIEW.md](docs/CODEBASE_OVERVIEW.md) | **High-level overview** — architecture, papers, modules, gates |
+| [MODEL_SCOPE_DECISION.md](docs/MODEL_SCOPE_DECISION.md) | **Frozen J1 model scope** — in / out / gated |
+| [BEGINNER_HPC_GUIDE.md](docs/BEGINNER_HPC_GUIDE.md) | HPC workflow (start here for runs) |
 | [docs/KNOWN_ISSUES.md](docs/KNOWN_ISSUES.md) | **Critical bugs and traps** |
 | [docs/REPO_MAP.md](docs/REPO_MAP.md) | Directory map and pipeline |
 | [docs/PROGRESS.md](docs/PROGRESS.md) | Live status + pre-rerun checklist |

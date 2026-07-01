@@ -72,3 +72,6 @@ schema_versions:
   raw_response: schemas/raw_response.v1.json
   summary: schemas/summary.v1.json
   cell_config: schemas/cell_config.v1.json
+
+amendments_file: papers/j1/amendments.yaml
+publication_matrix: papers/j1/publication_matrix.yaml

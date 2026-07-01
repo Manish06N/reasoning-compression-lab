@@ -4,6 +4,10 @@ from __future__ import annotations
 
 from typing import Dict, List, Optional, Sequence
 
+from src.evaluation.calibration.confidence import (
+    calibration_availability,
+    collect_calibration_pairs,
+)
 from src.evaluation.calibration.reliability import (
     adaptive_ece,
     negative_log_likelihood,
@@ -30,21 +34,26 @@ def compute_full_calibration_metrics(
     return base
 
 
-def calibration_summary_from_rows(rows: Sequence[dict]) -> Dict[str, object]:
-    """Build calibration metrics from scored rows with optional confidence field."""
-    confidences: List[float] = []
-    labels: List[int] = []
-    for row in rows:
-        if row.get("correct") is None:
-            continue
-        conf = row.get("confidence")
-        if conf is None:
-            conf = 1.0 if row.get("answer_parse_success") else 0.0
-        confidences.append(float(conf))
-        labels.append(1 if row.get("correct") else 0)
+def calibration_summary_from_rows(
+    rows: Sequence[dict],
+    *,
+    allow_parse_proxy: bool = False,
+) -> Dict[str, object]:
+    """Build calibration metrics when valid confidence is available."""
+    availability = calibration_availability(rows, allow_parse_proxy=allow_parse_proxy)
+    if not availability["available"]:
+        return {"skipped": True, "availability": availability}
+
+    confidences, labels, meta = collect_calibration_pairs(
+        rows, allow_parse_proxy=allow_parse_proxy
+    )
     if not confidences:
-        return {}
+        return {"skipped": True, "availability": availability}
+
     metrics = compute_full_calibration_metrics(confidences, labels)
     metrics["reliability_bins"] = reliability_diagram_bins(confidences, labels)
-    metrics["confidence_source"] = "row.confidence or answer_parse_success proxy"
+    metrics["confidence_valid_for_calibration"] = availability["valid_for_publication"]
+    metrics["confidence_sources_seen"] = meta.get("confidence_sources_seen", [])
+    metrics["skipped"] = False
+    metrics["availability"] = availability
     return metrics

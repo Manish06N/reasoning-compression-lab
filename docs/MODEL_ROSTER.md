@@ -2,6 +2,8 @@
 
 Single source of truth for Hugging Face IDs, local paths, env vars, and machine assignment.
 
+**Scope policy (what to add / not add):** [MODEL_SCOPE_DECISION.md](MODEL_SCOPE_DECISION.md)
+
 **Stack:** vLLM 0.8.5, `enforce_eager=true`, chat template enabled.
 
 ## Machine roles

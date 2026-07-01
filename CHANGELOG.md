@@ -1,5 +1,24 @@
 # Changelog
 
+## 2026-07-01 — J1 validation hardening (fail-closed calibration + runbook)
+
+**Trigger:** External architecture review — stop expanding; validate smallest J1 pipeline.
+
+**Code:**
+- `src/evaluation/calibration/confidence.py` — valid confidence sources; parse success not publication-valid
+- `scripts/score_run.py` — `--skip-calibration`, `--require-calibration`, `--allow-parse-confidence-proxy`
+- Scored rows get `confidence_value`, `confidence_source`, `confidence_valid_for_calibration`
+- `tests/test_calibration_confidence.py`
+
+**Docs / config:**
+- `docs/J1_VALIDATION_RUNBOOK.md` — HPC b01 rerun steps
+- `docs/HARDWARE_POLICY.md` — J1 HPC-only; RTX 5080 for J3 transfer only
+- `papers/j1/publication_matrix.yaml` + `scripts/validate_cell_matrix.py` (15 minimum cells OK)
+- `papers/j1/amendments.yaml`
+- Status wording: **engineering MVP complete; scientific validation pending**
+
+---
+
 ## 2026-07-01 — Add missing sober GSM8K prompt template
 
 **Problem:** `07_preflight_publication.py` failed on HPC — `level_b_qwen7b_fp8_gsm8k_seed0` resolved to `prompts/gsm8k.txt` (sober profile) but the file was never committed.

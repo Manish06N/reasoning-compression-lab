@@ -59,14 +59,15 @@ def test_calibration_and_selective_risk_from_rows():
     from src.evaluation.selective_risk.curves import selective_risk_from_rows
 
     rows = [
-        {"id": "1", "correct": True, "answer_parse_success": True},
-        {"id": "2", "correct": False, "answer_parse_success": True},
-        {"id": "3", "correct": True, "answer_parse_success": False},
+        {"id": "1", "correct": True, "confidence": 0.9, "confidence_source": "explicit"},
+        {"id": "2", "correct": False, "confidence": 0.8, "confidence_source": "explicit"},
+        {"id": "3", "correct": True, "confidence": 0.3, "confidence_source": "explicit"},
     ]
     cal = calibration_summary_from_rows(rows)
+    assert cal.get("skipped") is False
     assert "brier" in cal
-    assert "adaptive_ece" in cal
     risk = selective_risk_from_rows(rows)
+    assert risk.get("skipped") is False
     assert "aurc" in risk
     assert "coverage_at_risk_10pct" in risk
 

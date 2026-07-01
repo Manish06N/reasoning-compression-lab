@@ -1,0 +1,16 @@
+# Paper 1 protocol amendments — pre-specified changes only.
+# Append here BEFORE outcome analysis when scope must change.
+
+protocol_version: "1.0"
+locked_at: "2026-07-01"
+git_commit_at_lock: null  # set when supervisor signs off
+status: pilot  # pilot | frozen | submitted
+
+amendments: []
+# Example entry (do not delete — copy format when needed):
+#  - id: amd-001
+#    date: 2026-07-18
+#    reason: GPQA Hugging Face access delayed
+#    change: Run MATH-500 + GSM8K pilot before GPQA block b07
+#    made_before_outcome_analysis: true
+#    approved_by: supervisor

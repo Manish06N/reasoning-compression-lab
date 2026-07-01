@@ -4,6 +4,10 @@ from __future__ import annotations
 
 from typing import Dict, List, Sequence, Tuple
 
+from src.evaluation.calibration.confidence import (
+    calibration_availability,
+    collect_calibration_pairs,
+)
 from src.metrics.calibration import aurc_score
 from src.metrics.selective_risk import risk_coverage_curve
 
@@ -42,17 +46,24 @@ def summarize_selective_risk_full(
     return out
 
 
-def selective_risk_from_rows(rows: Sequence[dict]) -> Dict[str, object]:
-    confidences = []
-    labels = []
-    for row in rows:
-        if row.get("correct") is None:
-            continue
-        conf = row.get("confidence")
-        if conf is None:
-            conf = 1.0 if row.get("answer_parse_success") else 0.0
-        confidences.append(float(conf))
-        labels.append(1 if row.get("correct") else 0)
+def selective_risk_from_rows(
+    rows: Sequence[dict],
+    *,
+    allow_parse_proxy: bool = False,
+) -> Dict[str, object]:
+    availability = calibration_availability(rows, allow_parse_proxy=allow_parse_proxy)
+    if not availability["available"]:
+        return {"skipped": True, "availability": availability}
+
+    confidences, labels, meta = collect_calibration_pairs(
+        rows, allow_parse_proxy=allow_parse_proxy
+    )
     if not confidences:
-        return {}
-    return summarize_selective_risk_full(confidences, labels)
+        return {"skipped": True, "availability": availability}
+
+    out = summarize_selective_risk_full(confidences, labels)
+    out["confidence_valid_for_calibration"] = availability["valid_for_publication"]
+    out["confidence_sources_seen"] = meta.get("confidence_sources_seen", [])
+    out["skipped"] = False
+    out["availability"] = availability
+    return out

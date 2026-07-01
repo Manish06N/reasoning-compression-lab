@@ -46,10 +46,16 @@ git fetch origin && git reset --hard origin/main
 
 ## Important — affects interpretation
 
-### 4. Single-sample calibration is a proxy
+### 4. Single-sample calibration requires valid confidence
 
-`score_run.py` adds calibration/selective-risk using `answer_parse_success` as confidence when logprobs are absent.  
-For real calibration claims, use **maj@5** (`run_inference_multisample.py` + `compute_calibration.py`).
+`score_run.py` **does not** use `answer_parse_success` as a publication confidence score.
+
+- Default: pass@1/cost always computed; calibration **skipped** with `skipped: true` if no valid confidence.
+- `--skip-calibration`: explicit skip (use for b01 reproduction scoring).
+- `--require-calibration`: exit 1 if valid confidence unavailable (use before calibration analysis).
+- `--allow-parse-confidence-proxy`: debug only — marks `confidence_valid_for_calibration: false`.
+
+For manuscript Brier/AURC/ECE claims, use **maj@5** (`run_inference_multisample.py` + `compute_calibration.py`) or logprob-based confidence with a valid `confidence_source`.
 
 ### 5. Mixed provenance on resumed inference
 

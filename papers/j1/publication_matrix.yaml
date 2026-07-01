@@ -1,0 +1,50 @@
+# J1 experiment matrix — minimum publishable vs full Level C (aspirational)
+# Version: 1.0 · 2026-07-01
+
+status_note: >
+  Minimum publishable grid (seed 0, b01-b09) is wired and runnable now.
+  Full Level C (multi-seed × all tasks) is gated — not all cells exist as JSON yet.
+
+minimum_publishable:
+  description: HPC blocks b01-b09, seed 0, repro_qrm decoding
+  policy: HPC-only for paper numbers
+  models: [qwen_7b, llama_8b, qwen_1_5b]
+  quants: [bf16, fp8, awq4, gptq4, gptq3]
+  tasks: [math500, gsm8k, gpqa_diamond]
+  seeds: [0]
+  livecodebench: deferred
+
+  expected_cells:
+    - level_a_bf16_seed0
+    - level_c_llama8b_bf16_math500_seed0
+    - level_b_qwen7b_fp8_math500_seed0
+    - level_c_llama8b_fp8_math500_seed0
+    - level_b_qwen7b_awq4_math500_seed0
+    - level_c_llama8b_awq4_math500_seed0
+    - level_b_qwen7b_gptq4_math500_seed0
+    - level_c_llama8b_gptq4_math500_seed0
+    - level_b_qwen7b_gptq3_math500_seed0
+    - level_b_qwen7b_fp8_gsm8k_seed0
+    - level_c_qwen7b_fp8_gpqa_seed0
+    - level_c_qwen15b_bf16_math500_seed0
+    - level_c_qwen15b_fp8_math500_seed0
+    - level_c_qwen15b_awq4_math500_seed0
+    - level_c_qwen15b_gptq4_math500_seed0
+
+full_level_c_aspirational:
+  description: V8.2 roadmap full grid — generate after minimum grid is scored
+  models: [qwen_1_5b, qwen_7b, llama_8b]
+  quants: [bf16, fp8, awq4, gptq4, gptq3]
+  tasks: [math500, gpqa_diamond, gsm8k, livecodebench]
+  seeds: [0, 1, 2, 3, 4]
+  theoretical_cell_count: 300  # 3×5×4×5 — livecodebench not wired
+
+reproduction_gate:
+  cells:
+    - level_a_bf16_seed42
+    - level_a_bf16_seed43
+    - level_a_bf16_seed44
+    - level_a_gptq4_seed42
+    - level_a_gptq4_seed43
+    - level_a_gptq4_seed44
+  prompt_profile: reproduction
