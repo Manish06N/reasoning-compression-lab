@@ -1,7 +1,7 @@
 {
-  "last_cell_id": "level_a_qwen7b_bf16_math500_seed0",
-  "last_phase": "inference_complete",
-  "rows_done": 500,
+  "last_cell_id": "level_b_qwen7b_fp8_math500_seed0",
+  "last_phase": "inference",
+  "rows_done": 50,
   "rows_total": 500,
-  "updated_at": "2026-07-01T11:32:47.250134+00:00"
+  "updated_at": "2026-07-01T12:43:50.908698+00:00"
 }
