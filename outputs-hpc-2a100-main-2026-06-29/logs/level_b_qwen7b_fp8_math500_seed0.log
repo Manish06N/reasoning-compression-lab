@@ -47,4 +47,8 @@ INFO 07-01 08:12:54 [llm_engine.py:437] init engine (profile, create kv cache, w
 [5-5/500] generating batch of 1...
 Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [13:20<00:00, 800.28s/it, est. speed input: 0.52 toks/s, output: 40.43 toks/s]Processed prompts: 100%|██████████| 1/1 [13:20<00:00, 800.31s/it, est. speed input: 0.52 toks/s, output: 40.43 toks/s]
 [6-6/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [13:18<00:00, 798.59s/it, est. speed input: 0.15 toks/s, output: 40.89 toks/s]Processed prompts: 100%|██████████| 1/1 [13:18<00:00, 798.59s/it, est. speed input: 0.15 toks/s, output: 40.89 toks/s]
+[7-7/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [01:23<00:00, 83.06s/it, est. speed input: 1.13 toks/s, output: 76.26 toks/s]Processed prompts: 100%|██████████| 1/1 [01:23<00:00, 83.06s/it, est. speed input: 1.13 toks/s, output: 76.26 toks/s]
+[8-8/500] generating batch of 1...
 Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]
