@@ -45,4 +45,7 @@ INFO 07-01 08:12:11 [core_client.py:439] Core engine process 0 ready.
 [429-429/500] generating batch of 1...
 Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.97s/it, est. speed input: 0.35 toks/s, output: 77.49 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.99s/it, est. speed input: 0.35 toks/s, output: 77.49 toks/s]
 [430-430/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:05<00:00, 425.95s/it, est. speed input: 0.27 toks/s, output: 76.67 toks/s]Processed prompts: 100%|██████████| 1/1 [07:05<00:00, 425.98s/it, est. speed input: 0.27 toks/s, output: 76.67 toks/s]
+checkpoint saved: /scratch/manishn_iitp/reasoning-compression-lab/outputs-hpc-2a100-main-2026-06-29/raw/level_a_qwen7b_bf16_math500_seed0.jsonl (430 rows)
+[431-431/500] generating batch of 1...
 Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]
