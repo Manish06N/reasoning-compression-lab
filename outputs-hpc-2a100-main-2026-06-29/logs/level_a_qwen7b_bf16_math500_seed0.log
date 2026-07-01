@@ -52,4 +52,6 @@ checkpoint saved: /scratch/manishn_iitp/reasoning-compression-lab/outputs-hpc-2a
 [432-432/500] generating batch of 1...
 Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.93s/it, est. speed input: 0.27 toks/s, output: 77.57 toks/s]Processed prompts: 100%|██████████| 1/1 [07:00<00:00, 420.93s/it, est. speed input: 0.27 toks/s, output: 77.57 toks/s]
 [433-433/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [06:59<00:00, 419.88s/it, est. speed input: 0.36 toks/s, output: 77.68 toks/s]Processed prompts: 100%|██████████| 1/1 [06:59<00:00, 419.88s/it, est. speed input: 0.36 toks/s, output: 77.68 toks/s]
+[434-434/500] generating batch of 1...
 Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]
