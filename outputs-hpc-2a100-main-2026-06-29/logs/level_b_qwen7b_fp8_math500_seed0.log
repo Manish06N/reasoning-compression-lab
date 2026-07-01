@@ -121,4 +121,8 @@ checkpoint saved: /scratch/manishn_iitp/reasoning-compression-lab/outputs-hpc-2a
 Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [13:17<00:00, 797.19s/it, est. speed input: 0.13 toks/s, output: 40.98 toks/s]Processed prompts: 100%|██████████| 1/1 [13:17<00:00, 797.19s/it, est. speed input: 0.13 toks/s, output: 40.98 toks/s]
 checkpoint saved: /scratch/manishn_iitp/reasoning-compression-lab/outputs-hpc-2a100-main-2026-06-29/raw/level_b_qwen7b_fp8_math500_seed0.jsonl (40 rows)
 [41-41/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:12<00:00, 432.37s/it, est. speed input: 0.43 toks/s, output: 50.30 toks/s]Processed prompts: 100%|██████████| 1/1 [07:12<00:00, 432.37s/it, est. speed input: 0.43 toks/s, output: 50.30 toks/s]
+[42-42/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [02:13<00:00, 133.35s/it, est. speed input: 0.94 toks/s, output: 68.86 toks/s]Processed prompts: 100%|██████████| 1/1 [02:13<00:00, 133.35s/it, est. speed input: 0.94 toks/s, output: 68.86 toks/s]
+[43-43/500] generating batch of 1...
 Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]
