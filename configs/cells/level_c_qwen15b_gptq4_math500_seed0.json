@@ -5,5 +5,5 @@
   "quant_config": "gptq4",
   "decoding_config": "configs/decoding/repro_qrm.yaml",
   "seed": 0,
-  "prompt_profile": "sober",
+  "prompt_profile": "sober"
 }
