@@ -37,4 +37,6 @@ INFO 07-01 08:12:11 [core_client.py:439] Core engine process 0 ready.
 [425-425/500] generating batch of 1...
 Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:01<00:00, 421.63s/it, est. speed input: 0.27 toks/s, output: 77.45 toks/s]Processed prompts: 100%|██████████| 1/1 [07:01<00:00, 421.63s/it, est. speed input: 0.27 toks/s, output: 77.45 toks/s]
 [426-426/500] generating batch of 1...
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [07:03<00:00, 423.39s/it, est. speed input: 0.37 toks/s, output: 77.05 toks/s]Processed prompts: 100%|██████████| 1/1 [07:03<00:00, 423.46s/it, est. speed input: 0.37 toks/s, output: 77.05 toks/s]
+[427-427/500] generating batch of 1...
 Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]
