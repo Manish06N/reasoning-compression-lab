@@ -12,6 +12,21 @@ QR="${QR:-/scratch/$USER/reasoning-compression-lab}"
 cd "$QR"
 mkdir -p logs/slurm
 
+ensure_autopush() {
+  if ! command -v tmux >/dev/null 2>&1; then
+    echo "WARN: tmux not found; HPC output autopush daemon not started." >&2
+    return 0
+  fi
+  if tmux has-session -t hpc_git_autopush 2>/dev/null; then
+    return 0
+  fi
+  echo "Starting HPC output autopush daemon (results + backups) ..."
+  tmux new-session -d -s hpc_git_autopush \
+    "cd '$QR' && QR='$QR' GIT_AUTOPUSH_INTERVAL=300 scripts/hpc/git_autopush_outputs.sh loop"
+}
+
+ensure_autopush
+
 submit_2gpu() {
   local block="$1"
   local block_file="$QR/configs/machine_split/hpc_blocks/${block}.sh"
