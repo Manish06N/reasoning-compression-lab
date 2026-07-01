@@ -42,6 +42,18 @@ def test_all_cells_have_prompt_profile():
         assert "prompt_profile" in data, f"{path.name} missing prompt_profile"
 
 
+def test_all_prompt_profile_templates_exist():
+    from src.runners.config_utils import PROMPT_PROFILES
+
+    missing = [
+        rel
+        for templates in PROMPT_PROFILES.values()
+        for rel in templates.values()
+        if not (ROOT / rel).exists()
+    ]
+    assert not missing, f"Missing prompt templates: {missing}"
+
+
 def test_calibration_and_selective_risk_from_rows():
     from src.evaluation.calibration.metrics import calibration_summary_from_rows
     from src.evaluation.selective_risk.curves import selective_risk_from_rows

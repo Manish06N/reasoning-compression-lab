@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-07-01 — Add missing sober GSM8K prompt template
+
+**Problem:** `07_preflight_publication.py` failed on HPC — `level_b_qwen7b_fp8_gsm8k_seed0` resolved to `prompts/gsm8k.txt` (sober profile) but the file was never committed.
+
+**Fix:** Added `prompts/gsm8k.txt` (sober format, parallel to `prompts/math500.txt`); updated `configs/tasks/gsm8k.json` default; preflight + tests guard all `PROMPT_PROFILES` paths.
+
+---
+
 ## 2026-07-01 — Resume guard: block bad-archive rerun (code fix)
 
 **Problem:** Accidental resume into `outputs-hpc-2a100-main-2026-06-29` or pre-fix JSONL kept 7% pass@1.

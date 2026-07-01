@@ -5,6 +5,6 @@
   "config_name": "main",
   "problem_field": "question",
   "solution_field": "answer",
-  "prompt_template_file": "prompts/math500.txt",
-  "notes": "GSM8K control task — uses same math prompt template as MATH-500."
+  "prompt_template_file": "prompts/gsm8k.txt",
+  "notes": "GSM8K control task — sober prompt profile; reproduction uses prompts/qrm_gsm8k.txt."
 }

@@ -79,7 +79,12 @@ def check_prompt() -> None:
     qrm = build_prompt("prompts/qrm_math500.txt", question="2+2?")
     if "\\boxed" not in qrm:
         fail("QRM math prompt missing \\boxed instruction")
-    print("prompt formatting ok (sober + QRM)")
+    gsm = build_prompt("prompts/gsm8k.txt", question="Jan has 3 apples.")
+    if "{ANSWER}" not in gsm:
+        fail("GSM8K sober prompt did not preserve literal {ANSWER}")
+    if "Jan has 3 apples." not in gsm:
+        fail("GSM8K sober prompt did not include question")
+    print("prompt formatting ok (sober + QRM + GSM8K)")
 
 
 def check_all_cell_configs() -> None:

@@ -16,6 +16,18 @@ def test_sober_profile_math500():
     assert resolve_prompt_template(task, cell) == "prompts/math500.txt"
 
 
+def test_sober_profile_gsm8k():
+    task = {"task_name": "gsm8k", "prompt_template_file": "prompts/gsm8k.txt"}
+    cell = {"prompt_profile": "sober"}
+    assert resolve_prompt_template(task, cell) == "prompts/gsm8k.txt"
+
+
+def test_level_b_gsm8k_resolves_sober_prompt():
+    cell = load_cell_config("configs/cells/level_b_qwen7b_fp8_gsm8k_seed0.json")
+    assert cell["prompt_profile"] == "sober"
+    assert cell["task"]["prompt_template_file"] == "prompts/gsm8k.txt"
+
+
 def test_provenance_fields_present():
     cell = load_cell_config("configs/cells/level_a_bf16_seed0.json")
     fields = provenance_fields(cell, prompt_template_file=cell["task"]["prompt_template_file"])
