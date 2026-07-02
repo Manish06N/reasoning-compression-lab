@@ -2,23 +2,44 @@
 
 ## 2026-07-02 — External review fixes (full code pass)
 
-**Scope:** Close code-fixable gaps from external codebase review — CI, provenance, schema enforcement, config hashing, tests, packaging.
+**Scope:** Close code-fixable gaps from external codebase review — provenance, schema enforcement, config hashing, tests, packaging.
+
+**Commits:** `7556ba9` (review fixes) · `bbb4dfc` (preflight import fix) · `69ec673` (HPC lockfile)
 
 **Changes:**
-- **CI:** `.github/workflows/ci.yml` — pytest, compileall, shell `-n`, decoding/cell validation, deprecated import guard
+- **CI (deferred):** workflow saved as `docs/ci-workflow.yml.example` — live `.github/workflows/ci.yml` not pushed (GitHub token lacked `workflow` scope)
 - **Provenance:** `build_raw_response_row()` shared by `run_inference.py` and `run_inference_multisample.py`; content-based `config_hash` (no absolute `model_path`)
 - **Revisions:** `revision` pins on all model/task configs; `load_dataset_with_revision()` in preflight
 - **YAML:** strict duplicate-key rejection in `load_yaml()`; removed duplicate `repetition_penalty` in `repro_qrm.yaml`
 - **Schema:** `raw_response.v1.json` tightened (`additionalProperties: false`); validate on checkpoint + score
 - **Publication guard:** `QREASON_PUBLICATION_MODE` / `--publication` requires `batch_size=1`
 - **Scoring:** canonical implementation in `src/evaluation/correctness/scoring.py`; `src/metrics/scoring.py` shim
-- **Tests:** +21 tests (scoring, schema, multisample provenance, YAML strict, publication guard)
-- **Packaging:** `pyproject.toml`, pinned `requirements-hpc.txt`, `requirements-dev.txt`, `export_requirements_lock.sh`
+- **Tests:** +21 tests (scoring, schema, multisample provenance, YAML strict, publication guard) — **67 total**
+- **Packaging:** `pyproject.toml`, pinned `requirements-hpc.txt`, `requirements-dev.txt`, `scripts/hpc/export_requirements_lock.sh`
+- **Lockfile:** `requirements-hpc.lock.txt` exported from HPC `qreason` env (`69ec673`)
+- **Preflight fix:** restored missing `load_dataset` import in `07_preflight_publication.py` (`bbb4dfc`)
 - **Docs:** [docs/HPC_POST_MERGE_CHECKLIST.md](docs/HPC_POST_MERGE_CHECKLIST.md) for manual HPC steps
 
 **Breaking:** Resume into pre-fix archives may fail on `config_hash` mismatch — use `--fresh` or new `QREASON_OUTPUT_ROOT`.
 
-**Tests:** 67 passed (`pytest tests/ -q`).
+**MacBook validation:** 67 passed (`pytest tests/ -q`); `verify_decoding_params.py` OK; `validate_cell_matrix.py` OK.
+
+### HPC — fresh b01 rerun (same day)
+
+**Prep:**
+- Synced scratch to GitHub `main` (`69ec673`)
+- Cancelled stale queued jobs **86015** (smoke) and **86016** (old b01)
+- Renamed/retired diagnostic archive policy enforced; fresh root set:
+  `outputs-hpc-2a100-main-2026-07-02-rerun`
+- CPU preflight passed: `verify_decoding_params.py` + `07_preflight_publication.py`
+- Fresh-archive guard passed for new output root
+
+**Submitted:**
+- **Job 86212** — `b01_parallel_bf16_anchors` (2× A100, Qwen-7B BF16 + Llama-8B BF16 MATH-500 seed 0)
+- **Status at submit:** PENDING (Priority); scheduled ~2026-07-03 15:04 cluster time on `ragpu008`
+- **Slurm logs:** `logs/slurm/b01_parallel_bf16_86212.{out,err}` (empty until job starts)
+
+**Next (after 86212 completes):** score both BF16 cells → `compare_qrm_baseline.py` hard gate → b02 only if pass@1 in band.
 
 ---
 
