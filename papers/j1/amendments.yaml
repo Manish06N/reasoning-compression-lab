@@ -27,6 +27,8 @@ amendments:
     change: >
       Update qrm_literature_targets.yaml refs/sources; per-row tolerance_pp and gate type;
       compare_qrm_baseline exits 1 on hard_passed only.
+      Pending in logprob-patch commit (post-86016): Qwen BF16 refs from visual Table 1
+      read — MATH-500 93.9±0.7, GSM8K 91.2±0.6; comparator `expected_n` completeness check.
     made_before_outcome_analysis: true
     approved_by: team
 # Example entry (do not delete — copy format when needed):

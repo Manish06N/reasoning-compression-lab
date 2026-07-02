@@ -62,7 +62,7 @@ See [docs/KNOWN_ISSUES.md](docs/KNOWN_ISSUES.md) and [docs/J1_VALIDATION_RUNBOOK
 
 ### b01 pass criteria (after 86016 completes)
 
-**Primary:** Qwen-7B MATH-500 pass@1 in **89.0–99.0%** band (QRM T1 ref 94.0). Llama-8B **86.0–96.0%** (QRM Table 4 ref 91.0).
+**Primary:** Qwen-7B MATH-500 pass@1 in **88.9–98.9%** band (QRM T1 ref 93.9). Llama-8B **86.0–96.0%** (QRM Table 4 ref 91.0).
 
 **Also check** (not pass@1 alone):
 

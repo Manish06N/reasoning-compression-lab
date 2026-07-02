@@ -6,6 +6,7 @@
 
 **Fix:**
 - **Qwen-7B:** QRM Table 1 refs — MATH-500 94.0±0.8, GSM8K 91.0±0.5, GPQA 51.0±1.0 (DeepSeek cross-checks noted)
+      *(amd-003 shipped these; visual Table 1 p.119 read → **93.9±0.7** MATH-500, **91.2±0.6** GSM8K — fold into logprob-patch commit, not a standalone push)*
 - **Llama-8B:** QRM Appendix B **Table 4** — MATH-500 91.0±1.1, GPQA 49.5±2.3; GSM8K 88.7±0.4 marked `status: unused`
 - **Per-row `tolerance_pp`:** default 5.0; GPQA 8.0
 - **`gate: hard`** — reproduction MATH-500/GSM8K only; **`gate: sanity`** — GPQA (never exit 1 on pass@1 alone)

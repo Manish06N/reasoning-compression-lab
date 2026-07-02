@@ -65,7 +65,7 @@ MacBook push is inert for running Slurm jobs.
 
 | Model | QRM ref | ±5 pp band | Source |
 |-------|---------|------------|--------|
-| Qwen-7B | 94.0% | 89.0–99.0% | QRM Table 1 (Qwen-only) |
+| Qwen-7B | 93.9% | 88.9–98.9% | QRM Table 1 p.119 (BF16) |
 | Llama-8B | 91.0% | 86.0–96.0% | QRM Appendix B Table 4 |
 
 **Not sufficient alone:** also check `truncation_rate`, `completion_tokens_mean` (thousands), `decoding_repetition_penalty` in rows, manual audit.
@@ -91,8 +91,11 @@ source /home/apps/MSCC/miniconda3/etc/profile.d/conda.sh
 conda activate qreason
 git fetch origin && git reset --hard origin/main
 
-ROOT=$(ls -dt "$QR"/outputs-hpc-2a100-main-* 2>/dev/null | head -1)
+ROOT=$(ls -dt "$QR"/outputs-hpc-2a100-main-* 2>/dev/null | grep -v DIAGNOSTIC | head -1)
 echo "Scoring: $ROOT"
+if [[ -z "$ROOT" || "$ROOT" == *"2026-06-29"* || "$ROOT" == *DIAGNOSTIC* ]]; then
+  echo "ERROR: no valid rerun archive — abort." >&2; exit 1
+fi
 ```
 
 python scripts/score_run.py \

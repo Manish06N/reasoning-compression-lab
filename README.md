@@ -21,7 +21,7 @@ Deployment-science evaluation harness for compressed reasoning LLMs.
 
 **Policy:** **HPC-only** for all paper numbers (7B/8B, GSM8K, GPQA, 1.5B when queued).
 
-**b01 gate (MATH-500, hard):** Qwen-7B **89.0–99.0%** (QRM T1 94.0), Llama-8B **86.0–96.0%** (QRM Table 4 91.0) — see [qrm_literature_targets.yaml](configs/baselines/qrm_literature_targets.yaml).
+**b01 gate (MATH-500, hard):** Qwen-7B **88.9–98.9%** (QRM T1 93.9), Llama-8B **86.0–96.0%** (QRM Table 4 91.0) — see [qrm_literature_targets.yaml](configs/baselines/qrm_literature_targets.yaml).
 
 **Policy:** **HPC-only** for all paper numbers (7B/8B, GSM8K, GPQA, 1.5B when queued).
 

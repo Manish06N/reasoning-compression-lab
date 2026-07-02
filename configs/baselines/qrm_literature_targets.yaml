@@ -45,11 +45,12 @@ models:
       quant_config: bf16
       gate: hard
       prompt_profile: reproduction
+      expected_n: 500
       pass_at_1_pct:
-        reference: 94.0
-        reference_std: 0.8
+        reference: 93.9
+        reference_std: 0.7
         reference_deepseek_report: 92.8
-        source: "QRM Table 1 (Qwen-only; MATH-500 avg ± std, temp 0.6)"
+        source: "QRM Table 1 p.119 (Qwen-only; BF16 MATH-500 avg ± std, temp 0.6)"
         source_secondary: "DeepSeek-R1 report 92.8"
         tolerance_pp: 5.0
       completion_tokens_mean:
@@ -61,10 +62,11 @@ models:
       quant_config: bf16
       gate: hard
       prompt_profile: reproduction
+      expected_n: 1319
       pass_at_1_pct:
-        reference: 91.0
-        reference_std: 0.5
-        source: "QRM Table 1 (Qwen-only; GSM8K avg ± std, temp 0.6)"
+        reference: 91.2
+        reference_std: 0.6
+        source: "QRM Table 1 p.119 (Qwen-only; BF16 GSM8K avg ± std, temp 0.6)"
         tolerance_pp: 5.0
       truncation_rate_max: 0.10
       parse_failure_rate_max: 0.10
@@ -72,6 +74,7 @@ models:
       quant_config: bf16
       gate: sanity
       prompt_profile: sober
+      expected_n: 198
       prompt_profile_note: "b07 cell uses sober profile — not comparable to QRM repro as hard gate"
       pass_at_1_pct:
         reference: 51.0
@@ -88,6 +91,7 @@ models:
       quant_config: bf16
       gate: hard
       prompt_profile: reproduction
+      expected_n: 500
       pass_at_1_pct:
         reference: 91.0
         reference_std: 1.1
@@ -115,6 +119,7 @@ models:
       quant_config: bf16
       gate: sanity
       prompt_profile: sober
+      expected_n: 198
       pass_at_1_pct:
         reference: 49.5
         reference_std: 2.3
@@ -130,6 +135,7 @@ models:
       quant_config: bf16
       gate: sanity
       prompt_profile: reproduction
+      expected_n: 500
       pass_at_1_pct:
         reference: 84.7
         source: "QRM Table 1 (Qwen-only; 1.5B MATH-500 row)"
@@ -139,6 +145,7 @@ models:
     GSM8K:
       quant_config: bf16
       gate: sanity
+      expected_n: 1319
       pass_at_1_pct:
         reference: 84.5
         source: "QRM Table 1 (Qwen-only; 1.5B GSM8K row)"
@@ -151,6 +158,7 @@ models:
       quant_config: gptq4
       gate: hard
       prompt_profile: reproduction
+      expected_n: 500
       pass_at_1_pct:
         reference: null
         source: "QRM Table 1 GPTQ W4G128 MATH-500 — fill exact ref from paper"

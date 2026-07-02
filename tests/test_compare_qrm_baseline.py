@@ -16,6 +16,7 @@ def test_compare_summary_includes_provenance_and_gate():
     summary = {
         "cell_id": "level_a_qwen7b_bf16_math500_seed0",
         "task": "math500",
+        "n": 500,
         "pass_at_1": 0.93,
         "truncation_rate": 0.05,
         "parse_failure_rate": 0.02,
@@ -24,9 +25,9 @@ def test_compare_summary_includes_provenance_and_gate():
     report = compare_summary(summary, targets, targets_path=targets_path)
 
     assert report["targets_provenance"]["yaml_sha256"]
-    assert report["gate"]["reference_pct"] == 94.0
+    assert report["gate"]["reference_pct"] == 93.9
     assert report["gate"]["gate_type"] == "hard"
-    assert report["gate"]["sanity_band_pct"] == [89.0, 99.0]
+    assert report["gate"]["sanity_band_pct"] == [88.9, 98.9]
     assert report["hard_passed"] is True
 
 
@@ -76,6 +77,24 @@ def test_llama_math500_uses_table4_not_table1():
     cfg = targets["models"]["DeepSeek-R1-Distill-Llama-8B"]["MATH-500"]["pass_at_1_pct"]
     assert "Table 4" in cfg["source"]
     assert cfg["reference"] == 91.0
+
+
+def test_hard_gate_fails_incomplete_cell_n():
+    from scripts.compare_qrm_baseline import compare_summary
+    from src.runners.config_utils import load_yaml
+
+    targets_path = ROOT / "configs/baselines/qrm_literature_targets.yaml"
+    targets = load_yaml(targets_path)
+    summary = {
+        "cell_id": "level_a_qwen7b_bf16_math500_seed0",
+        "task": "math500",
+        "n": 350,
+        "pass_at_1": 0.93,
+    }
+    report = compare_summary(summary, targets, targets_path=targets_path)
+    n_check = next(c for c in report["checks"] if c["metric"] == "n")
+    assert n_check["status"] == "FAIL"
+    assert report["hard_passed"] is False
 
 
 def test_llama_gsm8k_marked_unused():

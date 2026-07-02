@@ -148,6 +148,7 @@ def compare_summary(
     ref = pass_cfg.get("reference")
     lo, hi, tol_pp = _pass_band(pass_cfg, default_tol=default_tol)
     source = pass_cfg.get("source")
+    expected_n = task_targets.get("expected_n")
 
     report["gate"] = {
         "model_key": model_key,
@@ -155,6 +156,7 @@ def compare_summary(
         "gate_type": gate_type,
         "prompt_profile": task_targets.get("prompt_profile"),
         "quant_config": task_targets.get("quant_config"),
+        "expected_n": expected_n,
         "reference_pct": ref,
         "reference_std": pass_cfg.get("reference_std"),
         "reference_deepseek_report": pass_cfg.get("reference_deepseek_report"),
@@ -165,6 +167,21 @@ def compare_summary(
         "yaml_path": str(targets_path.resolve()),
         "yaml_sha256": report["targets_provenance"]["yaml_sha256"],
     }
+
+    if expected_n is not None:
+        observed_n = summary.get("n")
+        ok = observed_n == expected_n
+        n_status = "PASS" if ok else ("FAIL" if gate_type == "hard" else "SANITY_WARN")
+        report["checks"].append({
+            "metric": "n",
+            "observed": observed_n,
+            "expected": expected_n,
+            "gate_type": gate_type,
+            "status": n_status,
+        })
+        if not ok and gate_type == "hard":
+            report["hard_passed"] = False
+            report["passed"] = False
 
     pass_pct = float(summary.get("pass_at_1", 0.0)) * 100.0
     if lo is not None and hi is not None:

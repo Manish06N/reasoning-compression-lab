@@ -53,14 +53,14 @@ sbatch slurm/smoke_test.slurm
 
 **Do not resume** `outputs-hpc-2a100-main-2026-06-29` — diagnostic only (decoding bug, ~7% pass@1).
 
-Prefer **rename** over delete for diagnostic evidence:
+Prefer **rename** to `*-DIAGNOSTIC-*` (not delete) so score-time `grep -v DIAGNOSTIC` self-enforces:
 
 ```bash
 if [ -d outputs-hpc-2a100-main-2026-06-29 ]; then
   mv outputs-hpc-2a100-main-2026-06-29 \
-     outputs-hpc-2a100-main-2026-06-29-DIAGNOSTIC-INVALID
+     outputs-hpc-2a100-main-2026-06-29-DIAGNOSTIC-decodingbug
   echo "INVALID FOR PUBLICATION: decoding bug ~7% pass@1." \
-    > outputs-hpc-2a100-main-2026-06-29-DIAGNOSTIC-INVALID/INVALID_FOR_PUBLICATION.txt
+    > outputs-hpc-2a100-main-2026-06-29-DIAGNOSTIC-decodingbug/INVALID_FOR_PUBLICATION.txt
 fi
 
 RUN_TS=$(date +%Y%m%d-%H%M%S)
@@ -102,10 +102,14 @@ source /home/apps/MSCC/miniconda3/etc/profile.d/conda.sh
 conda activate qreason
 git fetch origin && git reset --hard origin/main   # get amd-003+ baseline fix
 
-# QREASON_OUTPUT_ROOT is empty in a fresh shell — discover archive explicitly:
-ROOT=$(ls -dt "$QR"/outputs-hpc-2a100-main-* 2>/dev/null | head -1)
+# QREASON_OUTPUT_ROOT is empty in a fresh shell — discover archive explicitly.
+# READ the echo line: must be your July rerun, NOT June-29 DIAGNOSTIC-INVALID.
+ROOT=$(ls -dt "$QR"/outputs-hpc-2a100-main-* 2>/dev/null | grep -v DIAGNOSTIC | head -1)
 echo "Scoring: $ROOT"
-# Eyeball: must be July rerun archive, NOT June-29 DIAGNOSTIC-INVALID
+if [[ -z "$ROOT" || "$ROOT" == *"2026-06-29"* || "$ROOT" == *DIAGNOSTIC* ]]; then
+  echo "ERROR: no valid rerun archive found — do not score against June diagnostic data." >&2
+  exit 1
+fi
 ```
 
 ### Score both cells (pass@1 only — no calibration yet)
@@ -144,14 +148,26 @@ python scripts/compare_qrm_baseline.py \
 
 | Model | QRM ref | ±5 pp band | Source |
 |-------|---------|------------|--------|
-| Qwen-7B | 94.0% (DeepSeek 92.8) | **89.0–99.0%** | QRM Table 1 (Qwen-only) |
-| Llama-8B | 91.0% (DeepSeek 89.1) | **86.0–96.0%** | QRM Appendix B Table 4 |
+| Qwen-7B | 93.9% (QRM T1 p.119) | **88.9–98.9%** | QRM Table 1 BF16 row |
+| Llama-8B | 91.0% (QRM Table 4) | **86.0–96.0%** | QRM Appendix B Table 4 |
 
 **Do NOT use ~45–65%** — that is AIME/GPQA scale, not MATH-500.
 
 **GPQA (b07):** `gate: sanity` only — ±8 pp band, sober profile; comparator warns but does not exit 1 on pass@1 alone.
 
-**Also required (not pass@1 alone):**
+### Pre-gate sanity (eyeball summary JSON)
+
+Before trusting `compare_qrm_baseline.py`, check each summary:
+
+| Field | MATH-500 b01 expect | Red flag |
+|-------|---------------------|----------|
+| `n` | **500 exactly** | <500 partial cell — comparator hard-fails |
+| `pass_at_1` | ~0.89–0.99 (Qwen), ~0.86–0.96 (Llama) | ~0.07 (June bug), ~0.60 (wrong scale) |
+| `truncation_rate` | low single digits (≤0.15) | high — loop/truncation bug |
+| `completion_tokens_mean` | **low thousands** | hundreds → truncation/template; hugging max_tokens → repetition |
+| `parse_failure_rate` | low (≤0.10) | high — extractor or format issue |
+
+Comparator checks `n` against `expected_n` in yaml **before** pass@1 band (hard gate fails incomplete cells).
 
 | Metric | Gate |
 |--------|------|
@@ -237,8 +253,8 @@ From `configs/baselines/qrm_literature_targets.yaml`:
 
 | Task | Typical BF16 scale | Example hard gate (Qwen-7B) |
 |------|-------------------|----------------------------|
-| MATH-500 | ~85–95% | 89.0–99.0% (QRM T1 ref 94.0 ±5pp) |
-| GSM8K (b06) | ~85–92% | 86.0–96.0% (QRM T1 ref 91.0 ±5pp) |
+| MATH-500 | ~85–95% | 88.9–98.9% (QRM T1 ref 93.9 ±5pp) |
+| GSM8K (b06) | ~85–92% | 86.2–96.2% (QRM T1 ref 91.2 ±5pp) |
 | GPQA-D (b07) | ~45–55% | sanity ±8pp only (QRM T1 ref 51.0; sober profile) |
 
 Never copy GPQA/AIME bands onto MATH-500.
