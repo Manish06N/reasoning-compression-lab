@@ -14,7 +14,6 @@ sys.path.insert(0, str(ROOT))
 from src.runners.config_utils import build_prompt, load_cell_config
 from src.runners.vllm_runner import build_llm, generate_one
 
-
 SMOKE_QUESTIONS = [
     "What is 17 + 28?",
     "Solve for x: 2x + 5 = 19.",

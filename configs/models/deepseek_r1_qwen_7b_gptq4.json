@@ -11,5 +11,5 @@
   "enforce_eager": true,
   "kv_cache_dtype": "fp8",
   "gpu_memory_utilization": 0.95,
-  "revision": "main"
+  "revision": "9559a91ed463eecda64b93a532fe5aa8cc25f2eb"
 }

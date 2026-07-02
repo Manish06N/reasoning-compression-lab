@@ -4,16 +4,44 @@
 
 from __future__ import annotations
 
-
-
 from typing import Any, Dict, List
-
-
 
 from src.extraction.math_extractor import normalize_completion_text
 from src.profiling.gpu_stats import snapshot_vram_bytes, track_gpu
 from src.runners.sampling_utils import build_sampling_params_dict
 
+_TOKENIZER_CACHE: dict[tuple[str, bool], Any] = {}
+
+
+def _get_tokenizer(model_path: str, *, trust_remote_code: bool = True):
+    key = (model_path, trust_remote_code)
+    if key not in _TOKENIZER_CACHE:
+        from transformers import AutoTokenizer
+
+        _ensure_tokenizer_compatibility()
+        _TOKENIZER_CACHE[key] = AutoTokenizer.from_pretrained(
+            model_path, trust_remote_code=trust_remote_code
+        )
+    return _TOKENIZER_CACHE[key]
+
+
+
+
+def render_prompt(prompt: str, model_path: str, use_chat_template: bool = True) -> str:
+
+    tokenizer = _get_tokenizer(model_path)
+
+    if use_chat_template and getattr(tokenizer, "chat_template", None):
+
+        messages = [{"role": "user", "content": prompt}]
+
+        return tokenizer.apply_chat_template(
+
+            messages, tokenize=False, add_generation_prompt=True
+
+        )
+
+    return prompt
 
 
 
@@ -41,35 +69,6 @@ def _ensure_tokenizer_compatibility() -> None:
 
 
     PreTrainedTokenizerBase.all_special_tokens_extended = all_special_tokens_extended
-
-
-
-
-
-def render_prompt(prompt: str, model_path: str, use_chat_template: bool = True) -> str:
-
-    from transformers import AutoTokenizer
-
-
-
-    _ensure_tokenizer_compatibility()
-
-    tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
-
-    if use_chat_template and getattr(tokenizer, "chat_template", None):
-
-        messages = [{"role": "user", "content": prompt}]
-
-        return tokenizer.apply_chat_template(
-
-            messages, tokenize=False, add_generation_prompt=True
-
-        )
-
-    return prompt
-
-
-
 
 
 def build_llm(model_path: str, model_cfg: Dict[str, Any]):

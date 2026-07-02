@@ -1,5 +1,25 @@
 # Changelog
 
+## 2026-07-02 — Deep re-audit P0–P2 correction pass
+
+**Scope:** End-to-end publication safety wiring from second external review (items 1–22).
+
+**HPC action required:** Cancel job **86212** if still queued; sync this commit; use fresh archive `outputs-hpc-2a100-main-2026-07-02-p0fix`; rerun full preflight before b01.
+
+**Changes:**
+- **RunSpec:** frozen `RunSpec` + single `run_spec_hash` wired through provenance, resume guard, inference scripts
+- **Revisions:** all 17 model/task configs pinned to immutable HuggingFace commit SHAs; `scripts/pin_hf_revisions.py --verify`
+- **Publication mode:** HPC launcher exports `QREASON_PUBLICATION_MODE=1`, passes `--publication` to inference + score; clean-git gate
+- **Schema:** publication mode validates every raw row before checkpoint/score; homogeneity checks before scoring
+- **Statistics:** exact McNemar for small discordant counts; fixed Holm test; paired validation + bootstrap CI helpers
+- **Calibration:** multisample group validator; semantic equivalence agreement module
+- **CI:** live `.github/workflows/ci.yml` with blocking Ruff + preflight `--ci` subset
+- **math-verify:** pinned `0.9.0` in dev + HPC requirements; scorer metadata in summaries
+- **Governance:** autopush restricted to manifests/summaries (no raw/scored JSONL); manifest locking; expanded repro bundle
+- **Tests:** **78 passed** locally (`pytest tests/ -q`); Ruff clean
+
+**Breaking:** `config_hash` and revision SHAs invalidate resume into pre-P0 archives — new `QREASON_OUTPUT_ROOT` + `--fresh`.
+
 ## 2026-07-02 — External review fixes (full code pass)
 
 **Scope:** Close code-fixable gaps from external codebase review — provenance, schema enforcement, config hashing, tests, packaging.

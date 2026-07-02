@@ -11,5 +11,5 @@
   "gpu_memory_utilization": 0.85,
   "kv_cache_dtype": "fp8",
   "notes": "RTX 5080 smoke only \u2014 not for full MATH-500 reproduction.",
-  "revision": "main"
+  "revision": "916b56a44061fd5cd7d6a8fb632557ed4f724f60"
 }

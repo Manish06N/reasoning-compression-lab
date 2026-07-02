@@ -3,8 +3,37 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 from typing import Any, Mapping
+
+_BRANCH_REVISIONS = frozenset({"main", "master", "head", "dev", "develop"})
+_SHA_PATTERN = re.compile(r"^[0-9a-f]{7,40}$", re.IGNORECASE)
+
+
+class RevisionPinError(ValueError):
+    """Raised when a revision pin is not an immutable commit SHA."""
+
+
+def is_immutable_revision(revision: str | None) -> bool:
+    if not revision:
+        return False
+    text = str(revision).strip()
+    if text.lower() in _BRANCH_REVISIONS:
+        return False
+    return bool(_SHA_PATTERN.match(text))
+
+
+def require_immutable_revision(revision: str | None, *, label: str) -> str:
+    if not revision:
+        raise RevisionPinError(f"{label}: missing revision pin")
+    text = str(revision).strip()
+    if not is_immutable_revision(text):
+        raise RevisionPinError(
+            f"{label}: revision {text!r} is not an immutable commit SHA "
+            "(branch names like 'main' are rejected)"
+        )
+    return text
 
 
 def resolve_dataset_revision(task_cfg: Mapping[str, Any]) -> str | None:
@@ -49,5 +78,7 @@ def load_dataset_with_revision(task_cfg: Mapping[str, Any], *, split: str | None
     if revision:
         kwargs["revision"] = revision
     if config_name:
-        return load_dataset(dataset_id, config_name, **kwargs)
-    return load_dataset(dataset_id, **kwargs)
+        dataset = load_dataset(dataset_id, config_name, **kwargs)
+    else:
+        dataset = load_dataset(dataset_id, **kwargs)
+    return dataset

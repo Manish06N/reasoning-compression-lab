@@ -6,7 +6,7 @@ Adapted from sober-reasoning leaderboard style (data.json mean±std format).
 from __future__ import annotations
 
 import math
-from typing import Dict, Iterable, List, Sequence
+from typing import Dict, List, Sequence
 
 
 def mean_std(values: Sequence[float]) -> Dict[str, float]:

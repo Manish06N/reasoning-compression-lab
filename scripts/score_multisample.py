@@ -12,8 +12,13 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
+from src.evaluation.correctness.scoring import (
+    maj_at_k,
+    majority_vote_answer,
+    score_item,
+    summarize_scored_rows,
+)
 from src.metrics.consistency import calculate_consistency
-from src.evaluation.correctness.scoring import maj_at_k, majority_vote_answer, score_item, summarize_scored_rows
 
 
 def main() -> None:

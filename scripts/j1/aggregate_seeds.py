@@ -11,7 +11,6 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
-from src.evaluation.statistics.bootstrap import cluster_bootstrap_ci
 from src.stats.seed_variance import aggregate_by_seed, format_mean_std
 
 

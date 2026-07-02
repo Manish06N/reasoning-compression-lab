@@ -11,13 +11,24 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
+from src.evaluation.correctness.scoring import get_scorer_metadata
+from src.runners.artifact_validation import (
+    ArtifactValidationError,
+    validate_experiment_homogeneity,
+    validate_experiment_homogeneity_warn,
+)
+from src.runners.multisample_validation import infer_n_samples, validate_multisample_groups
+from src.runners.publication_mode import assert_clean_git_tree, is_publication_mode
 from src.runners.scoring_pipeline import (
     attach_calibration,
     build_summary,
     load_raw_rows,
     score_all_rows,
     validate_raw_input,
+    validate_scored_rows,
+    validate_summary,
 )
+from src.schemas.validate import SchemaValidationError
 
 
 def _display_path(path: Path) -> str:
@@ -36,7 +47,16 @@ def main() -> None:
     parser.add_argument("--skip-calibration", action="store_true")
     parser.add_argument("--require-calibration", action="store_true")
     parser.add_argument("--allow-parse-confidence-proxy", action="store_true")
+    parser.add_argument(
+        "--publication",
+        action="store_true",
+        help="Publication mode: full validation and fail-closed scoring.",
+    )
     args = parser.parse_args()
+
+    publication = is_publication_mode(cli_flag=args.publication)
+    if publication:
+        assert_clean_git_tree(ROOT)
 
     in_path = Path(args.input)
     if not in_path.is_absolute():
@@ -47,12 +67,38 @@ def main() -> None:
     out_path.parent.mkdir(parents=True, exist_ok=True)
     summary_path.parent.mkdir(parents=True, exist_ok=True)
 
-    validation = validate_raw_input(in_path)
+    validation = validate_raw_input(in_path, publication=publication)
     if not validation["valid"]:
-        print(f"WARN: raw input schema sample failed: {validation['errors'][:3]}", file=sys.stderr)
+        msg = f"raw input schema failed: {validation['errors'][:3]}"
+        if publication:
+            raise SchemaValidationError(msg)
+        print(f"WARN: {msg}", file=sys.stderr)
 
     rows = load_raw_rows(in_path)
-    scored = score_all_rows(rows, allow_parse_proxy=args.allow_parse_confidence_proxy)
+    if publication:
+        try:
+            validate_experiment_homogeneity(rows)
+        except ArtifactValidationError as exc:
+            raise SystemExit(f"ERROR: {exc}") from exc
+        n_samples = infer_n_samples(rows)
+        if n_samples and n_samples > 1:
+            validate_multisample_groups(rows, n_samples=n_samples, publication_mode=True)
+    else:
+        for warning in validate_experiment_homogeneity_warn(rows):
+            print(f"WARN: {warning}", file=sys.stderr)
+
+    scored = score_all_rows(
+        rows,
+        allow_parse_proxy=args.allow_parse_confidence_proxy,
+        publication=publication,
+    )
+
+    scored_validation = validate_scored_rows(scored, publication=publication)
+    if not scored_validation["valid"]:
+        msg = f"scored row schema failed: {scored_validation['errors'][:3]}"
+        if publication:
+            raise SchemaValidationError(msg)
+        print(f"WARN: {msg}", file=sys.stderr)
 
     with out_path.open("w", encoding="utf-8") as f:
         for row in scored:
@@ -61,6 +107,7 @@ def main() -> None:
     summary = build_summary(
         scored, in_path=in_path, out_path=out_path, display_path=_display_path
     )
+    summary.update(get_scorer_metadata(publication_mode=publication))
     attach_calibration(
         summary,
         scored,
@@ -68,6 +115,13 @@ def main() -> None:
         require_calibration=args.require_calibration,
         allow_parse_proxy=args.allow_parse_confidence_proxy,
     )
+
+    summary_validation = validate_summary(summary, publication=publication)
+    if not summary_validation["valid"]:
+        msg = f"summary schema failed: {summary_validation['errors'][:3]}"
+        if publication:
+            raise SchemaValidationError(msg)
+        print(f"WARN: {msg}", file=sys.stderr)
 
     if args.parquet:
         pq = Path(args.parquet)

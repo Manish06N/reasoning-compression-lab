@@ -6,7 +6,7 @@ Adapted from Cost-of-Pass/cost_of_pass/evaluation/estimate.py (FrontierCostofPas
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Iterable, List, Optional, Sequence
+from typing import List, Optional, Sequence
 
 
 @dataclass

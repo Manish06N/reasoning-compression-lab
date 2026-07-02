@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Periodically commit and push HPC output archives, including backup mirrors.
+# Periodically commit and push HPC output archives (manifests and summaries only).
 set -euo pipefail
 
 QR="${QR:-/scratch/$USER/reasoning-compression-lab}"
@@ -29,7 +29,7 @@ push_once() {
   git add scripts/hpc/run_hpc_2a100_publication.sh scripts/hpc/submit_hpc_blocks.sh scripts/hpc/git_autopush_outputs.sh 2>/dev/null || true
   git add -f outputs-hpc-*/manifest.json outputs-hpc-*/state.json outputs-hpc-*/reproducibility_bundle.json 2>/dev/null || true
   git add -f outputs-hpc-*/checkpoints outputs-hpc-*/metadata outputs-hpc-*/results outputs-hpc-*/paper_tables outputs-hpc-*/logs 2>/dev/null || true
-  git add -f outputs-hpc-*/raw outputs-hpc-*/scored outputs-hpc-*/_backup 2>/dev/null || true
+  # Do not git-track raw/scored JSONL or backup mirrors (size, gated content, history bloat).
 
   if git diff --cached --quiet; then
     log "no staged output changes"

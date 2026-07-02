@@ -8,18 +8,21 @@ wrong machine split, missing model folders, prompt formatting, and dataset acces
 
 from __future__ import annotations
 
+import argparse
 import json
 import subprocess
 import sys
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
 from src.runners.config_utils import build_prompt, load_cell_config
-from src.runners.revision_resolver import load_dataset_with_revision
-
+from src.runners.revision_resolver import (
+    is_immutable_revision,
+    load_dataset_with_revision,
+    require_immutable_revision,
+)
 
 EXPECTED_HPC_BLOCKS = {
     "b01_parallel_bf16_anchors.sh",
@@ -99,6 +102,17 @@ def check_all_cell_configs() -> None:
     print(f"loaded {len(list(cell_dir.glob('*.json')))} cell configs ok")
 
 
+def check_revision_pins() -> None:
+    print("== revision pins ==")
+    for path in sorted((ROOT / "configs/models").glob("*.json")):
+        data = json.loads(path.read_text(encoding="utf-8"))
+        require_immutable_revision(data.get("revision"), label=path.name)
+    for path in sorted((ROOT / "configs/tasks").glob("*.json")):
+        data = json.loads(path.read_text(encoding="utf-8"))
+        require_immutable_revision(data.get("revision"), label=path.name)
+    print("all model/task revision pins are immutable SHAs")
+
+
 def check_decoding_verify() -> None:
     print("== decoding verify ==")
     run(["python", "scripts/verify_decoding_params.py"])
@@ -149,8 +163,9 @@ def check_datasets() -> None:
         "configs/tasks/gpqa_diamond.json",
     ):
         task = json.loads((ROOT / task_rel).read_text(encoding="utf-8"))
-        if not task.get("revision"):
-            fail(f"{task_rel} missing revision pin")
+        revision = task.get("revision")
+        if not is_immutable_revision(str(revision) if revision else None):
+            fail(f"{task_rel} revision must be an immutable commit SHA, got {revision!r}")
         dataset = load_dataset_with_revision(task)
         print(
             task["task_name"],
@@ -168,13 +183,32 @@ def check_datasets() -> None:
             fail("GPQA-Diamond row count is not 198")
 
 
-def main() -> None:
+def run_ci_checks() -> None:
     check_static()
     check_prompt()
     check_all_cell_configs()
+    check_revision_pins()
     check_decoding_verify()
+
+
+def run_full_checks() -> None:
+    run_ci_checks()
     check_blocks_and_models()
     check_datasets()
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--ci",
+        action="store_true",
+        help="Run CPU-safe checks only (no local models or dataset downloads).",
+    )
+    args = parser.parse_args()
+    if args.ci:
+        run_ci_checks()
+    else:
+        run_full_checks()
     print("HPC publication CPU preflight passed.")
 
 

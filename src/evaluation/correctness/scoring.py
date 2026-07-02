@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-from collections import Counter
 import random
 import re
 import statistics
+from collections import Counter
 from typing import Any, Dict, Optional, Sequence
 
 from src.extraction.gpqa_extractor import extract_gpqa_letter, normalize_gpqa_letter
@@ -119,6 +119,41 @@ def _try_math_verify(gold: Optional[str], pred: Optional[str]) -> Optional[bool]
         return bool(verify(parse(gold), parse(pred)))
     except Exception:
         return None
+
+
+def answers_semantically_equivalent(a: Optional[str], b: Optional[str]) -> bool:
+    """Return True when two answers are equivalent under publication scoring."""
+    if a is None or b is None:
+        return False
+    if normalize_answer(a) == normalize_answer(b) and normalize_answer(a):
+        return True
+    result = _try_math_verify(a, b)
+    if result is not None:
+        return result
+    return str(a).strip() == str(b).strip()
+
+
+def get_scorer_metadata(*, publication_mode: bool = False) -> dict[str, str]:
+    """Record which scoring engine is active."""
+    try:
+        import math_verify
+
+        version = getattr(math_verify, "__version__", "unknown")
+        return {
+            "scorer": "math_verify",
+            "scorer_version": str(version),
+            "scoring_profile": "math500_v1",
+        }
+    except ImportError:
+        if publication_mode:
+            raise RuntimeError(
+                "Publication scoring requires math-verify; install math-verify==0.9.0"
+            )
+        return {
+            "scorer": "normalized_string",
+            "scorer_version": "builtin",
+            "scoring_profile": "math500_v1",
+        }
 
 
 def _mean(values: Sequence[float]) -> float:
@@ -298,7 +333,9 @@ def summarize_scored_rows(rows: list[dict]) -> dict:
 
 
 __all__ = [
+    "answers_semantically_equivalent",
     "bootstrap_ci",
+    "get_scorer_metadata",
     "maj_at_k",
     "majority_vote_answer",
     "score_gpqa_item",

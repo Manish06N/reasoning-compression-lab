@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "scored_response.v1.json",
+  "title": "Scored inference row",
+  "type": "object",
+  "required": ["id", "cell_id", "task", "correct"],
+  "properties": {
+    "id": { "type": ["string", "integer"] },
+    "cell_id": { "type": "string" },
+    "task": { "type": "string" },
+    "correct": { "type": "boolean" },
+    "pred_answer": { "type": ["string", "null"] },
+    "gold_answer": { "type": ["string", "null"] },
+    "completion": { "type": "string" },
+    "config_hash": { "type": "string" },
+    "confidence_value": { "type": ["number", "null"] },
+    "confidence_source": { "type": ["string", "null"] },
+    "confidence_valid_for_calibration": { "type": ["boolean", "null"] },
+    "sample_index": { "type": "integer" },
+    "latency_sec": { "type": ["number", "null"] }
+  },
+  "additionalProperties": true
+}

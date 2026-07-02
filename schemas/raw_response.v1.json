@@ -22,6 +22,8 @@
     "config_hash": { "type": "string" },
     "model_revision": { "type": ["string", "null"] },
     "dataset_revision": { "type": ["string", "null"] },
+    "resolved_model_commit": { "type": ["string", "null"] },
+    "resolved_dataset_commit": { "type": ["string", "null"] },
     "prompt_template_version": { "type": "string" },
     "prompt_template_file": { "type": "string" },
     "input_text_hash": { "type": "string" },

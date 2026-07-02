@@ -1,6 +1,5 @@
 """Strict YAML loading — reject duplicate top-level keys."""
 
-from pathlib import Path
 
 import pytest
 

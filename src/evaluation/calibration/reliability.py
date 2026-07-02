@@ -32,7 +32,7 @@ def adaptive_ece(
         if not chunk:
             continue
         confs = [c for c, _ in chunk]
-        labs = [l for _, l in chunk]
+        labs = [label for _, label in chunk]
         acc = sum(labs) / len(labs)
         conf_mean = sum(confs) / len(confs)
         weight = len(chunk) / n

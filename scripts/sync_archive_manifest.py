@@ -12,6 +12,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
+from src.runners.checkpoint_utils import atomic_locked_json_update
 from src.runners.task_utils import expected_rows_for_task
 
 
@@ -42,7 +43,18 @@ def _task_name_from_meta(meta: dict) -> str:
 
 def sync_archive(archive: Path) -> None:
     manifest_path = archive / "manifest.json"
-    manifest = json.loads(manifest_path.read_text(encoding="utf-8")) if manifest_path.exists() else {"cells": []}
+    def _write_manifest(manifest: dict) -> None:
+        atomic_locked_json_update(
+            manifest_path,
+            lambda current: {**current, **manifest},
+            default={"cells": []},
+        )
+
+    manifest = (
+        json.loads(manifest_path.read_text(encoding="utf-8"))
+        if manifest_path.exists()
+        else {"cells": []}
+    )
     cells_out = []
     last_cell_id = None
     last_rows_done = 0
@@ -96,16 +108,18 @@ def sync_archive(archive: Path) -> None:
 
     manifest["cells"] = cells_out
     manifest["updated_at"] = utc_now_iso()
-    manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+    _write_manifest(manifest)
 
-    state = {
-        "last_cell_id": last_cell_id,
-        "last_phase": last_phase,
-        "rows_done": last_rows_done,
-        "rows_total": last_rows_total,
-        "updated_at": utc_now_iso(),
-    }
-    (archive / "state.json").write_text(json.dumps(state, indent=2), encoding="utf-8")
+    atomic_locked_json_update(
+        archive / "state.json",
+        lambda state: {
+            **state,
+            "last_cell_id": last_cell_id,
+            "last_phase": last_phase,
+            "rows_done": last_rows_done,
+            "rows_total": last_rows_total,
+        },
+    )
     print(f"Synced manifest ({len(cells_out)} cells) and state.json for {archive}")
 
 

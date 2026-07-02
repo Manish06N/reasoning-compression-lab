@@ -1,8 +1,5 @@
 """Tests for Pareto frontier and QRM baseline comparison."""
 
-import json
-from pathlib import Path
-
 from pathlib import Path
 
 from scripts.compare_qrm_baseline import compare_summary

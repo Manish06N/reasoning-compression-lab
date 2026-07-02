@@ -12,7 +12,11 @@ sys.path.insert(0, str(ROOT))
 
 from src.runners.checkpoint_utils import load_jsonl
 from src.runners.config_utils import load_cell_config
-from src.runners.resume_guard import allow_resume_from_env, archive_is_forbidden, resume_block_reason
+from src.runners.resume_guard import (
+    allow_resume_from_env,
+    archive_is_forbidden,
+    resume_block_reason,
+)
 
 
 def main() -> None:

@@ -14,7 +14,22 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
+from src.evaluation.statistics.paired_validation import (
+    paired_difference_bootstrap_ci,
+    validate_paired_rows,
+)
 from src.runners.config_utils import load_yaml
+
+
+def compare_paired_scored_runs(
+    baseline_rows: list[dict[str, Any]],
+    variant_rows: list[dict[str, Any]],
+) -> dict[str, Any]:
+    """Validate paired row sets and optionally attach bootstrap CI on the difference."""
+    report = validate_paired_rows(baseline_rows, variant_rows)
+    if report["paired_comparison_valid"]:
+        report["paired_bootstrap"] = paired_difference_bootstrap_ci(baseline_rows, variant_rows)
+    return report
 
 
 def _load_targets(path: Path) -> dict[str, Any]:

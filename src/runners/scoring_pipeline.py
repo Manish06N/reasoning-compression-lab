@@ -14,7 +14,7 @@ from src.evaluation.calibration.metrics import calibration_summary_from_rows
 from src.evaluation.correctness.scoring import score_item, summarize_scored_rows
 from src.evaluation.selective_risk.curves import selective_risk_from_rows
 from src.evaluation.statistics.bootstrap import cluster_bootstrap_ci
-from src.schemas.validate import validate_jsonl_sample
+from src.schemas.validate import validate_jsonl_rows, validate_row
 
 
 def load_raw_rows(in_path: Path) -> list[dict[str, Any]]:
@@ -30,6 +30,7 @@ def score_all_rows(
     rows: list[dict[str, Any]],
     *,
     allow_parse_proxy: bool,
+    publication: bool = False,
 ) -> list[dict[str, Any]]:
     scored: list[dict[str, Any]] = []
     for row in rows:
@@ -88,6 +89,8 @@ def attach_calibration(
         cal = calibration_summary_from_rows(scored, allow_parse_proxy=allow_parse_proxy)
         if cal and not cal.get("skipped"):
             summary["calibration"] = cal
+            if cal.get("confidence_method") is None and availability.get("confidence_sources_seen"):
+                cal["confidence_method"] = availability["confidence_sources_seen"][0]
         risk = selective_risk_from_rows(scored, allow_parse_proxy=allow_parse_proxy)
         if risk and not risk.get("skipped"):
             summary["selective_risk"] = risk
@@ -99,6 +102,43 @@ def attach_calibration(
         summary["selective_risk"] = {"skipped": True, "availability": availability}
 
 
-def validate_raw_input(in_path: Path) -> dict[str, Any]:
-    """Validate a sample of raw rows before scoring."""
-    return validate_jsonl_sample(in_path)
+def validate_raw_input(in_path: Path, *, publication: bool = False) -> dict[str, Any]:
+    """Validate raw rows before scoring."""
+    if publication:
+        return validate_jsonl_rows(in_path, every_nth=1)
+    return validate_jsonl_rows(in_path, limit=None, every_nth=100)
+
+
+def validate_scored_rows(
+    rows: list[dict[str, Any]],
+    *,
+    publication: bool = False,
+) -> dict[str, Any]:
+    errors: list[str] = []
+    indices = range(len(rows)) if publication else _sample_indices(len(rows))
+    for i in indices:
+        row_errors = validate_row(rows[i], "scored_response.v1.json")
+        for err in row_errors:
+            errors.append(f"row {i}: {err}")
+    return {
+        "rows_checked": len(list(indices)),
+        "total_rows": len(rows),
+        "valid": len(errors) == 0,
+        "errors": errors[:20],
+    }
+
+
+def validate_summary(summary: dict[str, Any], *, publication: bool = False) -> dict[str, Any]:
+    if not publication:
+        return {"valid": True, "errors": []}
+    errors = validate_row(summary, "summary.v1.json")
+    return {"valid": len(errors) == 0, "errors": errors}
+
+
+def _sample_indices(total: int, *, every_nth: int = 100) -> list[int]:
+    if total == 0:
+        return []
+    indices = {0, total - 1}
+    for i in range(0, total, every_nth):
+        indices.add(i)
+    return sorted(indices)

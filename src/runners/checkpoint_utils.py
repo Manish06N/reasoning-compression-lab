@@ -147,23 +147,32 @@ def backup_snapshot(backup_root: Path, output_root: Path, label: str | None = No
 
 
 def update_state(output_root: Path, **fields: Any) -> None:
-    output_root.mkdir(parents=True, exist_ok=True)
-    state_path = output_root / "state.json"
-    lock_path = output_root / "state.json.lock"
-    state: dict[str, Any] = {}
+    atomic_locked_json_update(output_root / "state.json", lambda state: {**state, **fields})
+
+
+def atomic_locked_json_update(
+    path: Path,
+    mutator,
+    *,
+    default: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Read-modify-write JSON under an exclusive file lock."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    lock_path = path.with_suffix(path.suffix + ".lock")
+    state: dict[str, Any] = dict(default or {})
     with lock_path.open("a", encoding="utf-8") as lock:
         if fcntl is not None:
             fcntl.flock(lock.fileno(), fcntl.LOCK_EX)
         try:
-            if state_path.exists():
-                state = json.loads(state_path.read_text(encoding="utf-8"))
-            state.update(fields)
+            if path.exists():
+                state = json.loads(path.read_text(encoding="utf-8"))
+            state = mutator(state)
             state["updated_at"] = utc_now_iso()
 
             fd, tmp_name = tempfile.mkstemp(
-                prefix=f"{state_path.name}.",
+                prefix=f"{path.name}.",
                 suffix=".tmp",
-                dir=output_root,
+                dir=path.parent,
                 text=True,
             )
             tmp = Path(tmp_name)
@@ -172,10 +181,11 @@ def update_state(output_root: Path, **fields: Any) -> None:
                     f.write(json.dumps(state, indent=2))
                     f.flush()
                     os.fsync(f.fileno())
-                tmp.replace(state_path)
+                tmp.replace(path)
             finally:
                 if tmp.exists():
                     tmp.unlink()
         finally:
             if fcntl is not None:
                 fcntl.flock(lock.fileno(), fcntl.LOCK_UN)
+    return state

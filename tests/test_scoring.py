@@ -79,3 +79,9 @@ def test_summarize_scored_rows_golden():
     assert summary["n"] == 2
     assert summary["pass_at_1"] == 0.5
     assert "pass_at_1_ci95_low" in summary
+
+
+def test_math_equivalence_fractions():
+    from src.evaluation.correctness.scoring import answers_semantically_equivalent
+
+    assert answers_semantically_equivalent("1/2", "0.5") or answers_semantically_equivalent("0.5", "1/2")

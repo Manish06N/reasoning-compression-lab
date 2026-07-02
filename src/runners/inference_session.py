@@ -12,6 +12,7 @@ from src.runners.config_utils import REPO_ROOT
 from src.runners.dataset_rows import output_root_for
 from src.runners.resume_guard import resume_block_reason
 from src.runners.revision_resolver import load_dataset_with_revision
+from src.runners.run_spec import RunSpec
 
 
 class ConfigurationError(Exception):
@@ -83,9 +84,12 @@ def guard_and_recover_resume(
     *,
     allow_resume: bool,
     backup_root: Path | None,
+    run_spec: RunSpec | None = None,
 ) -> list[dict[str, Any]]:
     """Resume guard + corrupt JSONL recovery; returns existing rows."""
-    block_reason = resume_block_reason(out_path, cell, allow_resume=allow_resume)
+    block_reason = resume_block_reason(
+        out_path, cell, allow_resume=allow_resume, run_spec=run_spec
+    )
     if block_reason:
         print(f"ERROR: {block_reason}", file=sys.stderr)
         sys.exit(1)

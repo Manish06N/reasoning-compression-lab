@@ -60,7 +60,7 @@ J3 may cite RTX results **only** in the transfer section, with:
 - **Not in ordinary git long-term:** raw JSONL, full scored archives, large Parquet, model weights.
 - Use HPC scratch + optional Zenodo/HF Dataset release with manifest.
 
-HPC autopush of small summary commits may exist historically; do not treat full raw archives as permanent git assets.
+HPC autopush commits **manifests, metadata, summaries, and logs only** — not raw/scored JSONL or `_backup/` mirrors (size, gated benchmark content, git history bloat).
 
 ---
 

@@ -5,7 +5,7 @@ Adapted from Cost-of-Pass/cost_of_pass/evaluation/estimate.py (CoP = E[cost] / E
 
 from __future__ import annotations
 
-from typing import Dict, Iterable, List, Optional, Sequence
+from typing import Dict, Optional, Sequence
 
 
 def query_cost_seconds(latency_sec: float, gpu_hour_rate: Optional[float] = None) -> float:

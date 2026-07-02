@@ -4,10 +4,8 @@ from __future__ import annotations
 
 import json
 import os
-import re
 from pathlib import Path
 from typing import Any, Dict, Mapping
-
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
@@ -20,19 +18,31 @@ def load_json(path: str | Path) -> Dict[str, Any]:
         return json.load(f)
 
 
-def _assert_no_duplicate_yaml_keys(text: str, source: str) -> None:
-    """Reject duplicate top-level YAML keys (PyYAML silently keeps the last)."""
-    seen: set[str] = set()
-    for line in text.splitlines():
-        stripped = line.split("#", 1)[0].rstrip()
-        if not stripped:
-            continue
-        match = re.match(r"^([\w_.-]+)\s*:", stripped)
-        if match:
-            key = match.group(1)
-            if key in seen:
+def _load_yaml_text(text: str, source: str) -> Dict[str, Any]:
+    """Parse YAML and reject duplicate keys at any nesting depth."""
+    try:
+        import yaml
+    except ImportError as exc:
+        raise ImportError("PyYAML required for decoding configs. pip install pyyaml") from exc
+
+    class UniqueKeyLoader(yaml.SafeLoader):
+        pass
+
+    def construct_mapping(loader, node, deep=False):
+        mapping = {}
+        for key_node, value_node in node.value:
+            key = loader.construct_object(key_node, deep=deep)
+            if key in mapping:
                 raise ValueError(f"Duplicate YAML key '{key}' in {source}")
-            seen.add(key)
+            mapping[key] = loader.construct_object(value_node, deep=deep)
+        return mapping
+
+    UniqueKeyLoader.add_constructor(
+        yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
+        construct_mapping,
+    )
+    loaded = yaml.load(text, Loader=UniqueKeyLoader)
+    return loaded or {}
 
 
 def load_yaml(path: str | Path) -> Dict[str, Any]:
@@ -40,13 +50,7 @@ def load_yaml(path: str | Path) -> Dict[str, Any]:
     if not path.is_absolute():
         path = REPO_ROOT / path
     text = path.read_text(encoding="utf-8")
-    _assert_no_duplicate_yaml_keys(text, str(path))
-    try:
-        import yaml
-    except ImportError as exc:
-        raise ImportError("PyYAML required for decoding configs. pip install pyyaml") from exc
-    loaded = yaml.safe_load(text)
-    return loaded or {}
+    return _load_yaml_text(text, str(path))
 
 
 def resolve_model_path(model_cfg: Dict[str, Any], cell_cfg: Dict[str, Any]) -> str:

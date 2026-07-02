@@ -44,7 +44,7 @@ def cmd(args: list[str]) -> str | None:
 
 def package_versions() -> dict[str, str | None]:
     versions = {"python": sys.version.split()[0]}
-    for name in ["torch", "vllm", "transformers", "datasets", "numpy", "scipy", "sklearn"]:
+    for name in ["torch", "vllm", "transformers", "datasets", "numpy", "scipy", "sklearn", "math_verify"]:
         try:
             module = __import__(name)
             versions[name] = getattr(module, "__version__", "unknown")
@@ -66,6 +66,31 @@ def load_json(path: Path) -> dict[str, Any] | None:
     if not path.exists():
         return None
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def artifact_hashes(archive: Path) -> dict[str, str | None]:
+    out: dict[str, str | None] = {}
+    for sub in ("raw", "scored", "results"):
+        subdir = archive / sub
+        if not subdir.exists():
+            continue
+        for path in sorted(subdir.glob("*.jsonl")) + sorted(subdir.glob("*_summary.json")):
+            out[str(path.relative_to(archive))] = sha256(path)
+    return out
+
+
+def requirements_lock_hash() -> str | None:
+    lock = ROOT / "requirements-hpc.lock.txt"
+    return sha256(lock) if lock.exists() else None
+
+
+def dirty_patch_hash() -> dict[str, str | None]:
+    diff = cmd(["git", "diff"])
+    status = cmd(["git", "status", "--short"])
+    if not diff and not status:
+        return {"dirty": "false", "patch_sha256": None}
+    payload = (diff or "") + "\n" + (status or "")
+    return {"dirty": "true", "patch_sha256": hashlib.sha256(payload.encode()).hexdigest()}
 
 
 def main() -> None:
@@ -98,12 +123,17 @@ def main() -> None:
             "commit": cmd(["git", "rev-parse", "HEAD"]),
             "branch": cmd(["git", "branch", "--show-current"]),
             "status_short": cmd(["git", "status", "--short"]),
+            **dirty_patch_hash(),
         },
         "cuda": {
-            "nvidia_smi": cmd(["nvidia-smi", "--query-gpu=name,driver_version,memory.total", "--format=csv,noheader"]),
+            "nvidia_smi": cmd(
+                ["nvidia-smi", "--query-gpu=name,driver_version,memory.total", "--format=csv,noheader"]
+            ),
         },
         "packages": package_versions(),
+        "requirements_lock_sha256": requirements_lock_hash(),
         "archive_manifest": manifest,
+        "artifact_sha256": artifact_hashes(archive),
         "cell_metadata": metadata,
         "file_hashes_sha256": file_hashes(),
     }

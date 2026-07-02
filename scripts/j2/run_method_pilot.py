@@ -15,7 +15,6 @@ sys.path.insert(0, str(ROOT))
 from src.generation.sglang.runner import SGLangPilotConfig, check_sglang_available, pilot_manifest
 from src.runners.config_utils import load_yaml
 
-
 CANDIDATES = {
     "eagle": "07-j2-serving-acceleration/EAGLE",
     "specreason": "07-j2-serving-acceleration/specreason",

@@ -1,6 +1,6 @@
 """Tests for MATH answer extraction."""
 
-from src.extraction.math_extractor import extract_boxed, normalize_completion_text, normalize_answer
+from src.extraction.math_extractor import extract_boxed, normalize_answer, normalize_completion_text
 
 
 def test_extract_simple_boxed():

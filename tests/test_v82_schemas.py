@@ -36,7 +36,9 @@ def test_provenance_fields_present():
         cell, prompt_template_file=cell["task"]["prompt_template_file"]
     )
     assert fields["schema_version"] == "raw_response.v1"
-    assert fields.get("dataset_revision") == "main"
+    assert fields.get("dataset_revision")
+    assert len(str(fields.get("dataset_revision"))) >= 40
+    assert fields.get("resolved_dataset_commit") == fields.get("dataset_revision")
 
 
 def test_config_hash_independent_of_model_path():

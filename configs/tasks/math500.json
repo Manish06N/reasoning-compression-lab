@@ -3,5 +3,5 @@
   "dataset_id": "HuggingFaceH4/MATH-500",
   "split": "test",
   "prompt_template_file": "prompts/math500.txt",
-  "revision": "main"
+  "revision": "6e4ed1a2a79af7d8630a6b768ec859cb5af4d3be"
 }

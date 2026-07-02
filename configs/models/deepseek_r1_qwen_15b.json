@@ -9,5 +9,5 @@
   "use_chat_template": true,
   "enforce_eager": true,
   "gpu_memory_utilization": 0.9,
-  "revision": "main"
+  "revision": "ad9f0ae0864d7fbcd1cd905e3c6c5b069cc8b562"
 }

@@ -6,5 +6,5 @@
   "prompt_template_file": "prompts/gpqa_diamond.txt",
   "gated": true,
   "notes": "Requires Hugging Face gated access approval before download.",
-  "revision": "main"
+  "revision": "633f5ee89ab8ad4522a9f850766b73f62147ffdd"
 }

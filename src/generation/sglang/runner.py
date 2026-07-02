@@ -6,8 +6,7 @@ Reference: external_repos/07-j2-serving-acceleration/sglang/
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 
 @dataclass

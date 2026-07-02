@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, List
 
-from src.profiling.gpu_stats import GpuStats, snapshot_vram_bytes, track_gpu
+from src.profiling.gpu_stats import snapshot_vram_bytes, track_gpu
 
 
 def profile_generation(fn, *args, **kwargs) -> tuple[Any, Dict[str, float]]:

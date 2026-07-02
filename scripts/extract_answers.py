@@ -11,8 +11,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from src.extraction.math_extractor import normalize_completion_text
 from src.evaluation.correctness.scoring import score_item
+from src.extraction.math_extractor import normalize_completion_text
 
 
 def extract_row(row: dict) -> dict:

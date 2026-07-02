@@ -10,6 +10,7 @@ from typing import Any, Mapping
 from src.runners.config_hash import hash_material, stable_hash
 from src.runners.config_utils import REPO_ROOT
 from src.runners.revision_resolver import resolve_dataset_revision, resolve_model_revision
+from src.runners.run_spec import RunSpec, run_spec_hash
 
 
 def git_commit_short(repo: Path | None = None) -> str:
@@ -65,30 +66,43 @@ def make_run_id(cell_id: str, seed: int) -> str:
 def provenance_fields(
     cell: Mapping[str, Any],
     *,
-    prompt_template_file: str,
+    prompt_template_file: str | None = None,
     batch_size: int = 1,
     n_samples: int | None = None,
     max_model_len: int | None = None,
+    run_spec: RunSpec | None = None,
 ) -> dict[str, Any]:
     task = cell.get("task") or {}
     model = cell.get("model") or {}
     model_path = str(cell.get("model_path", ""))
+    if run_spec is None:
+        tmpl = prompt_template_file or task.get("prompt_template_file", "")
+        run_spec = RunSpec(
+            cell=cell,
+            prompt_template_file=tmpl,
+            batch_size=batch_size,
+            n_samples=n_samples,
+            max_model_len=max_model_len,
+            publication_mode=False,
+        )
+    elif prompt_template_file is None:
+        prompt_template_file = run_spec.prompt_template_file
+    else:
+        prompt_template_file = prompt_template_file or run_spec.prompt_template_file
+    dataset_rev = resolve_dataset_revision(task)
+    model_rev = resolve_model_revision(model, model_path)
     return {
         "run_id": make_run_id(str(cell["cell_id"]), int(cell["seed"])),
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "git_commit": git_commit_short(),
-        "config_hash": config_hash(
-            cell,
-            prompt_template_file=prompt_template_file,
-            batch_size=batch_size,
-            n_samples=n_samples,
-            max_model_len=max_model_len,
-        ),
+        "config_hash": run_spec_hash(run_spec),
         "prompt_template_version": Path(prompt_template_file).name,
         "prompt_template_file": prompt_template_file,
         "dataset_id": task.get("dataset_id"),
         "dataset_split": task.get("split"),
-        "dataset_revision": resolve_dataset_revision(task),
-        "model_revision": resolve_model_revision(model, model_path),
+        "dataset_revision": dataset_rev,
+        "resolved_dataset_commit": dataset_rev,
+        "model_revision": model_rev,
+        "resolved_model_commit": model_rev,
         "schema_version": "raw_response.v1",
     }

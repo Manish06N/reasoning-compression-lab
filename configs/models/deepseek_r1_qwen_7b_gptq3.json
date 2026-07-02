@@ -12,5 +12,5 @@
   "kv_cache_dtype": "fp8",
   "gpu_memory_utilization": 0.95,
   "notes": "Experimental 3-bit \u2014 run after BF16 and GPTQ-4 are stable.",
-  "revision": "main"
+  "revision": "0c4fcd7226922b88e26856cddda86fc5dea558a1"
 }

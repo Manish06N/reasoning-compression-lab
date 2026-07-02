@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import math
 from collections import Counter
-from typing import Iterable, List, Optional, Sequence
+from typing import Optional, Sequence
 
 
 def calculate_consistency(answers: Sequence[str], method: str = "agree_percent") -> float:

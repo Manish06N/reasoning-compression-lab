@@ -25,13 +25,27 @@ from src.runners.inference_session import (
     load_task_dataset,
     setup_output_paths,
 )
+from src.runners.publication_mode import assert_clean_git_tree, is_publication_mode
 from src.runners.raw_row import build_raw_response_row
 from src.runners.resume_guard import allow_resume_from_env
-from src.schemas.provenance import provenance_fields
-from src.schemas.validate import validate_jsonl_rows
+from src.runners.run_spec import run_spec_from_cell
 from src.runners.vllm_runner import build_llm, generate_chunk
+from src.schemas.provenance import provenance_fields
+from src.schemas.validate import SchemaValidationError, validate_jsonl_rows
 
 CHECKPOINT_EVERY = 10
+
+
+def _validate_checkpoint(out_path: Path, *, publication: bool) -> None:
+    if publication:
+        validation = validate_jsonl_rows(out_path, every_nth=1)
+    else:
+        validation = validate_jsonl_rows(out_path, limit=3)
+    if not validation["valid"]:
+        msg = f"schema validation: {validation['errors'][:3]}"
+        if publication:
+            raise SchemaValidationError(msg)
+        print(f"WARN: {msg}", file=sys.stderr)
 
 
 def main() -> None:
@@ -52,12 +66,16 @@ def main() -> None:
     )
     args = parser.parse_args()
 
+    publication = is_publication_mode(cli_flag=args.publication)
+    if publication:
+        assert_clean_git_tree(ROOT)
+
     cell = load_cell_config(args.cell_config)
     cell_id = cell["cell_id"]
     batch_size = max(1, args.batch_size)
 
     try:
-        assert_publication_batch_size(batch_size, publication=args.publication)
+        assert_publication_batch_size(batch_size, publication=args.publication or publication)
     except ConfigurationError as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         sys.exit(1)
@@ -76,9 +94,24 @@ def main() -> None:
         cell["model"]["max_model_len"] = int(cell["decoding"]["max_model_len"])
 
     task = cell["task"]
+    prompt_template_file = task["prompt_template_file"]
+    run_spec = run_spec_from_cell(
+        cell,
+        prompt_template_file=prompt_template_file,
+        batch_size=batch_size,
+        max_model_len=cell["model"].get("max_model_len"),
+        publication_mode=publication,
+    )
+
     dataset = load_task_dataset(cell, args.limit)
     allow_resume = args.allow_resume or allow_resume_from_env()
-    rows = guard_and_recover_resume(out_path, cell, allow_resume=allow_resume, backup_root=backup_root)
+    rows = guard_and_recover_resume(
+        out_path,
+        cell,
+        allow_resume=allow_resume,
+        backup_root=backup_root,
+        run_spec=run_spec,
+    )
 
     start_idx = len(rows)
     total = len(dataset)
@@ -116,13 +149,7 @@ def main() -> None:
     llm = build_llm(model_path, cell["model"])
     use_chat = cell["model"].get("use_chat_template", True)
     checkpoint_every = max(1, args.checkpoint_every)
-    prompt_template_file = task["prompt_template_file"]
-    run_provenance = provenance_fields(
-        cell,
-        prompt_template_file=prompt_template_file,
-        batch_size=batch_size,
-        max_model_len=cell["model"].get("max_model_len"),
-    )
+    run_provenance = provenance_fields(cell, run_spec=run_spec)
 
     idx = start_idx
     while idx < total:
@@ -161,9 +188,7 @@ def main() -> None:
         idx = batch_end
         if len(rows) % checkpoint_every == 0 or idx == total:
             atomic_write_jsonl(out_path, rows)
-            validation = validate_jsonl_rows(out_path, limit=3)
-            if not validation["valid"]:
-                print(f"WARN: schema validation: {validation['errors'][:3]}", file=sys.stderr)
+            _validate_checkpoint(out_path, publication=publication)
             print(f"checkpoint saved: {out_path} ({len(rows)} rows)")
             if backup_root:
                 backup_file(out_path, backup_root, "raw")

@@ -9,12 +9,12 @@ from typing import Sequence
 def mcnemar_test(
     baseline_correct: Sequence[bool],
     variant_correct: Sequence[bool],
-) -> dict[str, float | int | None]:
+) -> dict[str, float | int | str | None]:
     """
     Compare paired binary outcomes on the same items.
 
-    Returns counts b (baseline correct, variant wrong) and c (baseline wrong, variant correct),
-    chi-square statistic with continuity correction, and two-sided p-value.
+    Uses exact binomial test for small discordant counts; asymptotic with
+    continuity correction for larger samples.
     """
     if len(baseline_correct) != len(variant_correct):
         raise ValueError("baseline and variant must have same length")
@@ -25,20 +25,39 @@ def mcnemar_test(
         elif not base and var:
             c += 1
     n_discordant = b + c
+    n = len(baseline_correct)
+    effect = (sum(variant_correct) - sum(baseline_correct)) / n if n else 0.0
     if n_discordant == 0:
         return {
+            "test": "mcnemar_exact",
             "b": b,
             "c": c,
             "n_discordant": 0,
             "statistic": 0.0,
             "p_value": 1.0,
-            "effect_rate_diff": 0.0,
+            "effect_rate_diff": effect,
         }
-    stat = (abs(b - c) - 1) ** 2 / n_discordant
+
+    if n_discordant <= 25:
+        from scipy.stats import binomtest
+
+        p_value = float(
+            binomtest(min(b, c), n=n_discordant, p=0.5, alternative="two-sided").pvalue
+        )
+        return {
+            "test": "mcnemar_exact",
+            "b": b,
+            "c": c,
+            "n_discordant": n_discordant,
+            "statistic": None,
+            "p_value": p_value,
+            "effect_rate_diff": effect,
+        }
+
+    stat = max(abs(b - c) - 1, 0) ** 2 / n_discordant
     p_value = math.erfc(math.sqrt(stat / 2.0))
-    n = len(baseline_correct)
-    effect = (sum(variant_correct) - sum(baseline_correct)) / n if n else 0.0
     return {
+        "test": "mcnemar_asymptotic",
         "b": b,
         "c": c,
         "n_discordant": n_discordant,

@@ -6,8 +6,7 @@ Adapted from Calibrating-LLMs-with-Consistency/source/calibrate/utils.py
 
 from __future__ import annotations
 
-import math
-from typing import Dict, List, Optional, Sequence
+from typing import Dict, Optional, Sequence
 
 import numpy as np
 

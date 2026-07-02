@@ -12,9 +12,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
+from src.evaluation.correctness.scoring import majority_vote_answer, score_item
 from src.metrics.calibration import compute_calibration_metrics
 from src.metrics.consistency import calculate_consistency
-from src.evaluation.correctness.scoring import majority_vote_answer, score_item
 
 
 def _completion_for_majority(row: dict, majority: str) -> str:

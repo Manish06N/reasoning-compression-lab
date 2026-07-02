@@ -7,7 +7,8 @@ from pathlib import Path
 from typing import Any, Mapping
 
 from src.runners.checkpoint_utils import load_jsonl
-from src.schemas.provenance import config_hash, git_commit_short
+from src.runners.run_spec import RunSpec, run_spec_hash
+from src.schemas.provenance import git_commit_short
 
 # Archives known to contain pre-fix decoding (no repetition_penalty in rows).
 FORBIDDEN_ARCHIVE_MARKERS = (
@@ -25,6 +26,7 @@ def resume_block_reason(
     cell: Mapping[str, Any],
     *,
     allow_resume: bool,
+    run_spec: RunSpec | None = None,
 ) -> str | None:
     """Return error message if resume must be blocked, else None."""
     if allow_resume:
@@ -61,7 +63,12 @@ def resume_block_reason(
             f"current HEAD {current_commit}. Use --fresh after code sync."
         )
 
-    expected_hash = config_hash(cell)
+    if run_spec is not None:
+        expected_hash = run_spec_hash(run_spec)
+    else:
+        from src.schemas.provenance import config_hash
+
+        expected_hash = config_hash(cell)
     row_hashes = {r.get("config_hash") for r in rows if r.get("config_hash")}
     if row_hashes and expected_hash not in row_hashes:
         return (

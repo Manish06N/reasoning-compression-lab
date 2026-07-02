@@ -44,6 +44,19 @@ fi
 DECODING="${QREASON_DECODING:-configs/decoding/repro_qrm.yaml}"
 BATCH_SIZE="${QREASON_BATCH_SIZE:-1}"
 CHECKPOINT_EVERY="${QREASON_CHECKPOINT_EVERY:-10}"
+
+export QREASON_PUBLICATION_MODE=1
+export VLLM_BATCH_INVARIANT=1
+if [[ "${BATCH_SIZE:-1}" != "1" ]]; then
+  echo "Publication mode requires BATCH_SIZE=1" >&2
+  exit 1
+fi
+
+if ! git diff --quiet || ! git diff --cached --quiet; then
+  echo "Publication run requires a clean git working tree" >&2
+  exit 1
+fi
+
 export QR DATE_TAG BACKUP_ROOT DECODING BATCH_SIZE CHECKPOINT_EVERY
 
 cd "$QR"
@@ -227,6 +240,7 @@ run_one_cell() {
         rel_scored="${scored#"$QR"/}"
         rel_summary="${summary#"$QR"/}"
         python scripts/score_run.py \
+          --publication \
           --input "$rel_raw" \
           --output "$rel_scored" \
           --summary "$rel_summary" 2>&1 | tee -a "$log"
@@ -248,6 +262,7 @@ run_one_cell() {
   (
     export CUDA_VISIBLE_DEVICES="$gpu_id"
     python scripts/run_inference.py \
+      --publication \
       --cell-config "$cell_cfg" \
       --decoding-config "$DECODING" \
       --batch-size "$BATCH_SIZE" \
@@ -263,6 +278,7 @@ run_one_cell() {
   rel_scored="${scored#"$QR"/}"
   rel_summary="${summary#"$QR"/}"
   python scripts/score_run.py \
+    --publication \
     --input "$rel_raw" \
     --output "$rel_scored" \
     --summary "$rel_summary" 2>&1 | tee -a "$log"
