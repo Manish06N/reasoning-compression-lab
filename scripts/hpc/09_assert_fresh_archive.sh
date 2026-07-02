@@ -16,16 +16,6 @@ if [[ -z "$ROOT" ]]; then
   exit 1
 fi
 
-if [[ "$ROOT" == *"outputs-hpc-2a100-main-2026-06-29"* ]]; then
-  if [[ "${QREASON_ALLOW_BAD_ARCHIVE:-}" != "1" ]]; then
-    echo "ERROR: QREASON_OUTPUT_ROOT points at the invalid June-29 archive." >&2
-    echo "  rm -rf outputs-hpc-2a100-main-2026-06-29" >&2
-    echo "  export QREASON_OUTPUT_ROOT=\$QR/outputs-hpc-2a100-main-\$(date +%Y-%m-%d)-rerun" >&2
-    exit 1
-  fi
-  echo "WARN: QREASON_ALLOW_BAD_ARCHIVE=1 — proceeding at your own risk." >&2
-fi
-
 if [[ "${QREASON_FRESH_RUN:-}" == "1" && -d "$ROOT/raw" ]]; then
   count="$(find "$ROOT/raw" -name '*.jsonl' 2>/dev/null | wc -l | tr -d ' ')"
   if [[ "$count" -gt 0 && "${QREASON_ALLOW_RESUME:-}" != "1" ]]; then

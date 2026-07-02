@@ -113,3 +113,85 @@ def test_llama_gsm8k_marked_unused():
     report = compare_summary(summary, targets, targets_path=targets_path)
     assert report["passed"] is None
     assert report["checks"][0]["status"] == "SKIP"
+
+
+def test_resolve_model_key_from_model_id_without_cell_id():
+    from scripts.compare_qrm_baseline import _resolve_model_key, compare_summary
+    from src.runners.config_utils import load_yaml
+
+    targets_path = ROOT / "configs/baselines/qrm_literature_targets.yaml"
+    targets = load_yaml(targets_path)
+    summary = {
+        "cell_id": "ambiguous_cell_name",
+        "model_id": "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
+        "task": "math500",
+        "n": 500,
+        "pass_at_1": 0.93,
+    }
+    assert _resolve_model_key(summary, targets) == "DeepSeek-R1-Distill-Qwen-7B"
+    report = compare_summary(summary, targets, targets_path=targets_path)
+    assert report["model_key"] == "DeepSeek-R1-Distill-Qwen-7B"
+    assert report["hard_passed"] is True
+
+
+def test_resolve_model_key_llama_from_model_id():
+    from scripts.compare_qrm_baseline import _resolve_model_key
+    from src.runners.config_utils import load_yaml
+
+    targets = load_yaml(ROOT / "configs/baselines/qrm_literature_targets.yaml")
+    summary = {
+        "cell_id": "unknown",
+        "model_id": "deepseek-ai/DeepSeek-R1-Distill-Llama-8B",
+        "task": "math500",
+    }
+    assert _resolve_model_key(summary, targets) == "DeepSeek-R1-Distill-Llama-8B"
+
+
+def test_infer_model_family_from_summary_model_id():
+    from scripts.build_paper_tables import infer_model_family
+
+    summary = {"model_id": "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B", "cell_id": "x"}
+    assert infer_model_family(summary, None) == "Qwen-7B"
+
+
+def test_compare_summary_skips_fp8_against_bf16_target():
+    from scripts.compare_qrm_baseline import compare_summary
+    from src.runners.config_utils import load_yaml
+
+    targets_path = ROOT / "configs/baselines/qrm_literature_targets.yaml"
+    targets = load_yaml(targets_path)
+    summary = {
+        "cell_id": "level_a_qwen7b_fp8_math500_seed0",
+        "model_id": "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
+        "quant_config": "fp8",
+        "prompt_profile": "reproduction",
+        "task": "math500",
+        "n": 500,
+        "pass_at_1": 0.93,
+    }
+    report = compare_summary(summary, targets, targets_path=targets_path)
+    assert report["passed"] is None
+    assert report["checks"][0]["status"] == "SKIP"
+    assert "quant_config mismatch" in report["checks"][0]["message"]
+
+
+def test_resolve_model_key_qwen15b_cell_id():
+    from scripts.compare_qrm_baseline import _resolve_model_key
+    from src.runners.config_utils import load_yaml
+
+    targets = load_yaml(ROOT / "configs/baselines/qrm_literature_targets.yaml")
+    summary = {"cell_id": "level_c_qwen15b_bf16_math500_seed0", "task": "math500"}
+    assert _resolve_model_key(summary, targets) == "DeepSeek-R1-Distill-Qwen-1.5B"
+
+
+def test_resolve_model_key_gptq3_returns_none():
+    from scripts.compare_qrm_baseline import _resolve_model_key
+    from src.runners.config_utils import load_yaml
+
+    targets = load_yaml(ROOT / "configs/baselines/qrm_literature_targets.yaml")
+    summary = {
+        "cell_id": "level_b_qwen7b_gptq3_math500_seed0",
+        "quant_config": "gptq3",
+        "task": "math500",
+    }
+    assert _resolve_model_key(summary, targets) is None

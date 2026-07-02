@@ -40,6 +40,10 @@ source "$(conda info --base)/etc/profile.d/conda.sh"
 conda activate qreason
 
 pip install --upgrade pip
-pip install -r requirements-hpc.txt
+if [[ -f requirements-hpc.lock.txt ]]; then
+  pip install -r requirements-hpc.lock.txt
+else
+  pip install -r requirements-hpc.txt
+fi
 
 echo "Environment ready. Test with: bash scripts/hpc/01_gpu_check.sh"

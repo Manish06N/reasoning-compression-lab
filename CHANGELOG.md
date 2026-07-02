@@ -1,5 +1,45 @@
 # Changelog
 
+## 2026-07-02 — HPC operational fixes (full scope)
+
+**Commit:** `14781b2` — pushed to `origin/main` (MacBook).
+
+**Scope:** Publication-run failure modes for live SLURM jobs — git/autopush conflict, manifest locking, resume traps, submit env propagation, QRM gate matching, backup hardening, pin alignment, logprob capture.
+
+**Changes:**
+- **Git gates:** `assert_code_paths_clean()` — publication checks code paths only (`src`, `scripts`, `configs`, …); output manifest commits no longer block scoring
+- **Autopush:** opt-in via `QREASON_ENABLE_AUTOPUSH=1` (default off in `submit_hpc_blocks.sh`)
+- **Manifest:** `src/runners/archive_manifest.py` with `atomic_locked_json_update`; launcher bookkeeping non-fatal
+- **Resume guard:** allow resume when HEAD moved but code paths unchanged (autopush/output commits)
+- **Submit:** resolve `QREASON_OUTPUT_ROOT` once; explicit sbatch export; default `all` → b01 only; `--fresh` flag; `all_blocks` for soak
+- **QRM gate:** quant/profile mismatch → SKIP; gptq3/qwen15b model key fixes
+- **Logprobs:** `capture_logprobs` in sampling params; `normalized_sequence_logprob` on raw rows (GPU smoke before enabling calibration in launcher)
+- **Pins:** `requirements-hpc.txt` aligned to live lock (transformers 5.12.1, datasets 5.0.0, hub 1.21.0)
+- **Tests:** archive manifest concurrency, backup `.tmp` ignore, logprob extraction, QRM profile skip (32 targeted pass)
+
+**HPC ops:** Kill autopush tmux before scoring stuck jobs: `tmux kill-session -t hpc_git_autopush 2>/dev/null || true`
+
+**Progress:** [progress.md](progress.md) snapshot updated 2026-07-02.
+
+---
+
+## 2026-07-02 — Review hardening (recommended scope)
+
+**Commit:** `14781b2` (same push as operational fixes).
+
+**Scope:** Post-backup audit fixes — env docs, scalable archive blocking, publication git UX, `model_id` provenance for analysis scripts.
+
+**Changes:**
+- **`docs/ENV_VARS.md`:** central reference for all `QREASON_*`, cache, and cluster variables; `.env.example` and README updated
+- **Archive blocking:** `INVALID_FOR_PUBLICATION.txt` marker + `QREASON_FORBIDDEN_ARCHIVE_PATTERNS`; legacy June-29 substring retained; deduped shell assert in `09_assert_fresh_archive.sh`
+- **Publication mode:** `assert_clean_git_tree` catches missing Git with a clear error
+- **Provenance:** `model_id` on raw rows and scored summaries; `compare_qrm_baseline` and `build_paper_tables` prefer `model_id` over substring inference
+- **Tests:** resume guard marker/env patterns, publication git error, QRM model_id resolution
+
+**Progress:** [progress.md](progress.md) · [docs/PROGRESS.md](docs/PROGRESS.md)
+
+---
+
 ## 2026-07-02 — Deep re-audit P0–P2 correction pass
 
 **Scope:** End-to-end publication safety wiring from second external review (items 1–22).

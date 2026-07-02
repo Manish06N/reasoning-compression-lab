@@ -52,12 +52,11 @@ if [[ "${BATCH_SIZE:-1}" != "1" ]]; then
   exit 1
 fi
 
-if ! git diff --quiet || ! git diff --cached --quiet; then
-  echo "Publication run requires a clean git working tree" >&2
+if ! python -c "import sys; sys.path.insert(0, '$QR'); from src.runners.publication_mode import assert_code_paths_clean; assert_code_paths_clean('$QR')"; then
   exit 1
 fi
 
-export QR DATE_TAG BACKUP_ROOT DECODING BATCH_SIZE CHECKPOINT_EVERY
+export QR DATE_TAG BACKUP_ROOT DECODING BATCH_SIZE CHECKPOINT_EVERY QREASON_OUTPUT_ROOT
 
 cd "$QR"
 
@@ -66,7 +65,7 @@ cell_id_from_cfg() {
 }
 
 backup_archive() {
-  python - <<'PY_BACKUP'
+  python - <<'PY_BACKUP' || echo "WARN: backup_archive failed" >&2
 import os
 import sys
 from pathlib import Path
@@ -80,144 +79,33 @@ PY_BACKUP
 
 write_manifest_header() {
   local block_id="${1:-unknown}" block_file="${2:-}"
-  export HPC_MANIFEST_BLOCK_ID="$block_id"
-  export HPC_MANIFEST_BLOCK_FILE="$block_file"
-  python - <<'PY_MANIFEST'
-import json
-import os
-import platform
-import subprocess
-from datetime import datetime, timezone
-from pathlib import Path
-
-root = Path(os.environ["QREASON_OUTPUT_ROOT"])
-repo = Path(os.environ["QR"])
-manifest_path = root / "manifest.json"
-now = datetime.now(timezone.utc).isoformat()
-
-def cmd(args):
-    try:
-        return subprocess.check_output(args, cwd=repo, text=True).strip()
-    except Exception:
-        return None
-
-if manifest_path.exists():
-    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-    manifest["resumed_at"] = now
-else:
-    manifest = {
-        "machine": "PARAM Rudra HPC 2x A100",
-        "output_root": str(root),
-        "publication_mode": True,
-        "protocol": "hpc_repro_qrm",
-        "started_at": now,
-        "cells": [],
-    }
-
-manifest.update({
-    "date": os.environ.get("DATE_TAG"),
-    "block_id": os.environ.get("HPC_MANIFEST_BLOCK_ID"),
-    "block_file": os.environ.get("HPC_MANIFEST_BLOCK_FILE") or None,
-    "decoding_config": os.environ.get("DECODING"),
-    "batch_size": int(os.environ.get("BATCH_SIZE", "1")),
-    "checkpoint_every": int(os.environ.get("CHECKPOINT_EVERY", "10")),
-    "git_commit": cmd(["git", "rev-parse", "HEAD"]),
-    "git_branch": cmd(["git", "branch", "--show-current"]),
-    "git_status_short": cmd(["git", "status", "--short"]),
-    "slurm_job_id": os.environ.get("SLURM_JOB_ID"),
-    "slurm_job_name": os.environ.get("SLURM_JOB_NAME"),
-    "slurm_node_list": os.environ.get("SLURM_NODELIST"),
-    "user": os.environ.get("USER"),
-    "hostname": platform.node(),
-    "updated_at": now,
-})
-manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
-PY_MANIFEST
+  python -m src.runners.archive_manifest header \
+    --archive "$QREASON_OUTPUT_ROOT" \
+    --block-id "$block_id" \
+    --block-file "$block_file" \
+    --decoding "$DECODING" \
+    --batch-size "$BATCH_SIZE" \
+    --checkpoint-every "$CHECKPOINT_EVERY" \
+    --date-tag "$DATE_TAG" \
+    --repo "$QR" \
+    || echo "WARN: write_manifest_header failed" >&2
 }
 
 write_cell_metadata() {
   local cell_id="$1" cell_cfg="$2" gpu_id="$3" status="$4" out="$5" summary="${6:-}"
-  export HPC_META_CELL_ID="$cell_id"
-  export HPC_META_CELL_CFG="$cell_cfg"
-  export HPC_META_GPU_ID="$gpu_id"
-  export HPC_META_STATUS="$status"
-  export HPC_META_RAW="$out"
-  export HPC_META_SUMMARY="$summary"
-  python - <<'PY_METADATA'
-import json
-import os
-import subprocess
-from datetime import datetime, timezone
-from pathlib import Path
-
-root = Path(os.environ["QREASON_OUTPUT_ROOT"])
-repo = Path(os.environ["QR"])
-cell_cfg = Path(os.environ["HPC_META_CELL_CFG"])
-cell = json.loads((repo / cell_cfg).read_text(encoding="utf-8"))
-model = json.loads((repo / cell["model_config"]).read_text(encoding="utf-8"))
-task = json.loads((repo / cell["task_config"]).read_text(encoding="utf-8"))
-decoding_path = Path(os.environ["DECODING"])
-decoding_abs = repo / decoding_path
-decoding_text = decoding_abs.read_text(encoding="utf-8") if decoding_abs.exists() else ""
-raw_path = Path(os.environ["HPC_META_RAW"])
-summary_env = os.environ.get("HPC_META_SUMMARY") or ""
-summary_path = Path(summary_env) if summary_env else None
-rows = 0
-if raw_path.exists():
-    rows = sum(1 for line in raw_path.open("r", encoding="utf-8") if line.strip())
-
-try:
-    git_commit = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=repo, text=True).strip()
-except Exception:
-    git_commit = None
-
-cell_id = os.environ["HPC_META_CELL_ID"]
-payload = {
-    "cell_id": cell_id,
-    "status": os.environ["HPC_META_STATUS"],
-    "updated_at": datetime.now(timezone.utc).isoformat(),
-    "gpu_id": os.environ["HPC_META_GPU_ID"],
-    "rows_saved": rows,
-    "raw": str(raw_path),
-    "summary": str(summary_path) if summary_path else None,
-    "cell_config_path": str(cell_cfg),
-    "cell_config": cell,
-    "model_config_path": cell["model_config"],
-    "model_config": model,
-    "task_config_path": cell["task_config"],
-    "task_config": task,
-    "decoding_config_path": os.environ["DECODING"],
-    "decoding_config_text": decoding_text,
-    "batch_size": int(os.environ.get("BATCH_SIZE", "1")),
-    "checkpoint_every": int(os.environ.get("CHECKPOINT_EVERY", "10")),
-    "git_commit": git_commit,
-    "slurm_job_id": os.environ.get("SLURM_JOB_ID"),
-    "slurm_job_name": os.environ.get("SLURM_JOB_NAME"),
-    "slurm_node_list": os.environ.get("SLURM_NODELIST"),
-}
-
-metadata_dir = root / "metadata"
-metadata_dir.mkdir(parents=True, exist_ok=True)
-metadata_path = metadata_dir / f"{cell_id}.json"
-metadata_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
-
-manifest_path = root / "manifest.json"
-manifest = json.loads(manifest_path.read_text(encoding="utf-8")) if manifest_path.exists() else {"cells": []}
-entry = {
-    "cell_id": cell_id,
-    "status": payload["status"],
-    "raw": str(raw_path),
-    "summary": str(summary_path) if summary_path else None,
-    "metadata": str(metadata_path),
-    "rows_saved": rows,
-    "updated_at": payload["updated_at"],
-}
-cells = [c for c in manifest.get("cells", []) if c.get("cell_id") != cell_id]
-cells.append(entry)
-manifest["cells"] = cells
-manifest["updated_at"] = payload["updated_at"]
-manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
-PY_METADATA
+  python -m src.runners.archive_manifest cell-metadata \
+    --archive "$QREASON_OUTPUT_ROOT" \
+    --cell-id "$cell_id" \
+    --cell-config "$cell_cfg" \
+    --gpu-id "$gpu_id" \
+    --status "$status" \
+    --raw "$out" \
+    --summary "$summary" \
+    --decoding "$DECODING" \
+    --batch-size "$BATCH_SIZE" \
+    --checkpoint-every "$CHECKPOINT_EVERY" \
+    --repo "$QR" \
+    || echo "WARN: write_cell_metadata failed" >&2
 }
 
 run_one_cell() {
@@ -241,6 +129,7 @@ run_one_cell() {
         rel_summary="${summary#"$QR"/}"
         python scripts/score_run.py \
           --publication \
+          --skip-calibration \
           --input "$rel_raw" \
           --output "$rel_scored" \
           --summary "$rel_summary" 2>&1 | tee -a "$log"
@@ -279,6 +168,7 @@ run_one_cell() {
   rel_summary="${summary#"$QR"/}"
   python scripts/score_run.py \
     --publication \
+    --skip-calibration \
     --input "$rel_raw" \
     --output "$rel_scored" \
     --summary "$rel_summary" 2>&1 | tee -a "$log"

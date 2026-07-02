@@ -53,7 +53,10 @@ def build_summary(
     summary["scored_output"] = display_path(out_path)
     if scored:
         summary["cell_id"] = scored[0].get("cell_id")
+        summary["model_id"] = scored[0].get("model_id")
+        summary["model_path"] = scored[0].get("model_path")
         summary["quant_config"] = scored[0].get("quant_config")
+        summary["prompt_profile"] = scored[0].get("prompt_profile")
         summary["seed"] = scored[0].get("seed")
         summary["task"] = scored[0].get("task")
         if all(row.get("id") is not None for row in scored):

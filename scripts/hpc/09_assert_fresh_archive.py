@@ -13,6 +13,7 @@ sys.path.insert(0, str(ROOT))
 from src.runners.checkpoint_utils import load_jsonl
 from src.runners.config_utils import load_cell_config
 from src.runners.resume_guard import (
+    allow_bad_archive_from_env,
     allow_resume_from_env,
     archive_is_forbidden,
     resume_block_reason,
@@ -28,7 +29,9 @@ def main() -> None:
     if not archive.is_absolute():
         archive = ROOT / archive
 
-    if archive_is_forbidden(archive) and not allow_resume_from_env():
+    if archive_is_forbidden(archive) and not (
+        allow_resume_from_env() or allow_bad_archive_from_env()
+    ):
         raise SystemExit(
             f"ERROR: forbidden archive path {archive}. "
             "Delete it or choose a new QREASON_OUTPUT_ROOT."

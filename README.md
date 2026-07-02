@@ -25,7 +25,9 @@ Deployment-science evaluation harness for compressed reasoning LLMs.
 
 **b01 gate (MATH-500, hard):** Qwen-7B **88.9–98.9%** (QRM T1 93.9), Llama-8B **86.0–96.0%** (QRM Table 4 91.0) — see [qrm_literature_targets.yaml](configs/baselines/qrm_literature_targets.yaml).
 
-**Docs:** [docs/J1_VALIDATION_RUNBOOK.md](docs/J1_VALIDATION_RUNBOOK.md) · [docs/CODEBASE_OVERVIEW.md](docs/CODEBASE_OVERVIEW.md) · [docs/MODEL_SCOPE_DECISION.md](docs/MODEL_SCOPE_DECISION.md) · [docs/REPO_MAP.md](docs/REPO_MAP.md) · [docs/KNOWN_ISSUES.md](docs/KNOWN_ISSUES.md) · [docs/PROGRESS.md](docs/PROGRESS.md) · [progress.md](progress.md)
+**Docs:** [docs/J1_VALIDATION_RUNBOOK.md](docs/J1_VALIDATION_RUNBOOK.md) · [docs/CODEBASE_OVERVIEW.md](docs/CODEBASE_OVERVIEW.md) · [docs/ENV_VARS.md](docs/ENV_VARS.md) · [docs/MODEL_SCOPE_DECISION.md](docs/MODEL_SCOPE_DECISION.md) · [docs/REPO_MAP.md](docs/REPO_MAP.md) · [docs/KNOWN_ISSUES.md](docs/KNOWN_ISSUES.md) · [docs/PROGRESS.md](docs/PROGRESS.md) · [progress.md](progress.md)
+
+**Environment variables:** [docs/ENV_VARS.md](docs/ENV_VARS.md) (see also [`.env.example`](.env.example))
 
 **Live tracker:** [docs/PROGRESS.md](docs/PROGRESS.md) · **Full history:** [progress.md](progress.md) · **Ops log:** [CHANGELOG.md](CHANGELOG.md)
 
@@ -100,7 +102,8 @@ ssh manishn_iitp@paramrudra.iitp.ac.in -p 4422
 export QR=/scratch/$USER/reasoning-compression-lab
 cd $QR && git fetch origin && git reset --hard origin/main
 python scripts/verify_decoding_params.py
-bash scripts/hpc/submit_hpc_blocks.sh
+bash scripts/hpc/submit_hpc_blocks.sh        # default: b01 only
+# bash scripts/hpc/submit_hpc_blocks.sh --fresh b01   # new archive + wipe cells
 squeue -u $USER
 ```
 
@@ -219,7 +222,8 @@ sbatch slurm/run_level_a_bf16.slurm       # Gate 4 full
 ```bash
 export QR=/scratch/$USER/reasoning-compression-lab
 cd $QR && git pull
-bash scripts/hpc/submit_hpc_blocks.sh        # b01–b06
+bash scripts/hpc/submit_hpc_blocks.sh        # default: b01 only (gate-safe)
+# bash scripts/hpc/submit_hpc_blocks.sh all_blocks  # b01–b06 soak only
 # GPQA after HF gate: sbatch slurm/hpc_2a100_b07_gpqa.slurm
 ```
 

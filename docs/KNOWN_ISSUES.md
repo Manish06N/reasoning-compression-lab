@@ -57,7 +57,13 @@ git fetch origin && git reset --hard origin/main
 
 For manuscript Brier/AURC/ECE claims, use **maj@5** (`run_inference_multisample.py` + `compute_calibration.py`) or logprob-based confidence with a valid `confidence_source`.
 
-### 5. Mixed provenance on resumed inference
+**2026-07-02 update:** Raw rows now capture `confidence` / `confidence_source=normalized_sequence_logprob` when vLLM returns token logprobs. HPC launcher still passes `--skip-calibration` for b01 until a 3-question GPU smoke confirms logprobs on A100.
+
+### 4b. Publication git gate vs output bookkeeping — **fixed 2026-07-02**
+
+Publication mode now checks **code paths only** (`src`, `scripts`, `configs`, …). Tracked `outputs-hpc-*/manifest.json` updates no longer block `score_run.py --publication`.
+
+Autopush tmux is **opt-in** (`QREASON_ENABLE_AUTOPUSH=1`). Default workflow: MacBook rsync after runs, not autopush during SLURM jobs.
 
 Rows written before V8.2 provenance fields lack `run_id`, `git_commit`, etc. New rows in the same JSONL have them.  
 Analysis should filter by `schema_version` or rerun fresh archives for publication.

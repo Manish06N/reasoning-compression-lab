@@ -9,45 +9,73 @@ Canonical dated record for **Paper 1: Beyond Accuracy** (`reasoning-compression-
 
 ---
 
-## Current Status Snapshot (2026-07-01, late evening)
+## Current Status Snapshot (2026-07-02)
 
 | Area | Status |
 |------|--------|
-| **GitHub `main`** | **`286f5e4`** — baseline band fix + comparator provenance (after `8fb0fb0` validation hardening) |
-| **J1 engineering** | **MVP complete** — pipeline, stats, provenance, fail-closed calibration, matrix validator |
-| **J1 scientific validation** | **In flight** — Slurm smoke `86015` → b01 `86016` (dependency chain) |
-| **QRM baseline gates** | **Fixed** — MATH-500 ~88–98% / GPQA ~44–54%; old 45–65% bands were AIME-scale (amd-002) |
-| **15 core validation cells** | Wired seed 0 (b01–b09) — see `papers/j1/publication_matrix.yaml` |
-| **Multi-seed / logprobs** | **Not wired** — Gate 2 after b01; logprobs hard gate before b02 |
-| **Policy** | **HPC-only** for J1 paper numbers; RTX 5080 for J3 transfer only |
-| **Unit tests (MacBook)** | **43 passed** (`pytest tests/`) including `test_compare_qrm_baseline.py` |
+| **GitHub `main`** | **`14781b2`** — review hardening + HPC operational fixes (after `d4b877d` CI + job 86229 log) |
+| **J1 engineering** | **MVP complete** — RunSpec, revision pins, publication mode, stats, CI, env docs, manifest locking, logprob capture (GPU smoke pending) |
+| **J1 scientific validation** | **In flight** — b01 job **86229** on archive `outputs-hpc-2a100-main-2026-07-02-p0fix` |
+| **QRM baseline gates** | **Fixed** — task-specific bands; quant/profile mismatch → SKIP (not false PASS/FAIL) |
+| **15 core validation cells** | Wired seed 0 (b01–b09) — `papers/j1/publication_matrix.yaml` |
+| **Logprobs** | **Wired in code** — `normalized_sequence_logprob` on raw rows; launcher keeps `--skip-calibration` until A100 smoke |
+| **Policy** | **HPC-only** for J1 paper numbers; RTX 5080 retired for publication |
+| **Unit tests (MacBook)** | **32 targeted pass** (operational fixes); full suite **99 pass / 1 pre-existing fail** (`test_math_equivalence_fractions`) |
 
-### Active HPC queue (2026-07-01)
+### Active HPC queue (2026-07-02)
 
 | Job | Role | State | Notes |
 |-----|------|-------|-------|
-| **86015** | GPU smoke (`03_smoke_test.sh` via Slurm) | Pending (Resources) | Login node has no CUDA — correct to use Slurm |
-| **86016** | b01 BF16 anchors (Qwen-7B + Llama-8B MATH-500) | Pending (Dependency `afterok:86015`) | Runs only if smoke passes |
+| **86229** | b01 BF16 anchors (Qwen-7B + Llama-8B MATH-500) | Submitted (PENDING at last check) | Archive `outputs-hpc-2a100-main-2026-07-02-p0fix`; supersedes cancelled 86212 |
 
-**Cancelled:** old b01 job `86010` (stale queue entry).
+**Superseded / cancelled:** 86015/86016 chain, 86212 (pre-P0 archive `2026-07-02-rerun`).
 
-**HPC code at job launch:** `8fb0fb0` (inference tree frozen until jobs start).  
-**HPC code at score time:** must reset to **`286f5e4`** before `score_run.py` / `compare_qrm_baseline.py`.
+**HPC code at job launch:** frozen at submit-time tree (≥ `af4b8c2`).  
+**HPC code at score time:** `git fetch && git reset --hard origin/main` after job completes — need operational-fix commit for unscored jobs stuck on git/manifest gates.
 
-**Telegram watcher:** `hpc_math500_progress` restarted — watches 86015, reports 86016 queued.
+**Before scoring stuck jobs:** `tmux kill-session -t hpc_git_autopush 2>/dev/null || true` (autopush now opt-in only).
 
 ### Sync model (MacBook → GitHub → HPC)
 
 ```bash
 # MacBook: commit + push (inert for running Slurm jobs)
-git push origin main
+bash scripts/macbook/github_push.sh
 
-# HPC: ONLY after inference job finishes — NOT while 86015/86016 running
+# HPC: ONLY after inference job finishes — NOT while 86229 running
 cd $QR
-git fetch origin && git reset --hard origin/main   # never bare git pull on scratch
+git fetch origin && git reset --hard origin/main
+tmux kill-session -t hpc_git_autopush 2>/dev/null || true
 ```
 
-Running jobs execute whatever was on disk at **launch**. Baseline yaml fix deploys at **score time**.
+Running jobs execute whatever was on disk at **launch**. Operational fixes deploy at **score time** (or next submit after sync).
+
+---
+
+## 2026-07-02 — Review hardening + HPC operational fixes (MacBook)
+
+### Review hardening
+
+- Added `docs/ENV_VARS.md`; expanded `.env.example` and README
+- Scalable archive blocking: `INVALID_FOR_PUBLICATION.txt` + `QREASON_FORBIDDEN_ARCHIVE_PATTERNS`
+- `model_id` on raw rows/summaries; QRM comparator + paper tables prefer it
+- Publication git: clear error when Git missing
+
+### HPC operational fixes (full scope)
+
+| Phase | Deliverable |
+|-------|-------------|
+| Git/autopush | `assert_code_paths_clean()`; autopush opt-in (`QREASON_ENABLE_AUTOPUSH=1`) |
+| Manifest | `archive_manifest.py` with locking; non-fatal launcher bookkeeping |
+| Resume | Allow resume when HEAD moved but code unchanged |
+| Submit | Single archive root; `--fresh`; default `all` → b01 |
+| QRM gate | Quant/profile mismatch → SKIP |
+| Backup | `backup_mirror` ignores `*.tmp` / `*.lock` |
+| Pins | transformers 5.12.1 aligned to lock |
+| Logprobs | Pipeline wired; b01 keeps `--skip-calibration` until GPU smoke |
+
+**Verification:** 32 targeted tests pass; `pin_hf_revisions.py --verify` OK; full suite 99/100 (1 pre-existing fail).
+
+See [CHANGELOG.md](CHANGELOG.md) for full detail.
 
 ### Current HPC gate state (completed before queue submit)
 

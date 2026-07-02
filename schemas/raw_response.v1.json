@@ -78,7 +78,12 @@
     "decoding_max_tokens": { "type": ["integer", "null"] },
     "decoding_repetition_penalty": { "type": ["number", "null"] },
     "max_model_len": { "type": ["integer", "null"] },
-    "backend_version": { "type": ["string", "null"] }
+    "backend_version": { "type": ["string", "null"] },
+    "model_id": { "type": ["string", "null"] },
+    "prompt_profile": { "type": ["string", "null"] },
+    "confidence": { "type": ["number", "null"] },
+    "confidence_source": { "type": ["string", "null"] },
+    "mean_token_logprob": { "type": ["number", "null"] }
   },
   "additionalProperties": false
 }

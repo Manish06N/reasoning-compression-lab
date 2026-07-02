@@ -55,19 +55,54 @@ def _git_head_commit(root: Path) -> str | None:
         return None
 
 
-def _resolve_model_key(summary: dict[str, Any]) -> str | None:
+def _resolve_model_key(
+    summary: dict[str, Any],
+    targets: dict[str, Any] | None = None,
+) -> str | None:
+    quant = str(summary.get("quant_config", "")).lower()
+    if quant == "gptq3":
+        return None
+
+    model_id = summary.get("model_id")
+    if model_id:
+        basename = str(model_id).rsplit("/", 1)[-1].strip()
+        models = (targets or {}).get("models") or {}
+        if not targets or basename in models:
+            return basename or None
+
     cell_id = str(summary.get("cell_id", "")).lower()
     model_path = str(summary.get("model_path", "")).lower()
-    text = f"{cell_id} {model_path}"
+    text = f"{cell_id} {model_path} {quant}"
     if "llama" in text and "8b" in text:
         return "DeepSeek-R1-Distill-Llama-8B"
-    if "gptq" in text and "qwen" in text and "7b" in text:
+    if ("gptq4" in text or quant == "gptq4") and "qwen" in text and "7b" in text:
         return "DeepSeek-R1-Distill-Qwen-7B-GPTQ-W4G128"
-    if "qwen" in text and "1.5b" in text:
+    if "qwen15b" in text or "qwen-1.5b" in text or ("qwen" in text and "15b" in text):
         return "DeepSeek-R1-Distill-Qwen-1.5B"
     if "qwen" in text and "7b" in text:
         return "DeepSeek-R1-Distill-Qwen-7B"
     return None
+
+
+def _summary_matches_target(
+    summary: dict[str, Any],
+    task_targets: dict[str, Any],
+) -> tuple[bool, str | None]:
+    expected_quant = task_targets.get("quant_config")
+    observed_quant = summary.get("quant_config")
+    if expected_quant and observed_quant and observed_quant != expected_quant:
+        return False, (
+            f"quant_config mismatch: summary={observed_quant}, target={expected_quant}"
+        )
+
+    expected_profile = task_targets.get("prompt_profile")
+    observed_profile = summary.get("prompt_profile")
+    if expected_profile and observed_profile and observed_profile != expected_profile:
+        return False, (
+            f"prompt_profile mismatch: summary={observed_profile}, "
+            f"target={expected_profile}"
+        )
+    return True, None
 
 
 def _task_key(summary: dict[str, Any]) -> str:
@@ -124,7 +159,7 @@ def compare_summary(
     if targets_path is None:
         targets_path = ROOT / "configs/baselines/qrm_literature_targets.yaml"
 
-    model_key = _resolve_model_key(summary)
+    model_key = _resolve_model_key(summary, targets)
     task_key = _task_key(summary)
     report: dict[str, Any] = {
         "targets_provenance": _targets_provenance(targets_path, targets),
@@ -156,6 +191,13 @@ def compare_summary(
             "status": "SKIP",
             "message": task_targets.get("note") or "Row marked unused in yaml",
         })
+        report["passed"] = None
+        report["hard_passed"] = None
+        return report
+
+    matches, mismatch_msg = _summary_matches_target(summary, task_targets)
+    if not matches:
+        report["checks"].append({"status": "SKIP", "message": mismatch_msg})
         report["passed"] = None
         report["hard_passed"] = None
         return report

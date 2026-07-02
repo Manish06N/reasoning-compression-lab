@@ -1,10 +1,13 @@
 """Tests for resume guard (bad archive / stale decoding / RunSpec hash)."""
 
 import json
+import os
 from pathlib import Path
+from unittest import mock
 
 from src.runners.config_utils import load_cell_config
 from src.runners.resume_guard import (
+    INVALID_FOR_PUBLICATION_MARKER,
     archive_is_forbidden,
     resume_block_reason,
 )
@@ -17,6 +20,29 @@ def test_forbidden_archive_marker():
     assert archive_is_forbidden(p) is True
     p2 = Path("/scratch/user/reasoning-compression-lab/outputs-hpc-2a100-main-2026-07-01-rerun/raw/x.jsonl")
     assert archive_is_forbidden(p2) is False
+
+
+def test_forbidden_archive_marker_file(tmp_path):
+    archive = tmp_path / "outputs-clean"
+    archive.mkdir()
+    raw = archive / "raw" / "cell.jsonl"
+    raw.parent.mkdir()
+    raw.write_text("{}\n", encoding="utf-8")
+    assert archive_is_forbidden(raw) is False
+
+    (archive / INVALID_FOR_PUBLICATION_MARKER).write_text("pre-fix decoding\n", encoding="utf-8")
+    assert archive_is_forbidden(raw) is True
+
+
+def test_forbidden_archive_env_patterns(tmp_path):
+    archive = tmp_path / "outputs-custom-bad-run"
+    archive.mkdir()
+    path = archive / "raw" / "cell.jsonl"
+    path.parent.mkdir()
+    path.write_text("{}\n", encoding="utf-8")
+    with mock.patch.dict(os.environ, {"QREASON_FORBIDDEN_ARCHIVE_PATTERNS": "custom-bad-run"}):
+        assert archive_is_forbidden(path) is True
+    assert archive_is_forbidden(path) is False
 
 
 def test_blocks_resume_without_repetition_penalty(tmp_path):
@@ -103,3 +129,69 @@ def test_maj5_resume_rejects_wrong_n_samples(tmp_path):
     reason = resume_block_reason(out, cell, allow_resume=False, run_spec=resume_spec)
     assert reason is not None
     assert "config_hash mismatch" in reason
+
+
+def test_resume_allowed_when_only_output_commits_moved_head(monkeypatch, tmp_path):
+    from src.runners.config_utils import load_cell_config
+    from src.runners.run_spec import run_spec_from_cell
+    from src.schemas.provenance import provenance_fields
+
+    cell = load_cell_config("configs/cells/level_a_bf16_seed0.json")
+    prompt_file = cell["task"]["prompt_template_file"]
+    run_spec = run_spec_from_cell(
+        cell,
+        prompt_template_file=prompt_file,
+        batch_size=1,
+        n_samples=None,
+        max_model_len=cell["model"].get("max_model_len"),
+    )
+    prov = provenance_fields(cell, run_spec=run_spec)
+    out = tmp_path / "level_a.jsonl"
+    row = {
+        **prov,
+        "id": "x",
+        "git_commit": "oldcommit",
+        "decoding_repetition_penalty": cell["decoding"].get("repetition_penalty"),
+    }
+    out.write_text(json.dumps(row) + "\n")
+
+    monkeypatch.setattr(
+        "src.runners.resume_guard.code_changed_since",
+        lambda _root, commit: commit != "oldcommit",
+    )
+    monkeypatch.setattr("src.runners.resume_guard.git_commit_short", lambda: "newcommit")
+
+    reason = resume_block_reason(out, cell, allow_resume=False, run_spec=run_spec)
+    assert reason is None
+
+
+def test_resume_blocked_when_code_changed(monkeypatch, tmp_path):
+    from src.runners.config_utils import load_cell_config
+    from src.runners.run_spec import run_spec_from_cell
+    from src.schemas.provenance import provenance_fields
+
+    cell = load_cell_config("configs/cells/level_a_bf16_seed0.json")
+    prompt_file = cell["task"]["prompt_template_file"]
+    run_spec = run_spec_from_cell(
+        cell,
+        prompt_template_file=prompt_file,
+        batch_size=1,
+        n_samples=None,
+        max_model_len=cell["model"].get("max_model_len"),
+    )
+    prov = provenance_fields(cell, run_spec=run_spec)
+    out = tmp_path / "level_a.jsonl"
+    row = {
+        **prov,
+        "id": "x",
+        "git_commit": "oldcommit",
+        "decoding_repetition_penalty": cell["decoding"].get("repetition_penalty"),
+    }
+    out.write_text(json.dumps(row) + "\n")
+
+    monkeypatch.setattr("src.runners.resume_guard.code_changed_since", lambda _root, _commit: True)
+    monkeypatch.setattr("src.runners.resume_guard.git_commit_short", lambda: "newcommit")
+
+    reason = resume_block_reason(out, cell, allow_resume=False, run_spec=run_spec)
+    assert reason is not None
+    assert "code changed since row git" in reason

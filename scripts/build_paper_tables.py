@@ -66,7 +66,29 @@ def load_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+MODEL_FAMILY_FROM_BASE: dict[str, str] = {
+    "DeepSeek-R1-Distill-Qwen-1.5B": "Qwen-1.5B",
+    "DeepSeek-R1-Distill-Qwen-7B": "Qwen-7B",
+    "DeepSeek-R1-Distill-Llama-8B": "Llama-8B",
+}
+
+
+def _model_id_basename(model_id: str | None) -> str | None:
+    if not model_id:
+        return None
+    return str(model_id).rsplit("/", 1)[-1].strip() or None
+
+
 def infer_model_family(summary: dict[str, Any], metadata: dict[str, Any] | None) -> str:
+    candidates = [
+        summary.get("model_id"),
+        metadata.get("model_config", {}).get("model_id") if metadata else None,
+    ]
+    for candidate in candidates:
+        base = _model_id_basename(candidate)
+        if base and base in MODEL_FAMILY_FROM_BASE:
+            return MODEL_FAMILY_FROM_BASE[base]
+
     text = " ".join(
         str(x)
         for x in [
@@ -104,7 +126,7 @@ def collect_rows(archive: Path) -> list[dict[str, Any]]:
         row = dict(summary)
         row["cell_id"] = cell_id
         row["model_family"] = infer_model_family(summary, meta)
-        row["model_id"] = model_cfg.get("model_id")
+        row["model_id"] = summary.get("model_id") or model_cfg.get("model_id")
         row["model_config_path"] = meta.get("model_config_path") if meta else None
         row["task_config_path"] = meta.get("task_config_path") if meta else None
         row["decoding_config_path"] = meta.get("decoding_config_path") if meta else None

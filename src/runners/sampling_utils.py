@@ -38,6 +38,8 @@ def build_sampling_params_dict(decoding: Dict[str, Any], seed: int) -> Dict[str,
         params["repetition_penalty"] = decoding["repetition_penalty"]
     if decoding.get("frequency_penalty") is not None:
         params["frequency_penalty"] = decoding["frequency_penalty"]
+    if decoding.get("capture_logprobs", True):
+        params["logprobs"] = int(decoding.get("logprobs", 1))
     return params
 
 

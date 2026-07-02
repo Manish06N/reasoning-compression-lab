@@ -8,6 +8,7 @@ from typing import Any, Dict, List
 
 from src.extraction.math_extractor import normalize_completion_text
 from src.profiling.gpu_stats import snapshot_vram_bytes, track_gpu
+from src.runners.logprob_confidence import confidence_from_vllm_logprobs
 from src.runners.sampling_utils import build_sampling_params_dict
 
 _TOKENIZER_CACHE: dict[tuple[str, bool], Any] = {}
@@ -278,63 +279,40 @@ def generate_chunk(
 
         max_tokens = decoding.get("max_tokens", 32768)
 
-        results.append(
-
-            {
-
+        row_result: Dict[str, Any] = {
                 "prompt": rendered_prompt,
-
                 "completion": completion,
-
                 "latency_sec": per_latency,
-
                 "time_to_first_token_sec": time_to_first_token,
-
                 "peak_vram_gb": vram_max_gb,
-
                 "vram_before_gb": vram_before_gb,
-
                 "vram_after_gb": vram_after_gb,
-
                 "vram_max_gb": vram_max_gb,
-
                 "gpu_util_mean": stats.gpu_util_mean,
-
                 "gpu_util_max": stats.gpu_util_max,
-
                 "power_watts_mean": stats.power_watts_mean,
-
                 "power_watts_max": stats.power_watts_max,
-
                 "energy_joules": per_energy,
-
                 "prompt_tokens": prompt_tokens,
-
                 "completion_tokens": completion_tokens,
-
                 "total_tokens": total_tokens,
-
                 "tokens_per_second": total_tokens_per_second,
-
                 "decode_tokens_per_second": decode_tokens_per_second,
-
                 "seconds_per_output_token": seconds_per_output_token,
-
                 "tokens_per_joule": tokens_per_joule,
-
                 "finish_reason": finish_reason,
-
                 "stop_reason": stop_reason,
-
                 "truncated": finish_reason == "length" or completion_tokens >= max_tokens,
-
                 "completion_chars": len(completion),
-
                 "telemetry_method": "equal_split" if len(prompts) > 1 else "measured",
-
-            }
-
-        )
+        }
+        logprob_conf = confidence_from_vllm_logprobs(choice)
+        if logprob_conf is not None:
+            confidence, source, mean_lp = logprob_conf
+            row_result["confidence"] = confidence
+            row_result["confidence_source"] = source
+            row_result["mean_token_logprob"] = mean_lp
+        results.append(row_result)
 
     return results
 

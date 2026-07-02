@@ -69,7 +69,9 @@ def build_raw_response_row(
         "completion_chars": result.get("completion_chars"),
         "cell_id": cell_id,
         "model_path": model_path,
+        "model_id": cell.get("model", {}).get("model_id"),
         "quant_config": cell.get("quant_config"),
+        "prompt_profile": cell.get("prompt_profile"),
         "task": task["task_name"],
         "seed": cell["seed"],
         "batch_size": batch_size,
@@ -80,6 +82,10 @@ def build_raw_response_row(
         "decoding_repetition_penalty": decoding.get("repetition_penalty"),
         "max_model_len": cell.get("model", {}).get("max_model_len"),
     }
+
+    for field in ("confidence", "confidence_source", "mean_token_logprob"):
+        if result.get(field) is not None:
+            row[field] = result.get(field)
 
     if sample_index is not None:
         row["sample_index"] = sample_index

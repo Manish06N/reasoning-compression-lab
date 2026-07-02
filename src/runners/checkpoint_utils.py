@@ -110,6 +110,7 @@ def backup_mirror(backup_root: Path, output_root: Path) -> None:
     """Sync archive into backup_root/latest/ only (no timestamped snapshot)."""
     backup_root.mkdir(parents=True, exist_ok=True)
     lock_path = backup_root / ".backup.lock"
+    ignore = shutil.ignore_patterns("*.tmp", "*.lock")
     with lock_path.open("a", encoding="utf-8") as lock:
         if fcntl is not None:
             fcntl.flock(lock.fileno(), fcntl.LOCK_EX)
@@ -120,14 +121,20 @@ def backup_mirror(backup_root: Path, output_root: Path) -> None:
                 if not src_dir.exists():
                     continue
                 dest = latest / sub
-                if dest.exists():
-                    shutil.rmtree(dest)
-                shutil.copytree(src_dir, dest)
+                try:
+                    if dest.exists():
+                        shutil.rmtree(dest)
+                    shutil.copytree(src_dir, dest, ignore=ignore)
+                except OSError:
+                    continue
             for name in ("manifest.json", "state.json"):
                 src = output_root / name
                 if src.exists():
                     latest.mkdir(parents=True, exist_ok=True)
-                    shutil.copy2(src, latest / name)
+                    try:
+                        shutil.copy2(src, latest / name)
+                    except OSError:
+                        continue
         finally:
             if fcntl is not None:
                 fcntl.flock(lock.fileno(), fcntl.LOCK_UN)

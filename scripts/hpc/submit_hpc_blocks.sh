@@ -4,15 +4,51 @@
 # Usage (on PARAM Rudra):
 #   export QR=/scratch/$USER/reasoning-compression-lab
 #   cd $QR && git pull
-#   bash scripts/hpc/submit_hpc_blocks.sh        # submit b01-b06 only
-#   bash scripts/hpc/submit_hpc_blocks.sh b08    # optional future Qwen-1.5B block
+#   bash scripts/hpc/submit_hpc_blocks.sh              # submit b01 only (default)
+#   bash scripts/hpc/submit_hpc_blocks.sh b01 --fresh  # fresh archive for b01
+#   bash scripts/hpc/submit_hpc_blocks.sh all_blocks   # b01-b06 soak (violates b01 gate)
+#   bash scripts/hpc/submit_hpc_blocks.sh b08          # optional future Qwen-1.5B block
 set -euo pipefail
 
 QR="${QR:-/scratch/$USER/reasoning-compression-lab}"
 cd "$QR"
 mkdir -p logs/slurm
 
+FRESH_FLAG=""
+BLOCK=""
+for arg in "$@"; do
+  case "$arg" in
+    --fresh) FRESH_FLAG=1 ;;
+    *)
+      if [[ -z "$BLOCK" ]]; then
+        BLOCK="$arg"
+      fi
+      ;;
+  esac
+done
+BLOCK="${BLOCK:-all}"
+
+export QREASON_HPC_DATE="${QREASON_HPC_DATE:-$(date +%Y-%m-%d)}"
+export QREASON_OUTPUT_ROOT="${QREASON_OUTPUT_ROOT:-$QR/outputs-hpc-2a100-main-${QREASON_HPC_DATE}}"
+
+if [[ -n "$FRESH_FLAG" ]]; then
+  export QREASON_FRESH_RUN=1
+else
+  unset QREASON_FRESH_RUN || true
+fi
+
+SBATCH_EXPORT="ALL,QREASON_OUTPUT_ROOT=${QREASON_OUTPUT_ROOT},QREASON_HPC_DATE=${QREASON_HPC_DATE}"
+if [[ -n "${QREASON_FRESH_RUN:-}" ]]; then
+  SBATCH_EXPORT="${SBATCH_EXPORT},QREASON_FRESH_RUN=${QREASON_FRESH_RUN}"
+else
+  SBATCH_EXPORT="${SBATCH_EXPORT},QREASON_FRESH_RUN="
+fi
+
 ensure_autopush() {
+  if [[ "${QREASON_ENABLE_AUTOPUSH:-}" != "1" ]]; then
+    echo "HPC output autopush disabled (set QREASON_ENABLE_AUTOPUSH=1 to enable)."
+    return 0
+  fi
   if ! command -v tmux >/dev/null 2>&1; then
     echo "WARN: tmux not found; HPC output autopush daemon not started." >&2
     return 0
@@ -31,6 +67,7 @@ submit_2gpu() {
   local block="$1"
   local block_file="$QR/configs/machine_split/hpc_blocks/${block}.sh"
   echo "Submitting $block as independent 1-GPU cell jobs ..."
+  echo "Archive: $QREASON_OUTPUT_ROOT"
   # shellcheck disable=SC1090
   source "$block_file"
   for entry in "${HPC_BLOCK_CELLS[@]}"; do
@@ -38,7 +75,8 @@ submit_2gpu() {
     local cell_id
     cell_id="$(python3 -c "import json,sys; print(json.load(open(sys.argv[1]))['cell_id'])" "$cfg")"
     echo "Submitting $block / $cell_id (1xA100) ..."
-    sbatch --job-name="qreason-${cell_id}" \
+    sbatch --export="$SBATCH_EXPORT" \
+      --job-name="qreason-${cell_id}" \
       --output="logs/slurm/${block}_${cell_id}_%j.out" \
       --error="logs/slurm/${block}_${cell_id}_%j.err" \
       --time=47:00:00 \
@@ -52,7 +90,9 @@ submit_2gpu() {
 submit_1gpu() {
   local block="$1"
   echo "Submitting $block (1×A100) ..."
-  sbatch --job-name="qreason-${block}" \
+  echo "Archive: $QREASON_OUTPUT_ROOT"
+  sbatch --export="$SBATCH_EXPORT" \
+    --job-name="qreason-${block}" \
     --output="logs/slurm/${block}_%j.out" \
     --error="logs/slurm/${block}_%j.err" \
     --time=47:00:00 \
@@ -62,23 +102,29 @@ submit_1gpu() {
     --wrap="bash scripts/hpc/run_hpc_2a100_publication.sh ${block}"
 }
 
-BLOCK="${1:-all}"
+submit_all_blocks() {
+  echo "WARN: submitting b01-b06 together violates the documented b01 hard gate." >&2
+  submit_2gpu b01_parallel_bf16_anchors
+  submit_2gpu b02_parallel_fp8
+  submit_2gpu b03_parallel_awq4
+  submit_2gpu b04_parallel_gptq4
+  submit_1gpu b05_single_gptq3
+  submit_1gpu b06_single_gsm8k
+  echo ""
+  echo "b07_gpqa_fp8 NOT submitted — run after GPQA gate:"
+  echo "  sbatch slurm/hpc_2a100_b07_gpqa.slurm"
+  echo "b08-b09 Qwen-1.5B NOT submitted by default — future HPC-only lower-bound jobs:"
+  echo "  bash scripts/hpc/submit_hpc_blocks.sh b08"
+  echo "  bash scripts/hpc/submit_hpc_blocks.sh b09"
+}
+
 case "$BLOCK" in
-  all)
+  all|b01|b01_parallel_bf16_anchors)
     submit_2gpu b01_parallel_bf16_anchors
-    submit_2gpu b02_parallel_fp8
-    submit_2gpu b03_parallel_awq4
-    submit_2gpu b04_parallel_gptq4
-    submit_1gpu b05_single_gptq3
-    submit_1gpu b06_single_gsm8k
-    echo ""
-    echo "b07_gpqa_fp8 NOT submitted — run after GPQA gate:"
-    echo "  sbatch slurm/hpc_2a100_b07_gpqa.slurm"
-    echo "b08-b09 Qwen-1.5B NOT submitted by default — future HPC-only lower-bound jobs:"
-    echo "  bash scripts/hpc/submit_hpc_blocks.sh b08"
-    echo "  bash scripts/hpc/submit_hpc_blocks.sh b09"
     ;;
-  b01|b01_parallel_bf16_anchors) submit_2gpu b01_parallel_bf16_anchors ;;
+  all_blocks)
+    submit_all_blocks
+    ;;
   b02|b02_parallel_fp8) submit_2gpu b02_parallel_fp8 ;;
   b03|b03_parallel_awq4) submit_2gpu b03_parallel_awq4 ;;
   b04|b04_parallel_gptq4) submit_2gpu b04_parallel_gptq4 ;;
@@ -95,3 +141,4 @@ case "$BLOCK" in
 esac
 
 echo "Done. Monitor: squeue -u \$USER"
+echo "Archive: $QREASON_OUTPUT_ROOT"

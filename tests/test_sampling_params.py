@@ -18,6 +18,13 @@ def test_build_sampling_params_includes_repetition_penalty():
     assert params["seed"] == 0
     assert params["repetition_penalty"] == 1.05
     assert params["temperature"] == 0.6
+    assert params["logprobs"] == 1
+
+
+def test_build_sampling_params_can_disable_logprobs():
+    decoding = {"temperature": 0.6, "top_p": 0.95, "max_tokens": 32768, "capture_logprobs": False}
+    params = build_sampling_params_dict(decoding, seed=0)
+    assert "logprobs" not in params
 
 
 def test_verify_decoding_ok_with_repetition_penalty():

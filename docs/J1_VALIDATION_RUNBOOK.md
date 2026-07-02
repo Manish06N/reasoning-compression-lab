@@ -71,6 +71,14 @@ export QREASON_FRESH_RUN=1
 mkdir -p "$QREASON_OUTPUT_ROOT"
 ```
 
+**Submit (preferred):** `submit_hpc_blocks.sh` resolves `QREASON_OUTPUT_ROOT` once and passes it to all split cell jobs. Default `all` submits **b01 only**; use `--fresh` for a new archive batch. Autopush is off unless `QREASON_ENABLE_AUTOPUSH=1`.
+
+```bash
+tmux kill-session -t hpc_git_autopush 2>/dev/null || true
+export QREASON_OUTPUT_ROOT="$QR/outputs-hpc-2a100-main-$(date +%Y-%m-%d)-p0fix"
+bash scripts/hpc/submit_hpc_blocks.sh --fresh b01
+```
+
 ---
 
 ## Phase 3 — b01 BF16 reproduction (Gate 1)
