@@ -4,21 +4,48 @@
 
 **Scope:** End-to-end publication safety wiring from second external review (items 1–22).
 
-**HPC action required:** Cancel job **86212** if still queued; sync this commit; use fresh archive `outputs-hpc-2a100-main-2026-07-02-p0fix`; rerun full preflight before b01.
+**Commit:** `af4b8c2` — pushed to `origin/main` (MacBook).
+
+**HPC status:** synced clean at `af4b8c2`; full preflight passed (immutable revision pins OK). Job **86212** cancelled. Do **not** use pre-P0 archives or `2026-07-02-rerun` for paper numbers.
+
+**Fresh archive:** `/scratch/manishn_iitp/reasoning-compression-lab/outputs-hpc-2a100-main-2026-07-02-p0fix` (`QREASON_FRESH_RUN=1`).
+
+**Submitted b01 (P0 pass):**
+- **Job 86229** — `b01_parallel_bf16_anchors` (2× A100, Qwen-7B BF16 + Llama-8B BF16 MATH-500 seed 0)
+- **Status at submit:** PENDING (Priority); scheduled ~2026-07-03 15:04 cluster time (node may shift — check `scontrol show job 86229`)
+- **Slurm logs:** `logs/slurm/b01_parallel_bf16_86229.{out,err}` (empty until job starts)
+- **Blocker gate:** do not submit b02+ until b01 scored and `compare_qrm_baseline.py` hard gate passes
+
+**HPC next steps (after 86229 completes):** score both BF16 cells → QRM hard gate → manual trace audit sample → `build_repro_bundle.py` → rsync summaries to MacBook.
 
 **Changes:**
 - **RunSpec:** frozen `RunSpec` + single `run_spec_hash` wired through provenance, resume guard, inference scripts
-- **Revisions:** all 17 model/task configs pinned to immutable HuggingFace commit SHAs; `scripts/pin_hf_revisions.py --verify`
+- **Revisions:** all model/task configs pinned to immutable HuggingFace commit SHAs (including quant variants); `scripts/pin_hf_revisions.py --verify`
 - **Publication mode:** HPC launcher exports `QREASON_PUBLICATION_MODE=1`, passes `--publication` to inference + score; clean-git gate
 - **Schema:** publication mode validates every raw row before checkpoint/score; homogeneity checks before scoring
 - **Statistics:** exact McNemar for small discordant counts; fixed Holm test; paired validation + bootstrap CI helpers
 - **Calibration:** multisample group validator; semantic equivalence agreement module
-- **CI:** live `.github/workflows/ci.yml` with blocking Ruff + preflight `--ci` subset
+- **CI:** `.github/workflows/ci.yml` — blocking Ruff, preflight `--ci`, revision verify, 81 tests (enabled in follow-up commit after `workflow` OAuth scope)
 - **math-verify:** pinned `0.9.0` in dev + HPC requirements; scorer metadata in summaries
 - **Governance:** autopush restricted to manifests/summaries (no raw/scored JSONL); manifest locking; expanded repro bundle
-- **Tests:** **78 passed** locally (`pytest tests/ -q`); Ruff clean
+- **Tests:** **81 passed** locally (`pytest tests/ -q`); Ruff clean; preflight `--ci` passes
 
 **Breaking:** `config_hash` and revision SHAs invalidate resume into pre-P0 archives — new `QREASON_OUTPUT_ROOT` + `--fresh`.
+
+**MacBook follow-up:** CHANGELOG for job 86229, Ruff import fix, CI workflow push.
+
+### HPC — b01 job 86212 (superseded — do not use)
+
+**Prep (pre-P0 pass, commit `69ec673`):**
+- Cancelled stale queued jobs **86015** (smoke) and **86016** (old b01)
+- Fresh root: `outputs-hpc-2a100-main-2026-07-02-rerun`
+- CPU preflight passed on `69ec673`
+
+**Submitted then cancelled:**
+- **Job 86212** — `b01_parallel_bf16_anchors` — cancelled before/deep re-audit; queue confirmed empty
+- Any partial output under `2026-07-02-rerun` is **diagnostic only** — do not score for paper tables
+
+**Superseded by:** `af4b8c2` + archive `outputs-hpc-2a100-main-2026-07-02-p0fix`
 
 ## 2026-07-02 — External review fixes (full code pass)
 
@@ -44,22 +71,7 @@
 
 **MacBook validation:** 67 passed (`pytest tests/ -q`); `verify_decoding_params.py` OK; `validate_cell_matrix.py` OK.
 
-### HPC — fresh b01 rerun (same day)
-
-**Prep:**
-- Synced scratch to GitHub `main` (`69ec673`)
-- Cancelled stale queued jobs **86015** (smoke) and **86016** (old b01)
-- Renamed/retired diagnostic archive policy enforced; fresh root set:
-  `outputs-hpc-2a100-main-2026-07-02-rerun`
-- CPU preflight passed: `verify_decoding_params.py` + `07_preflight_publication.py`
-- Fresh-archive guard passed for new output root
-
-**Submitted:**
-- **Job 86212** — `b01_parallel_bf16_anchors` (2× A100, Qwen-7B BF16 + Llama-8B BF16 MATH-500 seed 0)
-- **Status at submit:** PENDING (Priority); scheduled ~2026-07-03 15:04 cluster time on `ragpu008`
-- **Slurm logs:** `logs/slurm/b01_parallel_bf16_86212.{out,err}` (empty until job starts)
-
-**Next (after 86212 completes):** score both BF16 cells → `compare_qrm_baseline.py` hard gate → b02 only if pass@1 in band.
+*(b01 job 86212 ops log moved under the P0–P2 section above as superseded.)*
 
 ---
 

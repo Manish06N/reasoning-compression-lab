@@ -2,7 +2,10 @@
 
 import pytest
 
-from src.runners.multisample_validation import MultisampleValidationError, validate_multisample_groups
+from src.runners.multisample_validation import (
+    MultisampleValidationError,
+    validate_multisample_groups,
+)
 
 
 def test_complete_maj5_group_valid():
