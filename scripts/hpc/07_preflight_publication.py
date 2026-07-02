@@ -17,6 +17,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
+from src.runners.config_utils import build_prompt, load_cell_config
 from src.runners.revision_resolver import load_dataset_with_revision
 
 
