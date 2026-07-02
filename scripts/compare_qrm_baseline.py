@@ -104,8 +104,11 @@ def compare_summary(
     summary: dict[str, Any],
     targets: dict[str, Any],
     *,
-    targets_path: Path,
+    targets_path: Path | None = None,
 ) -> dict[str, Any]:
+    if targets_path is None:
+        targets_path = ROOT / "configs/baselines/qrm_literature_targets.yaml"
+
     model_key = _resolve_model_key(summary)
     task_key = _task_key(summary)
     report: dict[str, Any] = {

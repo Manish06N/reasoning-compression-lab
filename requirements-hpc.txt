@@ -14,3 +14,4 @@ tqdm
 pynvml
 pyyaml
 math-verify
+pytest
