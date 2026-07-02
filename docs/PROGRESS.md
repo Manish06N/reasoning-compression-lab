@@ -61,12 +61,12 @@ MacBook push is inert for running Slurm jobs.
 
 ---
 
-## b01 pass criteria (MATH-500 BF16)
+## b01 pass criteria (MATH-500 BF16, hard gate)
 
-| Model | Reference | Band (±5 abs pp) |
-|-------|-----------|------------------|
-| Qwen-7B | 92.8% (QRM T1 ~94) | 87.8–97.8% |
-| Llama-8B | 89.1% | 84.1–94.1% |
+| Model | QRM ref | ±5 pp band | Source |
+|-------|---------|------------|--------|
+| Qwen-7B | 94.0% | 89.0–99.0% | QRM Table 1 (Qwen-only) |
+| Llama-8B | 91.0% | 86.0–96.0% | QRM Appendix B Table 4 |
 
 **Not sufficient alone:** also check `truncation_rate`, `completion_tokens_mean` (thousands), `decoding_repetition_penalty` in rows, manual audit.
 
@@ -87,9 +87,13 @@ python scripts/verify_decoding_params.py
 ```bash
 export QR=/scratch/$USER/reasoning-compression-lab
 cd $QR
+source /home/apps/MSCC/miniconda3/etc/profile.d/conda.sh
+conda activate qreason
 git fetch origin && git reset --hard origin/main
 
-ROOT="$QREASON_OUTPUT_ROOT"
+ROOT=$(ls -dt "$QR"/outputs-hpc-2a100-main-* 2>/dev/null | head -1)
+echo "Scoring: $ROOT"
+```
 
 python scripts/score_run.py \
   --input "$ROOT/raw/level_a_bf16_seed0.jsonl" \

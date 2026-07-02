@@ -98,7 +98,14 @@ head -n 1 "$ROOT/raw/level_a_bf16_seed0.jsonl" | python -m json.tool | head -30
 
 ```bash
 cd $QR
-git fetch origin && git reset --hard origin/main   # get 286f5e4+ baseline fix
+source /home/apps/MSCC/miniconda3/etc/profile.d/conda.sh
+conda activate qreason
+git fetch origin && git reset --hard origin/main   # get amd-003+ baseline fix
+
+# QREASON_OUTPUT_ROOT is empty in a fresh shell — discover archive explicitly:
+ROOT=$(ls -dt "$QR"/outputs-hpc-2a100-main-* 2>/dev/null | head -1)
+echo "Scoring: $ROOT"
+# Eyeball: must be July rerun archive, NOT June-29 DIAGNOSTIC-INVALID
 ```
 
 ### Score both cells (pass@1 only — no calibration yet)
@@ -133,14 +140,16 @@ python scripts/compare_qrm_baseline.py \
 - git commit (`286f5e4` or later)
 - ref + band + source citation
 
-**Pass criteria (MATH-500 BF16):**
+**Pass criteria (MATH-500 BF16, `gate: hard`, reproduction profile):**
 
-| Model | Reference | Band (±5 absolute pp) |
-|-------|-----------|------------------------|
-| Qwen-7B | 92.8% | **87.8–97.8%** |
-| Llama-8B | 89.1% | **84.1–94.1%** |
+| Model | QRM ref | ±5 pp band | Source |
+|-------|---------|------------|--------|
+| Qwen-7B | 94.0% (DeepSeek 92.8) | **89.0–99.0%** | QRM Table 1 (Qwen-only) |
+| Llama-8B | 91.0% (DeepSeek 89.1) | **86.0–96.0%** | QRM Appendix B Table 4 |
 
 **Do NOT use ~45–65%** — that is AIME/GPQA scale, not MATH-500.
+
+**GPQA (b07):** `gate: sanity` only — ±8 pp band, sober profile; comparator warns but does not exit 1 on pass@1 alone.
 
 **Also required (not pass@1 alone):**
 
@@ -226,11 +235,11 @@ Do **not** launch full 300-cell grid until pilot shows a reliability signal.
 
 From `configs/baselines/qrm_literature_targets.yaml`:
 
-| Task | Typical BF16 scale | Example Qwen-7B band |
-|------|-------------------|----------------------|
-| MATH-500 | ~85–95% | 87.8–97.8% |
-| GSM8K (b06) | ~85–92% | 86.0–96.0% |
-| GPQA-D (b07) | ~45–55% | 44.1–54.1% |
+| Task | Typical BF16 scale | Example hard gate (Qwen-7B) |
+|------|-------------------|----------------------------|
+| MATH-500 | ~85–95% | 89.0–99.0% (QRM T1 ref 94.0 ±5pp) |
+| GSM8K (b06) | ~85–92% | 86.0–96.0% (QRM T1 ref 91.0 ±5pp) |
+| GPQA-D (b07) | ~45–55% | sanity ±8pp only (QRM T1 ref 51.0; sober profile) |
 
 Never copy GPQA/AIME bands onto MATH-500.
 

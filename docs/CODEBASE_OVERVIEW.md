@@ -440,7 +440,7 @@ flowchart TD
 
 | Gate | Pass condition | Codebase support |
 |------|----------------|------------------|
-| **Reproduction** | BF16 pass@1 within ±5 **absolute pp** of QRM ref per task | `compare_qrm_baseline.py`, `qrm_literature_targets.yaml` |
+| **Reproduction** | BF16 pass@1 within ref±`tolerance_pp` (hard gate: repro MATH-500/GSM8K) | `compare_qrm_baseline.py`, `qrm_literature_targets.yaml` (QRM T1 Qwen; Table 4 Llama) |
 | **Extraction** | ≤ acceptable manual audit error on 50 samples | `scripts/j1/sample_audit.py`, `papers/j1/audit/` |
 | **Pilot** | 3–5 seed CIs + at least one reliability signal | `j1/aggregate_seeds.py`, Level B cells |
 | **Novelty** | No competing paper claims same joint study | Manual — template in roadmap Appendix C |

@@ -64,13 +64,38 @@ def _task_key(summary: dict[str, Any]) -> str:
     return "MATH-500"
 
 
+def _default_tolerance(targets: dict[str, Any], task_key: str) -> float:
+    tol = targets.get("tolerance") or {}
+    if task_key == "GPQA-Diamond":
+        return float(tol.get("gpqa_absolute_pp", 8.0))
+    return float(tol.get("pass_at_1_absolute_pp_default", 5.0))
+
+
+def _pass_band(
+    pass_cfg: dict[str, Any],
+    *,
+    default_tol: float,
+) -> tuple[float | None, float | None, float]:
+    tol = float(pass_cfg.get("tolerance_pp", default_tol))
+    lo = pass_cfg.get("sanity_min")
+    hi = pass_cfg.get("sanity_max")
+    if lo is not None and hi is not None:
+        return float(lo), float(hi), tol
+    ref = pass_cfg.get("reference")
+    if ref is None:
+        return None, None, tol
+    ref_f = float(ref)
+    return ref_f - tol, ref_f + tol, tol
+
+
 def _targets_provenance(targets_path: Path, targets: dict[str, Any]) -> dict[str, Any]:
     tol = targets.get("tolerance") or {}
     return {
         "yaml_path": str(targets_path.resolve()),
         "yaml_sha256": _sha256_file(targets_path),
         "repo_git_commit": _git_head_commit(ROOT),
-        "tolerance_absolute_pp": tol.get("pass_at_1_absolute_pp"),
+        "tolerance_default_pp": tol.get("pass_at_1_absolute_pp_default"),
+        "tolerance_gpqa_pp": tol.get("gpqa_absolute_pp"),
         "tolerance_note": tol.get("note"),
     }
 
@@ -90,12 +115,14 @@ def compare_summary(
         "task": task_key,
         "gate": None,
         "checks": [],
+        "hard_passed": True,
         "passed": True,
     }
 
     if not model_key:
         report["checks"].append({"status": "SKIP", "message": "Could not infer model from summary"})
         report["passed"] = None
+        report["hard_passed"] = None
         return report
 
     model_targets = (targets.get("models") or {}).get(model_key, {})
@@ -103,65 +130,96 @@ def compare_summary(
     if not task_targets:
         report["checks"].append({"status": "SKIP", "message": f"No targets for {model_key} / {task_key}"})
         report["passed"] = None
+        report["hard_passed"] = None
         return report
 
-    pass_pct = float(summary.get("pass_at_1", 0.0)) * 100.0
+    if task_targets.get("status") == "unused":
+        report["checks"].append({
+            "status": "SKIP",
+            "message": task_targets.get("note") or "Row marked unused in yaml",
+        })
+        report["passed"] = None
+        report["hard_passed"] = None
+        return report
+
+    gate_type = str(task_targets.get("gate", "sanity"))
+    default_tol = _default_tolerance(targets, task_key)
     pass_cfg = task_targets.get("pass_at_1_pct") or {}
     ref = pass_cfg.get("reference")
-    lo = pass_cfg.get("sanity_min")
-    hi = pass_cfg.get("sanity_max")
+    lo, hi, tol_pp = _pass_band(pass_cfg, default_tol=default_tol)
     source = pass_cfg.get("source")
 
     report["gate"] = {
         "model_key": model_key,
         "task": task_key,
+        "gate_type": gate_type,
+        "prompt_profile": task_targets.get("prompt_profile"),
         "quant_config": task_targets.get("quant_config"),
         "reference_pct": ref,
-        "reference_qrm_table1_approx": pass_cfg.get("reference_qrm_table1_approx"),
+        "reference_std": pass_cfg.get("reference_std"),
+        "reference_deepseek_report": pass_cfg.get("reference_deepseek_report"),
+        "tolerance_pp": tol_pp,
         "sanity_band_pct": [lo, hi] if lo is not None and hi is not None else None,
         "source": source,
+        "source_secondary": pass_cfg.get("source_secondary"),
         "yaml_path": str(targets_path.resolve()),
         "yaml_sha256": report["targets_provenance"]["yaml_sha256"],
     }
 
+    pass_pct = float(summary.get("pass_at_1", 0.0)) * 100.0
     if lo is not None and hi is not None:
         in_band = lo <= pass_pct <= hi
+        if gate_type == "hard":
+            status = "PASS" if in_band else "FAIL"
+            if not in_band:
+                report["hard_passed"] = False
+                report["passed"] = False
+        else:
+            status = "PASS" if in_band else "SANITY_WARN"
         report["checks"].append({
             "metric": "pass_at_1_pct",
             "observed": round(pass_pct, 2),
             "reference": ref,
-            "reference_qrm_table1_approx": pass_cfg.get("reference_qrm_table1_approx"),
+            "reference_std": pass_cfg.get("reference_std"),
+            "reference_deepseek_report": pass_cfg.get("reference_deepseek_report"),
             "source": source,
+            "source_secondary": pass_cfg.get("source_secondary"),
+            "tolerance_pp": tol_pp,
+            "gate_type": gate_type,
             "sanity_band": [lo, hi],
-            "status": "PASS" if in_band else "FAIL",
+            "status": status,
         })
-        if not in_band:
-            report["passed"] = False
 
     trunc_max = task_targets.get("truncation_rate_max")
     if trunc_max is not None and "truncation_rate" in summary:
         trunc = float(summary["truncation_rate"])
         ok = trunc <= trunc_max
-        report["checks"].append({
+        check = {
             "metric": "truncation_rate",
             "observed": round(trunc, 4),
             "max": trunc_max,
-            "status": "PASS" if ok else "FAIL",
-        })
-        if not ok:
+            "gate_type": gate_type,
+            "status": "PASS" if ok else ("FAIL" if gate_type == "hard" else "SANITY_WARN"),
+        }
+        report["checks"].append(check)
+        if not ok and gate_type == "hard":
+            report["hard_passed"] = False
             report["passed"] = False
 
     parse_max = task_targets.get("parse_failure_rate_max")
     if parse_max is not None and "parse_failure_rate" in summary:
         pf = float(summary["parse_failure_rate"])
         ok = pf <= parse_max
-        report["checks"].append({
+        check = {
             "metric": "parse_failure_rate",
             "observed": round(pf, 4),
             "max": parse_max,
-            "status": "PASS" if ok else "FAIL",
-        })
-        if not ok:
+            "gate_type": gate_type,
+            "status": "PASS" if ok else ("FAIL" if gate_type == "hard" else "SANITY_WARN"),
+        }
+        report["checks"].append(check)
+        if not ok and gate_type == "hard":
+            report["hard_passed"] = False
             report["passed"] = False
 
     steps_cfg = task_targets.get("reasoning_steps_mean") or {}
@@ -185,14 +243,17 @@ def compare_summary(
         hi_t = tokens_cfg.get("sanity_max")
         if lo_t is not None:
             ok = tokens_mean >= lo_t if hi_t is None else lo_t <= tokens_mean <= hi_t
-            report["checks"].append({
+            check = {
                 "metric": "completion_tokens_mean",
                 "observed": round(tokens_mean, 1),
                 "sanity_min": lo_t,
                 "sanity_max": hi_t,
-                "status": "PASS" if ok else "FAIL",
-            })
-            if not ok:
+                "gate_type": gate_type,
+                "status": "PASS" if ok else ("FAIL" if gate_type == "hard" else "SANITY_WARN"),
+            }
+            report["checks"].append(check)
+            if not ok and gate_type == "hard":
+                report["hard_passed"] = False
                 report["passed"] = False
 
     return report
@@ -202,18 +263,27 @@ def _print_provenance_banner(report: dict[str, Any]) -> None:
     prov = report.get("targets_provenance") or {}
     gate = report.get("gate") or {}
     print("=== QRM baseline gate provenance ===", file=sys.stderr)
-    print(f"  yaml:       {prov.get('yaml_path')}", file=sys.stderr)
+    print(f"  yaml:        {prov.get('yaml_path')}", file=sys.stderr)
     print(f"  yaml sha256: {prov.get('yaml_sha256')}", file=sys.stderr)
-    print(f"  git commit: {prov.get('repo_git_commit')}", file=sys.stderr)
-    print(f"  tolerance:  ±{prov.get('tolerance_absolute_pp')} absolute pp", file=sys.stderr)
+    print(f"  git commit:  {prov.get('repo_git_commit')}", file=sys.stderr)
+    print(
+        f"  tolerance:   default ±{prov.get('tolerance_default_pp')} pp; "
+        f"GPQA ±{prov.get('tolerance_gpqa_pp')} pp",
+        file=sys.stderr,
+    )
     if gate:
         band = gate.get("sanity_band_pct")
         print(
-            f"  gate:       {gate.get('model_key')} / {gate.get('task')} "
-            f"ref={gate.get('reference_pct')}% band={band}",
+            f"  gate:        {gate.get('gate_type')} — {gate.get('model_key')} / {gate.get('task')} "
+            f"ref={gate.get('reference_pct')}% ±{gate.get('tolerance_pp')}pp band={band}",
             file=sys.stderr,
         )
-        print(f"  source:     {gate.get('source')}", file=sys.stderr)
+        print(f"  source:      {gate.get('source')}", file=sys.stderr)
+        if gate.get("source_secondary"):
+            print(f"  cross-check: {gate.get('source_secondary')}", file=sys.stderr)
+        if gate.get("prompt_profile"):
+            print(f"  profile:     {gate.get('prompt_profile')}", file=sys.stderr)
+    print(f"  hard_passed: {report.get('hard_passed')}", file=sys.stderr)
     print("====================================", file=sys.stderr)
 
 
@@ -242,7 +312,7 @@ def main() -> None:
         out.write_text(json.dumps(report, indent=2), encoding="utf-8")
         print(f"Wrote {out}")
 
-    if report.get("passed") is False:
+    if report.get("hard_passed") is False:
         sys.exit(1)
 
 

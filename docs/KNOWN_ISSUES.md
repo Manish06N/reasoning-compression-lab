@@ -93,7 +93,7 @@ Deterministic per `(seed, row_index)` in this harness vs QRM’s fixed pipeline 
 - HPC must `git fetch && git reset --hard origin/main` at **score time** (after inference completes).
 - Always check comparator **stderr provenance banner** (yaml sha256 + git commit) before trusting PASS/FAIL.
 
-Archives scored with pre-fix yaml are **invalid for gate comparison**.
+Archives scored with pre-fix yaml are **invalid for gate comparison**. After amd-003, re-check provenance banner for Table 1 vs Table 4 sources and `gate_type`.
 
 ---
 

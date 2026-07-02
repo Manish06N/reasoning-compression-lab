@@ -1,6 +1,20 @@
 # Changelog
 
-## 2026-07-01 — Fix QRM baseline bands (MATH-500 vs AIME/GPQA cross-task error)
+## 2026-07-01 — QRM source attribution + GPQA tolerance (amd-003)
+
+**Problem:** Post–amd-002 yaml still mislabeled sources (Llama rows cited "QRM Table 1"; Qwen GPQA used DeepSeek 49.1 labeled as QRM). GPQA ±5pp too tight for n=198 (~16% false-fail rate). GPQA cells use sober profile but were treated as hard gates.
+
+**Fix:**
+- **Qwen-7B:** QRM Table 1 refs — MATH-500 94.0±0.8, GSM8K 91.0±0.5, GPQA 51.0±1.0 (DeepSeek cross-checks noted)
+- **Llama-8B:** QRM Appendix B **Table 4** — MATH-500 91.0±1.1, GPQA 49.5±2.3; GSM8K 88.7±0.4 marked `status: unused`
+- **Per-row `tolerance_pp`:** default 5.0; GPQA 8.0
+- **`gate: hard`** — reproduction MATH-500/GSM8K only; **`gate: sanity`** — GPQA (never exit 1 on pass@1 alone)
+- **`compare_qrm_baseline.py`:** computes bands from ref±tolerance; exits on `hard_passed` only
+- **Score-time docs:** `conda activate qreason` + explicit `ROOT=$(ls -dt ...)` archive discovery
+
+**Tests:** `tests/test_compare_qrm_baseline.py` expanded (5 tests).
+
+---
 
 **Commit:** `286f5e4` · **Protocol amendment:** `papers/j1/amendments.yaml` amd-002
 

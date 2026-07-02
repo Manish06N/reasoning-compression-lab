@@ -18,6 +18,17 @@ amendments:
       with old yaml are invalid for gate comparison.
     made_before_outcome_analysis: true
     approved_by: team
+  - id: amd-003
+    date: 2026-07-01
+    reason: >
+      QRM source attribution corrected after reading appendix tables: Table 1 is Qwen-only;
+      Llama-8B baselines are Appendix B Table 4. GPQA tolerance widened to ±8pp (n=198).
+      GPQA rows tagged gate=sanity (sober profile); only reproduction MATH-500/GSM8K are hard gates.
+    change: >
+      Update qrm_literature_targets.yaml refs/sources; per-row tolerance_pp and gate type;
+      compare_qrm_baseline exits 1 on hard_passed only.
+    made_before_outcome_analysis: true
+    approved_by: team
 # Example entry (do not delete — copy format when needed):
 #  - id: amd-001
 #    date: 2026-07-18
