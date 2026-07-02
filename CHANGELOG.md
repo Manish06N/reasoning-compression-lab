@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-07-01 — Fix QRM baseline bands (MATH-500 vs AIME/GPQA cross-task error)
+
+**Problem:** `qrm_literature_targets.yaml` used ~45–65% bands for MATH-500 (AIME-scale). A broken pipeline at ~60% would false-pass; a healthy ~93% run would false-fail.
+
+**Fix:**
+- Full yaml audit: MATH-500 (~88–98%), GSM8K (~86–96%), GPQA-D (~44–54%), 1.5B anchors added
+- `compare_qrm_baseline.py` prints yaml path, sha256, git commit, ref, band, source
+- `tests/test_compare_qrm_baseline.py`
+- Protocol note in `papers/j1/amendments.yaml` (amd-002)
+
+**Deploy:** push now; HPC `git fetch && git reset --hard origin/main` at **score time only** (after 86016 finishes).
+
+---
+
 ## 2026-07-01 — J1 validation hardening (fail-closed calibration + runbook)
 
 **Trigger:** External architecture review — stop expanding; validate smallest J1 pipeline.

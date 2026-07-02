@@ -1,11 +1,23 @@
 # Literature / baseline targets for reproduction sanity checks.
-# Sources: Quantized-Reasoning-Models (COLM 2025), DeepSeek-R1 report, sober-reasoning leaderboard.
-# Compare with: scripts/compare_qrm_baseline.py --summary results/<cell>_summary.json
+# Primary anchor: QRM (Quantized Reasoning Models, COLM 2025) Table 1.
+# Secondary cross-check: DeepSeek-R1 technical report (single-number refs).
+# sober-reasoning leaderboard: different protocol — reference only, not pass/fail.
 #
-# Notes:
-# - QRM uses temperature=0.6, top_p=0.95, max_tokens=32768, seeds 42-44 (avg).
-# - Our repro_qrm.yaml uses seed=0 + repetition_penalty=1.05 (vLLM 0.8.x anti-loop; not in QRM code).
-# - sober-reasoning math500 uses temp=0.8 — different protocol; listed separately.
+# Compare: scripts/compare_qrm_baseline.py --summary results/<cell>_summary.json
+#
+# Tolerance policy (J1 reproduction gate):
+#   pass@1 passes when observed is within ±5 ABSOLUTE percentage points of reference
+#   (e.g. reference 92.8 → acceptable 87.8–97.8). NOT relative ±5%.
+#
+# Benchmark scale cheat sheet (prevents cross-task copy errors):
+#   MATH-500 (R1-distill BF16):  ~85–95%  — high
+#   GSM8K (R1-distill BF16):     ~85–92%  — high
+#   GPQA-Diamond (BF16):         ~45–55%  — mid (NOT MATH-500 scale)
+#   AIME-120:                    ~40–65%  — hard; do NOT use for MATH-500 gates
+#
+# Protocol deltas vs QRM Table 1:
+#   - QRM: seeds 42–44 averaged; b01 anchors use seed 0 (expect ~1–2 pp noise).
+#   - repro_qrm.yaml adds repetition_penalty=1.05 (vLLM anti-loop; not in QRM code).
 
 protocols:
   qrm_repro:
@@ -18,48 +30,107 @@ protocols:
     seed: 0
     repetition_penalty: 1.05
 
+tolerance:
+  pass_at_1_absolute_pp: 5.0
+  note: "±5 absolute percentage points from reference (not relative %)"
+
 models:
   DeepSeek-R1-Distill-Qwen-7B:
     MATH-500:
       quant_config: bf16
       pass_at_1_pct:
-        reference: 55.5
-        source: "DeepSeek-R1 tech report; cross-check QRM Table 1"
-        sanity_min: 45.0
-        sanity_max: 65.0
-      truncation_rate_max: 0.30
-      parse_failure_rate_max: 0.40
-      reasoning_steps_mean:
-        sanity_min: 3.0
-        sanity_max: 80.0
+        reference: 92.8
+        reference_qrm_table1_approx: 94.0
+        source: "DeepSeek-R1 report Table; QRM Table 1 multi-seed avg ~94 (both inside band)"
+        sanity_min: 87.8
+        sanity_max: 97.8
+      completion_tokens_mean:
+        sanity_min: 1000
+        note: "Low mean suggests truncation/template bug even if pass@1 looks OK"
+      truncation_rate_max: 0.15
+      parse_failure_rate_max: 0.10
     GSM8K:
       quant_config: bf16
       pass_at_1_pct:
-        reference: 88.0
-        sanity_min: 75.0
-        sanity_max: 95.0
+        reference: 91.0
+        source: "QRM Table 1 GSM8K row (BF16 / full-precision anchor)"
+        sanity_min: 86.0
+        sanity_max: 96.0
+      truncation_rate_max: 0.10
+      parse_failure_rate_max: 0.10
+    GPQA-Diamond:
+      quant_config: bf16
+      pass_at_1_pct:
+        reference: 49.1
+        source: "QRM Table 1 GPQA-Diamond row"
+        sanity_min: 44.1
+        sanity_max: 54.1
+      truncation_rate_max: 0.20
+      parse_failure_rate_max: 0.15
 
   DeepSeek-R1-Distill-Llama-8B:
     MATH-500:
       quant_config: bf16
       pass_at_1_pct:
-        reference: 50.0
-        source: "DeepSeek-R1 report / QRM; verify against paper table"
-        sanity_min: 40.0
-        sanity_max: 60.0
-      truncation_rate_max: 0.30
-      parse_failure_rate_max: 0.40
+        reference: 89.1
+        source: "DeepSeek-R1 report; QRM Table 1 MATH-500 row (cross-check ~89–90)"
+        sanity_min: 84.1
+        sanity_max: 94.1
+      completion_tokens_mean:
+        sanity_min: 1000
+      truncation_rate_max: 0.15
+      parse_failure_rate_max: 0.10
+    GSM8K:
+      quant_config: bf16
+      pass_at_1_pct:
+        reference: 88.0
+        source: "QRM Table 1 GSM8K row — verify exact cell before manuscript"
+        sanity_min: 83.0
+        sanity_max: 93.0
+      truncation_rate_max: 0.10
+      parse_failure_rate_max: 0.10
+    GPQA-Diamond:
+      quant_config: bf16
+      pass_at_1_pct:
+        reference: 49.0
+        source: "QRM Table 1 GPQA-Diamond row"
+        sanity_min: 44.0
+        sanity_max: 54.0
+      truncation_rate_max: 0.20
+      parse_failure_rate_max: 0.15
+
+  DeepSeek-R1-Distill-Qwen-1.5B:
+    MATH-500:
+      quant_config: bf16
+      pass_at_1_pct:
+        reference: 84.7
+        source: "QRM Table 1 MATH-500 row (1.5B scale anchor)"
+        sanity_min: 79.7
+        sanity_max: 89.7
+      truncation_rate_max: 0.15
+      parse_failure_rate_max: 0.10
+    GSM8K:
+      quant_config: bf16
+      pass_at_1_pct:
+        reference: 84.5
+        source: "QRM Table 1 GSM8K row (1.5B)"
+        sanity_min: 79.5
+        sanity_max: 89.5
+      truncation_rate_max: 0.10
+      parse_failure_rate_max: 0.10
 
   DeepSeek-R1-Distill-Qwen-7B-GPTQ-W4G128:
     MATH-500:
       quant_config: gptq4
       pass_at_1_pct:
         reference: null
-        source: "QRM paper GPTQ W4G128 row — fill after first b04 run"
-        sanity_min: 40.0
-        sanity_max: 60.0
+        source: "QRM Table 1 GPTQ W4G128 MATH-500 — fill exact ref after Table 1 lookup"
+        sanity_min: 82.0
+        sanity_max: 97.0
+      truncation_rate_max: 0.15
+      parse_failure_rate_max: 0.10
 
-# sober-reasoning leaderboard (temp=0.8, different protocol — not a pass/fail gate)
+# sober-reasoning leaderboard (temp=0.8 — NOT a pass/fail gate)
 sober_reasoning_reference:
   DeepSeek-R1-Distill-Qwen-7B:
     math500_pct: 94.1

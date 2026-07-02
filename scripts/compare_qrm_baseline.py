@@ -4,7 +4,9 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
+import subprocess
 import sys
 from pathlib import Path
 from typing import Any
@@ -19,14 +21,35 @@ def _load_targets(path: Path) -> dict[str, Any]:
     return load_yaml(path) or {}
 
 
+def _sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    digest.update(path.read_bytes())
+    return digest.hexdigest()
+
+
+def _git_head_commit(root: Path) -> str | None:
+    try:
+        out = subprocess.check_output(
+            ["git", "rev-parse", "HEAD"],
+            cwd=root,
+            stderr=subprocess.DEVNULL,
+            text=True,
+        )
+        return out.strip() or None
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        return None
+
+
 def _resolve_model_key(summary: dict[str, Any]) -> str | None:
     cell_id = str(summary.get("cell_id", "")).lower()
     model_path = str(summary.get("model_path", "")).lower()
     text = f"{cell_id} {model_path}"
     if "llama" in text and "8b" in text:
         return "DeepSeek-R1-Distill-Llama-8B"
-    if "gptq" in text and "qwen" in text:
+    if "gptq" in text and "qwen" in text and "7b" in text:
         return "DeepSeek-R1-Distill-Qwen-7B-GPTQ-W4G128"
+    if "qwen" in text and "1.5b" in text:
+        return "DeepSeek-R1-Distill-Qwen-1.5B"
     if "qwen" in text and "7b" in text:
         return "DeepSeek-R1-Distill-Qwen-7B"
     return None
@@ -41,13 +64,31 @@ def _task_key(summary: dict[str, Any]) -> str:
     return "MATH-500"
 
 
-def compare_summary(summary: dict[str, Any], targets: dict[str, Any]) -> dict[str, Any]:
+def _targets_provenance(targets_path: Path, targets: dict[str, Any]) -> dict[str, Any]:
+    tol = targets.get("tolerance") or {}
+    return {
+        "yaml_path": str(targets_path.resolve()),
+        "yaml_sha256": _sha256_file(targets_path),
+        "repo_git_commit": _git_head_commit(ROOT),
+        "tolerance_absolute_pp": tol.get("pass_at_1_absolute_pp"),
+        "tolerance_note": tol.get("note"),
+    }
+
+
+def compare_summary(
+    summary: dict[str, Any],
+    targets: dict[str, Any],
+    *,
+    targets_path: Path,
+) -> dict[str, Any]:
     model_key = _resolve_model_key(summary)
     task_key = _task_key(summary)
     report: dict[str, Any] = {
+        "targets_provenance": _targets_provenance(targets_path, targets),
         "cell_id": summary.get("cell_id"),
         "model_key": model_key,
         "task": task_key,
+        "gate": None,
         "checks": [],
         "passed": True,
     }
@@ -69,6 +110,19 @@ def compare_summary(summary: dict[str, Any], targets: dict[str, Any]) -> dict[st
     ref = pass_cfg.get("reference")
     lo = pass_cfg.get("sanity_min")
     hi = pass_cfg.get("sanity_max")
+    source = pass_cfg.get("source")
+
+    report["gate"] = {
+        "model_key": model_key,
+        "task": task_key,
+        "quant_config": task_targets.get("quant_config"),
+        "reference_pct": ref,
+        "reference_qrm_table1_approx": pass_cfg.get("reference_qrm_table1_approx"),
+        "sanity_band_pct": [lo, hi] if lo is not None and hi is not None else None,
+        "source": source,
+        "yaml_path": str(targets_path.resolve()),
+        "yaml_sha256": report["targets_provenance"]["yaml_sha256"],
+    }
 
     if lo is not None and hi is not None:
         in_band = lo <= pass_pct <= hi
@@ -76,6 +130,8 @@ def compare_summary(summary: dict[str, Any], targets: dict[str, Any]) -> dict[st
             "metric": "pass_at_1_pct",
             "observed": round(pass_pct, 2),
             "reference": ref,
+            "reference_qrm_table1_approx": pass_cfg.get("reference_qrm_table1_approx"),
+            "source": source,
             "sanity_band": [lo, hi],
             "status": "PASS" if in_band else "FAIL",
         })
@@ -122,7 +178,43 @@ def compare_summary(summary: dict[str, Any], targets: dict[str, Any]) -> dict[st
                 "status": "PASS" if ok else "WARN",
             })
 
+    tokens_cfg = task_targets.get("completion_tokens_mean") or {}
+    if tokens_cfg and "completion_tokens_mean" in summary:
+        tokens_mean = float(summary["completion_tokens_mean"])
+        lo_t = tokens_cfg.get("sanity_min")
+        hi_t = tokens_cfg.get("sanity_max")
+        if lo_t is not None:
+            ok = tokens_mean >= lo_t if hi_t is None else lo_t <= tokens_mean <= hi_t
+            report["checks"].append({
+                "metric": "completion_tokens_mean",
+                "observed": round(tokens_mean, 1),
+                "sanity_min": lo_t,
+                "sanity_max": hi_t,
+                "status": "PASS" if ok else "FAIL",
+            })
+            if not ok:
+                report["passed"] = False
+
     return report
+
+
+def _print_provenance_banner(report: dict[str, Any]) -> None:
+    prov = report.get("targets_provenance") or {}
+    gate = report.get("gate") or {}
+    print("=== QRM baseline gate provenance ===", file=sys.stderr)
+    print(f"  yaml:       {prov.get('yaml_path')}", file=sys.stderr)
+    print(f"  yaml sha256: {prov.get('yaml_sha256')}", file=sys.stderr)
+    print(f"  git commit: {prov.get('repo_git_commit')}", file=sys.stderr)
+    print(f"  tolerance:  ±{prov.get('tolerance_absolute_pp')} absolute pp", file=sys.stderr)
+    if gate:
+        band = gate.get("sanity_band_pct")
+        print(
+            f"  gate:       {gate.get('model_key')} / {gate.get('task')} "
+            f"ref={gate.get('reference_pct')}% band={band}",
+            file=sys.stderr,
+        )
+        print(f"  source:     {gate.get('source')}", file=sys.stderr)
+    print("====================================", file=sys.stderr)
 
 
 def main() -> None:
@@ -140,7 +232,8 @@ def main() -> None:
     summary = json.loads(summary_path.read_text(encoding="utf-8"))
     targets = _load_targets(targets_path)
 
-    report = compare_summary(summary, targets)
+    report = compare_summary(summary, targets, targets_path=targets_path)
+    _print_provenance_banner(report)
     print(json.dumps(report, indent=2))
 
     if args.output:

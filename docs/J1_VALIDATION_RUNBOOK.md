@@ -93,7 +93,7 @@ python scripts/compare_qrm_baseline.py \
   --summary "$ROOT/results/level_a_bf16_seed0_summary.json"
 ```
 
-**Pass criterion:** pass@1 within ±0.05 of QRM band (see `configs/baselines/qrm_literature_targets.yaml`).
+**Pass criterion:** pass@1 within **±5 absolute percentage points** of reference in `configs/baselines/qrm_literature_targets.yaml` (MATH-500 BF16: Qwen-7B ~88–98%, Llama-8B ~84–94% — **not** 45–65%, which is AIME-scale).
 
 ---
 

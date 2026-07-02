@@ -95,7 +95,7 @@ Immediate work still left:
 - Once running, watch `logs/slurm/b01_parallel_bf16_86010.out` and per-cell archive logs.
 - Confirm raw rows include `decoding_repetition_penalty` and counts grow toward 500 each.
 - When b01 finishes, validate Qwen-7B BF16 with `scripts/compare_qrm_baseline.py`.
-- Do **not** submit b02–b06 until Qwen b01 pass@1 is in the expected ~45–65% range and truncation is low.
+- Do **not** submit b02–b06 until Qwen b01 pass@1 is in the expected MATH-500 band (~88–98%, not 7%) and truncation is low.
 - If job `86010` fails mid-run, resume the same archive with `unset QREASON_FRESH_RUN` before resubmitting b01.
 - After b01 passes, keep the same archive, unset fresh mode, and submit `bash scripts/hpc/submit_hpc_blocks.sh b02`; continue b03–b06 sequentially by gate.
 - **maj@5 pilot wired** — `run_inference_multisample.py` + `score_multisample.py` (after b01 sane).
@@ -204,7 +204,7 @@ b01 runs two parallel MATH-500 cells on 2×A100:
 3. Confirm raw row counts grow under `$QREASON_OUTPUT_ROOT/raw/` and rows include `decoding_repetition_penalty`.
 4. After Qwen b01 finishes, run:
    `python scripts/compare_qrm_baseline.py --summary $QREASON_OUTPUT_ROOT/results/level_a_qwen7b_bf16_math500_seed0_summary.json`.
-5. Gate criteria: Qwen pass@1 roughly 45–65% and truncation low. If still near 7% or high truncation, stop and inspect decoding/raw rows before any more submissions.
+5. Gate criteria: Qwen pass@1 roughly **88–98%** and Llama **84–94%** on MATH-500 (see `qrm_literature_targets.yaml`); truncation low. If still near 7% or high truncation, stop and inspect decoding/raw rows before any more submissions.
 6. If b01 passes, unset fresh mode and submit b02 on the same archive:
    `unset QREASON_FRESH_RUN; bash scripts/hpc/submit_hpc_blocks.sh b02`.
 7. Continue b03–b06 only after b02 behaves sensibly. Defer b07 GPQA and b08–b09 Qwen-1.5B until the main MATH-500 quantization signal is clear.
@@ -253,7 +253,7 @@ HPC publication runs write a durable archive manifest at `outputs-hpc-2a100-main
 
 Current judgement (updated 2026-07-01): b01-b09 seed0 remains the target core grid. The decode-loop fix is now deployed on HPC and b01 rerun job `86010` is queued on a clean archive. The previous June-29 b01/b02 numbers remain diagnostic only.
 
-Do not expand the queue until the post-fix b01 rerun shows sensible Qwen-7B BF16 pass@1 (expected ~45–65% range for R1-Distill on MATH-500, not 7%) and low truncation.
+Do not expand the queue until the post-fix b01 rerun shows sensible Qwen-7B BF16 pass@1 on MATH-500 (expected ~88–98%, not 7%) and low truncation.
 
 Recommended expansion only if needed:
 
