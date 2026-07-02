@@ -32,7 +32,7 @@ Canonical dated record for **Paper 1: Beyond Accuracy** (`reasoning-compression-
 
 **Cancelled:** 86229 (2-GPU combined job), 86212, 86015/86016 chain.
 
-**Git on compute:** First split submit failed — `git` not on PATH after conda activate on compute nodes. Fixed operationally with `conda install -y git` in `qreason`; codified in repo (pending push).
+**Git on compute:** First split submit failed — `git` not on PATH after conda activate on compute nodes. Fixed operationally with `conda install -y git` in `qreason`; codified in repo at **`85998e1`**.
 
 **Before scoring:** `tmux kill-session -t hpc_git_autopush 2>/dev/null || true` (autopush opt-in only).
 
