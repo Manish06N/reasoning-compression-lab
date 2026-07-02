@@ -187,7 +187,7 @@ reasoning-compression-lab/
 | `quantization/` | Method registry (bits, group size, notes) | `registry.yaml` — bf16, fp8, awq4, gptq4, gptq3 |
 | `serving/` | Backend version pins for cross-stack work | `vllm.yaml`, `sglang.yaml`, `llamacpp.yaml` |
 | `machine_split/` | HPC block → cell wiring | `hpc_blocks/b01_parallel_bf16_anchors.sh`, … b09 |
-| `baselines/` | QRM literature sanity bands | `qrm_literature_targets.yaml` |
+| `baselines/` | QRM literature sanity bands by task | `qrm_literature_targets.yaml` — MATH-500 ~88–98%, GPQA ~44–54%; see amd-002 |
 
 ### 3.3 `src/` — Python packages
 
@@ -266,7 +266,7 @@ Provenance fields are populated by `src/schemas/provenance.py` at inference time
 | `j1/aggregate_seeds.py` | Multi-seed aggregation and rank-reversal detection |
 | `j1/sample_audit.py` | Draw stratified audit sample for manual extraction review |
 | `j1/export_conference_cache.py` | Export C1 conference derivative cache |
-| `compare_qrm_baseline.py` | Sanity check pass@1 vs QRM literature bands |
+| `compare_qrm_baseline.py` | Sanity check pass@1 vs QRM literature bands; prints yaml sha256 + git commit provenance |
 | `run_inference_multisample.py` | maj@5 runs for calibration pilot |
 | `compute_calibration.py` | Calibration from multisample outputs |
 | `build_pareto_frontier.py` | Cost-per-correct Pareto analysis |
@@ -357,7 +357,9 @@ Implemented in `src/evaluation/calibration/`:
 | Reliability diagram bins | `reliability.py` | For plotting |
 | AURC / AUROC | via `src/metrics/calibration.py` | Selective prediction |
 
-**Calibration confidence (fail-closed):** `score_run.py` does **not** treat parse success as publication confidence. Use `--skip-calibration` for repro scoring; `--require-calibration` before analysis; maj@5 or logprobs for Brier/AURC claims. See [KNOWN_ISSUES.md](KNOWN_ISSUES.md) §4.
+**Calibration confidence (fail-closed):** `score_run.py` does **not** treat parse success as publication confidence. Use `--skip-calibration` for repro scoring; `--require-calibration` before analysis; maj@5 or logprobs for Brier/AURC claims. **Logprobs not yet stored in raw JSONL** — hard gate before b02. See [KNOWN_ISSUES.md](KNOWN_ISSUES.md) §4, §8.
+
+**QRM baseline bands (fixed `286f5e4`):** MATH-500 gates are ~88–98%, not 45–65% (AIME-scale error). Comparator prints provenance banner at score time.
 
 ### 4.3 Selective risk
 
@@ -438,13 +440,13 @@ flowchart TD
 
 | Gate | Pass condition | Codebase support |
 |------|----------------|------------------|
-| **Reproduction** | BF16/GPTQ-4 pass@1 within ±5% of QRM | `compare_qrm_baseline.py`, Level A cells seeds 42–44, `prompt_profile: reproduction` |
+| **Reproduction** | BF16 pass@1 within ±5 **absolute pp** of QRM ref per task | `compare_qrm_baseline.py`, `qrm_literature_targets.yaml` |
 | **Extraction** | ≤ acceptable manual audit error on 50 samples | `scripts/j1/sample_audit.py`, `papers/j1/audit/` |
 | **Pilot** | 3–5 seed CIs + at least one reliability signal | `j1/aggregate_seeds.py`, Level B cells |
 | **Novelty** | No competing paper claims same joint study | Manual — template in roadmap Appendix C |
 | **Scale** | 7B/8B story stable before 14B/32B | Config policy in `papers/j1/protocol.yaml` |
 
-**Current blocker (2026-07-01):** Publication numbers blocked until fresh HPC b01 rerun. Archive `outputs-hpc-2a100-main-2026-06-29` is diagnostic only (decoding bug — 7% pass@1). See [KNOWN_ISSUES.md](KNOWN_ISSUES.md).
+**Current blocker (2026-07-01):** Scientific validation pending b01 rerun (jobs 86015/86016). June-29 archive diagnostic only (~7% pass@1). Score with `286f5e4+` yaml. See [KNOWN_ISSUES.md](KNOWN_ISSUES.md).
 
 ---
 
@@ -455,7 +457,7 @@ flowchart TD
 | Component | Status |
 |-----------|--------|
 | Protocol YAML | ✅ `papers/j1/protocol.yaml` + `amendments.yaml` |
-| Minimum publishable grid | ✅ 15 cells — `papers/j1/publication_matrix.yaml` |
+| Minimum publishable grid | ✅ 15 **core validation** cells (seed 0) — `papers/j1/publication_matrix.yaml` |
 | Full Level C (300 cells) | ❌ Aspirational — not generated yet |
 | Inference + scoring pipeline | ✅ Production on vLLM |
 | Fail-closed calibration | ✅ `src/evaluation/calibration/confidence.py` |
@@ -463,8 +465,9 @@ flowchart TD
 | HPC block grid b01–b09 | ✅ Wired (seed 0) |
 | Reproduction seeds 42–44 | ✅ Cell configs exist |
 | Manual audit tooling | ✅ |
-| **Fresh HPC publication runs** | ⏳ **Blocker** — see [J1_VALIDATION_RUNBOOK.md](J1_VALIDATION_RUNBOOK.md) |
-| Valid calibration numbers | ⏳ Requires maj@5 or logprobs after repro |
+| **Fresh HPC publication runs** | ⏳ **In flight** — Slurm 86015→86016; see [J1_VALIDATION_RUNBOOK.md](J1_VALIDATION_RUNBOOK.md) |
+| QRM baseline yaml | ✅ Fixed task-specific bands (`286f5e4`, amd-002) |
+| Valid calibration numbers | ⏳ Requires logprobs patch or maj@5 after repro |
 | LiveCodeBench integration | ❌ Not yet wired |
 
 **Primary endpoints (pre-registered):** pass@1, Brier, AURC, cost-of-pass ratio.

@@ -2,34 +2,134 @@
 
 ## 2026-07-01 — Fix QRM baseline bands (MATH-500 vs AIME/GPQA cross-task error)
 
-**Problem:** `qrm_literature_targets.yaml` used ~45–65% bands for MATH-500 (AIME-scale). A broken pipeline at ~60% would false-pass; a healthy ~93% run would false-fail.
+**Commit:** `286f5e4` · **Protocol amendment:** `papers/j1/amendments.yaml` amd-002
 
-**Fix:**
-- Full yaml audit: MATH-500 (~88–98%), GSM8K (~86–96%), GPQA-D (~44–54%), 1.5B anchors added
-- `compare_qrm_baseline.py` prints yaml path, sha256, git commit, ref, band, source
-- `tests/test_compare_qrm_baseline.py`
-- Protocol note in `papers/j1/amendments.yaml` (amd-002)
+### Problem
 
-**Deploy:** push now; HPC `git fetch && git reset --hard origin/main` at **score time only** (after 86016 finishes).
+`configs/baselines/qrm_literature_targets.yaml` had **wrong pass@1 sanity bands for MATH-500**:
+
+| Model | Old reference | Old band | Actual MATH-500 scale |
+|-------|---------------|----------|------------------------|
+| Qwen-7B | 55.5% | 45–65% | ~88–98% (DeepSeek 92.8; QRM Table 1 ~94) |
+| Llama-8B | 50.0% | 40–60% | ~84–94% (DeepSeek 89.1) |
+
+Those numbers match **AIME-120 / GPQA-Diamond** scale (~40–55%), not MATH-500. Consequences:
+
+- A **broken pipeline at ~60% pass@1 would false-pass** the gate (defeating b01 validation).
+- A **healthy ~93% run would false-fail** the gate.
+- The error likely came from copying GPQA/AIME-flavored targets across tasks without checking benchmark scale.
+
+### Fix — full yaml audit (all tasks)
+
+Updated `configs/baselines/qrm_literature_targets.yaml`:
+
+| Task | Model | Reference | ±5 abs pp band | Source |
+|------|-------|-----------|----------------|--------|
+| MATH-500 | Qwen-7B | 92.8% | 87.8–97.8 | DeepSeek-R1 report; QRM T1 ~94 noted |
+| MATH-500 | Llama-8B | 89.1% | 84.1–94.1 | DeepSeek-R1 report; QRM T1 |
+| MATH-500 | Qwen-1.5B | 84.7% | 79.7–89.7 | QRM Table 1 |
+| GSM8K | Qwen-7B | 91.0% | 86.0–96.0 | QRM Table 1 (b06 gate) |
+| GSM8K | Llama-8B | 88.0% | 83.0–93.0 | QRM Table 1 |
+| GSM8K | Qwen-1.5B | 84.5% | 79.5–89.5 | QRM Table 1 |
+| GPQA-Diamond | Qwen-7B | 49.1% | 44.1–54.1 | QRM Table 1 (b07 gate) |
+| GPQA-Diamond | Llama-8B | 49.0% | 44.0–54.0 | QRM Table 1 |
+
+Also added:
+
+- **Benchmark scale cheat sheet** in yaml header (MATH-500 high / GPQA mid-40s / AIME ~40–65 — do not cross-copy).
+- **`tolerance.pass_at_1_absolute_pp: 5.0`** — ±5 **absolute percentage points**, not relative %.
+- **`completion_tokens_mean.sanity_min: 1000`** for MATH-500 — low mean flags truncation even if pass@1 looks OK.
+- Tighter **`truncation_rate_max`** (0.15 MATH-500, 0.10 GSM8K).
+
+### Comparator provenance (`scripts/compare_qrm_baseline.py`)
+
+Gate output is now self-documenting:
+
+- Prints stderr banner: yaml path, **sha256**, **git commit**, tolerance, ref, band, source citation.
+- JSON report includes `targets_provenance` and `gate` blocks.
+- Each `pass_at_1_pct` check carries `source` and optional `reference_qrm_table1_approx`.
+
+**Tests:** `tests/test_compare_qrm_baseline.py` (pass at 93%, fail at 7%, GPQA band sanity).
+
+### HPC deploy rule
+
+| When | Action |
+|------|--------|
+| **While 86015/86016 running** | **Do NOT** `git reset` on HPC — job uses code on disk at launch |
+| **After b01 inference completes** | `git fetch && git reset --hard origin/main` → **then score** |
+| **Scoring** | Uses yaml on disk at score time — must be `286f5e4` or later |
+
+Archives scored with pre-fix yaml are **invalid for gate comparison** (documented in amd-002).
+
+### Docs updated
+
+`progress.md`, `docs/PROGRESS.md`, `docs/J1_VALIDATION_RUNBOOK.md`, `docs/KNOWN_ISSUES.md` §8, `docs/CODEBASE_OVERVIEW.md`, `README.md`, `docs/README.md`, `docs/REPO_MAP.md`.
+
+---
+
+## 2026-07-01 — Documentation sync (baseline fix + HPC queue state)
+
+**Commit:** (this push)
+
+Updated all live status docs to reflect:
+
+- GitHub `286f5e4` baseline band fix and `8fb0fb0` validation hardening
+- HPC queue: smoke 86015 → b01 86016; sync-at-score-time rule
+- Correct MATH-500 pass bands (~88–98%), task-specific baseline table
+- Hard gates: logprobs before b02, 3-seed pilot before breadth
+- KNOWN_ISSUES §8 (wrong baseline bands)
+
+Files: `progress.md`, `docs/PROGRESS.md`, `docs/J1_VALIDATION_RUNBOOK.md`, `docs/KNOWN_ISSUES.md`, `docs/CODEBASE_OVERVIEW.md`, `README.md`, `docs/README.md`, `docs/REPO_MAP.md`.
 
 ---
 
 ## 2026-07-01 — J1 validation hardening (fail-closed calibration + runbook)
 
-**Trigger:** External architecture review — stop expanding; validate smallest J1 pipeline.
+**Commits:** `8fb0fb0` (main bundle) · **GitHub:** pushed 2026-07-01 evening
 
-**Code:**
-- `src/evaluation/calibration/confidence.py` — valid confidence sources; parse success not publication-valid
-- `scripts/score_run.py` — `--skip-calibration`, `--require-calibration`, `--allow-parse-confidence-proxy`
-- Scored rows get `confidence_value`, `confidence_source`, `confidence_valid_for_calibration`
-- `tests/test_calibration_confidence.py`
+**Trigger:** External architecture review — stop scope expansion; validate smallest J1 pipeline before burning GPU on breadth.
 
-**Docs / config:**
-- `docs/J1_VALIDATION_RUNBOOK.md` — HPC b01 rerun steps
-- `docs/HARDWARE_POLICY.md` — J1 HPC-only; RTX 5080 for J3 transfer only
-- `papers/j1/publication_matrix.yaml` + `scripts/validate_cell_matrix.py` (15 minimum cells OK)
-- `papers/j1/amendments.yaml`
-- Status wording: **engineering MVP complete; scientific validation pending**
+### Code changes
+
+| File | Change |
+|------|--------|
+| `src/evaluation/calibration/confidence.py` | **New** — resolves valid confidence sources; `answer_parse_success` is **not** publication-valid |
+| `src/evaluation/calibration/metrics.py` | Skips calibration when no valid confidence; no silent parse-proxy default |
+| `src/evaluation/selective_risk/curves.py` | Same fail-closed behavior for AURC/risk-coverage |
+| `scripts/score_run.py` | `--skip-calibration`, `--require-calibration`, `--allow-parse-confidence-proxy` (debug only) |
+| Scored rows | Enriched with `confidence_value`, `confidence_source`, `confidence_valid_for_calibration` |
+| `scripts/validate_cell_matrix.py` | **New** — validates 15 minimum core cells vs `publication_matrix.yaml` |
+| `tests/test_calibration_confidence.py` | **New** — 6 tests |
+| `tests/test_v82_architecture.py` | Updated calibration test to use explicit valid confidence |
+
+### Documentation and config (new/updated)
+
+| File | Purpose |
+|------|---------|
+| `docs/CODEBASE_OVERVIEW.md` | ~665-line canonical codebase map |
+| `docs/J1_VALIDATION_RUNBOOK.md` | Step-by-step HPC b01 validation phases 0–7 |
+| `docs/HARDWARE_POLICY.md` | J1 HPC-only; RTX 5080 for J3 transfer only |
+| `docs/MODEL_SCOPE_DECISION.md` | Frozen J1 model scope (in / out / gated) |
+| `papers/j1/publication_matrix.yaml` | 15 core validation cells (seed 0) vs 300-cell Level C aspirational |
+| `papers/j1/amendments.yaml` | Protocol amendment tracking |
+
+### Status language change
+
+**Before:** "V8.2 complete / publication ready"  
+**After:** **"J1 engineering MVP complete; scientific validation pending fresh HPC rerun"**
+
+Updated in: `README.md`, `docs/PROGRESS.md`, `docs/CODEBASE_OVERVIEW.md`.
+
+### Validation (MacBook)
+
+- `python -m pytest tests/ -q` → **40 passed** (after merge)
+- `python scripts/validate_cell_matrix.py` → **15/15 minimum cells wired**
+
+### Known gaps documented (not fixed in this commit)
+
+- Chosen-token **logprobs not stored** in raw JSONL — calibration requires maj@5 or code fix before b02.
+- Multi-seed blocks not wired — headline claim needs Gate 2 pilot after b01 passes.
+- LiveCodeBench unwired — descope or wire via protocol amendment.
 
 ---
 

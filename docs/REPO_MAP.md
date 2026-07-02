@@ -30,7 +30,7 @@ reasoning-compression-lab/
 │   ├── quantization/       # Quant method registry (V8.2)
 │   ├── serving/            # vLLM / SGLang / llama.cpp pins (V8.2)
 │   ├── machine_split/      # HPC block → cell wiring (b01–b09)
-│   └── baselines/          # QRM literature sanity bands
+│   └── baselines/          # QRM literature sanity bands (task-specific; amd-002)
 ├── prompts/
 │   ├── math500.txt         # Sober (main grid)
 │   ├── qrm_math500.txt     # QRM reproduction

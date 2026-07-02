@@ -1,6 +1,6 @@
 # Known issues and limitations
 
-Last updated: 2026-07-01
+Last updated: 2026-07-01 (late evening)
 
 Operational issues that can break paper results if ignored, plus known software limitations.
 
@@ -74,6 +74,26 @@ Comparing Level A to Level B pass@1 directly confounds prompt + quant — compar
 ### 7. GPQA answer shuffle
 
 Deterministic per `(seed, row_index)` in this harness vs QRM’s fixed pipeline RNG. Document when comparing to QRM Table 1.
+
+### 8. Wrong QRM baseline bands (fixed 2026-07-01, commit `286f5e4`)
+
+**Symptom:** `compare_qrm_baseline.py` passes at ~60% pass@1 or fails at ~93% on MATH-500.  
+**Cause:** Pre-fix `qrm_literature_targets.yaml` used **45–65% bands for MATH-500** — those are **AIME / GPQA-Diamond** scale, not MATH-500 (~88–98% for R1-distills).
+
+| Task | Correct scale (BF16) | Wrong scale if mis-copied |
+|------|----------------------|---------------------------|
+| MATH-500 | ~85–95% | ~40–65% (AIME) |
+| GSM8K | ~85–92% | — |
+| GPQA-Diamond | ~44–54% | — |
+
+**Fix:** Full yaml audit in `286f5e4`; protocol note amd-002 in `papers/j1/amendments.yaml`.
+
+**Deploy rule:**
+- Running Slurm jobs are **not** affected by MacBook push.
+- HPC must `git fetch && git reset --hard origin/main` at **score time** (after inference completes).
+- Always check comparator **stderr provenance banner** (yaml sha256 + git commit) before trusting PASS/FAIL.
+
+Archives scored with pre-fix yaml are **invalid for gate comparison**.
 
 ---
 

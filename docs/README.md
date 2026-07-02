@@ -29,6 +29,7 @@
 | [MODEL_SCOPE_DECISION.md](MODEL_SCOPE_DECISION.md) | **Frozen** — in / out / gated model scope for J1 |
 | [MODEL_ROSTER.md](MODEL_ROSTER.md) | Canonical model paths / HF IDs |
 | [PAPER1_DESIGN.md](PAPER1_DESIGN.md) | Scope, metrics, claim |
+| [../configs/baselines/qrm_literature_targets.yaml](../configs/baselines/qrm_literature_targets.yaml) | QRM Table 1 sanity bands by task |
 | [GIT_CREDENTIALS.md](GIT_CREDENTIALS.md) | GitHub PAT / credentials |
 
 ## Reference (read when needed)

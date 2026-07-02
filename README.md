@@ -7,15 +7,21 @@ Deployment-science evaluation harness for compressed reasoning LLMs.
 
 **Roadmap:** PhD plan V8.2 (1 Jul 2026) — see [docs/plans/2026-07-01-v82-reengineering.md](docs/plans/2026-07-01-v82-reengineering.md) and [papers/j1/protocol.yaml](papers/j1/protocol.yaml).
 
-## Current status (2026-07-01)
+## Current status (2026-07-01, late evening)
 
-**J1 engineering MVP complete; scientific validation pending fresh HPC rerun.**
+**J1 engineering MVP complete; scientific validation pending b01 rerun.**
+
+**GitHub `main`:** `286f5e4`
 
 | Machine | Status | Details |
 |---------|--------|---------|
-| **5080** | **Not used for J1 publication** | J3 local transfer only — see [HARDWARE_POLICY.md](docs/HARDWARE_POLICY.md) |
-| **HPC** | **Rerun pending** | Delete old archive; fresh b01 with fixed decoding |
-| **MacBook** | **Ready to push** | Fail-closed calibration, matrix validator, validation runbook |
+| **5080** | **Not used for J1 publication** | J3 local transfer only — [HARDWARE_POLICY.md](docs/HARDWARE_POLICY.md) |
+| **HPC** | **b01 in queue** | Smoke job 86015 → b01 job 86016 (`afterok`); do not reset git while jobs run |
+| **MacBook** | **Synced** | Fail-closed calibration, baseline band fix, 43 tests pass |
+
+**Policy:** **HPC-only** for all paper numbers (7B/8B, GSM8K, GPQA, 1.5B when queued).
+
+**b01 gate (MATH-500):** Qwen-7B **87.8–97.8%**, Llama-8B **84.1–94.1%** — not 45–65% (see [qrm_literature_targets.yaml](configs/baselines/qrm_literature_targets.yaml)).
 
 **Policy:** **HPC-only** for all paper numbers (7B/8B, GSM8K, GPQA, 1.5B when queued).
 
@@ -30,22 +36,21 @@ Deployment-science evaluation harness for compressed reasoning LLMs.
 python -m pytest tests/ -q
 python scripts/verify_decoding_params.py          # must print VERIFY OK
 
-# After push — on HPC
+# After push — on HPC (before inference only, OR at score time after job finishes)
 export QR=/scratch/$USER/reasoning-compression-lab
 cd $QR && git fetch origin && git reset --hard origin/main
 python scripts/verify_decoding_params.py
 python scripts/hpc/07_preflight_publication.py
-bash scripts/hpc/03_smoke_test.sh
+# GPU smoke via Slurm — not on login node (no CUDA)
 
-# CRITICAL — fresh archive (see docs/KNOWN_ISSUES.md)
-rm -rf outputs-hpc-2a100-main-2026-06-29
-export QREASON_OUTPUT_ROOT=$QR/outputs-hpc-2a100-main-$(date +%Y-%m-%d)-rerun
-mkdir -p "$QREASON_OUTPUT_ROOT"
+# Fresh archive — see docs/J1_VALIDATION_RUNBOOK.md
 export QREASON_FRESH_RUN=1
 bash scripts/hpc/run_hpc_2a100_publication.sh b01_parallel_bf16_anchors
 
-# After first clean cell
-python scripts/compare_qrm_baseline.py --summary $QREASON_OUTPUT_ROOT/results/<cell>_summary.json
+# After b01 completes — sync again, then score (needs 286f5e4+ for baseline yaml)
+python scripts/score_run.py --input $QREASON_OUTPUT_ROOT/raw/level_a_bf16_seed0.jsonl \
+  --summary $QREASON_OUTPUT_ROOT/results/level_a_bf16_seed0_summary.json --skip-calibration
+python scripts/compare_qrm_baseline.py --summary $QREASON_OUTPUT_ROOT/results/level_a_bf16_seed0_summary.json
 ```
 
 Do **not** cite archive `outputs-hpc-2a100-main-2026-06-29` pass@1 in the paper — rerun with `repetition_penalty: 1.05` first.
