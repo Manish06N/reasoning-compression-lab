@@ -63,6 +63,7 @@ def check_static() -> None:
             "-n",
             "scripts/hpc/submit_hpc_blocks.sh",
             "scripts/hpc/run_hpc_2a100_publication.sh",
+            "scripts/hpc/param_rudra_env.sh",
             "scripts/hpc/09_assert_fresh_archive.sh",
             "slurm/hpc_2a100_b01_parallel.slurm",
             "slurm/hpc_2a100_b07_gpqa.slurm",
@@ -116,6 +117,15 @@ def check_revision_pins() -> None:
 def check_decoding_verify() -> None:
     print("== decoding verify ==")
     run(["python", "scripts/verify_decoding_params.py"])
+
+
+def check_git_in_job_env() -> None:
+    print("== git in job env ==")
+    cmd = (
+        "source scripts/hpc/param_rudra_env.sh && "
+        "param_rudra_activate_conda && git --version"
+    )
+    run(["bash", "-lc", cmd])
 
 
 def check_blocks_and_models() -> None:
@@ -193,6 +203,7 @@ def run_ci_checks() -> None:
 
 def run_full_checks() -> None:
     run_ci_checks()
+    check_git_in_job_env()
     check_blocks_and_models()
     check_datasets()
 

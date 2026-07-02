@@ -1,6 +1,6 @@
 # Known issues and limitations
 
-Last updated: 2026-07-01 (late evening)
+Last updated: 2026-07-02
 
 Operational issues that can break paper results if ignored, plus known software limitations.
 
@@ -42,6 +42,18 @@ HPC autopush may leave local output commits. Always:
 git fetch origin && git reset --hard origin/main
 ```
 
+### 3b. Git missing on compute after `conda activate qreason` — **fixed 2026-07-02**
+
+**Symptom:** Split b01 Slurm jobs exit before inference with `Publication run requires Git installed and a git checkout.`  
+**Cause:** `assert_code_paths_clean()` runs `git diff` at job start; compute nodes may not have `git` on PATH after `conda activate qreason` (login-node preflight did not simulate job env).
+
+**Fix (repo + HPC):**
+- `scripts/hpc/00_setup_env.sh` now runs `conda install -y git` in `qreason`
+- `param_rudra_activate_conda()` prepends `/usr/bin:/bin` and fails fast if git is still missing
+- `07_preflight_publication.py` (full mode) verifies git after conda activate
+
+**One-time on HPC if jobs already running:** `conda activate qreason && conda install -y git` (already done for split jobs 86280/86281).
+
 ---
 
 ## Important — affects interpretation
@@ -64,6 +76,8 @@ For manuscript Brier/AURC/ECE claims, use **maj@5** (`run_inference_multisample.
 Publication mode now checks **code paths only** (`src`, `scripts`, `configs`, …). Tracked `outputs-hpc-*/manifest.json` updates no longer block `score_run.py --publication`.
 
 Autopush tmux is **opt-in** (`QREASON_ENABLE_AUTOPUSH=1`). Default workflow: MacBook rsync after runs, not autopush during SLURM jobs.
+
+### 5. Mixed provenance on resumed inference
 
 Rows written before V8.2 provenance fields lack `run_id`, `git_commit`, etc. New rows in the same JSONL have them.  
 Analysis should filter by `schema_version` or rerun fresh archives for publication.

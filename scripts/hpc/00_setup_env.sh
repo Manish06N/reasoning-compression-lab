@@ -39,6 +39,10 @@ fi
 source "$(conda info --base)/etc/profile.d/conda.sh"
 conda activate qreason
 
+# Publication mode requires git on compute nodes (assert_code_paths_clean).
+conda install -y git
+git --version
+
 pip install --upgrade pip
 if [[ -f requirements-hpc.lock.txt ]]; then
   pip install -r requirements-hpc.lock.txt

@@ -319,10 +319,11 @@ cd $QR
 bash scripts/hpc/00_setup_env.sh
 ```
 
-This creates conda env **`qreason`** (Python 3.11) and installs `requirements-hpc.txt`:
+This creates conda env **`qreason`** (Python 3.11), installs **`git`** (required for publication git gates on compute nodes), and installs `requirements-hpc.txt`:
 
 | Package | Version note |
 |---------|--------------|
+| git | **Required in qreason** — publication jobs call `git diff` at start |
 | vLLM | **0.8.5** (pinned — do not upgrade on Rudra) |
 | PyTorch | Installed as vLLM dependency (CUDA 12.x) |
 | transformers, datasets, huggingface_hub | Latest compatible |

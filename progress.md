@@ -9,31 +9,32 @@ Canonical dated record for **Paper 1: Beyond Accuracy** (`reasoning-compression-
 
 ---
 
-## Current Status Snapshot (2026-07-02)
+## Current Status Snapshot (2026-07-02, evening)
 
 | Area | Status |
 |------|--------|
-| **GitHub `main`** | **`c32a423`** — review hardening + HPC operational fixes (after `d4b877d` CI + job 86229 log) |
+| **GitHub `main`** | **`59c84dd`** — operational fixes + progress headers (git-on-compute fix pending push) |
 | **J1 engineering** | **MVP complete** — RunSpec, revision pins, publication mode, stats, CI, env docs, manifest locking, logprob capture (GPU smoke pending) |
-| **J1 scientific validation** | **In flight** — b01 job **86229** on archive `outputs-hpc-2a100-main-2026-07-02-p0fix` |
+| **J1 scientific validation** | **In flight** — split b01 jobs **86280** (Qwen) + **86281** (Llama) on `outputs-hpc-2a100-main-2026-07-02-p0fix` |
 | **QRM baseline gates** | **Fixed** — task-specific bands; quant/profile mismatch → SKIP (not false PASS/FAIL) |
 | **15 core validation cells** | Wired seed 0 (b01–b09) — `papers/j1/publication_matrix.yaml` |
 | **Logprobs** | **Wired in code** — `normalized_sequence_logprob` on raw rows; launcher keeps `--skip-calibration` until A100 smoke |
 | **Policy** | **HPC-only** for J1 paper numbers; RTX 5080 retired for publication |
+| **Submit workflow** | **Split 1-GPU per cell** via `submit_hpc_blocks.sh b01` (86229 2-GPU wrapper cancelled) |
 | **Unit tests (MacBook)** | **32 targeted pass** (operational fixes); full suite **99 pass / 1 pre-existing fail** (`test_math_equivalence_fractions`) |
 
 ### Active HPC queue (2026-07-02)
 
 | Job | Role | State | Notes |
 |-----|------|-------|-------|
-| **86229** | b01 BF16 anchors (Qwen-7B + Llama-8B MATH-500) | Submitted (PENDING at last check) | Archive `outputs-hpc-2a100-main-2026-07-02-p0fix`; supersedes cancelled 86212 |
+| **86280** | Qwen-7B BF16 MATH-500 | RUNNING (split 1-GPU) | `level_a_bf16_seed0`; passed git gate after conda install git |
+| **86281** | Llama-8B BF16 MATH-500 | PENDING (split 1-GPU) | `level_c_llama8b_bf16_math500_seed0`; scheduled ~2026-07-03 |
 
-**Superseded / cancelled:** 86015/86016 chain, 86212 (pre-P0 archive `2026-07-02-rerun`).
+**Cancelled:** 86229 (2-GPU combined job), 86212, 86015/86016 chain.
 
-**HPC code at job launch:** frozen at submit-time tree (≥ `af4b8c2`).  
-**HPC code at score time:** `git fetch && git reset --hard origin/main` after job completes — need operational-fix commit for unscored jobs stuck on git/manifest gates.
+**Git on compute:** First split submit failed — `git` not on PATH after conda activate on compute nodes. Fixed operationally with `conda install -y git` in `qreason`; codified in repo (pending push).
 
-**Before scoring stuck jobs:** `tmux kill-session -t hpc_git_autopush 2>/dev/null || true` (autopush now opt-in only).
+**Before scoring:** `tmux kill-session -t hpc_git_autopush 2>/dev/null || true` (autopush opt-in only).
 
 ### Sync model (MacBook → GitHub → HPC)
 
@@ -41,7 +42,7 @@ Canonical dated record for **Paper 1: Beyond Accuracy** (`reasoning-compression-
 # MacBook: commit + push (inert for running Slurm jobs)
 bash scripts/macbook/github_push.sh
 
-# HPC: ONLY after inference job finishes — NOT while 86229 running
+# HPC ONLY after inference job finishes — NOT while 86280/86281 running
 cd $QR
 git fetch origin && git reset --hard origin/main
 tmux kill-session -t hpc_git_autopush 2>/dev/null || true

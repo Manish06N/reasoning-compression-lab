@@ -1,5 +1,25 @@
 # Changelog
 
+## 2026-07-02 — HPC git-on-compute fix + split b01 jobs
+
+**Scope:** Publication jobs failed on compute nodes when `git` was not on PATH after `conda activate qreason`. Split b01 resubmit after cancelling 2-GPU job 86229.
+
+**HPC jobs:**
+- **Cancelled:** 86229 (2× A100 combined wrapper)
+- **86280** — Qwen-7B BF16 MATH-500 (1× A100, split submit)
+- **86281** — Llama-8B BF16 MATH-500 (1× A100, split submit)
+- Archive: `outputs-hpc-2a100-main-2026-07-02-p0fix`
+- Default submit path: `bash scripts/hpc/submit_hpc_blocks.sh b01` (two 1-GPU jobs)
+
+**Changes:**
+- **`00_setup_env.sh`:** `conda install -y git` in `qreason`
+- **`param_rudra_env.sh`:** PATH fallback + fail-fast if git missing after conda activate
+- **`07_preflight_publication.py`:** full preflight verifies git in job-like env
+
+**Ops note:** Running jobs 86280/86281 already have git via manual `conda install`; no mid-run sync required.
+
+---
+
 ## 2026-07-02 — HPC operational fixes (full scope)
 
 **Commit:** `c32a423` — pushed to `origin/main` (MacBook).

@@ -29,4 +29,11 @@ param_rudra_activate_conda() {
   # shellcheck disable=SC1091
   source "$CONDA_ROOT/etc/profile.d/conda.sh"
   conda activate qreason
+  export PATH="/usr/bin:/bin:${PATH}"
+  if ! command -v git >/dev/null 2>&1; then
+    echo "ERROR: git not found after conda activate qreason." >&2
+    echo "  Fix: conda activate qreason && conda install -y git" >&2
+    echo "  Or re-run: bash scripts/hpc/00_setup_env.sh" >&2
+    return 1
+  fi
 }
