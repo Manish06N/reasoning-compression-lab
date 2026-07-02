@@ -1,7 +1,7 @@
 # Progress — Paper 1 Experiments
 
 **Last updated:** 2026-07-02  
-**GitHub `main`:** `14781b2`  
+**GitHub `main`:** `c32a423`  
 **Repo:** https://github.com/Manish06N/reasoning-compression-lab  
 **Canonical log:** [progress.md](../progress.md) · **Ops detail:** [CHANGELOG.md](../CHANGELOG.md)
 

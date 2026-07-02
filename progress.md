@@ -13,7 +13,7 @@ Canonical dated record for **Paper 1: Beyond Accuracy** (`reasoning-compression-
 
 | Area | Status |
 |------|--------|
-| **GitHub `main`** | **`14781b2`** — review hardening + HPC operational fixes (after `d4b877d` CI + job 86229 log) |
+| **GitHub `main`** | **`c32a423`** — review hardening + HPC operational fixes (after `d4b877d` CI + job 86229 log) |
 | **J1 engineering** | **MVP complete** — RunSpec, revision pins, publication mode, stats, CI, env docs, manifest locking, logprob capture (GPU smoke pending) |
 | **J1 scientific validation** | **In flight** — b01 job **86229** on archive `outputs-hpc-2a100-main-2026-07-02-p0fix` |
 | **QRM baseline gates** | **Fixed** — task-specific bands; quant/profile mismatch → SKIP (not false PASS/FAIL) |

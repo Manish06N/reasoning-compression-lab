@@ -2,7 +2,7 @@
 
 ## 2026-07-02 — HPC operational fixes (full scope)
 
-**Commit:** `14781b2` — pushed to `origin/main` (MacBook).
+**Commit:** `c32a423` — pushed to `origin/main` (MacBook).
 
 **Scope:** Publication-run failure modes for live SLURM jobs — git/autopush conflict, manifest locking, resume traps, submit env propagation, QRM gate matching, backup hardening, pin alignment, logprob capture.
 
@@ -25,7 +25,7 @@
 
 ## 2026-07-02 — Review hardening (recommended scope)
 
-**Commit:** `14781b2` (same push as operational fixes).
+**Commit:** `c32a423` (same push as operational fixes).
 
 **Scope:** Post-backup audit fixes — env docs, scalable archive blocking, publication git UX, `model_id` provenance for analysis scripts.
 
