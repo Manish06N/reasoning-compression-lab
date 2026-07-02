@@ -1,7 +1,7 @@
 # Progress — Paper 1 Experiments
 
 **Last updated:** 2026-07-02 (evening)  
-**GitHub `main`:** `59c84dd` (git-on-compute fix pending push)  
+**GitHub `main`:** `85998e1`  
 **Repo:** https://github.com/Manish06N/reasoning-compression-lab  
 **Canonical log:** [progress.md](../progress.md) · **Ops detail:** [CHANGELOG.md](../CHANGELOG.md)
 
@@ -33,7 +33,7 @@
 - Cancelled 2-GPU job **86229**; resubmitted as split 1-GPU jobs **86280** (Qwen) + **86281** (Llama)
 - First split attempts failed: `git` not on PATH after `conda activate qreason` on compute nodes
 - Fixed operationally: `conda install -y git` in `qreason`; 86280 entered inference
-- Repo fix (pending push): `00_setup_env.sh`, `param_rudra_env.sh`, preflight git check
+- Repo fix: **`85998e1`** — `00_setup_env.sh`, `param_rudra_env.sh`, preflight git check
 
 Archive: `outputs-hpc-2a100-main-2026-07-02-p0fix`
 

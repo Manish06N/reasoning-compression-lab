@@ -2,6 +2,8 @@
 
 ## 2026-07-02 — HPC git-on-compute fix + split b01 jobs
 
+**Commit:** `85998e1` — pushed to `origin/main` (MacBook).
+
 **Scope:** Publication jobs failed on compute nodes when `git` was not on PATH after `conda activate qreason`. Split b01 resubmit after cancelling 2-GPU job 86229.
 
 **HPC jobs:**
