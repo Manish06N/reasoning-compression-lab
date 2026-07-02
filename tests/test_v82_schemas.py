@@ -32,5 +32,26 @@ def test_provenance_fields_present():
     cell = load_cell_config("configs/cells/level_a_bf16_seed0.json")
     fields = provenance_fields(cell, prompt_template_file=cell["task"]["prompt_template_file"])
     assert fields["git_commit"]
-    assert fields["config_hash"] == config_hash(cell)
+    assert fields["config_hash"] == config_hash(
+        cell, prompt_template_file=cell["task"]["prompt_template_file"]
+    )
     assert fields["schema_version"] == "raw_response.v1"
+    assert fields.get("dataset_revision") == "main"
+
+
+def test_config_hash_independent_of_model_path():
+    cell = load_cell_config("configs/cells/level_a_bf16_seed0.json")
+    tmpl = cell["task"]["prompt_template_file"]
+    h1 = config_hash(cell, prompt_template_file=tmpl)
+    alt = dict(cell)
+    alt["model_path"] = "/totally/different/path"
+    h2 = config_hash(alt, prompt_template_file=tmpl)
+    assert h1 == h2
+
+
+def test_config_hash_changes_with_batch_size():
+    cell = load_cell_config("configs/cells/level_a_bf16_seed0.json")
+    tmpl = cell["task"]["prompt_template_file"]
+    h1 = config_hash(cell, prompt_template_file=tmpl, batch_size=1)
+    h2 = config_hash(cell, prompt_template_file=tmpl, batch_size=4)
+    assert h1 != h2

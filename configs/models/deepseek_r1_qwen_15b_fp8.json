@@ -10,5 +10,6 @@
   "use_chat_template": true,
   "enforce_eager": true,
   "kv_cache_dtype": "fp8",
-  "gpu_memory_utilization": 0.90
+  "gpu_memory_utilization": 0.9,
+  "revision": "main"
 }

@@ -59,7 +59,7 @@ bash scripts/hpc/submit_hpc_blocks.sh b01    # one block
 | 0 | `level_a_bf16_seed0` | Qwen-7B **BF16** | MATH-500 | 500 |
 | 1 | `level_c_llama8b_bf16` | Llama-8B **BF16** | MATH-500 | 500 |
 
-> `level_b_qwen7b_bf16` duplicates Level A — **do not run** separately.
+> **`level_b_qwen7b_bf16`** uses the **sober** prompt profile (Level B grid), not Level A **reproduction** — it is **not** a duplicate of `level_a_bf16_seed0`. Do not compare pass@1 across profiles directly.
 
 ### b02 — 2× A100 parallel (~12–24 h)
 

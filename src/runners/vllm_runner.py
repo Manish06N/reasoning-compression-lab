@@ -195,7 +195,11 @@ def generate_chunk(
 
 ) -> List[Dict[str, Any]]:
 
-    """Run one vLLM.generate() call for a batch of prompts (continuous batching)."""
+    """Run one vLLM.generate() call for a batch of prompts (continuous batching).
+
+    When len(prompts) > 1, latency_sec and energy_joules are **equal-split** across rows
+    (not measured per request). Use batch_size=1 for publication telemetry.
+    """
 
     if not prompts:
 
@@ -326,6 +330,8 @@ def generate_chunk(
                 "truncated": finish_reason == "length" or completion_tokens >= max_tokens,
 
                 "completion_chars": len(completion),
+
+                "telemetry_method": "equal_split" if len(prompts) > 1 else "measured",
 
             }
 

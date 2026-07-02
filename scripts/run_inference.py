@@ -4,102 +4,67 @@
 from __future__ import annotations
 
 import argparse
-import json
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from datasets import load_dataset
-
-from src.schemas.provenance import input_text_hash, provenance_fields
 from src.runners.checkpoint_utils import (
     atomic_write_jsonl,
     backup_file,
-    load_jsonl,
-    recover_jsonl_from_backup,
     update_state,
-    validate_jsonl,
     write_progress,
 )
 from src.runners.config_utils import build_prompt, load_cell_config, load_decoding_from_file
-from src.runners.dataset_rows import output_root_for, prepare_example_row
-from src.runners.resume_guard import allow_resume_from_env, resume_block_reason
+from src.runners.dataset_rows import prepare_example_row
+from src.runners.inference_session import (
+    ConfigurationError,
+    assert_publication_batch_size,
+    guard_and_recover_resume,
+    load_task_dataset,
+    setup_output_paths,
+)
+from src.runners.raw_row import build_raw_response_row
+from src.runners.resume_guard import allow_resume_from_env
+from src.schemas.provenance import provenance_fields
+from src.schemas.validate import validate_jsonl_rows
 from src.runners.vllm_runner import build_llm, generate_chunk
 
 CHECKPOINT_EVERY = 10
 
 
-def _output_root_for(out_path: Path) -> Path | None:
-    return output_root_for(out_path)
-
-
 def main() -> None:
     parser = argparse.ArgumentParser(description="Run one inference cell with vLLM.")
+    parser.add_argument("--cell-config", default="configs/cells/level_a_bf16_seed0.json")
+    parser.add_argument("--limit", type=int, default=None)
+    parser.add_argument("--output", default=None)
+    parser.add_argument("--decoding-config", default=None)
+    parser.add_argument("--max-model-len", type=int, default=None)
+    parser.add_argument("--batch-size", type=int, default=1)
+    parser.add_argument("--checkpoint-every", type=int, default=CHECKPOINT_EVERY)
+    parser.add_argument("--fresh", action="store_true")
+    parser.add_argument("--allow-resume", action="store_true")
     parser.add_argument(
-        "--cell-config",
-        default="configs/cells/level_a_bf16_seed0.json",
-        help="Experiment cell config JSON.",
-    )
-    parser.add_argument(
-        "--limit",
-        type=int,
-        default=None,
-        help="Optional limit for debugging (e.g. 10).",
-    )
-    parser.add_argument(
-        "--output",
-        default=None,
-        help="Output JSONL path. Default: runs/raw/{cell_id}.jsonl",
-    )
-    parser.add_argument(
-        "--decoding-config",
-        default=None,
-        help="Override cell decoding (YAML), e.g. configs/decoding/pilot_5080.yaml",
-    )
-    parser.add_argument(
-        "--max-model-len",
-        type=int,
-        default=None,
-        help="Override model max_model_len for this run (pilot: 8192).",
-    )
-    parser.add_argument(
-        "--batch-size",
-        type=int,
-        default=1,
-        help="Prompts per vLLM.generate() call (5080 pilot: 4 for 1.5B, 2 for 7B/8B).",
-    )
-    parser.add_argument(
-        "--checkpoint-every",
-        type=int,
-        default=CHECKPOINT_EVERY,
-        help="Atomic checkpoint + backup every N completed rows.",
-    )
-    parser.add_argument(
-        "--fresh",
+        "--publication",
         action="store_true",
-        help="Delete existing output (and sibling scored/summary if in archive) before run.",
-    )
-    parser.add_argument(
-        "--allow-resume",
-        action="store_true",
-        help="Allow resume even into stale pre-fix rows (same as QREASON_ALLOW_RESUME=1).",
+        help="Publication mode: require batch_size=1 (also honors QREASON_PUBLICATION_MODE).",
     )
     args = parser.parse_args()
 
     cell = load_cell_config(args.cell_config)
     cell_id = cell["cell_id"]
-    if args.output:
-        out_path = Path(args.output)
-        if not out_path.is_absolute():
-            out_path = ROOT / out_path
-    else:
-        out_path = ROOT / f"runs/raw/{cell_id}.jsonl"
-    out_path.parent.mkdir(parents=True, exist_ok=True)
+    batch_size = max(1, args.batch_size)
 
-    archive_root = _output_root_for(out_path)
-    backup_root = (archive_root / "_backup") if archive_root else None
+    try:
+        assert_publication_batch_size(batch_size, publication=args.publication)
+    except ConfigurationError as exc:
+        print(f"ERROR: {exc}", file=sys.stderr)
+        sys.exit(1)
+
+    out_path, archive_root, backup_root = setup_output_paths(
+        cell_id, args.output, fresh=args.fresh
+    )
 
     if args.decoding_config:
         cell["decoding"] = load_decoding_from_file(args.decoding_config)
@@ -111,45 +76,10 @@ def main() -> None:
         cell["model"]["max_model_len"] = int(cell["decoding"]["max_model_len"])
 
     task = cell["task"]
-    print(f"Loading dataset: {task['dataset_id']} [{task['split']}]")
-    if task.get("config_name"):
-        dataset = load_dataset(task["dataset_id"], task["config_name"], split=task["split"])
-    else:
-        dataset = load_dataset(task["dataset_id"], split=task["split"])
-    if args.limit is not None:
-        dataset = dataset.select(range(min(args.limit, len(dataset))))
-
+    dataset = load_task_dataset(cell, args.limit)
     allow_resume = args.allow_resume or allow_resume_from_env()
+    rows = guard_and_recover_resume(out_path, cell, allow_resume=allow_resume, backup_root=backup_root)
 
-    if args.fresh and out_path.exists():
-        print(f"--fresh: removing {out_path}")
-        out_path.unlink()
-        if archive_root:
-            for sibling in (
-                archive_root / "scored" / out_path.name,
-                archive_root / "results" / f"{out_path.stem}_summary.json",
-                archive_root / "checkpoints" / f"{out_path.stem}.json",
-            ):
-                if sibling.exists():
-                    print(f"--fresh: removing {sibling}")
-                    sibling.unlink()
-
-    block_reason = resume_block_reason(out_path, cell, allow_resume=allow_resume)
-    if block_reason:
-        print(f"ERROR: {block_reason}", file=sys.stderr)
-        sys.exit(1)
-
-    ok, _ = validate_jsonl(out_path)
-    if not ok:
-        print(f"WARN: corrupt JSONL {out_path} — attempting restore from backup")
-        if backup_root and recover_jsonl_from_backup(out_path, backup_root):
-            print(f"Restored {out_path} from _backup/latest/raw/")
-        else:
-            corrupt = out_path.with_suffix(out_path.suffix + ".corrupt")
-            out_path.replace(corrupt)
-            print(f"Moved corrupt file → {corrupt}; starting fresh")
-
-    rows = load_jsonl(out_path)
     start_idx = len(rows)
     total = len(dataset)
     if start_idx:
@@ -161,7 +91,7 @@ def main() -> None:
         return
 
     model_path = cell["model_path"]
-    batch_size = max(1, args.batch_size)
+    telemetry_method = "equal_split" if batch_size > 1 else "measured"
     print(f"Loading model from: {model_path}")
     print(
         f"Decoding: temperature={cell['decoding'].get('temperature')}, "
@@ -169,8 +99,10 @@ def main() -> None:
         f"max_tokens={cell['decoding'].get('max_tokens')}, "
         f"repetition_penalty={cell['decoding'].get('repetition_penalty')}, "
         f"seed={cell['seed']}, "
-        f"max_model_len={cell['model'].get('max_model_len')}, batch_size={batch_size}"
+        f"max_model_len={cell['model'].get('max_model_len')}, batch_size={batch_size}, "
+        f"telemetry_method={telemetry_method}"
     )
+
     if archive_root:
         update_state(
             archive_root,
@@ -185,7 +117,12 @@ def main() -> None:
     use_chat = cell["model"].get("use_chat_template", True)
     checkpoint_every = max(1, args.checkpoint_every)
     prompt_template_file = task["prompt_template_file"]
-    run_provenance = provenance_fields(cell, prompt_template_file=prompt_template_file)
+    run_provenance = provenance_fields(
+        cell,
+        prompt_template_file=prompt_template_file,
+        batch_size=batch_size,
+        max_model_len=cell["model"].get("max_model_len"),
+    )
 
     idx = start_idx
     while idx < total:
@@ -209,88 +146,36 @@ def main() -> None:
             use_chat_template=use_chat,
         )
         for (_, row_base), result in zip(prepared, results):
-            row = {
-                **row_base,
-                **run_provenance,
-                "input_text_hash": input_text_hash(str(row_base.get("problem", ""))),
-                "prompt_template_file": prompt_template_file,
-                "prompt": result["prompt"],
-                "completion": result["completion"],
-                "latency_sec": result["latency_sec"],
-                "time_to_first_token_sec": result.get("time_to_first_token_sec"),
-                "peak_vram_gb": result["peak_vram_gb"],
-                "vram_before_gb": result.get("vram_before_gb"),
-                "vram_after_gb": result.get("vram_after_gb"),
-                "vram_max_gb": result.get("vram_max_gb"),
-                "gpu_util_mean": result.get("gpu_util_mean"),
-                "gpu_util_max": result.get("gpu_util_max"),
-                "power_watts_mean": result.get("power_watts_mean"),
-                "power_watts_max": result.get("power_watts_max"),
-                "energy_joules": result.get("energy_joules"),
-                "prompt_tokens": result["prompt_tokens"],
-                "completion_tokens": result["completion_tokens"],
-                "total_tokens": result.get("total_tokens"),
-                "tokens_per_second": result.get("tokens_per_second"),
-                "decode_tokens_per_second": result.get("decode_tokens_per_second"),
-                "seconds_per_output_token": result.get("seconds_per_output_token"),
-                "tokens_per_joule": result.get("tokens_per_joule"),
-                "finish_reason": result.get("finish_reason"),
-                "stop_reason": result.get("stop_reason"),
-                "truncated": result.get("truncated"),
-                "completion_chars": result.get("completion_chars"),
-                "cell_id": cell_id,
-                "model_path": model_path,
-                "quant_config": cell["quant_config"],
-                "task": task["task_name"],
-                "seed": cell["seed"],
-                "batch_size": batch_size,
-                "decoding_temperature": cell["decoding"].get("temperature"),
-                "decoding_top_p": cell["decoding"].get("top_p"),
-                "decoding_max_tokens": cell["decoding"].get("max_tokens"),
-                "decoding_repetition_penalty": cell["decoding"].get("repetition_penalty"),
-                "max_model_len": cell["model"].get("max_model_len"),
-            }
-            for field in (
-                "time_to_first_token_sec",
-                "vram_before_gb",
-                "vram_after_gb",
-                "vram_max_gb",
-                "gpu_util_mean",
-                "gpu_util_max",
-                "power_watts_mean",
-                "power_watts_max",
-                "energy_joules",
-                "total_tokens",
-                "tokens_per_second",
-                "decode_tokens_per_second",
-                "seconds_per_output_token",
-                "tokens_per_joule",
-                "finish_reason",
-                "stop_reason",
-                "truncated",
-                "completion_chars",
-            ):
-                if field in result:
-                    row[field] = result[field]
-            if args.decoding_config:
-                row["decoding_config"] = args.decoding_config
+            row = build_raw_response_row(
+                row_base=row_base,
+                result=result,
+                cell=cell,
+                prompt_template_file=prompt_template_file,
+                run_provenance=run_provenance,
+                batch_size=batch_size,
+                telemetry_method=telemetry_method,
+                decoding_config_override=args.decoding_config,
+            )
             rows.append(row)
 
         idx = batch_end
         if len(rows) % checkpoint_every == 0 or idx == total:
             atomic_write_jsonl(out_path, rows)
+            validation = validate_jsonl_rows(out_path, limit=3)
+            if not validation["valid"]:
+                print(f"WARN: schema validation: {validation['errors'][:3]}", file=sys.stderr)
             print(f"checkpoint saved: {out_path} ({len(rows)} rows)")
             if backup_root:
                 backup_file(out_path, backup_root, "raw")
-                if archive_root:
-                    write_progress(archive_root, cell_id, len(rows), total, status="in_progress")
-                    update_state(
-                        archive_root,
-                        last_cell_id=cell_id,
-                        last_phase="inference",
-                        rows_done=len(rows),
-                        rows_total=total,
-                    )
+            if archive_root:
+                write_progress(archive_root, cell_id, len(rows), total, status="in_progress")
+                update_state(
+                    archive_root,
+                    last_cell_id=cell_id,
+                    last_phase="inference",
+                    rows_done=len(rows),
+                    rows_total=total,
+                )
 
     if archive_root:
         write_progress(archive_root, cell_id, len(rows), total, status="completed")

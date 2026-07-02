@@ -3,6 +3,8 @@
 import json
 from pathlib import Path
 
+from pathlib import Path
+
 from scripts.compare_qrm_baseline import compare_summary
 from src.metrics.pareto_frontier import build_frontier_points, pareto_frontier
 from src.runners.config_utils import load_yaml
@@ -20,8 +22,12 @@ def test_pareto_frontier_selects_non_dominated():
     assert any(p.quant_config == "bf16" for p in frontier)
 
 
+ROOT = Path(__file__).resolve().parents[1]
+TARGETS_PATH = ROOT / "configs/baselines/qrm_literature_targets.yaml"
+
+
 def test_compare_qrm_baseline_fails_low_pass_at_1():
-    targets = load_yaml("configs/baselines/qrm_literature_targets.yaml")
+    targets = load_yaml(TARGETS_PATH)
     summary = {
         "cell_id": "level_a_qwen7b_bf16_math500_seed0",
         "task": "math500",
@@ -29,6 +35,6 @@ def test_compare_qrm_baseline_fails_low_pass_at_1():
         "truncation_rate": 0.9,
         "parse_failure_rate": 0.86,
     }
-    report = compare_summary(summary, targets)
+    report = compare_summary(summary, targets, targets_path=TARGETS_PATH)
     assert report["passed"] is False
     assert any(c["status"] == "FAIL" for c in report["checks"])

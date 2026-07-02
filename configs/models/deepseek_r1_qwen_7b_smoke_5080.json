@@ -10,5 +10,6 @@
   "enforce_eager": true,
   "gpu_memory_utilization": 0.85,
   "kv_cache_dtype": "fp8",
-  "notes": "RTX 5080 smoke only — not for full MATH-500 reproduction."
+  "notes": "RTX 5080 smoke only \u2014 not for full MATH-500 reproduction.",
+  "revision": "main"
 }

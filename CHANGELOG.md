@@ -1,5 +1,27 @@
 # Changelog
 
+## 2026-07-02 — External review fixes (full code pass)
+
+**Scope:** Close code-fixable gaps from external codebase review — CI, provenance, schema enforcement, config hashing, tests, packaging.
+
+**Changes:**
+- **CI:** `.github/workflows/ci.yml` — pytest, compileall, shell `-n`, decoding/cell validation, deprecated import guard
+- **Provenance:** `build_raw_response_row()` shared by `run_inference.py` and `run_inference_multisample.py`; content-based `config_hash` (no absolute `model_path`)
+- **Revisions:** `revision` pins on all model/task configs; `load_dataset_with_revision()` in preflight
+- **YAML:** strict duplicate-key rejection in `load_yaml()`; removed duplicate `repetition_penalty` in `repro_qrm.yaml`
+- **Schema:** `raw_response.v1.json` tightened (`additionalProperties: false`); validate on checkpoint + score
+- **Publication guard:** `QREASON_PUBLICATION_MODE` / `--publication` requires `batch_size=1`
+- **Scoring:** canonical implementation in `src/evaluation/correctness/scoring.py`; `src/metrics/scoring.py` shim
+- **Tests:** +21 tests (scoring, schema, multisample provenance, YAML strict, publication guard)
+- **Packaging:** `pyproject.toml`, pinned `requirements-hpc.txt`, `requirements-dev.txt`, `export_requirements_lock.sh`
+- **Docs:** [docs/HPC_POST_MERGE_CHECKLIST.md](docs/HPC_POST_MERGE_CHECKLIST.md) for manual HPC steps
+
+**Breaking:** Resume into pre-fix archives may fail on `config_hash` mismatch — use `--fresh` or new `QREASON_OUTPUT_ROOT`.
+
+**Tests:** 67 passed (`pytest tests/ -q`).
+
+---
+
 ## 2026-07-01 — QRM source attribution + GPQA tolerance (amd-003)
 
 **Problem:** Post–amd-002 yaml still mislabeled sources (Llama rows cited "QRM Table 1"; Qwen GPQA used DeepSeek 49.1 labeled as QRM). GPQA ±5pp too tight for n=198 (~16% false-fail rate). GPQA cells use sober profile but were treated as hard gates.

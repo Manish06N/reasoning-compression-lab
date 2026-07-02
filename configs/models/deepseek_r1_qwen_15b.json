@@ -8,5 +8,6 @@
   "trust_remote_code": true,
   "use_chat_template": true,
   "enforce_eager": true,
-  "gpu_memory_utilization": 0.90
+  "gpu_memory_utilization": 0.9,
+  "revision": "main"
 }

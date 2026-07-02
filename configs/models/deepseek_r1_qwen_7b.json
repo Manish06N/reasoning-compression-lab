@@ -7,5 +7,6 @@
   "tensor_parallel_size": 1,
   "trust_remote_code": true,
   "use_chat_template": true,
-  "enforce_eager": true
+  "enforce_eager": true,
+  "revision": "main"
 }

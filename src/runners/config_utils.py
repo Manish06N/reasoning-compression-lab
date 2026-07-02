@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 from pathlib import Path
 from typing import Any, Dict, Mapping
 
@@ -19,16 +20,33 @@ def load_json(path: str | Path) -> Dict[str, Any]:
         return json.load(f)
 
 
+def _assert_no_duplicate_yaml_keys(text: str, source: str) -> None:
+    """Reject duplicate top-level YAML keys (PyYAML silently keeps the last)."""
+    seen: set[str] = set()
+    for line in text.splitlines():
+        stripped = line.split("#", 1)[0].rstrip()
+        if not stripped:
+            continue
+        match = re.match(r"^([\w_.-]+)\s*:", stripped)
+        if match:
+            key = match.group(1)
+            if key in seen:
+                raise ValueError(f"Duplicate YAML key '{key}' in {source}")
+            seen.add(key)
+
+
 def load_yaml(path: str | Path) -> Dict[str, Any]:
     path = Path(path)
     if not path.is_absolute():
         path = REPO_ROOT / path
     text = path.read_text(encoding="utf-8")
+    _assert_no_duplicate_yaml_keys(text, str(path))
     try:
         import yaml
     except ImportError as exc:
         raise ImportError("PyYAML required for decoding configs. pip install pyyaml") from exc
-    return yaml.safe_load(text)
+    loaded = yaml.safe_load(text)
+    return loaded or {}
 
 
 def resolve_model_path(model_cfg: Dict[str, Any], cell_cfg: Dict[str, Any]) -> str:

@@ -62,6 +62,8 @@ For manuscript Brier/AURC/ECE claims, use **maj@5** (`run_inference_multisample.
 Rows written before V8.2 provenance fields lack `run_id`, `git_commit`, etc. New rows in the same JSONL have them.  
 Analysis should filter by `schema_version` or rerun fresh archives for publication.
 
+**2026-07-02:** `config_hash` is now content-based (no absolute `model_path`). Resume into pre-fix archives will fail with hash mismatch — use `--fresh` or a new `QREASON_OUTPUT_ROOT`.
+
 ### 6. QRM reproduction vs main grid prompts
 
 | Profile | Used for | Prompt style |

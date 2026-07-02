@@ -61,7 +61,10 @@ def aurc_score(confidences: Sequence[float], labels: Sequence[int]) -> float:
         risk = 1.0 - subset.mean()
         risks.append(risk)
         coverages.append(k / n)
-    return float(np.trapz(risks, coverages))
+    integrate = getattr(np, "trapezoid", None)
+    if integrate is None:
+        integrate = np.trapz  # type: ignore[attr-defined]  # NumPy < 2
+    return float(integrate(risks, coverages))
 
 
 def compute_calibration_metrics(

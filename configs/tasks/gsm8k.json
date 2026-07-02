@@ -6,5 +6,6 @@
   "problem_field": "question",
   "solution_field": "answer",
   "prompt_template_file": "prompts/gsm8k.txt",
-  "notes": "GSM8K control task — sober prompt profile; reproduction uses prompts/qrm_gsm8k.txt."
+  "notes": "GSM8K control task \u2014 sober prompt profile; reproduction uses prompts/qrm_gsm8k.txt.",
+  "revision": "main"
 }

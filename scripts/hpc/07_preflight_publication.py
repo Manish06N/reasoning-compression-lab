@@ -17,9 +17,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
-from datasets import load_dataset
-
-from src.runners.config_utils import build_prompt, load_cell_config
+from src.runners.revision_resolver import load_dataset_with_revision
 
 
 EXPECTED_HPC_BLOCKS = {
@@ -150,10 +148,9 @@ def check_datasets() -> None:
         "configs/tasks/gpqa_diamond.json",
     ):
         task = json.loads((ROOT / task_rel).read_text(encoding="utf-8"))
-        if task.get("config_name"):
-            dataset = load_dataset(task["dataset_id"], task["config_name"], split=task["split"])
-        else:
-            dataset = load_dataset(task["dataset_id"], split=task["split"])
+        if not task.get("revision"):
+            fail(f"{task_rel} missing revision pin")
+        dataset = load_dataset_with_revision(task)
         print(
             task["task_name"],
             task["dataset_id"],

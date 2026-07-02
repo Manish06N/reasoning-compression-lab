@@ -17,13 +17,13 @@ Deployment-science evaluation harness for compressed reasoning LLMs.
 |---------|--------|---------|
 | **5080** | **Not used for J1 publication** | J3 local transfer only — [HARDWARE_POLICY.md](docs/HARDWARE_POLICY.md) |
 | **HPC** | **b01 in queue** | Smoke job 86015 → b01 job 86016 (`afterok`); do not reset git while jobs run |
-| **MacBook** | **Synced** | Fail-closed calibration, baseline band fix, 43 tests pass |
+| **MacBook** | **Synced** | Review fixes landed; **67 tests** pass in CI |
 
-**Policy:** **HPC-only** for all paper numbers (7B/8B, GSM8K, GPQA, 1.5B when queued).
+**Policy:** **HPC-only** for all paper numbers (7B/8B, GSM8K, GPQA, 1.5B when queued). See [docs/HARDWARE_POLICY.md](docs/HARDWARE_POLICY.md).
+
+**Status (canonical):** [progress.md](progress.md) · [docs/KNOWN_ISSUES.md](docs/KNOWN_ISSUES.md) · [docs/HPC_POST_MERGE_CHECKLIST.md](docs/HPC_POST_MERGE_CHECKLIST.md)
 
 **b01 gate (MATH-500, hard):** Qwen-7B **88.9–98.9%** (QRM T1 93.9), Llama-8B **86.0–96.0%** (QRM Table 4 91.0) — see [qrm_literature_targets.yaml](configs/baselines/qrm_literature_targets.yaml).
-
-**Policy:** **HPC-only** for all paper numbers (7B/8B, GSM8K, GPQA, 1.5B when queued).
 
 **Docs:** [docs/J1_VALIDATION_RUNBOOK.md](docs/J1_VALIDATION_RUNBOOK.md) · [docs/CODEBASE_OVERVIEW.md](docs/CODEBASE_OVERVIEW.md) · [docs/MODEL_SCOPE_DECISION.md](docs/MODEL_SCOPE_DECISION.md) · [docs/REPO_MAP.md](docs/REPO_MAP.md) · [docs/KNOWN_ISSUES.md](docs/KNOWN_ISSUES.md) · [docs/PROGRESS.md](docs/PROGRESS.md) · [progress.md](progress.md)
 
@@ -48,9 +48,9 @@ export QREASON_FRESH_RUN=1
 bash scripts/hpc/run_hpc_2a100_publication.sh b01_parallel_bf16_anchors
 
 # After b01 completes — sync again, then score (needs 286f5e4+ for baseline yaml)
-python scripts/score_run.py --input $QREASON_OUTPUT_ROOT/raw/level_a_bf16_seed0.jsonl \
-  --summary $QREASON_OUTPUT_ROOT/results/level_a_bf16_seed0_summary.json --skip-calibration
-python scripts/compare_qrm_baseline.py --summary $QREASON_OUTPUT_ROOT/results/level_a_bf16_seed0_summary.json
+python scripts/score_run.py --input $QREASON_OUTPUT_ROOT/raw/level_a_qwen7b_bf16_math500_seed0.jsonl \
+  --summary $QREASON_OUTPUT_ROOT/results/level_a_qwen7b_bf16_math500_seed0_summary.json --skip-calibration
+python scripts/compare_qrm_baseline.py --summary $QREASON_OUTPUT_ROOT/results/level_a_qwen7b_bf16_math500_seed0_summary.json
 ```
 
 Do **not** cite archive `outputs-hpc-2a100-main-2026-06-29` pass@1 in the paper — rerun with `repetition_penalty: 1.05` first.
@@ -126,12 +126,12 @@ papers/           j1, j2, j3 protocols (V8.2 thesis alignment)
 schemas/          JSON Schema for raw rows and summaries
 src/
   generation/     vLLM (active), SGLang/llama.cpp (J2/J3 stubs)
-  evaluation/     correctness, calibration, selective risk, statistics
-  runners/        config, vLLM, checkpoints (HPC entrypoints)
-  metrics/        legacy scoring paths (still used)
+  evaluation/     correctness, calibration, selective risk, statistics (canonical)
+  runners/        config, vLLM, checkpoints, raw rows, inference session
+  metrics/        deprecated shims — prefer src/evaluation/
 prompts/          sober + QRM reproduction templates
 scripts/          run_inference, score_run, j1/j2/j3, hpc/
-tests/            31 unit tests
+tests/            unit tests (see CI badge / pytest)
 docs/             All documentation — start at docs/README.md
 dashboards/       Generated HTML dashboards
 outputs-hpc-*/    Publication archives (git-tracked when autopushed)

@@ -5,5 +5,6 @@
   "config_name": "gpqa_diamond",
   "prompt_template_file": "prompts/gpqa_diamond.txt",
   "gated": true,
-  "notes": "Requires Hugging Face gated access approval before download."
+  "notes": "Requires Hugging Face gated access approval before download.",
+  "revision": "main"
 }
