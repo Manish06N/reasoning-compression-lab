@@ -56,6 +56,14 @@ git fetch origin && git reset --hard origin/main
 
 ---
 
+### 3c. `QOSMaxGRESPerUser` with parallel 1-GPU cells — **documented 2026-07-03**
+
+**Symptom:** Second b01 cell `PENDING (QOSMaxGRESPerUser)` while only one inference job runs.  
+**Cause:** `--exclusive` on ragpu (2-GPU node) counts as **2 GPUs** toward the 2-GPU user limit; 1 running + 1 pending exclusive = 3 counted.  
+**Fix:** `submit_hpc_blocks.sh` split/single-cell submits **never** pass `--exclusive`. Use `docs/PARAM_RUDRA_SLURM.md` + dirty-node exclude.
+
+---
+
 ## Important — affects interpretation
 
 ### 4. Single-sample calibration requires valid confidence

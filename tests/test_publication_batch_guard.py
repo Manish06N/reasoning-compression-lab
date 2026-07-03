@@ -62,10 +62,19 @@ def test_hpc_submitter_supports_node_excludes():
     assert '"${SBATCH_EXCLUDE_ARGS[@]}"' in text
 
 
-def test_hpc_submitter_defaults_exclusive_on():
+def test_hpc_submitter_defaults_exclusive_off_for_split():
     submitter = ROOT / "scripts/hpc/submit_hpc_blocks.sh"
     text = submitter.read_text(encoding="utf-8")
-    assert 'QREASON_SLURM_EXCLUSIVE="${QREASON_SLURM_EXCLUSIVE:-1}"' in text
+    assert 'QREASON_SLURM_EXCLUSIVE="${QREASON_SLURM_EXCLUSIVE:-0}"' in text
+    assert "QOSMaxGRESPerUser" in text or "PARAM_RUDRA_SLURM" in text
+    assert "ignored for split 1-GPU cells" in text
+
+
+def test_hpc_submitter_has_single_cell_submit():
+    submitter = ROOT / "scripts/hpc/submit_hpc_blocks.sh"
+    text = submitter.read_text(encoding="utf-8")
+    assert "submit_single_cell" in text
+    assert "cell|single-cell|single_cell" in text
 
 
 def test_hpc_launcher_checks_free_gpu_memory_before_vllm():

@@ -45,9 +45,11 @@ else
   SBATCH_EXPORT="${SBATCH_EXPORT},QREASON_FRESH_RUN="
 fi
 
-# Default exclusive: whole node free of other jobs → avoids dirty-GPU VRAM contention.
-# Set QREASON_SLURM_EXCLUSIVE=0 for faster backfill on busy days (dirty_nodes.txt helps).
-export QREASON_SLURM_EXCLUSIVE="${QREASON_SLURM_EXCLUSIVE:-1}"
+# PARAM Rudra QOS: MaxTRESPerUser = gres/gpu=2. ragpu nodes have 2× A100.
+# NEVER use --exclusive on split 1-GPU cell jobs: SLURM counts exclusive as BOTH GPUs
+# on the node toward your quota, so 1 running + 1 pending exclusive → 3 counted → QOSMaxGRESPerUser.
+# Use dirty_nodes.txt + VRAM preflight instead. See docs/PARAM_RUDRA_SLURM.md.
+export QREASON_SLURM_EXCLUSIVE="${QREASON_SLURM_EXCLUSIVE:-0}"
 
 resolve_slurm_excludes() {
   local -a nodes=()
@@ -103,9 +105,9 @@ submit_split_2gpu() {
   echo "Archive: $QREASON_OUTPUT_ROOT"
   # shellcheck disable=SC1090
   source "$block_file"
-  local -a exclusive_args=()
-  if [[ "${QREASON_SLURM_EXCLUSIVE:-1}" == "1" ]]; then
-    exclusive_args+=(--exclusive)
+  # Split mode: never --exclusive (QOS trap on 2-GPU ragpu nodes).
+  if [[ "${QREASON_SLURM_EXCLUSIVE:-0}" == "1" ]]; then
+    echo "WARN: QREASON_SLURM_EXCLUSIVE=1 ignored for split 1-GPU cells (see docs/PARAM_RUDRA_SLURM.md)." >&2
   fi
   for entry in "${HPC_BLOCK_CELLS[@]}"; do
     local cfg="${entry#*:}"
@@ -121,9 +123,30 @@ submit_split_2gpu() {
       --partition=gpu \
       --cpus-per-task=8 \
       --gres=gpu:1 \
-      "${exclusive_args[@]}" \
       --wrap="bash scripts/hpc/run_hpc_2a100_publication.sh cell ${cfg} ${block}"
   done
+}
+
+submit_single_cell() {
+  local cell_cfg="$1"
+  local parent_block="${2:-single_cell}"
+  local cell_id
+  cell_id="$(python3 -c "import json,sys; print(json.load(open(sys.argv[1]))['cell_id'])" "$cell_cfg")"
+  echo "Submitting single cell $cell_id (1×A100, non-exclusive) ..."
+  echo "Archive: $QREASON_OUTPUT_ROOT"
+  if [[ "${QREASON_SLURM_EXCLUSIVE:-0}" == "1" ]]; then
+    echo "WARN: QREASON_SLURM_EXCLUSIVE=1 ignored for single 1-GPU cell (see docs/PARAM_RUDRA_SLURM.md)." >&2
+  fi
+  sbatch --export="$SBATCH_EXPORT" \
+    --job-name="qreason-${cell_id}" \
+    --output="logs/slurm/single_${cell_id}_%j.out" \
+    --error="logs/slurm/single_${cell_id}_%j.err" \
+    --time=47:00:00 \
+    "${SBATCH_EXCLUDE_ARGS[@]}" \
+    --partition=gpu \
+    --cpus-per-task=8 \
+    --gres=gpu:1 \
+    --wrap="bash scripts/hpc/run_hpc_2a100_publication.sh cell ${cell_cfg} ${parent_block}"
 }
 
 submit_2gpu_block() {
@@ -133,10 +156,10 @@ submit_2gpu_block() {
   source "$block_file"
   local cpus_per_task=$((8 * HPC_BLOCK_GPUS))
   local -a exclusive_args=()
-  if [[ "${QREASON_SLURM_EXCLUSIVE:-1}" == "1" ]]; then
+  if [[ "${QREASON_SLURM_EXCLUSIVE:-0}" == "1" ]]; then
     exclusive_args+=(--exclusive)
   fi
-  echo "Submitting $block as one ${HPC_BLOCK_GPUS}-GPU exclusive block job ..."
+  echo "Submitting $block as one ${HPC_BLOCK_GPUS}-GPU block job (exclusive=${QREASON_SLURM_EXCLUSIVE:-0}) ..."
   echo "Archive: $QREASON_OUTPUT_ROOT"
   sbatch --export="$SBATCH_EXPORT" \
     --job-name="qreason-${block}" \
@@ -196,6 +219,13 @@ submit_all_blocks() {
 }
 
 case "$BLOCK" in
+  cell|single-cell|single_cell)
+    if [[ $# -lt 2 ]]; then
+      echo "Usage: $0 cell <cell-config.json> [parent-block-id]"
+      exit 1
+    fi
+    submit_single_cell "$2" "${3:-single_cell}"
+    ;;
   all|b01|b01_parallel_bf16_anchors)
     submit_2gpu b01_parallel_bf16_anchors
     ;;
