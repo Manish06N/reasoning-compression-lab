@@ -62,5 +62,12 @@ def test_hpc_launcher_checks_free_gpu_memory_before_vllm():
     assert 'check_gpu_free_memory "$gpu_id" "$cuda_devices"' in text
 
 
+def test_hpc_archive_guard_uses_active_python():
+    guard = ROOT / "scripts/hpc/09_assert_fresh_archive.sh"
+    text = guard.read_text(encoding="utf-8")
+    assert 'python scripts/hpc/09_assert_fresh_archive.py --archive "$ROOT"' in text
+    assert "python3 scripts/hpc/09_assert_fresh_archive.py" not in text
+
+
 def test_normal_mode_allows_batch():
     assert_publication_batch_size(4, publication=False)

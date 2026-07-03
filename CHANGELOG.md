@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-07-03 — Archive guard Python fix for split retry
+
+**Scope:** Follow-up for split retry jobs **86426/86427**.
+
+**Status:** Jobs **86426** and **86427** submitted as two individual 1-GPU jobs and started on separate nodes (`ragpu006`, `ragpu008`), but both failed after 00:01:31 before inference.
+
+**Root cause:** `scripts/hpc/09_assert_fresh_archive.sh` invoked system `python3` on compute nodes. That interpreter was too old for `from __future__ import annotations`, causing `SyntaxError: future feature annotations is not defined`.
+
+**Fix:** `09_assert_fresh_archive.sh` now invokes active conda `python`; regression test added in `tests/test_publication_batch_guard.py`.
+
+---
+
 ## 2026-07-03 — Restore split b01 submits
 
 **Scope:** Correct the July 3 exclusive-allocation retry after confirming 2-GPU allocations are too hard to obtain quickly.

@@ -25,5 +25,5 @@ if [[ "${QREASON_FRESH_RUN:-}" == "1" && -d "$ROOT/raw" ]]; then
   fi
 fi
 
-python3 scripts/hpc/09_assert_fresh_archive.py --archive "$ROOT"
+python scripts/hpc/09_assert_fresh_archive.py --archive "$ROOT"
 echo "Archive check passed: $ROOT"
