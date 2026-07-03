@@ -8,6 +8,8 @@
 
 **Fix:** `submit_hpc_blocks.sh` now supports `QREASON_SLURM_EXCLUDE`, passed through to `sbatch --exclude`, so split retries can avoid nodes that just failed the free-VRAM preflight while still submitting one 1-GPU job per model.
 
+**HPC retry:** Submitted split retry 3 with `QREASON_SLURM_EXCLUDE=ragpu006,ragpu008` to archive `outputs-hpc-2a100-main-2026-07-03-splitretry3`. Jobs **86444** (Qwen-7B BF16) and **86445** (Llama-8B BF16) are pending as separate 1-GPU jobs.
+
 ---
 
 ## 2026-07-03 — Archive guard Python fix for split retry
