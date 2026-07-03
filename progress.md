@@ -9,24 +9,53 @@ Canonical dated record for **Paper 1: Beyond Accuracy** (`reasoning-compression-
 
 ---
 
-## Current Status Snapshot (2026-07-03)
+## Current Status Snapshot (2026-07-03, evening)
 
 | Area | Status |
 |------|--------|
-| **GitHub `main`** | Up to date (latest commit pushed with VLLM fix and tracking updates). |
-| **J1 scientific validation** | **Active runs** — GPTQ4 pair (86698 Qwen, 86699 Llama) now RUNNING (~2:51) on separate nodes (ragpu006 + racn116). AWQ4 pair (86696/86697) hit git clean assert and are gone from queue (failed early). FP8 pair failed earlier on max_model_len (before env var fix). No rows yet (0/500). |
+| **GitHub `main`** | **Behind HPC** — local commits `434f373` (docs) + `4da8913` (Triton gcc fix) not yet pushed. MacBook rsync → push needed. |
+| **J1 scientific validation** | **Blocked until Triton fix verified** — afternoon wave produced **0/500 rows**. Root cause found and patched; b02 FP8 resubmitted as 86718/86719. |
 | **QRM baseline gates** | **Fixed** (prior) |
-| **Submit workflow** | b02/b03/b04 resubmitted with EXCLUSIVE=0 + VLLM_ALLOW_LONG_MAX_MODEL_LEN=1. |
-| **GPU parallel + context** | Fixed high 1M+ (simplified, no dynamic calc). GPTQ4 using it. |
-| **Environment & Requirements** | Clean (vLLM 0.8.5, torch 2.6, 13 models, pip check OK). |
-| **Overall** | Queue has 2 running + 4 pending (QOS). Jobs still in early preflight/dataset stage (no model load visible in tails yet). |
+| **Submit workflow** | `EXCLUSIVE=0`, `VLLM_ALLOW_LONG_MAX_MODEL_LEN=1`, split 1-GPU-per-cell via `submit_hpc_blocks.sh`. |
+| **GPU parallel + context** | Fixed high 1M+ context. FP8/AWQ/GPTQ configs use it; BF16 now also sets `kv_cache_dtype: fp8` so 1M fits on 1× A100. |
+| **Environment & Requirements** | vLLM 0.8.5, torch 2.6, triton 3.2.0. **New:** conda `gcc_linux-64` toolchain for compute-node Triton JIT. |
+| **Overall** | Queue: 86718/86719 (b02 FP8, PD), 86707–86709 (b03 AWQ + b05 GPTQ3, PD). Waiting for GPU slots. |
 
-**Verification performed (latest check 2026-07-03 ~11:00+):**
-- squeue: GPTQ4 pair (86698 Qwen on ragpu006, 86699 Llama on racn116) RUNNING ~2:51; AWQ4 (86696/7) no longer listed (failed git assert per .err); FP8 failed earlier on max_model_len (pre-fix).
-- Logs: AWQ/GPTQ tails show only SLURM header + preflight (81GB free) + archive/git clean PASSED + "=== inference: ... (CUDA=...)". No "Loading model" or generation yet. Cell logs only pynvml + HF cache fallback.
-- Raw: 0 lines. Checkpoints: rows_done=0, in_progress (updated ~11:00).
-- Git: Clean (pushed 02d861b with VLLM fix); only ?? AGENTS.md.
-- 13 models + env verified clean. High 1M+ context active in configs. VLLM_ALLOW env now in launcher.
+**Root cause fixed this session — Triton JIT on compute nodes:**
+
+PARAM Rudra compute nodes have `/usr/bin/gcc` but **no** `/usr/include/stdlib.h`. vLLM 0.8.5 + XFormers prefix attention triggers Triton host compilation on the **first** `generate()` call. `enforce_eager=True` does not prevent this. Error pattern:
+
+```text
+fatal error: stdlib.h: No such file or directory
+```
+
+**Fix (commit `4da8913`):** Point `CC`/`CXX` at conda's `x86_64-conda-linux-gnu-gcc` (ships its own sysroot headers). Added `param_rudra_assert_triton_cc` preflight in `run_hpc_2a100_publication.sh`. Installed `gcc_linux-64 gxx_linux-64 sysroot_linux-64` in `qreason`. Documented in `00_setup_env.sh`.
+
+**Secondary fix — BF16 KV cache OOM at 1M:** Job 86703 needed 56 GiB KV cache but only 50.5 GiB was free with BF16 KV. Added `kv_cache_dtype: fp8` + `gpu_memory_utilization: 0.95` to `deepseek_r1_qwen_7b.json` and `deepseek_r1_llama_8b.json` (FP8-quant paths already had this and reached generation before Triton failure).
+
+**Verification performed (2026-07-03 ~16:28+ IST):**
+- Triton preflight on login node: `param_rudra_assert_triton_cc` → OK (`CC=.../x86_64-conda-linux-gnu-gcc`).
+- Job 86705 proved FP8 1M fits: model load 8.16 GiB, **65.52 GiB KV reserved**, engine warmup OK — then Triton gcc killed first sample.
+- Cancelled 86706 (pre-fix); resubmitted b02 → **86718** (Qwen FP8), **86719** (Llama FP8).
+- Raw rows: still **0/500** in `outputs-hpc-2a100-main-2026-07-03`.
+- Git: `main` ahead of `origin/main` by 2; untracked `AGENTS.md`.
+
+**Active / recent HPC jobs (2026-07-03 evening wave):**
+
+| Job | Cell | State | Notes |
+|-----|------|-------|-------|
+| 86696/86697 | b03 AWQ4 | FAILED (~50s) | Git clean assert at submit |
+| 86698/86699 | b04 GPTQ4 | FAILED (~6m) | Triton gcc / `stdlib.h` on first generate |
+| 86703/86704 | b01 BF16 | FAILED / CANCELLED | KV cache OOM at 1M without fp8 KV |
+| 86705 | b02 FP8 Qwen | FAILED (~6m) | Triton gcc (model load OK) |
+| 86706 | b02 FP8 Llama | CANCELLED | Mid-run; replaced by 86719 |
+| **86718** | b02 FP8 Qwen | PENDING | Resubmit with Triton fix |
+| **86719** | b02 FP8 Llama | PENDING | Resubmit with Triton fix |
+| **86707** | b03 AWQ Qwen | PENDING | Downstream; picks up fix at start |
+| **86708** | b03 AWQ Llama | PENDING | Downstream |
+| **86709** | b05 GPTQ3 | PENDING | Downstream |
+
+**How to verify the fix:** When 86718 runs, tail `logs/slurm/b02_parallel_fp8_level_b_qwen7b_fp8_math500_seed0_86718.out`. Success = `[1-1/500] generating` then progress past `Processed prompts: 0%` and rows in `outputs-hpc-2a100-main-2026-07-03/raw/`.
 
 **Codebase review — over-engineered parts (2026-07-03)**
 
@@ -69,9 +98,7 @@ If you agree on a subset, I can clean the corresponding files (e.g. simplify the
 
 What parts feel most painful to you right now when you try to run? Which ones should we attack first?
 
-**Active / recent HPC jobs (final 2026-07-03 state)** (no new activity)
-
-**Active / recent HPC jobs (final 2026-07-03 state)**
+**Active / recent HPC jobs (earlier 2026-07-03 morning wave — historical)**
 
 | Job | Role | State | Notes |
 |-----|------|-------|-------|
@@ -97,33 +124,28 @@ What parts feel most painful to you right now when you try to run? Which ones sh
 
 **Progress (final for this wave):** 0 raw lines, 0 rows_done. Multiple output roots created during iteration (queued primary, attempt1, main-07-03, splitretry*). Launch + binding + gates validated. No inference samples completed.
 
-**Fixes applied 2026-07-03 — simplified (see CHANGELOG.md for full):**
+**Fixes applied 2026-07-03 (see CHANGELOG.md for full):**
 - **Quantization** — GPTQ-4 for both families correctly "compressed-tensors" (on-disk match).
-- **Context length — simplified per user ("over engineered it, just set a max value for the model and forget about it")**:
-  - Removed the complex two-phase post-load VRAM measurement + dynamic override from run_inference.py.
-  - No more estimates, phase-1 tiny loads, kv_bpt calcs at runtime for max length.
-  - Just fixed high static value: 1048576 (1M+) in repro_qrm.yaml + main Qwen-7B/Llama-8B model configs (all variants).
-  - vllm_runner default high.
-  - Updated yaml notes: fixed high, simplified, no over-engineering.
-  - Code now simply ensures the high value from config (or sets if lower) and proceeds. Basic post-load VRAM report kept for monitoring only.
+- **Context length — simplified** — fixed high 1M+ in configs/decoding; no dynamic VRAM calc at runtime.
+- **VLLM_ALLOW_LONG_MAX_MODEL_LEN=1** — exported in `run_hpc_2a100_publication.sh` (commit `02d861b`).
+- **Triton JIT on compute nodes (commit `4da8913`, evening)** — conda `gcc_linux-64` toolchain; `CC`/`CXX` → `x86_64-conda-linux-gnu-gcc`; `param_rudra_assert_triton_cc` preflight. Fixes `stdlib.h: No such file or directory` on first `generate()`.
+- **BF16 1M on 1× A100** — `kv_cache_dtype: fp8` + `gpu_memory_utilization: 0.95` on BF16 Qwen/Llama model configs (fixes 86703-style KV OOM).
 - MATH-500: short prompts, high fixed output limit supports long reasoning.
-- Env: 13 models, clean qreason (vLLM 0.8.5 etc.), no jobs running.
-- Full checks: imports, configs, syntax all good.
+- Env: 13 models, qreason (vLLM 0.8.5, triton 3.2.0, conda gcc for JIT).
 
 **Model comparison (Qwen-7B vs Llama-8B distilled):**
 - Both now use the exact same simple fixed high 1M+ max. No dynamic per-model differences.
 - Qwen more KV-efficient but irrelevant — fixed value for simplicity ("set and forget").
 - Keeps long CoT support without complexity.
 
-**Next:** 
-1. Choose stable root or use --fresh.
-2. `export QREASON_SLURM_EXCLUSIVE=0`
-3. Resubmit b01 (and blocks) via `bash scripts/hpc/submit_hpc_blocks.sh b01` (or specific).
-4. **Do not cancel** once past preflight + "Loading model" — let full reasoning traces complete (fixed 1M+ max now).
-5. Monitor: raw wc + checkpoints + basic [VRAM post-load] report (used/free + the fixed high max).
-6. After meaningful rows + full traces: score, then sync (HPC commit → MacBook rsync+push → HPC reset).
+**Next (post-Triton fix):**
+1. **Verify 86718** passes first generate (tail SLURM log; check `raw/` row count).
+2. Let 86719, 86707–86709 run without cancel once past model load.
+3. Resubmit **b01 BF16** after b02 proves fix: `QREASON_SLURM_EXCLUSIVE=0 bash scripts/hpc/submit_hpc_blocks.sh b01`.
+4. Monitor: `wc -l outputs-hpc-2a100-main-2026-07-03/raw/*.jsonl` + checkpoints.
+5. **Sync:** HPC commit docs → MacBook rsync+push → HPC `git reset --hard origin/main`.
 
-**Note on 0 rows:** Not a failure of the parallel fix. Jobs proved the allocation/binding logic and gates; they simply did not live long enough for even the first sample. The mechanism (split no-exclusive + launcher CUDA handling) is now confirmed working.
+**Note on 0 rows (afternoon wave):** Parallel co-schedule + gates worked; jobs died on Triton gcc (FP8/GPTQ) or git assert (AWQ) or BF16 KV OOM — not on SLURM binding. Job 86705 proved FP8 1M fits (65.52 GiB KV) before Triton killed inference.
 
 ### Active HPC queue (2026-07-02)
 

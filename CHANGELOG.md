@@ -1,6 +1,53 @@
 # Changelog
 
+## 2026-07-03 — Fix Triton JIT on compute nodes (commit `4da8913`); resubmit b02 FP8
+
+**Root cause (blocking all inference after model load):** On PARAM Rudra compute nodes, vLLM's first `generate()` call triggers Triton JIT via the XFormers prefix-attention path. Triton used `/usr/bin/gcc` (because `param_rudra_env.sh` prepends `/usr/bin` to `PATH` and `CC` was unset). Compute nodes lack `/usr/include/stdlib.h`, so compilation failed:
+
+```text
+fatal error: stdlib.h: No such file or directory
+subprocess.CalledProcessError: Command '['/usr/bin/gcc', ...]' returned non-zero exit status 1.
+```
+
+`enforce_eager=True` disables CUDA graphs but **does not** stop this Triton host compile. Jobs 86698, 86699 (GPTQ4), and 86705 (FP8 Qwen) all reached model load + KV init + `[1-1/500] generating` then died at `Processed prompts: 0%`.
+
+**Secondary failure (b01 BF16):** Job 86703 failed earlier at vLLM engine init — 1M `max_model_len` with BF16 KV needed 56 GiB KV cache but only 50.5 GiB was available on 1× A100. FP8-quant paths fit because weights are smaller and configs already use `kv_cache_dtype: fp8`.
+
+**Fix applied (`4da8913`, HPC local — MacBook/GitHub sync pending):**
+
+| Change | File(s) |
+|--------|---------|
+| Install conda gcc toolchain with sysroot headers | `qreason` env via `conda install -c conda-forge gcc_linux-64 gxx_linux-64 sysroot_linux-64` |
+| Set `CC`/`CXX` to `x86_64-conda-linux-gnu-gcc/g++` | `scripts/hpc/param_rudra_env.sh` (`param_rudra_configure_triton_cc`) |
+| Fail-fast preflight: compile probe with `stdlib.h` | `scripts/hpc/param_rudra_env.sh` (`param_rudra_assert_triton_cc`), called from `run_hpc_2a100_publication.sh` |
+| Document gcc install in setup gate | `scripts/hpc/00_setup_env.sh` |
+| BF16 1M context on 1× A100: add `kv_cache_dtype: fp8`, `gpu_memory_utilization: 0.95` | `configs/models/deepseek_r1_qwen_7b.json`, `configs/models/deepseek_r1_llama_8b.json` |
+
+**Job actions after fix:**
+
+- Cancelled **86706** (Llama FP8) — started before `CC` fix was committed.
+- Resubmitted b02 FP8: **86718** (Qwen FP8), **86719** (Llama FP8) with `QREASON_SLURM_EXCLUSIVE=0`.
+- Pending downstream (will pick up fix at runtime): **86707** (AWQ Qwen), **86708** (AWQ Llama), **86709** (b05 GPTQ3).
+
+**Failure summary for the 2026-07-03 afternoon wave (pre-fix):**
+
+| Jobs | Block | Failure |
+|------|-------|---------|
+| 86696/86697 | b03 AWQ4 | Git clean assert (dirty tree at submit) |
+| 86698/86699 | b04 GPTQ4 | Triton `/usr/bin/gcc` + missing `stdlib.h` |
+| 86703/86704 | b01 BF16 | KV cache OOM at 1M without fp8 KV (86704 cancelled with sibling) |
+| 86705 | b02 FP8 Qwen | Triton gcc (passed model load; 65.52 GiB KV reserved) |
+| 86706 | b02 FP8 Llama | Cancelled mid-run to apply fix |
+
+**Current state (~16:28+ IST):** 0/500 raw rows in `outputs-hpc-2a100-main-2026-07-03`. Queue: 86718/86719 (b02 FP8, PD Priority), 86707–86709 (PD Resources/QOS). Verify fix when 86718 reaches first generate — success = progress past `Processed prompts: 0%` without `stdlib.h` error.
+
+**Sync:** HPC `main` ahead of `origin/main` by 2 commits (`434f373` docs, `4da8913` fix). Run MacBook rsync → push before `git reset --hard origin/main` on HPC.
+
+---
+
 ## 2026-07-03 — Latest tracking (post-resubmit): GPTQ4 pair (86698 Qwen on ragpu006, 86699 Llama on racn116) RUNNING ~2:51 after AWQ4 (86696/86697) and FP8 failed on git assert / max_model_len (pre-VLLM fix). No rows (0/500), logs only at preflight/archive/git clean stage + "=== inference: ...". VLLM_ALLOW fix committed+pushed; high 1M+ active. AWQ hit "Publication run requires clean git tree" (uncommitted changes at submit). GPTQ should proceed with env var.
+
+> **Superseded** by Triton gcc fix entry above. Jobs 86698/86699 later **FAILED** on Triton JIT, not still running.
 
 **Overengineered areas identified (full review of scripts/, src/runners/, configs/, preflights, etc.):**
 
