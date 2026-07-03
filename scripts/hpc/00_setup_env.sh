@@ -43,6 +43,9 @@ conda activate qreason
 conda install -y git
 git --version
 
+# Triton JIT on compute nodes needs a host compiler with C headers (/usr/include is often missing).
+conda install -y -c conda-forge gcc_linux-64 gxx_linux-64 sysroot_linux-64
+
 pip install --upgrade pip
 if [[ -f requirements-hpc.lock.txt ]]; then
   pip install -r requirements-hpc.lock.txt

@@ -21,6 +21,7 @@ QR="${QR:-/scratch/$USER/reasoning-compression-lab}"
 # shellcheck disable=SC1091
 source "$SCRIPT_DIR/param_rudra_env.sh"
 param_rudra_activate_conda
+param_rudra_assert_triton_cc
 
 export VLLM_ALLOW_LONG_MAX_MODEL_LEN=1
 
