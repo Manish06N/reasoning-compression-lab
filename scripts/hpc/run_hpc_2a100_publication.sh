@@ -22,6 +22,8 @@ QR="${QR:-/scratch/$USER/reasoning-compression-lab}"
 source "$SCRIPT_DIR/param_rudra_env.sh"
 param_rudra_activate_conda
 
+echo "=== DEBUG: after activate, python=$(which python 2>/dev/null || echo none) git=$(command -v git 2>/dev/null || echo none) ===" >&2
+
 DATE_TAG="${QREASON_HPC_DATE:-$(date +%Y-%m-%d)}"
 export QREASON_OUTPUT_ROOT="${QREASON_OUTPUT_ROOT:-$QR/outputs-hpc-2a100-main-${DATE_TAG}}"
 RAW="$QREASON_OUTPUT_ROOT/raw"
@@ -33,8 +35,12 @@ METADATA="$QREASON_OUTPUT_ROOT/metadata"
 BACKUP_ROOT="$QREASON_OUTPUT_ROOT/_backup"
 mkdir -p "$RAW" "$SCORED" "$RESULTS" "$LOGS" "$CHECKPOINTS" "$METADATA" "$BACKUP_ROOT"
 
+echo "=== DEBUG: dirs created for $QREASON_OUTPUT_ROOT ===" >&2
+
 # Block accidental resume into the bad June-29 archive or stale pre-fix JSONL.
 bash "$SCRIPT_DIR/09_assert_fresh_archive.sh"
+
+echo "=== DEBUG: after 09_assert_fresh_archive ===" >&2
 
 # Clean zero-byte stale lock files from prior crashed publication attempts.
 # These can cause the early manifest/backup python steps (atomic_locked_json_update,
@@ -42,6 +48,8 @@ bash "$SCRIPT_DIR/09_assert_fresh_archive.sh"
 # or run_inference (observed on 86579 etc.: wrapper stops after "Archive check passed",
 # 0 GPU usage, job stays RUNNING for 1h+).
 find "${QREASON_OUTPUT_ROOT:-}" -name '*.lock' -size 0 -delete 2>/dev/null || true
+
+echo "=== DEBUG: stale locks cleaned ===" >&2
 
 FRESH_FLAG=""
 if [[ "${QREASON_FRESH_RUN:-}" == "1" ]]; then
@@ -62,9 +70,13 @@ if [[ "${BATCH_SIZE:-1}" != "1" ]]; then
   exit 1
 fi
 
+echo "=== DEBUG: about to run git clean assert ===" >&2
+
 if ! python -c "import sys; sys.path.insert(0, '$QR'); from src.runners.publication_mode import assert_code_paths_clean; assert_code_paths_clean('$QR')"; then
   exit 1
 fi
+
+echo "=== DEBUG: git clean assert PASSED ===" >&2
 
 export QR DATE_TAG BACKUP_ROOT DECODING BATCH_SIZE CHECKPOINT_EVERY QREASON_OUTPUT_ROOT
 
