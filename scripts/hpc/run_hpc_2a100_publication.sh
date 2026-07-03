@@ -22,6 +22,8 @@ QR="${QR:-/scratch/$USER/reasoning-compression-lab}"
 source "$SCRIPT_DIR/param_rudra_env.sh"
 param_rudra_activate_conda
 
+export VLLM_ALLOW_LONG_MAX_MODEL_LEN=1
+
 echo "=== DEBUG: after activate, python=$(which python 2>/dev/null || echo none) git=$(command -v git 2>/dev/null || echo none) ===" >&2
 
 DATE_TAG="${QREASON_HPC_DATE:-$(date +%Y-%m-%d)}"
