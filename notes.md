@@ -153,8 +153,10 @@ The harness runs DeepSeek-R1 distill models (Qwen-7B, Llama-8B, later 1.5B) thro
 | | QRM | Us |
 |---|-----|-----|
 | Harness | Lighteval tasks | `run_inference.py` + `qrm_math500.txt` |
-| Seeds | 3 averaged | seed 0 first |
-| Extraction | Their pipeline | `\boxed{}` + MATH scorer |
+| Prompt text | Same MATH-500 instruction (verified vs `reasoning.py`) | **Matches** |
+| Seeds | 3 averaged (42–44) | seed 0 first |
+| repetition_penalty | Not set | 1.05 (deployment default) |
+| Extraction | `latex_gold_metric` | `\boxed{}` + math_verify |
 
 **Publishability:**
 
@@ -321,9 +323,10 @@ Week 4+: b06 GSM8K, b07 GPQA; seeds 42–44 only if needed for robustness
 ### If truncation stays ~90% at clean 32k
 
 - **Still finish 500/500** and report.  
-- Frame as **budget-limited deployment** finding.  
-- Diff prompts vs QRM GitHub / Lighteval tasks.  
-- Optional: controlled 64k sweep for **all 500** — separate table.
+- Frame as **budget-limited deployment** finding (Protocol B).  
+- Prompt already matches QRM — investigate stack (vLLM version, scorer, seed) not prompt text.  
+- Optional: controlled 64k sweep for **all 500** — separate table.  
+- See **§19** for strict Protocol A rerun if gate miss with low truncation.
 
 ---
 
@@ -410,4 +413,181 @@ e733b7a CHANGELOG: campaign narrative + truncation methodology
 
 ---
 
-*Last updated: 2026-07-03 (evening IST). Refresh §12 after major job milestones.*
+## 17. Queue audit (2026-07-03 ~19:30 IST)
+
+| Question | Answer |
+|----------|--------|
+| Are all required jobs queued? | **Only b01** — intentional. b02–b06 **not** submitted (b01 gate). |
+| Jobs running | **86757** Qwen BF16 `ragpu006`; **86758** Llama BF16 `racn116` |
+| Progress | Qwen **8/500** in logs (~7 min/question, ~78 tok/s output) |
+| Raw JSONL on disk | **0 rows** — checkpoint every **10** rows; first file at row 10 |
+| b07–b09 | Not queued (GPQA needs HF gate; 1.5B cells future) |
+
+**Verdict:** Queue state is **correct** for current strategy. Do **not** submit b02–b06 until b01 is 500/500 and scored.
+
+---
+
+## 18. QRM reproduction audit (vs GitHub `inference.py` + `reasoning.py`)
+
+Fetched 2026-07-03 from [ruikangliu/Quantized-Reasoning-Models](https://github.com/ruikangliu/Quantized-Reasoning-Models).
+
+### What matches (good)
+
+| Item | QRM | Us | Status |
+|------|-----|-----|--------|
+| Prompt (MATH-500) | `{problem}\n\nPlease reason step by step…\boxed{}` | `prompts/qrm_math500.txt` — **same text** | **MATCH** |
+| Chat template | `use_chat_template=True` | `render_prompt()` applies HF chat template | **MATCH** |
+| temperature | 0.6 | 0.6 | **MATCH** |
+| top_p | 0.95 | 0.95 | **MATCH** |
+| max generation | `max_new_tokens=32768` | `max_tokens=32768` | **MATCH** |
+| Models / task | Qwen-7B, Llama-8B BF16 MATH-500 | b01 cells | **MATCH** |
+| `prompt_profile` | reproduction task | `reproduction` in cell configs | **MATCH** |
+| `verify_decoding_params.py` | QRM ref in `sampling_utils.py` | VERIFY OK on active yaml | **MATCH** |
+
+QRM `reasoning.py` prompt_fn (MATH-500):
+
+```python
+query=f"{line['problem']}\n\nPlease reason step by step, and put your final answer within \\boxed{{}}."
+```
+
+Our `prompts/qrm_math500.txt` is the same instruction (with `{question}` placeholder). **No long 5-rule system prompt** — earlier concern was wrong.
+
+### Gaps vs strict QRM (material)
+
+| Item | QRM | Us (active `729d773`) | Impact |
+|------|-----|----------------------|--------|
+| **Seed** | default **42**; paper **3 seeds** (42–44) | **seed 0** | Medium — variance; gate expects QRM bands |
+| **repetition_penalty** | **Not set** in `GenerationParameters` | **1.05** (June loop fix) | Medium — may shorten traces vs QRM |
+| **enforce_eager** | **true** | **false** (BF16 speed) | Low — documented deviation |
+| **max_model_len** | **32768** | **40960** (KV headroom) | Low — output still capped at 32k |
+| **Harness** | Lighteval + `latex_gold_metric` | `run_inference.py` + `\boxed{}` / math_verify | Medium — scorer may disagree on edge cases |
+| **top_k** | 30 for QwQ only; **None** for Qwen/Llama | not set | **MATCH** for our models |
+
+### Reproduction status
+
+- **Decoding + prompt aligned** with QRM `inference.py` defaults.  
+- **Results not yet proven** — June 7% invalid; current run too early (8/500, no checkpoint file).  
+- **Cannot claim** “reproduced QRM Table 1” until `compare_qrm_baseline.py` **hard_passed** on scored 500/500.
+
+---
+
+## 19. Should we match QRM 100%? (protocol decision)
+
+**Short answer: No — not everywhere. Yes — for the b01 gate claim only, on parameters that change generations.**
+
+Paper 1 is **not** the QRM paper. Our contribution is pass@1 **plus** truncation, calibration, cost, and seed variance under a **fixed deployment budget**. QRM is a **sanity baseline**, not the thesis.
+
+Use **two labeled protocols** (already sketched in `configs/baselines/qrm_literature_targets.yaml`):
+
+### Protocol A — `qrm_repro` (b01 hard gate)
+
+**Purpose:** “Our stack can hit QRM Table 1 bands before we open the quant grid.”
+
+| Parameter | Target |
+|-----------|--------|
+| Prompt | `prompts/qrm_math500.txt` (verified = QRM) |
+| temp / top_p / max_tokens | 0.6 / 0.95 / 32768 |
+| Seeds | **42, 43, 44** (report mean ± std like QRM) |
+| repetition_penalty | **None** (match QRM `inference.py`) |
+| enforce_eager | **true** preferred; if false, **document** in methods |
+| max_model_len | 32768 or 40960 OK if `max_tokens` stays 32768 |
+| Scorer | If gate fails with low truncation, diff Lighteval `latex_gold_metric` vs our math_verify |
+
+**When to run:** After current pilot finishes **or** if pilot shows gate miss with low truncation.
+
+### Protocol B — `our_hpc_deployment` (Paper 1 main grid b02–b06)
+
+**Purpose:** Fair **internal** comparison across BF16 / FP8 / AWQ / GPTQ at fixed budget.
+
+| Parameter | Target |
+|-----------|--------|
+| Fixed budget | **32k** `max_tokens` all cells (non-negotiable for cross-quant tables) |
+| repetition_penalty | **1.05** allowed — label as *our vLLM anti-loop deployment default* |
+| enforce_eager | **false** on BF16 A100 (speed; same across all quants in a table) |
+| Seeds | seed 0 for grid; add 42–44 only if Sober Look / variance section needs it |
+| Truncation | **First-class metric** beside pass@1 |
+
+**Do not** mix Protocol A and B rows in one table without a protocol column.
+
+### What to do with jobs 86757/86758 (running now)
+
+| Choice | Rationale |
+|--------|-----------|
+| **Let them finish** | Sunk cost; first clean post-`729d773` signal at 32k |
+| **Label as** `our_hpc_repro` seed-0 **pilot** | Not strict QRM repro until seeds 42–44 + no repetition_penalty rerun |
+| **Do not cancel** for 100% QRM mid-run | Would waste ~8h; learn truncation_rate first |
+| **If gate fails after score** | (1) truncation high → budget/stack issue, not prompt; (2) truncation low, pass@1 low → scorer or seed rerun under Protocol A; (3) then decide b02 |
+
+### Decision tree
+
+```
+86757/86758 finish 500/500 (Protocol B pilot, seed 0)
+  → score → compare_qrm_baseline.py
+    → PASS (pass@1 ~94% ±5pp, trunc ≤15%) → submit b02 ONE block, same 32k protocol
+    → FAIL trunc high, pass@1 low → finish Paper 1 as budget-limited deployment; optional Protocol A rerun
+    → FAIL trunc low, pass@1 low → Protocol A strict rerun (seeds 42–44, no repetition_penalty) before b02
+```
+
+**Bottom line:** Match QRM **where it gates credibility** (32k, prompt, temp, top_p, seeds for the repro table). **Do not** slow the whole thesis to Lighteval parity or drop `repetition_penalty` from the main quant grid without labeling — that is a **feature** of our deployment study, not a bug.
+
+---
+
+## 20. Telegram watcher, 48h walltime, checkpoints, backups
+
+### Telegram watcher
+
+| Item | Status |
+|------|--------|
+| Script | `~/start-hpc-telegram-watcher.sh` |
+| Watches | Jobs **86757**, **86758** |
+| Archive | `outputs-hpc-2a100-main-2026-07-03` |
+| Caveat | Compute nodes may not resolve `api.telegram.org` — watcher can fail DNS-side; use `squeue` + logs as ground truth |
+
+### 48h SLURM walltime
+
+| Item | Detail |
+|------|--------|
+| Cluster limit | ~**47–48 h** per job |
+| Qwen ETA | 500 × ~7 min ≈ **58 h** → **will hit wall** before 500/500 |
+| Auto-pause | **None** — job ends at walltime |
+| Resume | Resubmit **same archive**, **no** `--fresh`: `bash scripts/hpc/submit_hpc_blocks.sh b01` |
+| Checkpoint | Every **10** rows to `raw/*.jsonl` + `state.json` |
+| SIGTERM handler | **No** graceful flush — rely on last checkpoint ≤10 rows behind log |
+
+### Backups
+
+| Path | Contents |
+|------|----------|
+| `_backup/latest/` | Mirrors logs, metadata, manifest |
+| `_backup/latest/raw/` | Empty until first 10-row checkpoint |
+| Git autopush | **Off** unless `QREASON_ENABLE_AUTOPUSH=1` |
+
+---
+
+## 21. Publishability recap (simple language)
+
+| Claim | OK now? |
+|-------|---------|
+| “We reproduced QRM 93.9%” | **No** — June invalid; July run incomplete |
+| “Under fixed 32k, pass@1 = X, truncation = Y%” | **Yes** — after 500/500 scored (Paper 1 core) |
+| “Quantization increases truncation at same budget” | **Yes** — after b02–b05 (novelty) |
+| “Calibration / cost-per-correct under compression” | **Yes** — Paper 1 contribution (after scoring pipeline) |
+
+~7% pass@1 with ~90% truncation is **not** publishable as QRM reproduction. It **is** publishable as evidence that **budget-capped deployment** fails silently (high truncation, low scored accuracy) — if reported honestly with `truncation_rate`.
+
+---
+
+## 22. Live snapshot (refresh)
+
+| Item | Value |
+|------|-------|
+| Time | 2026-07-03 ~19:30 IST |
+| Jobs | **86757** RUNNING ~1h02m; **86758** RUNNING ~51m |
+| Qwen log | **8/500** (~7 min/q, ~78 tok/s) |
+| Raw JSONL | 0 lines (checkpoint at 10) |
+| Next milestone | Row 10 → inspect `truncated` / `finish_reason` |
+| ETA risk | Resume likely before 500/500 |
+
+---
+
+*Last updated: 2026-07-03 (~19:30 IST). Refresh §22 after row-10 checkpoint and §12 if superseded.*
