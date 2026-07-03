@@ -2,7 +2,7 @@
   "model_id": "jakiAJK/DeepSeek-R1-Distill-Llama-8B_AWQ",
   "local_path_env": "QREASON_MODEL_LLAMA8B_AWQ4",
   "local_path_default": "models/DeepSeek-R1-Distill-Llama-8B-AWQ-4",
-  "dtype": "auto",
+  "dtype": "float16",
   "quantization": "awq",
   "max_model_len": 1048576,
   "tensor_parallel_size": 1,
