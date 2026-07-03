@@ -9,6 +9,42 @@ Personal backup of findings, decisions, and learnings from the July 3 working se
 
 ---
 
+## Executive summary (read this first)
+
+### Match QRM 100%?
+
+| Question | Answer |
+|----------|--------|
+| Match QRM everywhere? | **No** — Paper 1 is not a QRM reproduction paper |
+| Match QRM for b01 gate? | **Yes** — on params that change generations (32k, prompt, temp, top_p, seeds 42–44) |
+| Match QRM for quant grid (b02–b06)? | **No** — use fixed **32k** + labeled **deployment protocol** (repetition_penalty OK) |
+
+**Bottom line:** QRM is a **sanity baseline** before opening the quant grid. The thesis contribution is pass@1 **plus** truncation, calibration, and cost — not hitting 93.9% in every table.
+
+### Two protocols at a glance
+
+| | **Protocol A — `qrm_repro`** | **Protocol B — `our_hpc_deployment`** |
+|---|---|---|
+| **When** | b01 hard gate; claim “reproduced Table 1” | Main grid b02–b06; Paper 1 tables |
+| **32k `max_tokens`** | Yes | Yes (non-negotiable across quants) |
+| **Prompt** | `qrm_math500.txt` (= QRM GitHub) | Same file, `reproduction` profile |
+| **Seeds** | **42, 43, 44** (mean ± std) | **0** for grid; more only for variance section |
+| **repetition_penalty** | **None** (match QRM) | **1.05** — label as vLLM anti-loop default |
+| **enforce_eager** | true preferred | false on A100 (document in methods) |
+| **Truncation** | Gate metric (≤15%) | **First-class paper metric** beside pass@1 |
+
+**Never** mix Protocol A and B rows in one table without a `protocol` column.
+
+### Current run label
+
+Jobs **86757** / **86758** = **Protocol B pilot, seed 0**. Let finish; do **not** cancel for strict QRM mid-run. If gate fails after score → see decision tree in **§19**.
+
+### Verified good news (QRM GitHub audit)
+
+MATH-500 **prompt text matches** QRM `reasoning.py` exactly. Decoding (0.6 / 0.95 / 32768) matches `inference.py`. Real gaps: **seed 0 vs 42–44**, **repetition_penalty 1.05**, **enforce_eager false**, possible **scorer** diff (Lighteval vs math_verify).
+
+---
+
 ## 1. What this project is (one paragraph)
 
 **Paper 1** (*Beyond Accuracy: Reliability, Calibration, Seed Variance, and Cost-per-Correct of Quantized Reasoning LLMs*) studies whether compressed reasoning models stay **trustworthy and economical** under real serving — not just whether a single accuracy number drops.
@@ -404,6 +440,7 @@ git fetch origin && git reset --hard origin/main
 ## 16. Git commits referenced today
 
 ```text
+7f1b32c notes: QRM protocol decision, queue audit, infra checklist (§17–22)
 9912d7d Add literature archive (paper1 .md, paper2 pdf+md)
 ab58206 Docs: QRM baseline and pass@1 reproduction gap
 e733b7a CHANGELOG: campaign narrative + truncation methodology
@@ -509,6 +546,18 @@ Use **two labeled protocols** (already sketched in `configs/baselines/qrm_litera
 
 **Do not** mix Protocol A and B rows in one table without a protocol column.
 
+### Side-by-side: what changes between protocols
+
+| Parameter | Protocol A (`qrm_repro`) | Protocol B (`our_hpc_deployment`) | Why different |
+|-----------|------------------------|-----------------------------------|---------------|
+| Claim in paper | “Reproduced QRM baseline” | “Deployment under fixed budget” | Different scientific claims |
+| Seeds | 42, 43, 44 | 0 (grid) | QRM reports mean ± std over 3 seeds |
+| repetition_penalty | unset | 1.05 | June proved R1 loops without it on vLLM 0.8.x |
+| enforce_eager | true | false | Speed on A100; document if A uses false |
+| max_model_len | 32768 or 40960 | 40960 | Headroom only; output capped at 32k |
+| Harness | Ideally Lighteval parity if gate fails | Custom harness OK | Only matters if trunc low but pass@1 low |
+| Opens b02? | Only if `compare_qrm_baseline.py` hard_passed | Grid can proceed with honest truncation story | Gate vs contribution |
+
 ### What to do with jobs 86757/86758 (running now)
 
 | Choice | Rationale |
@@ -581,13 +630,71 @@ Use **two labeled protocols** (already sketched in `configs/baselines/qrm_litera
 
 | Item | Value |
 |------|-------|
-| Time | 2026-07-03 ~19:30 IST |
-| Jobs | **86757** RUNNING ~1h02m; **86758** RUNNING ~51m |
-| Qwen log | **8/500** (~7 min/q, ~78 tok/s) |
-| Raw JSONL | 0 lines (checkpoint at 10) |
-| Next milestone | Row 10 → inspect `truncated` / `finish_reason` |
-| ETA risk | Resume likely before 500/500 |
+| Time | 2026-07-03 ~19:35 IST |
+| Jobs | **86757** RUNNING ~1h05m `ragpu006`; **86758** RUNNING ~54m `racn116` |
+| Qwen log | **9/500** (~7 min/q, ~78 tok/s) |
+| Llama log | ~8/500 (similar pace) |
+| Raw JSONL | 0 lines (first checkpoint at row **10**) |
+| Protocol label | **Protocol B** pilot, seed 0 (`our_hpc_repro`) |
+| Next milestone | Row 10 → `wc -l raw/*.jsonl`; spot-check `truncated` / `finish_reason` |
+| ETA risk | 500 × 7 min ≈ 58 h > 48 h wall → **resume** same archive, no `--fresh` |
 
 ---
 
-*Last updated: 2026-07-03 (~19:30 IST). Refresh §22 after row-10 checkpoint and §12 if superseded.*
+## 23. Practical commands by protocol
+
+### Protocol B — current pilot (86757/86758)
+
+```bash
+# Monitor
+squeue -u $USER
+tail -30 outputs-hpc-2a100-main-2026-07-03/logs/level_a_qwen7b_bf16_math500_seed0.log
+wc -l outputs-hpc-2a100-main-2026-07-03/raw/*.jsonl
+
+# Resume after 48h wall (same archive — NO --fresh)
+cd /scratch/manishn_iitp/reasoning-compression-lab
+bash scripts/hpc/submit_hpc_blocks.sh b01
+
+# Score after 500/500
+python3 scripts/compare_qrm_baseline.py \
+  --summary results/level_a_qwen7b_bf16_math500_seed0_summary.json
+```
+
+### Protocol A — strict QRM gate rerun (only if needed)
+
+Trigger when: gate fails with **low truncation** but **low pass@1** (scorer/seed issue, not budget).
+
+1. Edit `configs/decoding/repro_qrm.yaml`: remove or comment `repetition_penalty`; set `seed: 42` (repeat 43, 44).
+2. Optionally set `enforce_eager: true` in serving config for BF16 cells.
+3. Fresh archive or new protocol label in cell metadata — do **not** mix with Protocol B rows.
+4. Submit one seed at a time:
+
+```bash
+# Example: seed 42 only, fresh archive for strict repro
+QREASON_OUTPUT_ROOT=outputs-hpc-2a100-qrm-repro-seed42 \
+  bash scripts/hpc/submit_hpc_blocks.sh b01 --fresh
+```
+
+5. Gate must pass on **each** of seeds 42–44 before claiming QRM reproduction (report mean ± std).
+
+### After b01 gate (either protocol path)
+
+```bash
+# ONE block at a time — never all_blocks before gate
+bash scripts/hpc/submit_hpc_blocks.sh b02   # only after b01 scored + decision in §19
+```
+
+---
+
+## 24. Manuscript wording cheat sheet
+
+| Situation | Write this | Do NOT write this |
+|-----------|------------|-------------------|
+| July pilot (seed 0, rep_penalty 1.05) | “BF16 baseline under our deployment protocol at 32k” | “We reproduced QRM at 93.9%” |
+| Protocol A passes 42–44 | “BF16 matches QRM Table 1 within ±5 pp (seeds 42–44)” | “Identical to QRM” (harness still differs) |
+| High truncation at 32k | “X% of completions hit the budget cap before `\boxed{}`” | “Model accuracy is X%” without truncation column |
+| Quant grid (b02–b05) | “Fixed 32k across quants; truncation_rate in Table N” | Mix June 7% archive with July rows |
+
+---
+
+*Last updated: 2026-07-03 (~19:35 IST). Refresh §22 after row-10 checkpoint.*
