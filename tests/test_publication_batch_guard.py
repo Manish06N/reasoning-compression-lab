@@ -57,8 +57,15 @@ def test_hpc_submitter_supports_node_excludes():
     submitter = ROOT / "scripts/hpc/submit_hpc_blocks.sh"
     text = submitter.read_text(encoding="utf-8")
     assert "QREASON_SLURM_EXCLUDE" in text
-    assert 'SBATCH_EXCLUDE_ARGS=(--exclude="${QREASON_SLURM_EXCLUDE}")' in text
+    assert "resolve_slurm_excludes" in text
+    assert "dirty_nodes.txt" in text
     assert '"${SBATCH_EXCLUDE_ARGS[@]}"' in text
+
+
+def test_hpc_submitter_defaults_exclusive_on():
+    submitter = ROOT / "scripts/hpc/submit_hpc_blocks.sh"
+    text = submitter.read_text(encoding="utf-8")
+    assert 'QREASON_SLURM_EXCLUSIVE="${QREASON_SLURM_EXCLUSIVE:-1}"' in text
 
 
 def test_hpc_launcher_checks_free_gpu_memory_before_vllm():

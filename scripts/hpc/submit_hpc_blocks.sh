@@ -45,10 +45,37 @@ else
   SBATCH_EXPORT="${SBATCH_EXPORT},QREASON_FRESH_RUN="
 fi
 
+# Default exclusive: whole node free of other jobs → avoids dirty-GPU VRAM contention.
+# Set QREASON_SLURM_EXCLUSIVE=0 for faster backfill on busy days (dirty_nodes.txt helps).
+export QREASON_SLURM_EXCLUSIVE="${QREASON_SLURM_EXCLUSIVE:-1}"
+
+resolve_slurm_excludes() {
+  local -a nodes=()
+  local dirty_file="${QREASON_OUTPUT_ROOT}/metadata/dirty_nodes.txt"
+  local merged=""
+
+  if [[ -n "${QREASON_SLURM_EXCLUDE:-}" ]]; then
+    IFS="," read -r -a nodes <<<"${QREASON_SLURM_EXCLUDE}"
+  fi
+  if [[ -f "$dirty_file" ]]; then
+    while IFS= read -r node; do
+      [[ -n "$node" ]] && nodes+=("$node")
+    done <"$dirty_file"
+  fi
+
+  if [[ "${#nodes[@]}" -eq 0 ]]; then
+    return 0
+  fi
+
+  merged="$(printf '%s\n' "${nodes[@]}" | awk 'NF && !seen[$0]++' | paste -sd, -)"
+  if [[ -n "$merged" ]]; then
+    SBATCH_EXCLUDE_ARGS=(--exclude="$merged")
+    echo "SLURM exclude list: $merged"
+  fi
+}
+
 SBATCH_EXCLUDE_ARGS=()
-if [[ -n "${QREASON_SLURM_EXCLUDE:-}" ]]; then
-  SBATCH_EXCLUDE_ARGS=(--exclude="${QREASON_SLURM_EXCLUDE}")
-fi
+resolve_slurm_excludes
 
 ensure_autopush() {
   if [[ "${QREASON_ENABLE_AUTOPUSH:-}" != "1" ]]; then

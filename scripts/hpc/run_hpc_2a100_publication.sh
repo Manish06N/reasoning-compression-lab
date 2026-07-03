@@ -93,6 +93,21 @@ cuda_visible_for_gpu() {
   echo "$gpu_id"
 }
 
+record_dirty_node() {
+  local node="${SLURMD_NODENAME:-${SLURM_NODELIST:-unknown}}"
+  node="${node%%,*}"
+  node="${node%% *}"
+  local dirty_file="${QREASON_OUTPUT_ROOT}/metadata/dirty_nodes.txt"
+  mkdir -p "$(dirname "$dirty_file")"
+  if [[ "$node" == "unknown" || -z "$node" ]]; then
+    return 0
+  fi
+  if ! grep -qxF "$node" "$dirty_file" 2>/dev/null; then
+    echo "$node" >>"$dirty_file"
+    echo "WARN: recorded dirty node ${node} in ${dirty_file} (auto-excluded on next submit)." >&2
+  fi
+}
+
 check_gpu_free_memory() {
   local gpu_id="$1" cuda_devices="$2" free_mb
 
@@ -135,6 +150,7 @@ check_gpu_free_memory() {
 
   # After local attempts, still too low: decide on requeue or hard fail
   echo "ERROR: GPU $gpu_id (CUDA_VISIBLE_DEVICES=$cuda_devices) has only ${free_mb} MiB free; refusing to start vLLM on a busy GPU." >&2
+  record_dirty_node
   local restart_count="${SLURM_RESTART_COUNT:-0}"
   if [[ "$GPU_PREFLIGHT_REQUEUE" == "1" && -n "${SLURM_JOB_ID:-}" && "$restart_count" =~ ^[0-9]+$ && "$GPU_PREFLIGHT_REQUEUE_MAX" =~ ^[0-9]+$ && "$restart_count" -lt "$GPU_PREFLIGHT_REQUEUE_MAX" ]]; then
     echo "WARN: requeueing Slurm job ${SLURM_JOB_ID} after busy-GPU preflight failure (${restart_count}/${GPU_PREFLIGHT_REQUEUE_MAX})." >&2
