@@ -12,6 +12,8 @@
 
 **Reason:** job **86421** failed because another process occupied ~77.66 GiB on the assigned GPU. The new default requests an exclusive 2-GPU node allocation and refuses to start on a busy GPU, avoiding another late vLLM OOM.
 
+**HPC retry:** Submitted fixed exclusive b01 retry as job **86423** with archive `outputs-hpc-2a100-main-2026-07-03-exclusive`. Initial state: `PENDING (Resources)` for one exclusive 2-GPU allocation.
+
 ---
 
 ## 2026-07-03 — Split-cell GPU allocation fix + b01 resubmit status
