@@ -114,7 +114,7 @@ submit_2gpu_block() {
 
 submit_2gpu() {
   local block="$1"
-  case "${QREASON_SUBMIT_2GPU_MODE:-exclusive_block}" in
+  case "${QREASON_SUBMIT_2GPU_MODE:-split}" in
     split) submit_split_2gpu "$block" ;;
     exclusive_block|block) submit_2gpu_block "$block" ;;
     *)

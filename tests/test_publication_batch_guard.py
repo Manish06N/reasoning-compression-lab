@@ -44,13 +44,13 @@ def test_hpc_submitter_exports_resolved_repo_path():
     assert "QR=${QR}" in text
 
 
-def test_hpc_submitter_defaults_to_exclusive_2gpu_blocks():
+def test_hpc_submitter_defaults_to_split_2gpu_jobs():
     submitter = ROOT / "scripts/hpc/submit_hpc_blocks.sh"
     text = submitter.read_text(encoding="utf-8")
-    assert "QREASON_SUBMIT_2GPU_MODE:-exclusive_block" in text
+    assert "QREASON_SUBMIT_2GPU_MODE:-split" in text
+    assert "submit_split_2gpu" in text
+    assert "exclusive_block|block" in text
     assert "submit_2gpu_block" in text
-    assert "--exclusive" in text
-    assert '--gres="gpu:${HPC_BLOCK_GPUS}"' in text
 
 
 def test_hpc_launcher_checks_free_gpu_memory_before_vllm():

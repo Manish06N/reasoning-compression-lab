@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-07-03 — Restore split b01 submits
+
+**Scope:** Correct the July 3 exclusive-allocation retry after confirming 2-GPU allocations are too hard to obtain quickly.
+
+**Changes:**
+- **Submit default:** `submit_hpc_blocks.sh b01 --fresh` again submits two independent 1-GPU jobs, one per model (`QREASON_SUBMIT_2GPU_MODE=split`).
+- **Optional mode:** `QREASON_SUBMIT_2GPU_MODE=exclusive_block` remains available only when a 2-GPU allocation is acceptable.
+- **OOM guard retained:** the per-GPU free-memory preflight remains in `run_hpc_2a100_publication.sh`, so split jobs fail fast before vLLM starts if the assigned GPU is already busy.
+- **Queue cleanup:** pending exclusive job **86423** was cancelled before resubmitting split jobs.
+
+---
+
 ## 2026-07-03 — Exclusive b01 allocation guard
 
 **Scope:** Follow-up for July 3 jobs **86421/86422**, which confirmed the CUDA mapping fix but still failed on a dirty/shared GPU.

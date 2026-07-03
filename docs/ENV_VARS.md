@@ -59,7 +59,7 @@ Cell configs reference these via `local_path_env` in `configs/models/*.json`.
 | `QREASON_CHECKPOINT_EVERY` | `10` | Block launchers | Write checkpoint validation every N rows | Default OK |
 | `QREASON_CELL_QUEUE` | unset | 5080 scripts | Path to shell snippet defining `CELL_QUEUE` array | 5080 only |
 | `QREASON_ENABLE_AUTOPUSH` | unset (off) | Manual export or submit script | `1` -> start tmux `git_autopush_outputs.sh` loop on submit | **Off by default** — prefer MacBook rsync after runs |
-| `QREASON_SUBMIT_2GPU_MODE` | `exclusive_block` | `submit_hpc_blocks.sh` | `exclusive_block` -> one `--gres=gpu:2 --exclusive` block job; `split` -> two independent `--gres=gpu:1` jobs | Use default for b01 publication reruns |
+| `QREASON_SUBMIT_2GPU_MODE` | `split` | `submit_hpc_blocks.sh` | `split` -> two independent `--gres=gpu:1` jobs; `exclusive_block` -> one `--gres=gpu:2 --exclusive` block job | Use default for b01 when 2-GPU allocations are scarce |
 | `QREASON_SLURM_EXCLUSIVE` | `1` | `submit_hpc_blocks.sh` | Adds `--exclusive` for 2-GPU block submits; set `0` only for debugging | Keep `1` for publication |
 | `QREASON_MIN_FREE_GPU_MB` | `70000` | `run_hpc_2a100_publication.sh` | Refuse to start vLLM when the selected GPU has less free VRAM; set `0` to disable | Keep default for A100 BF16 anchors |
 
@@ -67,7 +67,7 @@ Cell configs reference these via `local_path_env` in `configs/models/*.json`.
 
 **`QREASON_ALLOW_BAD_ARCHIVE` vs `QREASON_ALLOW_RESUME`:** The former only bypasses the forbidden-archive path check (shell legacy). The latter bypasses all Python resume guards (stale decoding, config hash, git commit). Use neither for publication runs.
 
-**Submit script (`scripts/hpc/submit_hpc_blocks.sh`):** Resolves `QR`, `QREASON_OUTPUT_ROOT`, and `QREASON_HPC_DATE` once per submit batch and passes them to every `sbatch` job. Default target `all` submits **b01 only** (gate-safe). Two-GPU blocks now default to one exclusive `--gres=gpu:2` allocation to avoid shared-GPU OOM; set `QREASON_SUBMIT_2GPU_MODE=split` only for debugging. Use `all_blocks` for b01–b06 soak tests (stderr warning). Pass `--fresh` to set `QREASON_FRESH_RUN=1` for that batch only; split cell jobs clear `QREASON_FRESH_RUN` so later cells do not wipe progress.
+**Submit script (`scripts/hpc/submit_hpc_blocks.sh`):** Resolves `QR`, `QREASON_OUTPUT_ROOT`, and `QREASON_HPC_DATE` once per submit batch and passes them to every `sbatch` job. Default target `all` submits **b01 only** (gate-safe). Two-GPU blocks default to two independent `--gres=gpu:1` jobs; set `QREASON_SUBMIT_2GPU_MODE=exclusive_block` only when a 2-GPU allocation is acceptable. Use `all_blocks` for b01–b06 soak tests (stderr warning). Pass `--fresh` to set `QREASON_FRESH_RUN=1` for that batch only; split cell jobs clear `QREASON_FRESH_RUN` so later cells do not wipe progress.
 
 ---
 
