@@ -98,25 +98,47 @@ check_gpu_free_memory() {
     return 0
   fi
 
-  free_mb="$(nvidia-smi --id="$cuda_devices" --query-gpu=memory.free --format=csv,noheader,nounits 2>/dev/null | head -n 1 | tr -d ' ')"
-  if [[ -z "$free_mb" || ! "$free_mb" =~ ^[0-9]+$ ]]; then
-    echo "WARN: could not read free GPU memory for CUDA_VISIBLE_DEVICES=$cuda_devices; continuing" >&2
-    return 0
-  fi
+  # Log who is using the GPU(s) for diagnostics on dirty nodes
+  echo "[gpu $gpu_id] nvidia-smi processes on id=$cuda_devices:"
+  nvidia-smi --id="$cuda_devices" --query-compute-apps=pid,process_name,used_memory --format=csv 2>/dev/null || echo "  (no compute apps or query failed)"
+  nvidia-smi --id="$cuda_devices" --query-gpu=index,name,memory.free,memory.used,memory.total --format=csv,noheader 2>/dev/null || true
 
-  echo "[gpu $gpu_id] free VRAM before vLLM: ${free_mb} MiB (required >= ${MIN_FREE_GPU_MB} MiB)"
-  if (( free_mb < MIN_FREE_GPU_MB )); then
-    echo "ERROR: GPU $gpu_id (CUDA_VISIBLE_DEVICES=$cuda_devices) has only ${free_mb} MiB free; refusing to start vLLM on a busy GPU." >&2
-    local restart_count="${SLURM_RESTART_COUNT:-0}"
-    if [[ "$GPU_PREFLIGHT_REQUEUE" == "1" && -n "${SLURM_JOB_ID:-}" && "$restart_count" =~ ^[0-9]+$ && "$GPU_PREFLIGHT_REQUEUE_MAX" =~ ^[0-9]+$ && "$restart_count" -lt "$GPU_PREFLIGHT_REQUEUE_MAX" ]]; then
-      echo "WARN: requeueing Slurm job ${SLURM_JOB_ID} after busy-GPU preflight failure (${restart_count}/${GPU_PREFLIGHT_REQUEUE_MAX})." >&2
-      if scontrol requeue "$SLURM_JOB_ID"; then
-        exit 0
-      fi
-      echo "WARN: scontrol requeue failed; leaving job failed with exit 75." >&2
+  # Local re-sample loop: transient holders may exit; avoid expensive full requeues
+  local attempts=0
+  local max_local_attempts=4
+  local sleep_s=20
+  while (( attempts < max_local_attempts )); do
+    attempts=$((attempts + 1))
+    free_mb="$(nvidia-smi --id="$cuda_devices" --query-gpu=memory.free --format=csv,noheader,nounits 2>/dev/null | head -n 1 | tr -d ' ')"
+    if [[ -z "$free_mb" || ! "$free_mb" =~ ^[0-9]+$ ]]; then
+      echo "WARN: could not read free GPU memory for CUDA_VISIBLE_DEVICES=$cuda_devices (attempt $attempts)" >&2
+      if (( attempts < max_local_attempts )); then sleep "$sleep_s"; continue; fi
+      free_mb=0
     fi
-    return 75
+
+    echo "[gpu $gpu_id] free VRAM before vLLM (attempt $attempts): ${free_mb} MiB (required >= ${MIN_FREE_GPU_MB} MiB)"
+    if (( free_mb >= MIN_FREE_GPU_MB )); then
+      return 0
+    fi
+
+    if (( attempts < max_local_attempts )); then
+      echo "  GPU still busy; sleeping ${sleep_s}s before recheck (local attempt)..."
+      sleep "$sleep_s"
+    fi
+  done
+
+  # After local attempts, still too low: decide on requeue or hard fail
+  echo "ERROR: GPU $gpu_id (CUDA_VISIBLE_DEVICES=$cuda_devices) has only ${free_mb} MiB free; refusing to start vLLM on a busy GPU." >&2
+  local restart_count="${SLURM_RESTART_COUNT:-0}"
+  if [[ "$GPU_PREFLIGHT_REQUEUE" == "1" && -n "${SLURM_JOB_ID:-}" && "$restart_count" =~ ^[0-9]+$ && "$GPU_PREFLIGHT_REQUEUE_MAX" =~ ^[0-9]+$ && "$restart_count" -lt "$GPU_PREFLIGHT_REQUEUE_MAX" ]]; then
+    echo "WARN: requeueing Slurm job ${SLURM_JOB_ID} after busy-GPU preflight failure (${restart_count}/${GPU_PREFLIGHT_REQUEUE_MAX})." >&2
+    if scontrol requeue "$SLURM_JOB_ID"; then
+      exit 0
+    fi
+    echo "WARN: scontrol requeue failed; leaving job failed with exit 75." >&2
   fi
+  echo "ERROR: preflight failed after local retries and no more requeues allowed; aborting (exit 75)." >&2
+  exit 75
 }
 
 cell_id_from_cfg() {

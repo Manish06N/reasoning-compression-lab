@@ -1,5 +1,33 @@
 # Changelog
 
+## 2026-07-03 — HPC b01 publication jobs stuck (busy GPU + git gate)
+
+**Analysis (from AGENTS.md + live logs + recent jobs 864xx/865xx):**
+
+- Primary failure mode: split 1-GPU cells (Qwen level_a + Llama level_c) repeatedly allocated to dirty nodes (ragpu004/006/008). nvidia-smi showed other processes holding 77 GiB+; free often 1-2 GiB or less vs required ~70 GiB. SLURM --gres=gpu:1 does not guarantee clean VRAM.
+- Preflight in `run_hpc_2a100_publication.sh` was catching it and requeuing (e.g. restart_count=48/240 on 86466), but:
+  - Split submits did **not** pass `--exclusive`, so nodes remained shared.
+  - No node exclude by default in recent submits.
+  - Only single nvidia sample (no local retry/sleep), so transient contention still caused full requeues.
+  - On max-retry or certain paths, `return 75` was not aborting the launch → would proceed to vLLM OOM (torch.OutOfMemoryError during weight alloc / Engine core init, with 879 MiB free).
+- After fixes + resubmit, new jobs (86570/86571) hit the publication gate: `assert_code_paths_clean` (in `src/runners/publication_mode.py`) because scripts/hpc/ edits were uncommitted + junk untracked files in tree. Wrapper started on clean GPU (racn116, 81 GiB free) but errored before inference. No rows written, cell logs stale.
+- Confirmed via: squeue/sacct, b01_parallel_*.out/.err, outputs/.../logs/*, nvidia peeks under jobs, manifest/checkpoints (always rows_done=0), AGENTS.md history of OOM/requeue/exclusive experiments.
+
+**Fixes applied:**
+
+- `scripts/hpc/submit_hpc_blocks.sh`: `submit_split_2gpu` now also adds `--exclusive` (controlled by `QREASON_SLURM_EXCLUSIVE`, default on) for 1-GPU cells, matching the block path. Better node isolation.
+- `scripts/hpc/run_hpc_2a100_publication.sh`: `check_gpu_free_memory` now:
+  - Prints `nvidia-smi` process list + full GPU summary for root-cause visibility.
+  - Local re-sample loop (up to 4 attempts + 20s sleeps) before deciding to requeue — cheap way to ride out short-lived holders.
+  - Always `exit 75` (never fallthrough) on final refusal.
+- Cleaned garbage untracked root files (`-o`, `[`, `done`, `echo`, the grep pattern filename) that were polluting `git status` and manifests.
+- Cancelled stuck lineage (86466), resubmitted 86570 (Qwen) + 86571 (Llama) with `QREASON_SLURM_EXCLUDE=ragpu004,ragpu006,ragpu008`.
+- Qwen landed on clean `racn116`; preflight now has stronger defense. Llama pending on QOS (expected under 2-GPU/user limit).
+
+**Next:** Commit these changes (see sync rules). Resubmit if gate still blocks due to timing. Monitor first successful rows in `outputs-hpc-2a100-main-2026-07-03/raw/`. Lowering MIN_FREE or further KV tweaks are secondary; dirty allocation was the blocker.
+
+---
+
 ## 2026-07-03 — Busy GPU self-requeue for split jobs
 
 **Scope:** Fix split b01 retries without excluding GPU nodes.

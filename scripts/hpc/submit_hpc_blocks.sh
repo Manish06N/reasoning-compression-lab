@@ -76,6 +76,10 @@ submit_split_2gpu() {
   echo "Archive: $QREASON_OUTPUT_ROOT"
   # shellcheck disable=SC1090
   source "$block_file"
+  local -a exclusive_args=()
+  if [[ "${QREASON_SLURM_EXCLUSIVE:-1}" == "1" ]]; then
+    exclusive_args+=(--exclusive)
+  fi
   for entry in "${HPC_BLOCK_CELLS[@]}"; do
     local cfg="${entry#*:}"
     local cell_id
@@ -90,6 +94,7 @@ submit_split_2gpu() {
       --partition=gpu \
       --cpus-per-task=8 \
       --gres=gpu:1 \
+      "${exclusive_args[@]}" \
       --wrap="bash scripts/hpc/run_hpc_2a100_publication.sh cell ${cfg} ${block}"
   done
 }
