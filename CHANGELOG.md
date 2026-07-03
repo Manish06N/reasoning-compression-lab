@@ -1,5 +1,192 @@
 # Changelog
 
+## 2026-07-03 — Simplification wave: revert 1M context, soften gates, b01-only restart (commit `a3414a4`)
+
+This entry records the **full reasoning arc** for the July 3 HPC campaign: what broke, what we tried, what we kept, what we stripped, and how to run the project going forward. Read this before changing context length, publication gates, or submit strategy.
+
+### 1. Historical baseline — what “worked” before (June 29 archive)
+
+The June 29 campaign (`outputs-hpc-2a100-main-2026-06-29`) **completed 500/500 rows** for both BF16 anchors:
+
+| Cell | pass@1 | Truncation |
+|------|--------|------------|
+| Qwen-7B BF16 | 7.0% | ~90% |
+| Llama-8B BF16 | 21.4% | ~59% |
+
+The **pipeline was healthy**; the **science was wrong** because:
+
+- `max_tokens` / `max_model_len` were **32,768** — far too short for DeepSeek-R1-style chain-of-thought (CoT) traces that often need 10k–50k+ tokens before `\boxed{}`.
+- `repetition_penalty: 1.05` in `repro_qrm.yaml` **never reached vLLM** due to a YAML passthrough bug (fixed July 1). Models repeated without penalty.
+
+**Lesson:** Low pass@1 with high truncation means the inference stack ran; the decoding budget was the bottleneck, not SLURM or vLLM init.
+
+### 2. Over-correction — why 1M context made everything harder (July 1–3)
+
+After identifying truncation as the root cause of bad science, the project **over-corrected**:
+
+| Change | Intent | Actual effect on PARAM Rudra |
+|--------|--------|------------------------------|
+| Raise context to **1,048,576 (1M)** in configs + `run_inference.py` clamp | Stop truncation on long CoT | BF16 KV cache alone needed **~56 GiB** at 1M; 1× A100 80GB could not reserve enough alongside bf16 weights → **engine init OOM** (job 86703) |
+| `VLLM_ALLOW_LONG_MAX_MODEL_LEN=1` | Allow vLLM to accept 1M | Required for 1M path; unnecessary at native 128k |
+| `kv_cache_dtype: fp8` on BF16 | Fit 1M KV on one GPU | vLLM `fp8` (e4m3) triggered **unsupported `fp8e4nv` Triton kernel on A100**; switched to `fp8_e5m2` (commit `60111a8`) — still awkward for BF16 anchors |
+| `gpu_memory_utilization: 0.95` on BF16 | Maximize KV reservation | Increased OOM risk and contention on shared nodes |
+| Parallel 9-cell queue (b01–b05 + variants) | Finish campaign fast | Violated **b01 hard gate**; burned QOS GPU slots; 0/4500 rows for days |
+| Strict `assert_code_paths_clean` on every job start | Paper reproducibility | Jobs died during iteration when HPC had uncommitted fixes (86696/86697 AWQ) |
+| `--exclusive` SLURM + 55–70 GB VRAM preflight + 240 requeues | Avoid dirty GPUs | Jobs sat **PENDING ~28h** (86740/86741) on a busy cluster; requeue storms on 22 GB free nodes |
+| Many output archive roots (`-queued`, `-attempt`, etc.) | Isolate failed waves | Manifest/state proliferation; resume confusion |
+
+**Lesson:** Fixing truncation requires **enough** context, not **maximum possible** context. Native model context (128k for these distill models) is the right trade-off on 1× A100 80GB: long enough for most R1 CoT, small enough to load reliably.
+
+### 3. Infrastructure fixes we **kept** (still required on this cluster)
+
+These fixes address real platform bugs and are **not** over-engineering:
+
+| Commit | Problem | Fix | Why keep |
+|--------|---------|-----|----------|
+| `4da8913` | Triton JIT uses `/usr/bin/gcc`; compute nodes lack `stdlib.h` | Conda `gcc_linux-64` + `CC`/`CXX` in `param_rudra_env.sh`; `param_rudra_assert_triton_cc` preflight | First `generate()` **always** hits Triton on vLLM 0.8.5 + XFormers; `enforce_eager` does not skip host compile |
+| `8ec36f8` | AWQ with `dtype: auto` → bfloat16 rejected | `dtype: float16` in AWQ model JSONs | vLLM 0.8.5 requires float16 weights for AWQ kernels |
+| `1e53e10` | GPTQ-3 same dtype issue | `dtype: float16` in GPTQ-3 JSON | Same as AWQ |
+| `60111a8` | `kv_cache_dtype: fp8` → e4m3 Triton `fp8e4nv` unsupported on A100 | All quant configs: `fp8_e5m2` | A100-safe fp8 KV variant for **quantized** cells only |
+| `02d861b` (superseded for BF16) | vLLM rejects >32k without env | `VLLM_ALLOW_LONG_MAX_MODEL_LEN=1` | **Removed** in `a3414a4` — not needed at 131072 |
+
+### 4. Simplification applied (`a3414a4`) — what changed and why
+
+**Philosophy:** Use config values directly. Fail less during iteration. Validate science on **b01 BF16 only** before opening b02–b05.
+
+#### 4a. Context length — 1M → 131072 (128k native)
+
+| File | Change |
+|------|--------|
+| `configs/decoding/repro_qrm.yaml` | `max_tokens` / `max_model_len`: 1048576 → **131072** |
+| All main 7B/8B model JSONs (bf16, fp8, awq, gptq4, gptq3) | `max_model_len`: 1048576 → **131072** |
+| `scripts/run_inference.py` | **Removed** lines that clamped any value below 1M up to 1048576 |
+| `src/runners/vllm_runner.py` | Default `max_model_len`: 1048576 → **131072** |
+| `scripts/hpc/run_hpc_2a100_publication.sh` | **Removed** `VLLM_ALLOW_LONG_MAX_MODEL_LEN=1` |
+
+**Reasoning:**
+
+- 128k is the models’ **native** context window — no vLLM long-context hack.
+- At 128k, BF16 weights (~14–16 GiB) + bf16 KV (~4–8 GiB depending on architecture) fit comfortably on 1× A100 without fp8 KV tricks.
+- 128k is ~4× the old 32k campaign and should cut truncation dramatically while staying loadable.
+- If truncation remains high after b01, increase incrementally (e.g. 65536 was too low; 262144 may be tried **in config only**, not via runtime clamp).
+
+#### 4b. BF16 models — drop fp8 KV and aggressive memory utilization
+
+| File | Removed |
+|------|---------|
+| `configs/models/deepseek_r1_qwen_7b.json` | `kv_cache_dtype`, `gpu_memory_utilization` |
+| `configs/models/deepseek_r1_llama_8b.json` | `kv_cache_dtype`, `gpu_memory_utilization` |
+
+**Reasoning:** BF16 anchors should use **default bf16 KV**. Adding fp8 KV to BF16 was a workaround for 1M context, not a principled choice. It introduced extra Triton/dtype failure modes without helping the actual goal (reliable 500-row completion).
+
+**Quantized cells** (FP8 weights, AWQ, GPTQ) **keep** `kv_cache_dtype: fp8_e5m2` and `gpu_memory_utilization: 0.95` — smaller weights need the KV budget for long output.
+
+#### 4c. Publication git gate — warn by default, strict opt-in
+
+| File | Change |
+|------|--------|
+| `src/runners/publication_mode.py` | New `warn_or_assert_code_paths_clean()`; `assert_clean_git_tree()` calls it; strict only when `QREASON_STRICT_GIT=1` |
+| `scripts/hpc/run_hpc_2a100_publication.sh` | Launcher uses `warn_or_assert_code_paths_clean` instead of hard-fail `assert_code_paths_clean` |
+
+**Reasoning:**
+
+- Clean git is essential for **final paper artifacts** but blocks **HPC iteration** when fixes are committed locally but not yet synced to GitHub.
+- Default: **WARN** and continue so jobs run after local commits.
+- Final campaign: `export QREASON_STRICT_GIT=1` before submit for fail-closed reproducibility.
+
+`QREASON_PUBLICATION_MODE=1` is **unchanged** — still enforces `batch_size=1`, schema validation, and `--publication` on inference/score.
+
+#### 4d. GPU preflight — lighter defaults
+
+| Setting | Before | After | Reason |
+|---------|--------|-------|--------|
+| `QREASON_MIN_FREE_GPU_MB` default | 55000–70000 | **40000** | BF16 at 128k needs ~40 GB headroom, not 70; 55 GB blocked jobs on nodes with 22 GB free + other users |
+| `QREASON_GPU_PREFLIGHT_REQUEUE_MAX` default | 240 | **12** | Avoid multi-hour requeue storms; fail faster and resubmit manually |
+| Debug `echo === DEBUG:` lines | Many | **Removed** | Noise in SLURM logs |
+
+Preflight still: nvidia-smi process listing, 4 local rechecks with 20s sleep, optional `scontrol requeue` on exit 75.
+
+#### 4e. Submit strategy — b01 only, non-exclusive for scheduling
+
+**Actions on 2026-07-03 ~17:43 IST:**
+
+1. **Cancelled** entire 9-cell wave (86721–86733, 86725 AWQ mid-run, etc.) — all running on **pre-simplification** 1M configs.
+2. **Submitted b01 BF16 only** with `--fresh`: jobs **86740** (Qwen), **86741** (Llama).
+3. Both stuck **PENDING** — `Reason=Resources` / `Priority`; scheduler estimated **StartTime ≈ 2026-07-04 21:56** because `QREASON_SLURM_EXCLUSIVE=1` (default) requires a fully idle node.
+4. **Cancelled 86740/86741**; **resubmitted** with `QREASON_SLURM_EXCLUSIVE=0`: jobs **86743** (Qwen, ragpu006), **86744** (Llama, ragpu008) → **RUNNING within ~20s**.
+
+**Reasoning:**
+
+- Cluster QOS allows **2 GPUs/user**; filling all 9 cells guarantees queue contention and violates the documented b01 gate.
+- `--exclusive` is safer for dirty GPUs but impractical on a saturated partition; **40 GB preflight** is the compromise for shared nodes.
+- **Single archive:** `outputs-hpc-2a100-main-2026-07-03` (no new `-attempt` root).
+
+### 5. Failure timeline summary (July 3, pre-`a3414a4`)
+
+| Jobs | Block | Failure mode |
+|------|-------|--------------|
+| 86696/86697 | b03 AWQ4 | Git clean assert (dirty tree at submit) |
+| 86698/86699 | b04 GPTQ4 | Triton `/usr/bin/gcc` + missing `stdlib.h` |
+| 86703 | b01 BF16 | 1M KV OOM at engine init (~56 GiB KV, ~50.5 GiB available) |
+| 86705 | b02 FP8 Qwen | Triton gcc (passed 65.52 GiB KV init, died at first generate) |
+| 86718/86719 | b02 FP8 | AWQ dtype / various; wave cancelled before rows |
+| 86721–86733 | all blocks | Cancelled for simplification resubmit |
+| 86740/86741 | b01 BF16 | PENDING ~28h (exclusive on busy cluster) — cancelled |
+| **86743/86744** | **b01 BF16** | **RUNNING** post-`a3414a4`, non-exclusive |
+
+### 6. Current state (2026-07-03 ~17:47 IST)
+
+| Item | Value |
+|------|-------|
+| Running jobs | **86743** Qwen-7B BF16 (ragpu006), **86744** Llama-8B BF16 (ragpu008) |
+| Archive | `outputs-hpc-2a100-main-2026-07-03` |
+| Raw rows | **0/500** per cell (model load in progress; expect first row ~5–10 min after vLLM init) |
+| Git (HPC) | `main` **ahead 4** of `origin/main` (`a3414a4` + prior dtype/Triton fixes); MacBook sync pending |
+| Tests | `test_publication_mode.py` + `test_publication_batch_guard.py` — 16/16 pass |
+
+**Success criteria for b01 (before submitting b02–b05):**
+
+1. `raw/level_a_qwen7b_bf16_math500_seed0.jsonl` and `raw/level_c_llama8b_bf16_math500_seed0.jsonl` reach **500/500** rows.
+2. Logs show progress past `Processed prompts: 0%` **without** Triton `stdlib.h` or KV OOM errors.
+3. Scored summaries show **truncation rate well below** June 29 (~90% Qwen / ~59% Llama) and **pass@1 in a plausible range** (not artificially low from 32k cuts).
+4. Only then: `bash scripts/hpc/submit_hpc_blocks.sh b02` (etc.), still one block at a time.
+
+### 7. Future agent checklist
+
+**Do:**
+
+- Use **131072** context from configs; change YAML/JSON only, never runtime clamps.
+- Submit **b01 first**; wait for 500/500 + sanity metrics.
+- Use `QREASON_SLURM_EXCLUSIVE=0` on busy days unless nodes are empty.
+- Keep conda gcc / Triton preflight (`4da8913`).
+- Keep `dtype: float16` for AWQ/GPTQ and `fp8_e5m2` KV on quants only.
+- Set `QREASON_STRICT_GIT=1` only for final publication scoring runs.
+
+**Do not:**
+
+- Reintroduce 1M clamp in `run_inference.py` without measuring BF16 KV on 1× A100.
+- Add `kv_cache_dtype` to BF16 configs unless profiling proves 128k bf16 KV OOMs.
+- Submit `all_blocks` or parallel 9-cell waves before b01 passes.
+- Spawn new output roots per retry; reuse `outputs-hpc-2a100-main-<date>` or `--fresh` once per campaign.
+
+### 8. Commits in this wave (HPC local, sync pending)
+
+```text
+a3414a4 Simplify HPC inference: native 128k context, soft git gate, lighter preflight.
+60111a8 Use fp8_e5m2 KV cache on A100: fp8 e4m3 Triton kernel unsupported.
+1e53e10 Fix GPTQ-3 config: use float16 dtype (vLLM rejects bfloat16 for gptq).
+8ec36f8 Fix AWQ model configs: use float16 dtype (vLLM rejects bfloat16 for awq).
+4da8913 Fix Triton JIT on compute nodes: use conda gcc with C headers.
+```
+
+**Sync:** HPC cannot push directly. Part 1 done (local commits). User runs MacBook rsync → push → HPC `git reset --hard origin/main`.
+
+---
+
+> **Supersedes** the 2026-07-03 entries below that recommend 1M+ fixed context, BF16 `kv_cache_dtype: fp8`, and `VLLM_ALLOW_LONG_MAX_MODEL_LEN=1` as the simplification path. The correct simplification is **128k native + direct config use + softer iteration gates**.
+
+---
+
 ## 2026-07-03 — Fix Triton JIT on compute nodes (commit `4da8913`); resubmit b02 FP8
 
 **Root cause (blocking all inference after model load):** On PARAM Rudra compute nodes, vLLM's first `generate()` call triggers Triton JIT via the XFormers prefix-attention path. Triton used `/usr/bin/gcc` (because `param_rudra_env.sh` prepends `/usr/bin` to `PATH` and `CC` was unset). Compute nodes lack `/usr/include/stdlib.h`, so compilation failed:
