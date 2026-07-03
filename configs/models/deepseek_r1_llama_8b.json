@@ -8,7 +8,7 @@
   "trust_remote_code": true,
   "use_chat_template": true,
   "enforce_eager": true,
-  "kv_cache_dtype": "fp8",
+  "kv_cache_dtype": "fp8_e5m2",
   "gpu_memory_utilization": 0.95,
   "notes": "HPC A100 only \u2014 BF16 weights exceed 16 GB RTX 5080.",
   "revision": "6a6f4aa4197940add57724a7707d069478df56b1"

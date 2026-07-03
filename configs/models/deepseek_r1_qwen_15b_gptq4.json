@@ -9,7 +9,7 @@
   "trust_remote_code": true,
   "use_chat_template": true,
   "enforce_eager": true,
-  "kv_cache_dtype": "fp8",
+  "kv_cache_dtype": "fp8_e5m2",
   "gpu_memory_utilization": 0.9,
   "revision": "55cb6fe6fc87e42e8cb06c22ebf9eca56ac4da83"
 }
