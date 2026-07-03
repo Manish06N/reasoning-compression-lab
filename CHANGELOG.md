@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-07-03 — Split-cell GPU allocation fix + b01 resubmit status
+
+**Scope:** Follow-up for failed b01 split-cell jobs **86274–86281** and the July 3 fixed resubmit.
+
+**Fixes:**
+- **HPC launcher:** `run_hpc_2a100_publication.sh` now preserves Slurm-provided `CUDA_VISIBLE_DEVICES` for independent 1-GPU cell jobs and narrows within the scheduler-visible list for multi-GPU block mode. This avoids all split jobs overriding their allocation with physical GPU `0`.
+- **Submit wrapper:** `submit_hpc_blocks.sh` now exports the resolved `QR` path through `sbatch --export`, so compute jobs run publication git checks against the intended checkout instead of relying on cluster `USER`/shell defaults.
+- **Requirements:** `requirements-hpc.txt` and the `pyproject.toml` HPC extra now match the live lock for direct pins that drifted after the July 2 environment export.
+- **Preflight:** `07_preflight_publication.py --ci` now uses the active `sys.executable` for subprocess Python checks instead of relying on `python` being on `PATH`.
+- **Tests/docs:** added launcher/submitter guard tests and clarified the scheduler-owned GPU environment contract in `docs/ENV_VARS.md`.
+
+**Root cause:** b01 was changed to submit two independent `--gres=gpu:1` jobs, but the runner still forced `CUDA_VISIBLE_DEVICES="$gpu_id"`. On PARAM Rudra this allowed multiple split jobs on the same node to target physical GPU 0, producing vLLM CUDA OOM before any raw rows were written.
+
+**HPC resubmit:** Submitted fixed b01 with `bash scripts/hpc/submit_hpc_blocks.sh b01 --fresh` to archive `outputs-hpc-2a100-main-2026-07-03`. Jobs **86421** (`level_a_qwen7b_bf16_math500_seed0`) and **86422** (`level_c_llama8b_bf16_math500_seed0`) started on `ragpu004`; logs confirmed separate CUDA devices (`0` and `1`). Final status: **86421 FAILED** (`1:0`) after 00:05:44 with CUDA OOM caused by another process occupying ~77.66 GiB on the visible GPU; **86422 CANCELLED** (`0:9`) after 00:05:44. No paper results were produced.
+
+---
+
 ## 2026-07-02 — HPC git-on-compute fix + split b01 jobs
 
 **Commit:** `85998e1` — pushed to `origin/main` (MacBook).
@@ -18,7 +35,7 @@
 - **`param_rudra_env.sh`:** PATH fallback + fail-fast if git missing after conda activate
 - **`07_preflight_publication.py`:** full preflight verifies git in job-like env
 
-**Ops note:** Running jobs 86280/86281 already have git via manual `conda install`; no mid-run sync required.
+**Ops note:** Jobs 86280/86281 already had git via manual `conda install`; July 3 follow-up status is recorded above.
 
 ---
 

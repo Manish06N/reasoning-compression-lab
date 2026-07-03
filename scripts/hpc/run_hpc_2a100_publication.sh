@@ -60,6 +60,30 @@ export QR DATE_TAG BACKUP_ROOT DECODING BATCH_SIZE CHECKPOINT_EVERY QREASON_OUTP
 
 cd "$QR"
 
+cuda_visible_for_gpu() {
+  local gpu_id="$1"
+  local visible="${CUDA_VISIBLE_DEVICES:-}"
+  local -a devices=()
+
+  if [[ -z "$visible" ]]; then
+    echo "$gpu_id"
+    return 0
+  fi
+
+  IFS="," read -r -a devices <<< "$visible"
+  if [[ "${#devices[@]}" -le 1 ]]; then
+    echo "$visible"
+    return 0
+  fi
+
+  if [[ "$gpu_id" =~ ^[0-9]+$ && "$gpu_id" -lt "${#devices[@]}" ]]; then
+    echo "${devices[$gpu_id]}"
+    return 0
+  fi
+
+  echo "$gpu_id"
+}
+
 cell_id_from_cfg() {
   python -c "import json; print(json.load(open('$1'))['cell_id'])"
 }
@@ -147,9 +171,11 @@ run_one_cell() {
 
   write_cell_metadata "$cell_id" "$cell_cfg" "$gpu_id" "in_progress" "$out" ""
   backup_archive
-  echo "[gpu $gpu_id] === inference: $cell_id ==="
+  local cuda_devices
+  cuda_devices="$(cuda_visible_for_gpu "$gpu_id")"
+  echo "[gpu $gpu_id] === inference: $cell_id (CUDA_VISIBLE_DEVICES=$cuda_devices) ==="
   (
-    export CUDA_VISIBLE_DEVICES="$gpu_id"
+    export CUDA_VISIBLE_DEVICES="$cuda_devices"
     python scripts/run_inference.py \
       --publication \
       --cell-config "$cell_cfg" \

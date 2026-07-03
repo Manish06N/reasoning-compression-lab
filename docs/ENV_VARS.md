@@ -64,7 +64,7 @@ Cell configs reference these via `local_path_env` in `configs/models/*.json`.
 
 **`QREASON_ALLOW_BAD_ARCHIVE` vs `QREASON_ALLOW_RESUME`:** The former only bypasses the forbidden-archive path check (shell legacy). The latter bypasses all Python resume guards (stale decoding, config hash, git commit). Use neither for publication runs.
 
-**Submit script (`scripts/hpc/submit_hpc_blocks.sh`):** Resolves `QREASON_OUTPUT_ROOT` and `QREASON_HPC_DATE` once per submit batch and passes them to every `sbatch` job. Default target `all` submits **b01 only** (gate-safe). Use `all_blocks` for b01–b06 soak tests (stderr warning). Pass `--fresh` to set `QREASON_FRESH_RUN=1` for that batch only; split cell jobs clear `QREASON_FRESH_RUN` so later cells do not wipe progress.
+**Submit script (`scripts/hpc/submit_hpc_blocks.sh`):** Resolves `QR`, `QREASON_OUTPUT_ROOT`, and `QREASON_HPC_DATE` once per submit batch and passes them to every `sbatch` job. Default target `all` submits **b01 only** (gate-safe). Use `all_blocks` for b01–b06 soak tests (stderr warning). Pass `--fresh` to set `QREASON_FRESH_RUN=1` for that batch only; split cell jobs clear `QREASON_FRESH_RUN` so later cells do not wipe progress.
 
 ---
 
@@ -73,7 +73,7 @@ Cell configs reference these via `local_path_env` in `configs/models/*.json`.
 | Variable | Default | Set in | Effect | Publication |
 |----------|---------|--------|--------|-------------|
 | `CONDA_ROOT` | `/home/apps/MSCC/miniconda3` | `param_rudra_env.sh` | Conda install path on PARAM Rudra | Override on other clusters |
-| `CUDA_VISIBLE_DEVICES` | Slurm/job | Slurm | GPU index visible to process; affects NVML mapping | Set by scheduler |
+| `CUDA_VISIBLE_DEVICES` | Slurm/job | Slurm | GPU index visible to process; affects vLLM placement and NVML mapping | Preserve scheduler allocation; launcher only narrows multi-GPU block jobs to one selected visible device |
 | `VLLM_BATCH_INVARIANT` | unset | 5080 publication | `1` → enforce batch-size invariance checks | HPC uses `QREASON_PUBLICATION_MODE` instead |
 
 ---

@@ -69,7 +69,7 @@ def check_static() -> None:
             "slurm/hpc_2a100_b07_gpqa.slurm",
         ]
     )
-    run(["python", "-m", "compileall", "-q", "scripts", "src"])
+    run([sys.executable, "-m", "compileall", "-q", "scripts", "src"])
 
 
 def check_prompt() -> None:
@@ -116,7 +116,7 @@ def check_revision_pins() -> None:
 
 def check_decoding_verify() -> None:
     print("== decoding verify ==")
-    run(["python", "scripts/verify_decoding_params.py"])
+    run([sys.executable, "scripts/verify_decoding_params.py"])
 
 
 def check_git_in_job_env() -> None:

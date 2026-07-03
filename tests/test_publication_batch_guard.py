@@ -28,5 +28,21 @@ def test_hpc_launcher_exports_publication_mode():
     assert "--publication" in text
 
 
+def test_hpc_launcher_preserves_slurm_gpu_allocation():
+    launcher = ROOT / "scripts/hpc/run_hpc_2a100_publication.sh"
+    text = launcher.read_text(encoding="utf-8")
+    assert "cuda_visible_for_gpu()" in text
+    assert 'cuda_visible_for_gpu "$gpu_id"' in text
+    assert 'CUDA_VISIBLE_DEVICES="$cuda_devices"' in text
+    assert 'CUDA_VISIBLE_DEVICES="$gpu_id"' not in text
+
+
+def test_hpc_submitter_exports_resolved_repo_path():
+    submitter = ROOT / "scripts/hpc/submit_hpc_blocks.sh"
+    text = submitter.read_text(encoding="utf-8")
+    assert "export QR" in text
+    assert "QR=${QR}" in text
+
+
 def test_normal_mode_allows_batch():
     assert_publication_batch_size(4, publication=False)

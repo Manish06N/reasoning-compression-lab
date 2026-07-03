@@ -11,6 +11,7 @@
 set -euo pipefail
 
 QR="${QR:-/scratch/$USER/reasoning-compression-lab}"
+export QR
 cd "$QR"
 mkdir -p logs/slurm
 
@@ -37,7 +38,7 @@ else
   unset QREASON_FRESH_RUN || true
 fi
 
-SBATCH_EXPORT="ALL,QREASON_OUTPUT_ROOT=${QREASON_OUTPUT_ROOT},QREASON_HPC_DATE=${QREASON_HPC_DATE}"
+SBATCH_EXPORT="ALL,QR=${QR},QREASON_OUTPUT_ROOT=${QREASON_OUTPUT_ROOT},QREASON_HPC_DATE=${QREASON_HPC_DATE}"
 if [[ -n "${QREASON_FRESH_RUN:-}" ]]; then
   SBATCH_EXPORT="${SBATCH_EXPORT},QREASON_FRESH_RUN=${QREASON_FRESH_RUN}"
 else
