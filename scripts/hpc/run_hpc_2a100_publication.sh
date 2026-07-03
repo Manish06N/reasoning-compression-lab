@@ -45,6 +45,8 @@ DECODING="${QREASON_DECODING:-configs/decoding/repro_qrm.yaml}"
 BATCH_SIZE="${QREASON_BATCH_SIZE:-1}"
 CHECKPOINT_EVERY="${QREASON_CHECKPOINT_EVERY:-10}"
 MIN_FREE_GPU_MB="${QREASON_MIN_FREE_GPU_MB:-70000}"
+GPU_PREFLIGHT_REQUEUE="${QREASON_GPU_PREFLIGHT_REQUEUE:-1}"
+GPU_PREFLIGHT_REQUEUE_MAX="${QREASON_GPU_PREFLIGHT_REQUEUE_MAX:-8}"
 
 export QREASON_PUBLICATION_MODE=1
 export VLLM_BATCH_INVARIANT=1
@@ -105,6 +107,14 @@ check_gpu_free_memory() {
   echo "[gpu $gpu_id] free VRAM before vLLM: ${free_mb} MiB (required >= ${MIN_FREE_GPU_MB} MiB)"
   if (( free_mb < MIN_FREE_GPU_MB )); then
     echo "ERROR: GPU $gpu_id (CUDA_VISIBLE_DEVICES=$cuda_devices) has only ${free_mb} MiB free; refusing to start vLLM on a busy GPU." >&2
+    local restart_count="${SLURM_RESTART_COUNT:-0}"
+    if [[ "$GPU_PREFLIGHT_REQUEUE" == "1" && -n "${SLURM_JOB_ID:-}" && "$restart_count" =~ ^[0-9]+$ && "$GPU_PREFLIGHT_REQUEUE_MAX" =~ ^[0-9]+$ && "$restart_count" -lt "$GPU_PREFLIGHT_REQUEUE_MAX" ]]; then
+      echo "WARN: requeueing Slurm job ${SLURM_JOB_ID} after busy-GPU preflight failure (${restart_count}/${GPU_PREFLIGHT_REQUEUE_MAX})." >&2
+      if scontrol requeue "$SLURM_JOB_ID"; then
+        exit 0
+      fi
+      echo "WARN: scontrol requeue failed; leaving job failed with exit 75." >&2
+    fi
     return 75
   fi
 }

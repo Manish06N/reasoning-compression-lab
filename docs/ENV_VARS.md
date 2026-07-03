@@ -63,6 +63,8 @@ Cell configs reference these via `local_path_env` in `configs/models/*.json`.
 | `QREASON_SLURM_EXCLUSIVE` | `1` | `submit_hpc_blocks.sh` | Adds `--exclusive` for 2-GPU block submits; set `0` only for debugging | Keep `1` for publication |
 | `QREASON_SLURM_EXCLUDE` | unset | `submit_hpc_blocks.sh` | Optional comma-separated node exclude list passed to `sbatch --exclude` | Use to avoid nodes that just failed free-VRAM preflight |
 | `QREASON_MIN_FREE_GPU_MB` | `70000` | `run_hpc_2a100_publication.sh` | Refuse to start vLLM when the selected GPU has less free VRAM; set `0` to disable | Keep default for A100 BF16 anchors |
+| `QREASON_GPU_PREFLIGHT_REQUEUE` | `1` | `run_hpc_2a100_publication.sh` | Requeue the Slurm job when free-VRAM preflight finds a busy assigned GPU | Keep enabled for split b01 retries |
+| `QREASON_GPU_PREFLIGHT_REQUEUE_MAX` | `8` | `run_hpc_2a100_publication.sh` | Maximum self-requeue attempts based on `SLURM_RESTART_COUNT` | Raise only if the partition is very busy |
 
 **Forbidden archive marker:** Place `INVALID_FOR_PUBLICATION.txt` in an archive root to block resume/scoring into that tree (see `src/runners/resume_guard.py`).
 

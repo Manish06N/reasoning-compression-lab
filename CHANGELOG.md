@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-07-03 — Busy GPU self-requeue for split jobs
+
+**Scope:** Fix split b01 retries without excluding GPU nodes.
+
+**Troubleshooting:** The failures are not from combining the two models. Jobs **86429/86430** proved the split path works, but their assigned GPUs had only **733 MiB** and **8865 MiB** free. Slurm also shows other long-running jobs on the same GPU nodes, including interactive jobs without `gres/gpu` in `ReqTRES`, so scheduler GPU allocation and actual VRAM can diverge on this partition.
+
+**Fix:** `run_hpc_2a100_publication.sh` now self-requeues the current Slurm job when the free-VRAM preflight finds a busy assigned GPU. This keeps b01 as two independent 1-GPU jobs and avoids blocking nodes with excludes; jobs retry until Slurm lands them on a GPU with enough free VRAM or `QREASON_GPU_PREFLIGHT_REQUEUE_MAX` is reached.
+
+---
+
 ## 2026-07-03 — Split retry node-exclude control
 
 **Scope:** Follow-up for split retry 2 jobs **86429/86430**.

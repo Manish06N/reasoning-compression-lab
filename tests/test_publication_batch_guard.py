@@ -70,6 +70,15 @@ def test_hpc_launcher_checks_free_gpu_memory_before_vllm():
     assert 'check_gpu_free_memory "$gpu_id" "$cuda_devices"' in text
 
 
+def test_hpc_launcher_requeues_busy_gpu_preflight():
+    launcher = ROOT / "scripts/hpc/run_hpc_2a100_publication.sh"
+    text = launcher.read_text(encoding="utf-8")
+    assert "QREASON_GPU_PREFLIGHT_REQUEUE:-1" in text
+    assert "QREASON_GPU_PREFLIGHT_REQUEUE_MAX:-8" in text
+    assert 'scontrol requeue "$SLURM_JOB_ID"' in text
+    assert "exit 0" in text
+
+
 def test_hpc_archive_guard_uses_active_python():
     guard = ROOT / "scripts/hpc/09_assert_fresh_archive.sh"
     text = guard.read_text(encoding="utf-8")
