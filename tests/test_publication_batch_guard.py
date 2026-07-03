@@ -53,6 +53,14 @@ def test_hpc_submitter_defaults_to_split_2gpu_jobs():
     assert "submit_2gpu_block" in text
 
 
+def test_hpc_submitter_supports_node_excludes():
+    submitter = ROOT / "scripts/hpc/submit_hpc_blocks.sh"
+    text = submitter.read_text(encoding="utf-8")
+    assert "QREASON_SLURM_EXCLUDE" in text
+    assert 'SBATCH_EXCLUDE_ARGS=(--exclude="${QREASON_SLURM_EXCLUDE}")' in text
+    assert '"${SBATCH_EXCLUDE_ARGS[@]}"' in text
+
+
 def test_hpc_launcher_checks_free_gpu_memory_before_vllm():
     launcher = ROOT / "scripts/hpc/run_hpc_2a100_publication.sh"
     text = launcher.read_text(encoding="utf-8")

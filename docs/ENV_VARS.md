@@ -61,6 +61,7 @@ Cell configs reference these via `local_path_env` in `configs/models/*.json`.
 | `QREASON_ENABLE_AUTOPUSH` | unset (off) | Manual export or submit script | `1` -> start tmux `git_autopush_outputs.sh` loop on submit | **Off by default** — prefer MacBook rsync after runs |
 | `QREASON_SUBMIT_2GPU_MODE` | `split` | `submit_hpc_blocks.sh` | `split` -> two independent `--gres=gpu:1` jobs; `exclusive_block` -> one `--gres=gpu:2 --exclusive` block job | Use default for b01 when 2-GPU allocations are scarce |
 | `QREASON_SLURM_EXCLUSIVE` | `1` | `submit_hpc_blocks.sh` | Adds `--exclusive` for 2-GPU block submits; set `0` only for debugging | Keep `1` for publication |
+| `QREASON_SLURM_EXCLUDE` | unset | `submit_hpc_blocks.sh` | Optional comma-separated node exclude list passed to `sbatch --exclude` | Use to avoid nodes that just failed free-VRAM preflight |
 | `QREASON_MIN_FREE_GPU_MB` | `70000` | `run_hpc_2a100_publication.sh` | Refuse to start vLLM when the selected GPU has less free VRAM; set `0` to disable | Keep default for A100 BF16 anchors |
 
 **Forbidden archive marker:** Place `INVALID_FOR_PUBLICATION.txt` in an archive root to block resume/scoring into that tree (see `src/runners/resume_guard.py`).

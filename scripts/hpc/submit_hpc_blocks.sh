@@ -45,6 +45,11 @@ else
   SBATCH_EXPORT="${SBATCH_EXPORT},QREASON_FRESH_RUN="
 fi
 
+SBATCH_EXCLUDE_ARGS=()
+if [[ -n "${QREASON_SLURM_EXCLUDE:-}" ]]; then
+  SBATCH_EXCLUDE_ARGS=(--exclude="${QREASON_SLURM_EXCLUDE}")
+fi
+
 ensure_autopush() {
   if [[ "${QREASON_ENABLE_AUTOPUSH:-}" != "1" ]]; then
     echo "HPC output autopush disabled (set QREASON_ENABLE_AUTOPUSH=1 to enable)."
@@ -81,6 +86,7 @@ submit_split_2gpu() {
       --output="logs/slurm/${block}_${cell_id}_%j.out" \
       --error="logs/slurm/${block}_${cell_id}_%j.err" \
       --time=47:00:00 \
+      "${SBATCH_EXCLUDE_ARGS[@]}" \
       --partition=gpu \
       --cpus-per-task=8 \
       --gres=gpu:1 \
@@ -105,6 +111,7 @@ submit_2gpu_block() {
     --output="logs/slurm/${block}_%j.out" \
     --error="logs/slurm/${block}_%j.err" \
     --time=47:00:00 \
+    "${SBATCH_EXCLUDE_ARGS[@]}" \
     --partition=gpu \
     --cpus-per-task="$cpus_per_task" \
     --gres="gpu:${HPC_BLOCK_GPUS}" \
@@ -133,6 +140,7 @@ submit_1gpu() {
     --output="logs/slurm/${block}_%j.out" \
     --error="logs/slurm/${block}_%j.err" \
     --time=47:00:00 \
+    "${SBATCH_EXCLUDE_ARGS[@]}" \
     --partition=gpu \
     --cpus-per-task=8 \
     --gres=gpu:1 \

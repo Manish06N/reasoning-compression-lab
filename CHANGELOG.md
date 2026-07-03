@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-07-03 — Split retry node-exclude control
+
+**Scope:** Follow-up for split retry 2 jobs **86429/86430**.
+
+**Status:** Jobs **86429** and **86430** submitted as two individual 1-GPU jobs, but both failed fast by design with exit **75** after the free-VRAM preflight: `ragpu006` had only **733 MiB** free and `ragpu008` had only **8865 MiB** free.
+
+**Fix:** `submit_hpc_blocks.sh` now supports `QREASON_SLURM_EXCLUDE`, passed through to `sbatch --exclude`, so split retries can avoid nodes that just failed the free-VRAM preflight while still submitting one 1-GPU job per model.
+
+---
+
 ## 2026-07-03 — Archive guard Python fix for split retry
 
 **Scope:** Follow-up for split retry jobs **86426/86427**.
