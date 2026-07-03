@@ -5,6 +5,8 @@ Deployment-science evaluation harness for compressed reasoning LLMs.
 **GitHub:** https://github.com/Manish06N/reasoning-compression-lab  
 **Paper 1:** *Beyond Accuracy: Reliability, Calibration, Seed Variance, and Cost-per-Correct of Quantized Reasoning LLMs*
 
+**What is QRM?** Shorthand for Liu et al., COLM 2025 — [*Quantization Hurts Reasoning?*](https://arxiv.org/abs/2504.04823) ([code](https://github.com/ruikangliu/Quantized-Reasoning-Models)). That paper is our **accuracy baseline**; Paper 1 goes **beyond** accuracy (calibration, cost, truncation). Level A / b01 checks we can run their protocol before the quant grid. Full beginner explanation: [docs/BEGINNER_HPC_GUIDE.md §1.1–1.2](docs/BEGINNER_HPC_GUIDE.md).
+
 **Roadmap:** PhD plan V8.2 (1 Jul 2026) — see [docs/plans/2026-07-01-v82-reengineering.md](docs/plans/2026-07-01-v82-reengineering.md) and [papers/j1/protocol.yaml](papers/j1/protocol.yaml).
 
 ## Current status (2026-07-01, late evening)

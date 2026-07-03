@@ -41,6 +41,101 @@ Most papers report a single accuracy number. This project treats deployment as a
 
 Everything is driven by **JSON configs** in `configs/` and **shell scripts** in `scripts/hpc/`.
 
+### 1.1 What is QRM? (the baseline paper — not your paper)
+
+**QRM** is project shorthand for the **Quantized Reasoning Models** baseline from Liu et al., COLM 2025:
+
+| Field | Value |
+|-------|--------|
+| **Title** | *Quantization Hurts Reasoning? An Empirical Study on Quantized Reasoning Models* |
+| **Authors** | Ruikang Liu et al. |
+| **Venue** | COLM 2025 |
+| **arXiv** | [2504.04823](https://arxiv.org/abs/2504.04823) |
+| **Code / quantized weights** | [github.com/ruikangliu/Quantized-Reasoning-Models](https://github.com/ruikangliu/Quantized-Reasoning-Models) |
+
+**What QRM studied (their question):**  
+When you compress reasoning models (BF16 → FP8 → 4-bit), does **accuracy** on math/science/code benchmarks drop?
+
+**What your Paper 1 studies (your question):**  
+Even when accuracy looks stable, do **calibration, cost-per-correct, seed variance, and truncation** change under compression?  
+See [PAPER1_DESIGN.md](PAPER1_DESIGN.md) and [PHD_ROADMAP.md](PHD_ROADMAP.md) §7.
+
+```text
+QRM (COLM 2025)                    Your Paper 1 (this repo)
+─────────────────                  ─────────────────────────
+"Does quantization hurt            "Is accuracy alone enough
+ reasoning accuracy?"               for deployment decisions?"
+         │                                    │
+         └──── Level A reproduction gate ─────┘
+              (sanity check, not the thesis)
+```
+
+**Where QRM numbers live in this repo:**
+
+| File | Purpose |
+|------|---------|
+| [configs/baselines/qrm_literature_targets.yaml](../configs/baselines/qrm_literature_targets.yaml) | Reference pass@1 bands (e.g. Qwen MATH-500 **93.9%** ± 5 pp) |
+| [configs/decoding/repro_qrm.yaml](../configs/decoding/repro_qrm.yaml) | Decoding protocol: temp 0.6, **max_tokens 32768**, etc. |
+| [prompts/qrm_math500.txt](../prompts/qrm_math500.txt) | Reproduction prompt (`reproduction` profile) |
+| [scripts/compare_qrm_baseline.py](../scripts/compare_qrm_baseline.py) | Hard gate: does our summary match QRM bands? |
+
+**Level A / b01 gate:** Before the main quant grid (b02–b06), run Qwen-7B + Llama-8B BF16 on MATH-500 under the **QRM-matched protocol**. If pass@1 and truncation look sane, open the rest of the grid.
+
+---
+
+### 1.2 Why is our pass@1 much lower than QRM (~7% vs ~94%)? Is something wrong?
+
+**Short answer:** The June 2026 archive (**7% / ~90% truncation**) is **not** a valid reproduction of QRM — it had known bugs and almost every answer **ran out of token budget** before `\boxed{}`. That is **wrong for claiming QRM reproduction**, but it is **not** proof that your whole thesis is broken. The **current** run (`729d773`, jobs 86757/86758) is the first fair retry; it is too early to judge final pass@1.
+
+#### What QRM reported vs what we measured (June 29 archive)
+
+| | QRM paper (Table 1) | Our June 29 run |
+|---|---------------------|-----------------|
+| Model | Qwen-7B BF16 | Same |
+| Task | MATH-500 | Same |
+| Nominal budget | 32,768 output tokens | Same |
+| pass@1 | **~93.9%** | **~7%** |
+| Truncation | (included in their scoring) | **~90%** |
+
+So we are not “bad at math” in the cluster sense — **most completions were cut off mid-trace** and never delivered a final `\boxed{}` answer.
+
+#### Known reasons the June run is not apples-to-apples (bugs — “wrong” for repro)
+
+| Issue | Effect |
+|-------|--------|
+| `repetition_penalty: 1.05` in YAML **did not reach vLLM** (fixed 2026-07-01) | Models could loop longer → more hits on 32k cap |
+| Archive `outputs-hpc-2a100-main-2026-06-29` | **Diagnostic only** — do not cite in the manuscript ([KNOWN_ISSUES.md](KNOWN_ISSUES.md) §2) |
+
+Rescoring that archive cannot fix truncated raw text.
+
+#### Reasons pass@1 can still differ even with a clean stack (not necessarily a bug)
+
+| Factor | Plain explanation |
+|--------|-------------------|
+| **Truncation at 32k** | R1-style traces are very long. If our vLLM run fills 32k before `\boxed{}`, pass@1 collapses even when the “recipe” matches QRM on paper. |
+| **Different inference stack** | QRM’s public code uses their **lighteval** pipeline; we use **vLLM 0.8.5** + our harness. Same hyperparameters ≠ identical token streams. |
+| **Seeds** | QRM Table 1 averages **seeds 42–44**; b01 uses **seed 0** first. That shifts pass@1 a few points, **not** 7% → 94%. |
+| **Chat template / tokenizer** | DeepSeek-R1 distill models are sensitive to formatting; small differences change trace length. |
+| **~7 min/question ≈ 32k tokens** | Current Qwen logs (~420 s, ~78 tok/s out) suggest we are still **hitting the cap** — same failure mode as June, even with bugs fixed. |
+
+#### Is the low pass@1 “wrong”?
+
+| Statement | True? |
+|-----------|-------|
+| “Our June 7% reproduces QRM” | **No** — invalid run + massive truncation |
+| “Our pipeline is permanently broken” | **Not proven** — June had config bugs; July rerun still in progress |
+| “We can never publish” | **No** — you can publish **pass@1 + truncation_rate** under a fixed budget; that is deployment science |
+| “We must match 93.9% for Paper 1” | **No** for the **main** contribution — only for the **Level A hard gate** before opening b02 |
+
+**Decision rule:**
+
+1. Finish **current** b01 at `max_tokens=32768` with commit `729d773`.
+2. Run `compare_qrm_baseline.py` on scored summaries.
+3. If **truncation ≤ 15%** and pass@1 near 93.9% → reproduction **passed**, proceed b02–b06.
+4. If **truncation still ~90%** → reproduction **failed**, but report honestly: *“Under our vLLM stack and 32k budget, pass@1 is X with Y% truncation.”* Then investigate stack diff vs QRM or run a **separate** all-500 budget sweep (8k/16k/32k/64k) — never rescue only truncated items.
+
+See also [CHANGELOG.md](../CHANGELOG.md) §2026-07-03 (truncation methodology) and [qrm_literature_targets.yaml](../configs/baselines/qrm_literature_targets.yaml).
+
 ---
 
 ## 2. Big-picture architecture
