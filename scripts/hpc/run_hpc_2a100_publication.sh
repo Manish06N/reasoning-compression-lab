@@ -36,6 +36,13 @@ mkdir -p "$RAW" "$SCORED" "$RESULTS" "$LOGS" "$CHECKPOINTS" "$METADATA" "$BACKUP
 # Block accidental resume into the bad June-29 archive or stale pre-fix JSONL.
 bash "$SCRIPT_DIR/09_assert_fresh_archive.sh"
 
+# Clean zero-byte stale lock files from prior crashed publication attempts.
+# These can cause the early manifest/backup python steps (atomic_locked_json_update,
+# backup_mirror) to block forever, preventing the job from ever reaching GPU preflight
+# or run_inference (observed on 86579 etc.: wrapper stops after "Archive check passed",
+# 0 GPU usage, job stays RUNNING for 1h+).
+find "${QREASON_OUTPUT_ROOT:-}" -name '*.lock' -size 0 -delete 2>/dev/null || true
+
 FRESH_FLAG=""
 if [[ "${QREASON_FRESH_RUN:-}" == "1" ]]; then
   FRESH_FLAG="--fresh"
