@@ -1,5 +1,257 @@
 # Changelog
 
+## 2026-07-03 — Campaign narrative, truncation methodology, and b01 protocol reset (commit `729d773`)
+
+This entry is the **canonical story** for the reasoning-compression-lab HPC MATH-500 campaign: what happened from June 26 through July 3, how to score truncated completions, what to do if truncation is high again, and the current active run. Read this before changing `max_tokens`, rescoring archives, or opening b02–b06.
+
+**Supersedes for decoding protocol:** The `a3414a4` simplification entry below still documents the 1M→131072 arc and infrastructure lessons, but **BF16 b01 now runs at QRM protocol** (`max_tokens: 32768`, `max_model_len: 40960`, `enforce_eager: false`) per commit `729d773`. Do not treat 131072 rows as publication data.
+
+---
+
+### A. What this project is trying to do (plain language)
+
+1. Run reasoning models (DeepSeek-R1 distill: **Qwen-7B**, **Llama-8B**, plus quantized variants) on **MATH-500** (500 hard math problems).
+2. Let each model produce a long chain-of-thought, then extract the final answer from `\boxed{...}`.
+3. Compare **pass@1**, **trace length**, **latency**, **VRAM**, **cost-per-correct**, and **calibration** across BF16 / FP8 / AWQ / GPTQ.
+4. **Level A gate (b01):** Reproduce QRM’s Qwen-7B BF16 MATH-500 reference (**93.9%** pass@1 at **32,768** output tokens, temp 0.6) before opening b02–b06.
+
+The **token budget is part of the protocol** — like a fixed recipe in a reproduction study. Changing it mid-campaign without labeling a new protocol invalidates cross-cell and QRM comparisons.
+
+---
+
+### B. Full timeline — the story from the beginning
+
+#### Act 1 — June 26–29: pipeline healthy, science weak (32k + config bug)
+
+| Milestone | Job / artifact | Outcome |
+|-----------|----------------|---------|
+| GPU + vLLM gate | 85013 `qreason-gpu-check` | PASSED |
+| Smoke gate | 85306 `qreason-smoke-quick` | PASSED (~7 min) |
+| First b01 submit | 85342 `qreason-hpc-b01` | Llama branch crashed on shared `state.json.tmp` race; Qwen continued |
+| Fix | `6dc8ed3` checkpoint_utils lock + unique temp files | Prevents parallel state corruption |
+| Corrected b01 | **85394** on `ragpu008` | 2-GPU block: Qwen + Llama BF16 in one SLURM job (`--gres=gpu:2`) |
+| June 29 Codex check (~1d6h runtime) | Logs tailed | Qwen **~309/500**, Llama **~381/500**, ~7 min/problem, stderr empty |
+| Queue | 85343–85347 b02–b06 | PENDING `(QOSMaxGRESPerUser)` — expected while 85394 holds 2 GPUs |
+| Live VRAM (June 29) | `nvidia-smi` on ragpu008 | GPU0 Qwen ~72.6 GB; GPU1 Llama ~56.8 GB / 80 GB |
+
+**June 29 scored results** (`outputs-hpc-2a100-main-2026-06-29`, rescored July 1):
+
+| Cell | pass@1 | Truncation | Parse fail |
+|------|--------|------------|------------|
+| Qwen-7B BF16 | 7.0% | ~90% | ~86% |
+| Llama-8B BF16 | 21.4% | ~59% | ~60% |
+
+**Diagnosis:** Infrastructure worked (500/500 rows completed). Low pass@1 was mostly **budget exhaustion** at `max_tokens: 32768` — models ran out of space before `\boxed{}`. Additionally, `repetition_penalty: 1.05` was in YAML but **never reached vLLM** until the July 1 passthrough fix.
+
+**Lesson:** Low pass@1 + high truncation → decoding budget bottleneck, not SLURM/vLLM init failure.
+
+**Do not cite** `outputs-hpc-2a100-main-2026-06-29` pass@1 in the paper without a rerun — invalid decoding + missing repetition penalty.
+
+---
+
+#### Act 2 — July 1–3: over-correction (1M / 131k) and queue mistakes
+
+After June truncation diagnosis, the project **over-corrected**:
+
+| Attempt | Config | Result |
+|---------|--------|--------|
+| **1M context** | `max_model_len: 1048576` + runtime clamp | BF16 **KV OOM** at engine init (~56 GiB KV, job 86703) |
+| **131k context** | Native 128k in configs (`a3414a4`) | Loaded but **absurdly slow** — 36+ min on Q1, **0/500 rows** (job 86743) |
+| **9-cell parallel queue** | b01–b05 + variants together | Violated b01 hard gate; burned QOS slots; days at 0/4500 rows |
+| **`--exclusive` on split 1-GPU cells** | Default in submit path | SLURM counted exclusive as **2 GPUs** on ragpu nodes → siblings stuck `QOSMaxGRESPerUser` (fixed `7448164`) |
+| Strict git gate | `assert_code_paths_clean` | Jobs died mid-iteration (86696/86697 AWQ) |
+| Heavy VRAM preflight + 240 requeues | 55–70 GB default | PENDING ~28h on busy cluster |
+
+**Lesson:** Fixing truncation needs **enough** context under a **declared protocol**, not maximum possible context. 131k was loadable but not QRM-comparable and not practical for 500×2 cells at batch_size=1.
+
+**Discard all 131k inference rows.** They are not protocol-compliant; `config_hash` differs from 32k YAML; resume guard refuses merges. Fresh rerun at 32768 only.
+
+---
+
+#### Act 3 — July 3 afternoon: audit, QRM protocol restore (`729d773`)
+
+External audit verified root causes of b01 slowness. Fixes applied and tested (111/111 tests pass):
+
+| Claim | Verdict | Fix |
+|-------|---------|-----|
+| `max_tokens: 131072` vs QRM ref `32768` | **TRUE** | `repro_qrm.yaml` → **32768** |
+| `max_model_len: 131072` too large for BF16 speed | **TRUE** | BF16 configs → **40960** |
+| `enforce_eager: true` slows A100 decode | **TRUE** | BF16 → **`false`**; `build_llm` default `false` |
+| `verify_decoding` skipped `max_tokens` check | **TRUE** | Fixed in `sampling_utils.py` |
+| Logprob confidence double-count | **TRUE** | Fixed `logprob_confidence.py` (use `token_ids`) |
+| Zero-byte lock delete breaks flock | **TRUE** | Removed from `run_hpc_2a100_publication.sh` |
+| `--exclusive` on split jobs | Already fixed `7448164` | — |
+
+**Actions:**
+
+1. Cancelled **86743** (36+ min, 0/500 on Q1 with 131k cap).
+2. Resubmitted fresh b01 split pair: **86757** (Qwen), **86758** (Llama).
+3. Archive: `outputs-hpc-2a100-main-2026-07-03`.
+4. Pushed GitHub: **`729d773`**.
+5. Telegram watcher restarted for 86757/86758.
+
+**Expected speed:** ~3–4× faster per problem vs 131k (smaller cap + smaller KV + no eager). Full b01 target **12–24 h** at batch_size=1.
+
+**Trade-off (explicit):** 32768 matches QRM Level A gate, but June 29 showed ~90% Qwen truncation at 32k. This rerun is the first fair test with `repetition_penalty` actually applied. High truncation after a clean run is a **reportable finding**, not a reason to rescue individual items.
+
+---
+
+### C. Truncation methodology — settled practice (QRM + DeepSeek-R1)
+
+This is the **official scoring and reporting policy** for all publication cells.
+
+#### C.1 Score truncated completions as incorrect; keep denominator n = 500
+
+- Completion hits `max_tokens` cap → often no `\boxed{}` → extraction fails → `pred_answer` empty → **`correct = 0`**.
+- Row **stays in the denominator**. Never drop truncated rows — excluding them is **selection bias** that inflates pass@1.
+- QRM’s **93.9%** reference at 32k **includes** truncations scored as wrong. Level A comparison is apples-to-apples only at the same budget with the same rule.
+- **Pipeline behavior (already correct):** `src/evaluation/correctness/scoring.py` — no boxed answer → wrong; `vllm_runner` sets `truncated` when `finish_reason == "length"`.
+
+#### C.2 Report truncation_rate as a first-class metric
+
+- Already computed in cell summaries; gated for Qwen MATH-500: **`truncation_rate_max: 0.15`** in `configs/baselines/qrm_literature_targets.yaml`.
+- **Paper tables:** column next to pass@1, not a footnote.
+- **Quantized cells (b02–b05):** higher truncation is often a **finding** — compression → longer/loopier traces → more budget exhaustion. Separating “accuracy drop from truncation” vs “reasoning failure” is core deployment-efficiency analysis.
+
+#### C.3 Do not selectively re-run truncated items with a bigger budget
+
+- Per-item rescue at 64k/128k **biases** cross-cell comparison — only hard/long items get extra room.
+- **Allowed:** separate **controlled budget sweep** — all 500 items at 8k / 16k / 32k / 64k, new protocol label, new `config_hash`, appendix or secondary table.
+- **Not allowed:** mid-campaign rescue of truncated rows only.
+
+#### C.4 Calibration and selective risk — one primary rule + appendix ablation
+
+| Analysis | Rule |
+|----------|------|
+| **Primary metric** | pass@1 on all rows; truncated = wrong |
+| **Calibration (ECE, reliability)** | Rows with valid confidence source |
+| **Selective-risk curves** | Include truncated rows as `correct=0` at logprob confidence |
+| **Appendix** | Ablation excluding truncated rows from calibration |
+
+**Trap:** Looping traces have **high** mean token logprob (repetition is predictable) → loop-truncated rows look **confidently wrong**. Partly real (logprob gameable by degenerate decoding); partly amplified by pre-`729d773` logprob double-count — **fix applied before drawing calibration conclusions from truncated rows**.
+
+#### C.5 Gate check after b01
+
+```bash
+python3 scripts/compare_qrm_baseline.py --summary results/<cell>_summary.json
+```
+
+**Qwen-7B BF16 MATH-500 (hard gate):**
+
+| Metric | Threshold |
+|--------|-----------|
+| pass@1 | Within **±5 pp** of **93.9%** (QRM Table 1) |
+| truncation_rate | **≤ 0.15** |
+| parse_failure_rate | **≤ 0.10** |
+| completion_tokens_mean | Sanity min **1000** (low mean suggests bug even if pass@1 OK) |
+
+Gate failure does **not** mean discard the run — it means the cell does not match QRM under the official protocol. Report pass@1 + truncation_rate anyway.
+
+---
+
+### D. If truncation happens again — decision tree
+
+```
+b01 finishes at max_tokens=32768
+        │
+        ▼
+Score all 500 rows (truncated = wrong)
+        │
+        ▼
+Report pass@1 + truncation_rate + parse_failure_rate (always)
+        │
+        ├── truncation ≤ 15% AND pass@1 ≈ 93% ± 5pp
+        │       → hard gate PASSED → proceed b02–b06 one block at a time
+        │
+        ├── truncation HIGH, pass@1 LOW
+        │       → report as-is (primary 32k table)
+        │       → gate FAILS on truncation and/or pass@1
+        │       → paper narrative: "budget-limited deployment under QRM protocol"
+        │       → optional: full 500×{8k,16k,32k,64k} sweep as separate labeled experiment
+        │       → do NOT per-item rescue
+        │
+        ├── truncation LOW, pass@1 LOW
+        │       → debug prompts, extraction, repetition_penalty, model load — not budget
+        │
+        └── pass@1 OK-ish but truncation > 15%
+                → gate FAILS on truncation; report both metrics; investigate stack vs QRM
+```
+
+**What to do (summary):**
+
+| Situation | Action |
+|-----------|--------|
+| Any finished 32k run | **Report as-is** — primary paper numbers |
+| High truncation | **Report truncation_rate**; explain pass@1 gap; gate may fail |
+| Want more accuracy | **New protocol** (e.g. all-500 at 65536), not rescue |
+| 131k / 1M rows | **Discard** — not protocol-compliant |
+| Mixing archives | **Forbidden** — `config_hash` / resume guard blocks merge |
+
+---
+
+### E. Publication block queue (June 29 Codex context)
+
+Full plan is **b01–b09**; default submit queues **b01–b06** only.
+
+| Block | June 29 state | Content |
+|-------|---------------|---------|
+| b01 | RUNNING 85394 | Qwen + Llama BF16 MATH-500 |
+| b02–b06 | PENDING 85343–85347 | FP8, AWQ, GPTQ, GSM8K — blocked by 2-GPU QOS while b01 runs |
+| b07 | Not submitted | GPQA — after HF gate: `sbatch slurm/hpc_2a100_b07_gpqa.slurm` |
+| b08–b09 | Not submitted | Future Qwen-1.5B lower-bound cells |
+
+June 29 jobs 85394 and 85343–85347 were **cancelled** 2026-06-30. Current campaign is a **fresh July 3 archive**, not a resume of June 29.
+
+---
+
+### F. Current state (2026-07-03 evening, post-`729d773`)
+
+| Item | Value |
+|------|-------|
+| Git | `729d773` — `main...origin/main` synced |
+| Archive | `outputs-hpc-2a100-main-2026-07-03` |
+| Jobs | **86757** Qwen BF16 RUNNING (`ragpu006`); **86758** Llama BF16 RUNNING (`racn116`) |
+| Config | `max_tokens=32768`, `max_model_len=40960`, `enforce_eager=false`, `repetition_penalty=1.05` |
+| Raw rows | Check `raw/*.jsonl` line counts before opening b02 |
+| Watcher | `~/start-hpc-telegram-watcher.sh` on 86757/86758 |
+
+**Success criteria before b02–b05:**
+
+1. Both raw JSONL files reach **500/500**.
+2. No Triton `stdlib.h` or KV OOM in logs.
+3. Run `compare_qrm_baseline.py` — document `hard_passed`, `truncation_rate`, `pass_at_1`.
+4. **Report truncation even if gate fails** — do not drop rows or rerun truncated items only.
+
+---
+
+### G. Infrastructure fixes to keep (unchanged from earlier July 3 entries)
+
+| Fix | Commit | Why keep |
+|-----|--------|----------|
+| Conda gcc + Triton preflight | `4da8913` | First `generate()` always JIT-compiles on vLLM 0.8.5 |
+| AWQ/GPTQ `dtype: float16` | `8ec36f8`, `1e53e10` | vLLM 0.8.5 rejects bfloat16 for quant kernels |
+| Quant KV `fp8_e5m2` only | `60111a8` | A100-safe; **not** on BF16 anchors |
+| No `--exclusive` on split 1-GPU cells | `7448164` | QOS trap on 2-GPU ragpu nodes — see `docs/PARAM_RUDRA_SLURM.md` |
+| Soft git gate default | `a3414a4` | WARN unless `QREASON_STRICT_GIT=1` |
+
+---
+
+### H. Commits in the full July 3 arc
+
+```text
+729d773 Fix b01 slowness: QRM max_tokens 32768, faster HPC BF16 settings.
+7448164 Fix QOS trap: never use --exclusive on split 1-GPU cells.
+a3414a4 Simplify HPC inference: native 128k context, soft git gate, lighter preflight.
+60111a8 Use fp8_e5m2 KV cache on A100.
+1e53e10 Fix GPTQ-3 config: float16 dtype.
+8ec36f8 Fix AWQ model configs: float16 dtype.
+4da8913 Fix Triton JIT on compute nodes: conda gcc.
+```
+
+**Protocol note:** `a3414a4` 131072 path is **historical**; active BF16 b01 protocol is **`729d773` (32768 / 40960)**.
+
+---
+
 ## 2026-07-03 — Simplification wave: revert 1M context, soften gates, b01-only restart (commit `a3414a4`)
 
 This entry records the **full reasoning arc** for the July 3 HPC campaign: what broke, what we tried, what we kept, what we stripped, and how to run the project going forward. Read this before changing context length, publication gates, or submit strategy.
