@@ -8,6 +8,8 @@
 
 **Fix:** `run_hpc_2a100_publication.sh` now self-requeues the current Slurm job when the free-VRAM preflight finds a busy assigned GPU. This keeps b01 as two independent 1-GPU jobs and avoids blocking nodes with excludes; jobs retry until Slurm lands them on a GPU with enough free VRAM or `QREASON_GPU_PREFLIGHT_REQUEUE_MAX` is reached.
 
+**Follow-up:** Current split retry jobs **86465/86466** repeatedly landed on `ragpu008` while the assigned GPUs still had only **8865 MiB** and **21955 MiB** free, so the default busy-GPU retry cap was raised from **8** to **240**. The jobs still do not exclude nodes or request a combined 2-GPU allocation.
+
 ---
 
 ## 2026-07-03 — Split retry node-exclude control

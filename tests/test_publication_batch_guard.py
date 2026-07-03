@@ -74,7 +74,7 @@ def test_hpc_launcher_requeues_busy_gpu_preflight():
     launcher = ROOT / "scripts/hpc/run_hpc_2a100_publication.sh"
     text = launcher.read_text(encoding="utf-8")
     assert "QREASON_GPU_PREFLIGHT_REQUEUE:-1" in text
-    assert "QREASON_GPU_PREFLIGHT_REQUEUE_MAX:-8" in text
+    assert "QREASON_GPU_PREFLIGHT_REQUEUE_MAX:-240" in text
     assert 'scontrol requeue "$SLURM_JOB_ID"' in text
     assert "exit 0" in text
 
