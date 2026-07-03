@@ -32,8 +32,8 @@ Core Paper 1 literature groups:
 
 | Group | PDF source | Code reference |
 |-------|------------|----------------|
-| 1. Quantized reasoning | `ALL_PAPERS_MERGED.pdf` | `external_repos/01-core-baselines/Quantized-Reasoning-Models/` |
-| 2. Quantization methods | `ALL_PAPERS_MERGED(1).pdf` (GPTQ, SmoothQuant) | `external_repos/03-quantization-implementations/` |
+| 1. Quantized reasoning | [paper1/ALL_PAPERS_MERGED.pdf](paper1/ALL_PAPERS_MERGED.pdf) · [text extract](paper1/ALL_PAPERS_MERGED.md) | `external_repos/01-core-baselines/Quantized-Reasoning-Models/` |
+| 2. Quantization methods | same bundle (GPTQ, SmoothQuant, …) | `external_repos/03-quantization-implementations/` |
 | 3. Calibration | merged bundles | `external_repos/02-calibration-and-cost/Calibrating-LLMs-with-Consistency/` |
 | 4. Seed variance | merged bundles | `external_repos/01-core-baselines/sober-reasoning/` |
 | 5. Cost | merged bundles | `external_repos/02-calibration-and-cost/Cost-of-Pass/` |
