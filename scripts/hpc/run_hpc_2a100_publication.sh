@@ -44,6 +44,7 @@ fi
 DECODING="${QREASON_DECODING:-configs/decoding/repro_qrm.yaml}"
 BATCH_SIZE="${QREASON_BATCH_SIZE:-1}"
 CHECKPOINT_EVERY="${QREASON_CHECKPOINT_EVERY:-10}"
+MIN_FREE_GPU_MB="${QREASON_MIN_FREE_GPU_MB:-70000}"
 
 export QREASON_PUBLICATION_MODE=1
 export VLLM_BATCH_INVARIANT=1
@@ -82,6 +83,30 @@ cuda_visible_for_gpu() {
   fi
 
   echo "$gpu_id"
+}
+
+check_gpu_free_memory() {
+  local gpu_id="$1" cuda_devices="$2" free_mb
+
+  if [[ "${MIN_FREE_GPU_MB:-0}" == "0" ]]; then
+    return 0
+  fi
+  if ! command -v nvidia-smi >/dev/null 2>&1; then
+    echo "WARN: nvidia-smi not found; skipping GPU free-memory preflight" >&2
+    return 0
+  fi
+
+  free_mb="$(nvidia-smi --id="$cuda_devices" --query-gpu=memory.free --format=csv,noheader,nounits 2>/dev/null | head -n 1 | tr -d ' ')"
+  if [[ -z "$free_mb" || ! "$free_mb" =~ ^[0-9]+$ ]]; then
+    echo "WARN: could not read free GPU memory for CUDA_VISIBLE_DEVICES=$cuda_devices; continuing" >&2
+    return 0
+  fi
+
+  echo "[gpu $gpu_id] free VRAM before vLLM: ${free_mb} MiB (required >= ${MIN_FREE_GPU_MB} MiB)"
+  if (( free_mb < MIN_FREE_GPU_MB )); then
+    echo "ERROR: GPU $gpu_id (CUDA_VISIBLE_DEVICES=$cuda_devices) has only ${free_mb} MiB free; refusing to start vLLM on a busy GPU." >&2
+    return 75
+  fi
 }
 
 cell_id_from_cfg() {
@@ -174,6 +199,7 @@ run_one_cell() {
   local cuda_devices
   cuda_devices="$(cuda_visible_for_gpu "$gpu_id")"
   echo "[gpu $gpu_id] === inference: $cell_id (CUDA_VISIBLE_DEVICES=$cuda_devices) ==="
+  check_gpu_free_memory "$gpu_id" "$cuda_devices"
   (
     export CUDA_VISIBLE_DEVICES="$cuda_devices"
     python scripts/run_inference.py \

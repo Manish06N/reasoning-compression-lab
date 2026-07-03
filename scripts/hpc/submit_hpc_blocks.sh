@@ -64,7 +64,7 @@ ensure_autopush() {
 
 ensure_autopush
 
-submit_2gpu() {
+submit_split_2gpu() {
   local block="$1"
   local block_file="$QR/configs/machine_split/hpc_blocks/${block}.sh"
   echo "Submitting $block as independent 1-GPU cell jobs ..."
@@ -86,6 +86,42 @@ submit_2gpu() {
       --gres=gpu:1 \
       --wrap="bash scripts/hpc/run_hpc_2a100_publication.sh cell ${cfg} ${block}"
   done
+}
+
+submit_2gpu_block() {
+  local block="$1"
+  local block_file="$QR/configs/machine_split/hpc_blocks/${block}.sh"
+  # shellcheck disable=SC1090
+  source "$block_file"
+  local cpus_per_task=$((8 * HPC_BLOCK_GPUS))
+  local -a exclusive_args=()
+  if [[ "${QREASON_SLURM_EXCLUSIVE:-1}" == "1" ]]; then
+    exclusive_args+=(--exclusive)
+  fi
+  echo "Submitting $block as one ${HPC_BLOCK_GPUS}-GPU exclusive block job ..."
+  echo "Archive: $QREASON_OUTPUT_ROOT"
+  sbatch --export="$SBATCH_EXPORT" \
+    --job-name="qreason-${block}" \
+    --output="logs/slurm/${block}_%j.out" \
+    --error="logs/slurm/${block}_%j.err" \
+    --time=47:00:00 \
+    --partition=gpu \
+    --cpus-per-task="$cpus_per_task" \
+    --gres="gpu:${HPC_BLOCK_GPUS}" \
+    "${exclusive_args[@]}" \
+    --wrap="bash scripts/hpc/run_hpc_2a100_publication.sh ${block}"
+}
+
+submit_2gpu() {
+  local block="$1"
+  case "${QREASON_SUBMIT_2GPU_MODE:-exclusive_block}" in
+    split) submit_split_2gpu "$block" ;;
+    exclusive_block|block) submit_2gpu_block "$block" ;;
+    *)
+      echo "ERROR: unknown QREASON_SUBMIT_2GPU_MODE=${QREASON_SUBMIT_2GPU_MODE}" >&2
+      exit 2
+      ;;
+  esac
 }
 
 submit_1gpu() {

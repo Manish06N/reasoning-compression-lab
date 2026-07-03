@@ -44,5 +44,23 @@ def test_hpc_submitter_exports_resolved_repo_path():
     assert "QR=${QR}" in text
 
 
+def test_hpc_submitter_defaults_to_exclusive_2gpu_blocks():
+    submitter = ROOT / "scripts/hpc/submit_hpc_blocks.sh"
+    text = submitter.read_text(encoding="utf-8")
+    assert "QREASON_SUBMIT_2GPU_MODE:-exclusive_block" in text
+    assert "submit_2gpu_block" in text
+    assert "--exclusive" in text
+    assert '--gres="gpu:${HPC_BLOCK_GPUS}"' in text
+
+
+def test_hpc_launcher_checks_free_gpu_memory_before_vllm():
+    launcher = ROOT / "scripts/hpc/run_hpc_2a100_publication.sh"
+    text = launcher.read_text(encoding="utf-8")
+    assert "QREASON_MIN_FREE_GPU_MB:-70000" in text
+    assert "check_gpu_free_memory" in text
+    assert "nvidia-smi --id" in text
+    assert 'check_gpu_free_memory "$gpu_id" "$cuda_devices"' in text
+
+
 def test_normal_mode_allows_batch():
     assert_publication_batch_size(4, publication=False)

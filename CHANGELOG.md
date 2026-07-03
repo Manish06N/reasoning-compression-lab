@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-07-03 — Exclusive b01 allocation guard
+
+**Scope:** Follow-up for July 3 jobs **86421/86422**, which confirmed the CUDA mapping fix but still failed on a dirty/shared GPU.
+
+**Changes:**
+- **Submit:** `submit_hpc_blocks.sh` now defaults 2-GPU blocks to one `--gres=gpu:2 --exclusive` Slurm allocation (`QREASON_SUBMIT_2GPU_MODE=exclusive_block`) instead of two independent 1-GPU jobs.
+- **Fallback:** `QREASON_SUBMIT_2GPU_MODE=split` keeps the old split-job behavior available for debugging only.
+- **GPU preflight:** `run_hpc_2a100_publication.sh` now checks selected GPU free memory before vLLM starts and exits early when free VRAM is below `QREASON_MIN_FREE_GPU_MB` (default `70000`).
+- **Docs/tests:** `docs/ENV_VARS.md` documents the new controls; launcher tests guard exclusive submit and free-VRAM checks.
+
+**Reason:** job **86421** failed because another process occupied ~77.66 GiB on the assigned GPU. The new default requests an exclusive 2-GPU node allocation and refuses to start on a busy GPU, avoiding another late vLLM OOM.
+
+---
+
 ## 2026-07-03 — Split-cell GPU allocation fix + b01 resubmit status
 
 **Scope:** Follow-up for failed b01 split-cell jobs **86274–86281** and the July 3 fixed resubmit.
