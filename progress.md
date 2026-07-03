@@ -13,20 +13,20 @@ Canonical dated record for **Paper 1: Beyond Accuracy** (`reasoning-compression-
 
 | Area | Status |
 |------|--------|
-| **GitHub `main`** | Up to date with simplifications. |
-| **J1 scientific validation** | **Review + simplification phase** — Fixed high context (1M+) in place. Full codebase review done (over-engineered areas listed below and in CHANGELOG). 13 models good, env clean, queue empty. Working toward simpler reliable run path. |
+| **GitHub `main`** | Up to date (latest commit pushed with VLLM fix and tracking updates). |
+| **J1 scientific validation** | **Active runs** — GPTQ4 pair (86698 Qwen, 86699 Llama) now RUNNING (~2:51) on separate nodes (ragpu006 + racn116). AWQ4 pair (86696/86697) hit git clean assert and are gone from queue (failed early). FP8 pair failed earlier on max_model_len (before env var fix). No rows yet (0/500). |
 | **QRM baseline gates** | **Fixed** (prior) |
-| **Submit workflow** | Simplified fixed high max from config. |
-| **GPU parallel + context** | Fixed high 1M+ (dynamic length calc removed). |
-| **Environment & Requirements** | Clean (vLLM 0.8.5, torch 2.6, 13 models). |
-| **Overall** | Some over-engineering identified (preflights, locking, manifests, pub asserts, telemetry, etc.). See review section below. |
+| **Submit workflow** | b02/b03/b04 resubmitted with EXCLUSIVE=0 + VLLM_ALLOW_LONG_MAX_MODEL_LEN=1. |
+| **GPU parallel + context** | Fixed high 1M+ (simplified, no dynamic calc). GPTQ4 using it. |
+| **Environment & Requirements** | Clean (vLLM 0.8.5, torch 2.6, 13 models, pip check OK). |
+| **Overall** | Queue has 2 running + 4 pending (QOS). Jobs still in early preflight/dataset stage (no model load visible in tails yet). |
 
-**Verification performed:**
-- squeue empty.
-- 13/13 models: sizes + configs verified (GPTQ-4 now correctly compressed-tensors on disk + in project configs).
-- qreason: key packages present + pip check passed + all project JSONs load + vllm_runner logic exercised.
-- Changes staged/committed/pushed with token.
-- Docs (CHANGELOG + progress) updated with this session.
+**Verification performed (latest check 2026-07-03 ~11:00+):**
+- squeue: GPTQ4 pair (86698 Qwen on ragpu006, 86699 Llama on racn116) RUNNING ~2:51; AWQ4 (86696/7) no longer listed (failed git assert per .err); FP8 failed earlier on max_model_len (pre-fix).
+- Logs: AWQ/GPTQ tails show only SLURM header + preflight (81GB free) + archive/git clean PASSED + "=== inference: ... (CUDA=...)". No "Loading model" or generation yet. Cell logs only pynvml + HF cache fallback.
+- Raw: 0 lines. Checkpoints: rows_done=0, in_progress (updated ~11:00).
+- Git: Clean (pushed 02d861b with VLLM fix); only ?? AGENTS.md.
+- 13 models + env verified clean. High 1M+ context active in configs. VLLM_ALLOW env now in launcher.
 
 **Codebase review — over-engineered parts (2026-07-03)**
 

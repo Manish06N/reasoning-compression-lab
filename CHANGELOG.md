@@ -1,6 +1,62 @@
 # Changelog
 
-## 2026-07-03 — Codebase review for over-engineering + simplification plan. Identified several complex layers that make "just running long-context MATH-500" harder than necessary. Core recommendation: fix high context (done), keep minimal reproducibility (git assert, basic preflight), strip dynamic/phase/lock-heavy machinery where possible. See details below and in progress.md.
+## 2026-07-03 — Latest tracking (post-resubmit): GPTQ4 pair (86698 Qwen on ragpu006, 86699 Llama on racn116) RUNNING ~2:51 after AWQ4 (86696/86697) and FP8 failed on git assert / max_model_len (pre-VLLM fix). No rows (0/500), logs only at preflight/archive/git clean stage + "=== inference: ...". VLLM_ALLOW fix committed+pushed; high 1M+ active. AWQ hit "Publication run requires clean git tree" (uncommitted changes at submit). GPTQ should proceed with env var.
+
+**Overengineered areas identified (full review of scripts/, src/runners/, configs/, preflights, etc.):**
+
+1. **VRAM / max context calculation** (run_inference.py, vllm_runner.py compute_kv...):
+   - Two-phase loads, post-weights measurement, dynamic override, estimates, multiple caps.
+   - **Status**: Simplified to fixed high 1M+ (user request). Good.
+
+2. **GPU preflight & assignment** (run_hpc_2a100_publication.sh: check_gpu_free_memory, cuda_visible_for_gpu, multi-attempt loops + requeue logic):
+   - 4 attempts, sleeps, local vs full requeue, process listing, fallback.
+   - Overly defensive for a cluster with shared/dirty GPUs and QOS.
+
+3. **Manifest, locking, checkpoint, backup, atomic writes** (archive_manifest.py, checkpoint_utils.py, 09_assert_fresh_archive*, state.json.lock, _backup/, backup_mirror, with_lock in autopush):
+   - Extremely elaborate (headers, cell-metadata, multiple locks, mirrors, atomic updates).
+   - Creates many side-effect files and failure modes.
+
+4. **Preflight / gate / assert layers** (07_preflight_publication.py, 09_assert_fresh_archive, assert_code_paths_clean in publication_mode.py, git clean asserts, fresh archive checks everywhere):
+   - Multiple independent "refuse to run" gates + resume guards.
+   - Useful for paper rigor but adds significant complexity and opaque errors.
+
+5. **Resume / recovery machinery** (resume_guard.py, guard_and_recover_resume, allow_resume_from_env, bad-archive handling):
+   - Sophisticated logic for git-hash changes, partial runs, manifest state.
+   - Interacts with all the locking/manifest code.
+
+6. **Publication mode strictness + invariants** (publication_mode.py, VLLM_BATCH_INVARIANT, assert_code_paths_clean on src/scripts/configs, specific batch=1 + skip-calib requirements):
+   - Forces very clean state on every pub run. Good philosophy, but brittle during iteration.
+
+7. **Telemetry / profiling depth** (gpu_stats.py with energy_joules, power, tokens_per_joule, gpu_util, logprob_confidence, confidence_from_vllm_logprobs):
+   - Heavy instrumentation on every sample. Valuable for paper but not core to "get results".
+
+8. **HPC split/parallel orchestration** (submit_hpc_blocks split vs exclusive_block, many env vars, gpu_id remapping, CUDA_VISIBLE_DEVICES hacks).
+   - Necessary due to QOS + node sharing, but adds a lot of moving parts.
+
+9. **Config layering + output root proliferation** (configs/cells/ + machine_split/hpc_blocks/ + per-quant model jsons + decoding + quantization/registry).
+   - Extremely flexible for many variants/experiments.
+   - For focused b01/b02 runs, creates many small files and historical clutter.
+
+**How to make it work (proposed simplification path):**
+- **Keep (essential for correct long-context results on this cluster)**: Fixed high max_model_len (1M+), basic nvidia-smi free preflight + git clean assert (for reproducibility), correct quantization in model configs, one clear output root per campaign.
+- **Strip / simplify**:
+  - Remove or heavily simplify dynamic VRAM context calc (done).
+  - Make GPU preflight a single check + optional short wait (no 4-attempt dance or requeue by default).
+  - Reduce manifest/locking to minimal (just write results + a simple provenance file; drop heavy atomic + mirror unless scoring needs it).
+  - Make publication asserts optional or "warn only" during development; enforce only for final scoring.
+  - Drop or optionalize deep telemetry (energy etc.) for core runs.
+  - Consolidate submit: prefer simple "run cell with fixed high ctx" over split/block/exclusive matrix for now.
+  - Use fewer output roots; name them clearly (e.g. outputs-hpc-b01-2026-07-04).
+  - Consider flattening some config (hardcode common 7B/8B settings for the current campaign).
+- Goal: get from "sbatch a block" to "results written" with as few moving parts as possible while still being able to trust the numbers.
+
+This review was triggered by the context-length discussion. The project has excellent engineering for robustness/reproducibility (which is great for a paper), but some of that robustness has become complexity that makes iteration and "just making it run" harder on the actual hardware constraints.
+
+---
+
+## 2026-07-03 — Latest tracking (post-resubmit): GPTQ4 pair (86698 Qwen on ragpu006, 86699 Llama on racn116) RUNNING ~2:51 after AWQ4 (86696/86697) and FP8 failed on git assert / max_model_len (pre-VLLM fix). No rows (0/500), logs only at preflight/archive/git clean stage + "=== inference: ...". VLLM_ALLOW fix committed+pushed; high 1M+ active. AWQ hit "Publication run requires clean git tree" (uncommitted changes at submit). GPTQ should proceed with env var.
+
+**Overengineered areas identified (full review of scripts/, src/runners/, configs/, preflights, etc.):**
 
 **Overengineered areas identified (full review of scripts/, src/runners/, configs/, preflights, etc.):**
 
