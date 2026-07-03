@@ -3,12 +3,10 @@
   "local_path_env": "QREASON_MODEL_QWEN7B",
   "local_path_default": "models/DeepSeek-R1-Distill-Qwen-7B",
   "dtype": "bfloat16",
-  "max_model_len": 1048576,
+  "max_model_len": 131072,
   "tensor_parallel_size": 1,
   "trust_remote_code": true,
   "use_chat_template": true,
   "enforce_eager": true,
-  "kv_cache_dtype": "fp8_e5m2",
-  "gpu_memory_utilization": 0.95,
   "revision": "916b56a44061fd5cd7d6a8fb632557ed4f724f60"
 }

@@ -102,7 +102,7 @@ def build_llm(model_path: str, model_cfg: Dict[str, Any]):
 
         "dtype": model_cfg.get("dtype", "bfloat16"),
 
-        "max_model_len": model_cfg.get("max_model_len", 1048576),
+        "max_model_len": model_cfg.get("max_model_len", 131072),
 
         "tensor_parallel_size": model_cfg.get("tensor_parallel_size", 1),
 

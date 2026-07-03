@@ -4,7 +4,7 @@
   "local_path_default": "models/DeepSeek-R1-Distill-Llama-8B-AWQ-4",
   "dtype": "float16",
   "quantization": "awq",
-  "max_model_len": 1048576,
+  "max_model_len": 131072,
   "tensor_parallel_size": 1,
   "trust_remote_code": true,
   "use_chat_template": true,

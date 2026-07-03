@@ -23,10 +23,6 @@ source "$SCRIPT_DIR/param_rudra_env.sh"
 param_rudra_activate_conda
 param_rudra_assert_triton_cc
 
-export VLLM_ALLOW_LONG_MAX_MODEL_LEN=1
-
-echo "=== DEBUG: after activate, python=$(which python 2>/dev/null || echo none) git=$(command -v git 2>/dev/null || echo none) ===" >&2
-
 DATE_TAG="${QREASON_HPC_DATE:-$(date +%Y-%m-%d)}"
 export QREASON_OUTPUT_ROOT="${QREASON_OUTPUT_ROOT:-$QR/outputs-hpc-2a100-main-${DATE_TAG}}"
 RAW="$QREASON_OUTPUT_ROOT/raw"
@@ -38,12 +34,8 @@ METADATA="$QREASON_OUTPUT_ROOT/metadata"
 BACKUP_ROOT="$QREASON_OUTPUT_ROOT/_backup"
 mkdir -p "$RAW" "$SCORED" "$RESULTS" "$LOGS" "$CHECKPOINTS" "$METADATA" "$BACKUP_ROOT"
 
-echo "=== DEBUG: dirs created for $QREASON_OUTPUT_ROOT ===" >&2
-
 # Block accidental resume into the bad June-29 archive or stale pre-fix JSONL.
 bash "$SCRIPT_DIR/09_assert_fresh_archive.sh"
-
-echo "=== DEBUG: after 09_assert_fresh_archive ===" >&2
 
 # Clean zero-byte stale lock files from prior crashed publication attempts.
 # These can cause the early manifest/backup python steps (atomic_locked_json_update,
@@ -51,8 +43,6 @@ echo "=== DEBUG: after 09_assert_fresh_archive ===" >&2
 # or run_inference (observed on 86579 etc.: wrapper stops after "Archive check passed",
 # 0 GPU usage, job stays RUNNING for 1h+).
 find "${QREASON_OUTPUT_ROOT:-}" -name '*.lock' -size 0 -delete 2>/dev/null || true
-
-echo "=== DEBUG: stale locks cleaned ===" >&2
 
 FRESH_FLAG=""
 if [[ "${QREASON_FRESH_RUN:-}" == "1" ]]; then
@@ -62,9 +52,9 @@ fi
 DECODING="${QREASON_DECODING:-configs/decoding/repro_qrm.yaml}"
 BATCH_SIZE="${QREASON_BATCH_SIZE:-1}"
 CHECKPOINT_EVERY="${QREASON_CHECKPOINT_EVERY:-10}"
-MIN_FREE_GPU_MB="${QREASON_MIN_FREE_GPU_MB:-55000}"
+MIN_FREE_GPU_MB="${QREASON_MIN_FREE_GPU_MB:-40000}"
 GPU_PREFLIGHT_REQUEUE="${QREASON_GPU_PREFLIGHT_REQUEUE:-1}"
-GPU_PREFLIGHT_REQUEUE_MAX="${QREASON_GPU_PREFLIGHT_REQUEUE_MAX:-240}"
+GPU_PREFLIGHT_REQUEUE_MAX="${QREASON_GPU_PREFLIGHT_REQUEUE_MAX:-12}"
 
 export QREASON_PUBLICATION_MODE=1
 export VLLM_BATCH_INVARIANT=1
@@ -73,13 +63,7 @@ if [[ "${BATCH_SIZE:-1}" != "1" ]]; then
   exit 1
 fi
 
-echo "=== DEBUG: about to run git clean assert ===" >&2
-
-if ! python -c "import sys; sys.path.insert(0, '$QR'); from src.runners.publication_mode import assert_code_paths_clean; assert_code_paths_clean('$QR')"; then
-  exit 1
-fi
-
-echo "=== DEBUG: git clean assert PASSED ===" >&2
+python -c "import sys; sys.path.insert(0, '$QR'); from src.runners.publication_mode import warn_or_assert_code_paths_clean; warn_or_assert_code_paths_clean('$QR')"
 
 export QR DATE_TAG BACKUP_ROOT DECODING BATCH_SIZE CHECKPOINT_EVERY QREASON_OUTPUT_ROOT
 

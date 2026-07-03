@@ -136,18 +136,6 @@ def main() -> None:
         f"telemetry_method={telemetry_method}"
     )
 
-    # Simplified: use fixed high max value from config (per user: no over-engineering, just set and forget)
-    # For reasoning models on MATH-500, we use a high static value (1M+) that fits comfortably on A100 80GB
-    # with the quantized models + fp8 KV. Prompts are short; the budget is for long CoT output.
-    if cell["model"].get("max_model_len", 0) < 1048576:
-        cell["model"] = dict(cell.get("model", {}))
-        cell["model"]["max_model_len"] = 1048576
-    if cell["decoding"].get("max_tokens", 0) < 1048576:
-        cell["decoding"] = dict(cell.get("decoding", {}))
-        cell["decoding"]["max_tokens"] = 1048576
-
-    print(f"Using fixed high max_model_len={cell['model']['max_model_len']}, max_tokens={cell['decoding']['max_tokens']} (simplified)")
-
     if archive_root:
         update_state(
             archive_root,

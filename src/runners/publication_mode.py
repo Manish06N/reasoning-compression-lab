@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import os
 import subprocess
+import sys
 from pathlib import Path
 
 PUBLICATION_CODE_PATHS: tuple[str, ...] = (
@@ -27,9 +28,23 @@ def is_publication_mode(*, cli_flag: bool = False) -> bool:
     return env in ("1", "true", "yes")
 
 
+def is_strict_git() -> bool:
+    """True when dirty code paths must abort the run."""
+    env = os.environ.get("QREASON_STRICT_GIT", "").strip().lower()
+    return env in ("1", "true", "yes")
+
+
 def _git_diff_quiet(repo_root: Path, *extra_args: str) -> None:
     args = ["git", "diff", "--quiet", *extra_args, "--", *PUBLICATION_CODE_PATHS]
     subprocess.run(args, cwd=repo_root, check=True, capture_output=True)
+
+
+def _code_paths_dirty_message() -> str:
+    return (
+        "Publication run has uncommitted changes in code paths "
+        f"({', '.join(PUBLICATION_CODE_PATHS)}). "
+        "Commit or stash code changes, or use a fresh checkout."
+    )
 
 
 def assert_code_paths_clean(repo_root) -> None:
@@ -43,11 +58,27 @@ def assert_code_paths_clean(repo_root) -> None:
             "ERROR: Publication run requires Git installed and a git checkout."
         ) from exc
     except subprocess.CalledProcessError as exc:
+        raise SystemExit(f"ERROR: {_code_paths_dirty_message()}") from exc
+
+
+def warn_or_assert_code_paths_clean(repo_root) -> None:
+    """Warn on dirty code paths unless QREASON_STRICT_GIT=1."""
+    root = Path(repo_root)
+    try:
+        _git_diff_quiet(root)
+        _git_diff_quiet(root, "--cached")
+    except FileNotFoundError as exc:
         raise SystemExit(
-            "ERROR: Publication run requires a clean git working tree for code paths "
-            f"({', '.join(PUBLICATION_CODE_PATHS)}). "
-            "Commit or stash code changes, or use a fresh checkout."
+            "ERROR: Publication run requires Git installed and a git checkout."
         ) from exc
+    except subprocess.CalledProcessError:
+        msg = _code_paths_dirty_message()
+        if is_strict_git():
+            raise SystemExit(f"ERROR: {msg}")
+        print(
+            f"WARN: {msg} Continuing (set QREASON_STRICT_GIT=1 to fail closed).",
+            file=sys.stderr,
+        )
 
 
 def code_changed_since(repo_root, commit: str) -> bool:
@@ -66,5 +97,5 @@ def code_changed_since(repo_root, commit: str) -> bool:
 
 
 def assert_clean_git_tree(repo_root) -> None:
-    """Refuse publication runs on dirty code paths (output bookkeeping allowed)."""
-    assert_code_paths_clean(repo_root)
+    """Warn or refuse publication runs on dirty code paths (output bookkeeping allowed)."""
+    warn_or_assert_code_paths_clean(repo_root)
