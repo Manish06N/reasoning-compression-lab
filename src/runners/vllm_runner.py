@@ -72,6 +72,20 @@ def _ensure_tokenizer_compatibility() -> None:
     PreTrainedTokenizerBase.all_special_tokens_extended = all_special_tokens_extended
 
 
+def compute_kv_bytes_per_token(model_path: str, kv_cache_dtype: str = "fp8") -> int:
+    """Exact KV cache bytes per token (batch=1) from HF config + kv dtype.
+    Used so we can measure leftover VRAM after weights and keep the rest for
+    very long reasoning traces (much >32k tokens).
+    """
+    from transformers import AutoConfig
+    cfg = AutoConfig.from_pretrained(model_path, trust_remote_code=True)
+    n_layers = getattr(cfg, "num_hidden_layers", 28)
+    n_kv_heads = getattr(cfg, "num_key_value_heads", getattr(cfg, "num_attention_heads", 28))
+    head_dim = getattr(cfg, "head_dim", cfg.hidden_size // getattr(cfg, "num_attention_heads", 28))
+    elem_bytes = 1 if kv_cache_dtype and "fp8" in str(kv_cache_dtype).lower() else 2
+    return 2 * n_layers * n_kv_heads * head_dim * elem_bytes
+
+
 def build_llm(model_path: str, model_cfg: Dict[str, Any]):
 
     _ensure_tokenizer_compatibility()
@@ -88,7 +102,7 @@ def build_llm(model_path: str, model_cfg: Dict[str, Any]):
 
         "dtype": model_cfg.get("dtype", "bfloat16"),
 
-        "max_model_len": model_cfg.get("max_model_len", 32768),
+        "max_model_len": model_cfg.get("max_model_len", 65536),
 
         "tensor_parallel_size": model_cfg.get("tensor_parallel_size", 1),
 

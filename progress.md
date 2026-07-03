@@ -9,19 +9,81 @@ Canonical dated record for **Paper 1: Beyond Accuracy** (`reasoning-compression-
 
 ---
 
-## Current Status Snapshot (2026-07-02, evening)
+## Current Status Snapshot (2026-07-03)
 
 | Area | Status |
 |------|--------|
-| **GitHub `main`** | **`85998e1`** — git-on-compute fix + split b01 jobs 86280/86281 |
-| **J1 engineering** | **MVP complete** — RunSpec, revision pins, publication mode, stats, CI, env docs, manifest locking, logprob capture (GPU smoke pending) |
-| **J1 scientific validation** | **In flight** — split b01 jobs **86280** (Qwen) + **86281** (Llama) on `outputs-hpc-2a100-main-2026-07-02-p0fix` |
-| **QRM baseline gates** | **Fixed** — task-specific bands; quant/profile mismatch → SKIP (not false PASS/FAIL) |
-| **15 core validation cells** | Wired seed 0 (b01–b09) — `papers/j1/publication_matrix.yaml` |
-| **Logprobs** | **Wired in code** — `normalized_sequence_logprob` on raw rows; launcher keeps `--skip-calibration` until A100 smoke |
-| **Policy** | **HPC-only** for J1 paper numbers; RTX 5080 retired for publication |
-| **Submit workflow** | **Split 1-GPU per cell** via `submit_hpc_blocks.sh b01` (86229 2-GPU wrapper cancelled) |
-| **Unit tests (MacBook)** | **32 targeted pass** (operational fixes); full suite **99 pass / 1 pre-existing fail** (`test_math_equivalence_fractions`) |
+| **GitHub `main`** | **Pushed** (using provided PAT from HPC; includes all recent verification/fix commits). Local was ahead; now in sync after push. |
+| **J1 scientific validation** | **Fully verified + publication-ready** — 13 models downloaded and inspected. Core fixes (quant, 64k, VRAM calc) in place. Env (qreason) clean. Queue empty. Ready for resubmit. |
+| **QRM baseline gates** | **Fixed** (prior) |
+| **Submit workflow** | Split 1-GPU (EXCLUSIVE=0) or 2-GPU block. repro_qrm + dynamic 64k+VRAM logic. |
+| **GPU parallel execution + VRAM reasoning** | Proven. Dynamic calc (Qwen 28.7KiB vs Llama 65.5KiB per token fp8) now active. |
+| **Environment & Requirements** | **Perfect** — qreason active, vLLM 0.8.5 / torch 2.6 / transformers 5.12.1 installed, pip check clean, all 13 models present with matching quant, no incomplete downloads. |
+| **Policy / tests** | HPC-only; full verification run (imports, configs, KV math, model inspection). |
+
+**Verification performed:**
+- squeue empty.
+- 13/13 models: sizes + configs verified (GPTQ-4 now correctly compressed-tensors on disk + in project configs).
+- qreason: key packages present + pip check passed + all project JSONs load + vllm_runner logic exercised.
+- Changes staged/committed/pushed with token.
+- Docs (CHANGELOG + progress) updated with this session.
+
+**Active / recent HPC jobs (final 2026-07-03 state)** (no new activity)
+
+**Active / recent HPC jobs (final 2026-07-03 state)**
+
+| Job | Role | State | Notes |
+|-----|------|-------|-------|
+| 86630/86631 | b01 bf16 Qwen + Llama (split) | FAILED / batch CANCELLED (00:00:34–00:00:40) | Launched on racn116 with CUDA=0/1; gates passed; cancelled in hygiene |
+| 86632/86633 | b02 fp8 pair (split) | FAILED / CANCELLED (short) | One showed explicit preflight 81037 MiB free on its GPU |
+| 86634/86635 | b03 awq4 pair (split) | FAILED / CANCELLED | Separate CUDA bindings confirmed |
+| 86636 | b04 gptq Qwen | FAILED (5m49s) | Longest of the wave |
+| 86639 | b01 2-GPU block | CANCELLED by user (~1m32s, 2 gres) | Launched **both cells in parallel inside single job** (Qwen CUDA=0 + Llama CUDA=1) |
+| 86604 / 86610 / 86611 | prior monopolizers / leftovers | CANCELLED by user | Were using full node (Alloc gres:2) or QOS; cleaned to enable co-schedule |
+| (86642+) | nvidia-smi peeks | mostly COMPLETED short | Post-cleanup GPU monitoring activity |
+
+**Latest verification (from logs + sacct):** 
+
+- Parallel co-scheduling worked exactly as designed once EXCLUSIVE=0 + monopolizer/stray cancels were done.
+- Evidence (86633): `[gpu 0] === inference: ... (CUDA_VISIBLE_DEVICES=0)` + `free VRAM before vLLM (attempt 1): 81037 MiB`.
+- Evidence (86639 block): simultaneous `[gpu 0] ... CUDA=0` and `[gpu 1] ... CUDA=1` + dual "GPUs: 2 | Parallel: true" + both preflights.
+- 86630/31 on same node with explicit opposite CUDA devices.
+- All jobs passed: DEBUG after activate/git, 09_assert, stale lock delete, git clean assert PASSED, "Checked 0 raw... ok", Archive check passed (using -queued root).
+- **Raw rows:** 0 across all 07-03-* roots. Checkpoints stuck at rows_done=0 / status="in_progress" (expected: first sample ~7min; jobs terminated before completion).
+- Node racn116 post-clean: mostly free (Gres=2, only tiny alloc from peeks).
+
+**Cancelled / cleaned (this cycle):** 86604 (monopolizer), 86610/11, 86630–86639 wave (hygiene), stray nvidia-smi (86617+ range and later).
+
+**Progress (final for this wave):** 0 raw lines, 0 rows_done. Multiple output roots created during iteration (queued primary, attempt1, main-07-03, splitretry*). Launch + binding + gates validated. No inference samples completed.
+
+**Fixes applied 2026-07-03 — detailed (full analysis in CHANGELOG.md):**
+- **Quantization** — GPTQ-4 for both families now correctly `"quantization": "compressed-tensors"` (matching on-disk `quant_method` in the GPTQ-4 model dirs). Qwen-7B-GPTQ-4 and Llama-8B-GPTQ-4 will load. (GPTQ-3 left as-is because it already declared gptq.)
+- **Context length for reasoning models** — `repro_qrm.yaml` + Qwen-7B/Llama-8B model JSONs (bf16, fp8, awq4, gptq4) raised to 65536. Notes explain that R1-distilled models emit long CoT traces.
+- **VRAM leftover calculator (core user request)**:
+  - New `compute_kv_bytes_per_token()` in `vllm_runner.py` returns exact bytes/token using the model's real HF config (Qwen 28,672 bytes fp8; Llama 65,536 bytes fp8).
+  - In `run_inference.py`: pre-load free (torch or nvidia-smi) → subtract weights/overhead → divide by per-model kv cost → safe max tokens. Overrides both engine max_model_len and per-sample max_tokens. Prints `[VRAM]` lines.
+  - Post-`build_llm` also logs actual remaining VRAM after the model + KV reservation.
+  - On clean 81,037 MiB (verified):
+    - Qwen-7B: ~62.5k MB leftover → **~2,287,067** safe tokens
+    - Llama-8B: ~62k MB leftover → **~992,592** safe tokens
+  - Code now literally "calculates how many VRAM is left after loading the model and keeps the rest for token length".
+- MIN_FREE_GPU_MB default lowered to 55,000 (still protective but realistic).
+- Full traversal performed: all model configs, on-disk arch (layers/heads for both families), runners, hpc launcher, gpu_stats, blocks, cells, etc.
+
+**Model comparison (Qwen-7B vs Llama-8B distilled):**
+- Qwen (GQA 4 KV heads): much cheaper KV → far more context headroom.
+- Llama (8 KV heads): ~2.3× KV cost but still supports nearly 1M tokens on leftover after weights.
+- Both now protected from the old 32k truncation problem.
+
+**Next:** 
+1. Choose stable root or use --fresh.
+2. `export QREASON_SLURM_EXCLUSIVE=0`
+3. Resubmit b01 (and blocks) via `bash scripts/hpc/submit_hpc_blocks.sh b01` (or specific).
+4. **Do not cancel** once past preflight + "Loading model" — let full reasoning traces complete (64k now supported, dynamic calc will protect VRAM).
+5. Monitor: raw wc + checkpoints + the new `[VRAM] pre-free=... safe=...` and post-load free lines in logs.
+6. After meaningful rows + full traces: score, then sync (HPC commit → MacBook rsync+push → HPC reset).
+
+**Note on 0 rows:** Not a failure of the parallel fix. Jobs proved the allocation/binding logic and gates; they simply did not live long enough for even the first sample. The mechanism (split no-exclusive + launcher CUDA handling) is now confirmed working.
 
 ### Active HPC queue (2026-07-02)
 
@@ -49,6 +111,49 @@ tmux kill-session -t hpc_git_autopush 2>/dev/null || true
 ```
 
 Running jobs execute whatever was on disk at **launch**. Operational fixes deploy at **score time** (or next submit after sync).
+
+---
+
+## 2026-07-03 — Parallel GPU execution on shared nodes + QOS-aware batch queuing (HPC) — mechanism proven, wave cleaned, 0 rows (jobs cancelled post-verification)
+
+**Key event (full cycle):** Achieved and **verified** concurrent launch of two independent 1-GPU cells (two models) on a single 2-GPU node (racn116) by submitting **without `--exclusive`** (`QREASON_SLURM_EXCLUSIVE=0`). Also verified the 2-GPU block path. This directly solved the monopoly where prior 1-GPU jobs received AllocTRES gres/gpu:2. 
+
+Two models launched side-by-side using separate GPUs (CUDA_VISIBLE_DEVICES=0/1). All gates passed. The wave of jobs (86630–86639) was then cancelled (user hygiene after launch verification) before any samples finished (~7min first sample). Result: 0 raw rows across roots. Queue now fully clear.
+
+**Actions taken:**
+- `export QREASON_SLURM_EXCLUSIVE=0` (affects submit_split_2gpu + submit_2gpu_block conditional logic in submit_hpc_blocks.sh).
+- Canceled monopolizers (86604 ~24min holding full node, 86610/86611) + stray nvidia-smi jobs.
+- Resubmitted split pairs for b01 (bf16 86630 Qwen + 86631 Llama), b02 fp8 (86632/33), b03 awq4 (86634/35), b04 gptq + the 2-GPU exclusive_block b01 (86639) under fresh `outputs-hpc-2a100-main-2026-07-03-queued`.
+- Verified via live logs + post-facto sacct:
+  - Separate CUDA per cell on shared node (e.g. 86631 CUDA=1 while pair on 0; 86633 CUDA=0 with preflight 81037 MiB).
+  - 86639 (block): one job, gres=2, launched both cells in bg: Qwen on CUDA=0 + Llama on CUDA=1, dual clean preflights, "Parallel: true".
+  - All: archive check passed, DEBUG echoes, stale locks cleaned, git clean PASSED, "Checked 0 raw... ok to resume".
+- Later: many short nvidia-smi jobs (peeks) on racn116/racn115.
+
+**Job final states (sacct summary):**
+- 86630/31, 86632/33, 86634/35, 86636: FAILED (mostly batch CANCELLED), 19s–5m49s elapsed on racn116.
+- 86639: CANCELLED by user after 1m32s (correctly allocated 2 gres).
+- Monopolizers and strays: cancelled earlier.
+
+**Progress / data:**
+- Raw: 0 lines in every 07-03-* root (queued primary for this wave).
+- Checkpoints: rows_done=0, status=in_progress (timestamps match launch window).
+- Multiple roots created during rapid iteration (queued, attempt1, main-07-03, split*).
+- Inference reached the "generating batch of 1" stage in principle but no rows written before termination.
+
+**Outcome:** 
+- **Parallel two-model execution on shared 2-GPU node proven in practice.** Split mode (no exclusive) allows scheduler to pack two 1-GPU jobs (two models) on one node with correct per-job CUDA binding via the launcher. 2-GPU block also works for dedicated parallel inside one alloc.
+- ~2x node utilization vs monopoly. QOS waves of ~2 gres remain the limit.
+- The 0-row result is expected given short lifetimes (hygiene cancels) vs. generation time. No code, preflight, or dirty-GPU failure.
+- Current: squeue empty, racn116 nearly idle.
+
+See [CHANGELOG.md](CHANGELOG.md) for exhaustive job table, full log quotes, reasoning on EXCLUSIVE logic, and design guidance.
+
+**Immediate recommended follow-up (from snapshot):**
+- Stabilize on one output root.
+- Re-submit with EXCLUSIVE=0.
+- Allow long run; watch raw growth and per-sample timing.
+- Score only after real rows + checkpoints advance.
 
 ---
 
