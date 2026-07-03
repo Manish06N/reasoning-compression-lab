@@ -3,11 +3,11 @@
 
 temperature: 0.6
 top_p: 0.95
-max_tokens: 65536
-max_model_len: 65536
+max_tokens: 1048576
+max_model_len: 1048576
 repetition_penalty: 1.05
 seed: 0
 # R1 distilled reasoning models often produce very long CoT traces (10k-50k+ tokens) before \boxed{}.
-# 64k is a safe increase vs original 32k to avoid premature truncation on complex MATH-500 problems.
-# KV cache is kept cheap via fp8 + GQA on these models. Leftover VRAM after weights is reserved for this.
-notes: Increased for full reasoning traces on DeepSeek-R1-Distill (Qwen-7B + Llama-8B). Use with fp8 kv_cache on quants. Monitor actual completion lengths.
+# Fixed high value (1M+) for long CoT on reasoning models. MATH-500 prompts are short; output can be very long.
+# KV cache kept cheap via fp8 + GQA. No dynamic calc – simple fixed high max for the model.
+notes: Fixed high max_tokens/max_model_len (1048576) for full reasoning traces on DeepSeek-R1-Distill (Qwen-7B + Llama-8B). Simplified, no over-engineering. Use with fp8 kv on quants.

@@ -13,13 +13,13 @@ Canonical dated record for **Paper 1: Beyond Accuracy** (`reasoning-compression-
 
 | Area | Status |
 |------|--------|
-| **GitHub `main`** | **Pushed** (using provided PAT from HPC; includes all recent verification/fix commits). Local was ahead; now in sync after push. |
-| **J1 scientific validation** | **Fully verified + publication-ready** — 13 models downloaded and inspected. Core fixes (quant, 64k, VRAM calc) in place. Env (qreason) clean. Queue empty. Ready for resubmit. |
+| **GitHub `main`** | Up to date with simplifications. |
+| **J1 scientific validation** | **Review + simplification phase** — Fixed high context (1M+) in place. Full codebase review done (over-engineered areas listed below and in CHANGELOG). 13 models good, env clean, queue empty. Working toward simpler reliable run path. |
 | **QRM baseline gates** | **Fixed** (prior) |
-| **Submit workflow** | Split 1-GPU (EXCLUSIVE=0) or 2-GPU block. repro_qrm + dynamic 64k+VRAM logic. |
-| **GPU parallel execution + VRAM reasoning** | Proven. Dynamic calc (Qwen 28.7KiB vs Llama 65.5KiB per token fp8) now active. |
-| **Environment & Requirements** | **Perfect** — qreason active, vLLM 0.8.5 / torch 2.6 / transformers 5.12.1 installed, pip check clean, all 13 models present with matching quant, no incomplete downloads. |
-| **Policy / tests** | HPC-only; full verification run (imports, configs, KV math, model inspection). |
+| **Submit workflow** | Simplified fixed high max from config. |
+| **GPU parallel + context** | Fixed high 1M+ (dynamic length calc removed). |
+| **Environment & Requirements** | Clean (vLLM 0.8.5, torch 2.6, 13 models). |
+| **Overall** | Some over-engineering identified (preflights, locking, manifests, pub asserts, telemetry, etc.). See review section below. |
 
 **Verification performed:**
 - squeue empty.
@@ -27,6 +27,47 @@ Canonical dated record for **Paper 1: Beyond Accuracy** (`reasoning-compression-
 - qreason: key packages present + pip check passed + all project JSONs load + vllm_runner logic exercised.
 - Changes staged/committed/pushed with token.
 - Docs (CHANGELOG + progress) updated with this session.
+
+**Codebase review — over-engineered parts (2026-07-03)**
+
+I reviewed the full structure (scripts/hpc/, src/runners/, configs/, run_inference, preflights, manifests, etc.).
+
+**Clearly over-engineered for the goal of "run long-context MATH-500 on the 7B/8B models and get results":**
+
+- **VRAM / max context logic** — the two-phase, post-weights calc, dynamic override (we just removed most of it per your request). Good.
+
+- **GPU preflight** (check_gpu_free_memory with 4 attempts + sleep + requeue logic + detailed nvidia-smi dumps + cuda_visible_for_gpu mapping). Defensive but complicated for shared/dirty nodes.
+
+- **Manifest + locking + backup + atomic + _backup system** (archive_manifest.py, checkpoint_utils, 09_assert_fresh_archive, state.json.lock, heavy mirroring). Very thorough but creates many files and failure surfaces.
+
+- **Layered preflight / assert / gate machinery** (07_preflight_publication.py, multiple git clean + fresh archive + publication_mode asserts in the launcher). Good intent, high complexity.
+
+- **Resume / guard sophistication** (resume_guard.py + guard_and_recover + allow_resume_from_env + bad archive paths). Nice for long runs, but interacts badly with all the locking.
+
+- **Publication mode strictness** (assert_code_paths_clean on src/scripts/configs + VLLM_BATCH_INVARIANT + batch=1 + skip-calib requirements). Excellent for final paper runs, over-constraining during debugging/iteration.
+
+- **Telemetry depth** (gpu_stats with energy, power, tokens_per_joule, logprob confidence, etc.). Great for the paper, not needed for core "get the answers".
+
+- **HPC split/parallel orchestration** (submit_hpc_blocks split vs exclusive_block, many env vars, gpu_id remapping). Necessary due to QOS + node sharing, but adds a lot of moving parts.
+
+- **Config layering** (cells/ + hpc_blocks/ + per-quant model jsons + decoding + quantization registry). Flexible for many experiments, but for the current focused campaign it is a lot of small files.
+
+- **Output root explosion** (the many outputs-hpc-*-{queued,attempt1,splitretry,p0fix,...} dirs). Symptom of previous churn.
+
+**How to make it work (my proposal — let's decide):**
+
+Minimal path that still lets us trust the numbers:
+- Fixed high max_context (1M+ done).
+- Basic preflight: one nvidia-smi free check + "is the code tree clean?" git check.
+- One clear output root per campaign.
+- Write results + a simple provenance (git hash + command + config snapshot).
+- Keep the essential quantization correctness and the fixed high context.
+- Drop or make optional: heavy dynamic VRAM calc, multi-attempt preflight, complex manifest locking, strict pub asserts during dev, deep energy telemetry, over-complex split logic.
+- For parallel: start with simple 1-GPU-per-cell (no exclusive) or true 2-GPU block.
+
+If you agree on a subset, I can clean the corresponding files (e.g. simplify the preflight function, reduce manifest usage in the run script, etc.).
+
+What parts feel most painful to you right now when you try to run? Which ones should we attack first?
 
 **Active / recent HPC jobs (final 2026-07-03 state)** (no new activity)
 
@@ -56,31 +97,30 @@ Canonical dated record for **Paper 1: Beyond Accuracy** (`reasoning-compression-
 
 **Progress (final for this wave):** 0 raw lines, 0 rows_done. Multiple output roots created during iteration (queued primary, attempt1, main-07-03, splitretry*). Launch + binding + gates validated. No inference samples completed.
 
-**Fixes applied 2026-07-03 — detailed (full analysis in CHANGELOG.md):**
-- **Quantization** — GPTQ-4 for both families now correctly `"quantization": "compressed-tensors"` (matching on-disk `quant_method` in the GPTQ-4 model dirs). Qwen-7B-GPTQ-4 and Llama-8B-GPTQ-4 will load. (GPTQ-3 left as-is because it already declared gptq.)
-- **Context length for reasoning models** — `repro_qrm.yaml` + Qwen-7B/Llama-8B model JSONs (bf16, fp8, awq4, gptq4) raised to 65536. Notes explain that R1-distilled models emit long CoT traces.
-- **VRAM leftover calculator (core user request)**:
-  - New `compute_kv_bytes_per_token()` in `vllm_runner.py` returns exact bytes/token using the model's real HF config (Qwen 28,672 bytes fp8; Llama 65,536 bytes fp8).
-  - In `run_inference.py`: pre-load free (torch or nvidia-smi) → subtract weights/overhead → divide by per-model kv cost → safe max tokens. Overrides both engine max_model_len and per-sample max_tokens. Prints `[VRAM]` lines.
-  - Post-`build_llm` also logs actual remaining VRAM after the model + KV reservation.
-  - On clean 81,037 MiB (verified):
-    - Qwen-7B: ~62.5k MB leftover → **~2,287,067** safe tokens
-    - Llama-8B: ~62k MB leftover → **~992,592** safe tokens
-  - Code now literally "calculates how many VRAM is left after loading the model and keeps the rest for token length".
-- MIN_FREE_GPU_MB default lowered to 55,000 (still protective but realistic).
-- Full traversal performed: all model configs, on-disk arch (layers/heads for both families), runners, hpc launcher, gpu_stats, blocks, cells, etc.
+**Fixes applied 2026-07-03 — simplified (see CHANGELOG.md for full):**
+- **Quantization** — GPTQ-4 for both families correctly "compressed-tensors" (on-disk match).
+- **Context length — simplified per user ("over engineered it, just set a max value for the model and forget about it")**:
+  - Removed the complex two-phase post-load VRAM measurement + dynamic override from run_inference.py.
+  - No more estimates, phase-1 tiny loads, kv_bpt calcs at runtime for max length.
+  - Just fixed high static value: 1048576 (1M+) in repro_qrm.yaml + main Qwen-7B/Llama-8B model configs (all variants).
+  - vllm_runner default high.
+  - Updated yaml notes: fixed high, simplified, no over-engineering.
+  - Code now simply ensures the high value from config (or sets if lower) and proceeds. Basic post-load VRAM report kept for monitoring only.
+- MATH-500: short prompts, high fixed output limit supports long reasoning.
+- Env: 13 models, clean qreason (vLLM 0.8.5 etc.), no jobs running.
+- Full checks: imports, configs, syntax all good.
 
 **Model comparison (Qwen-7B vs Llama-8B distilled):**
-- Qwen (GQA 4 KV heads): much cheaper KV → far more context headroom.
-- Llama (8 KV heads): ~2.3× KV cost but still supports nearly 1M tokens on leftover after weights.
-- Both now protected from the old 32k truncation problem.
+- Both now use the exact same simple fixed high 1M+ max. No dynamic per-model differences.
+- Qwen more KV-efficient but irrelevant — fixed value for simplicity ("set and forget").
+- Keeps long CoT support without complexity.
 
 **Next:** 
 1. Choose stable root or use --fresh.
 2. `export QREASON_SLURM_EXCLUSIVE=0`
 3. Resubmit b01 (and blocks) via `bash scripts/hpc/submit_hpc_blocks.sh b01` (or specific).
-4. **Do not cancel** once past preflight + "Loading model" — let full reasoning traces complete (64k now supported, dynamic calc will protect VRAM).
-5. Monitor: raw wc + checkpoints + the new `[VRAM] pre-free=... safe=...` and post-load free lines in logs.
+4. **Do not cancel** once past preflight + "Loading model" — let full reasoning traces complete (fixed 1M+ max now).
+5. Monitor: raw wc + checkpoints + basic [VRAM post-load] report (used/free + the fixed high max).
 6. After meaningful rows + full traces: score, then sync (HPC commit → MacBook rsync+push → HPC reset).
 
 **Note on 0 rows:** Not a failure of the parallel fix. Jobs proved the allocation/binding logic and gates; they simply did not live long enough for even the first sample. The mechanism (split no-exclusive + launcher CUDA handling) is now confirmed working.

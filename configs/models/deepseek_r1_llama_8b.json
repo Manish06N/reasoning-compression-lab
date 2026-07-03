@@ -3,7 +3,7 @@
   "local_path_env": "QREASON_MODEL_LLAMA8B",
   "local_path_default": "models/DeepSeek-R1-Distill-Llama-8B",
   "dtype": "bfloat16",
-  "max_model_len": 65536,
+  "max_model_len": 1048576,
   "tensor_parallel_size": 1,
   "trust_remote_code": true,
   "use_chat_template": true,

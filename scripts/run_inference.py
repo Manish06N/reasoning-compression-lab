@@ -136,44 +136,17 @@ def main() -> None:
         f"telemetry_method={telemetry_method}"
     )
 
-    # === Dynamic VRAM leftover calculation for reasoning models ===
-    # After model weights load (or pre-estimate), keep as much VRAM as possible for
-    # KV cache / token length. Reasoning models (R1 distill) need 32k-100k+ tokens
-    # for full CoT before \boxed{}. We compute safe max from remaining VRAM.
-    try:
-        import torch, subprocess
-        from src.runners.vllm_runner import compute_kv_bytes_per_token
-        free_mb = None
-        if torch.cuda.is_available():
-            free_b, _tot = torch.cuda.mem_get_info()
-            free_mb = free_b / (1024**2)
-        else:
-            # fallback for pre-load free using nvidia-smi (used in preflight too)
-            try:
-                out = subprocess.check_output(["nvidia-smi", "--query-gpu=memory.free", "--format=csv,noheader,nounits"], text=True)
-                free_mb = float(out.strip().split()[0])
-            except Exception:
-                pass
-        if free_mb:
-            kv_dtype = cell["model"].get("kv_cache_dtype", "fp8")
-            kv_bpt = compute_kv_bytes_per_token(model_path, kv_dtype)
-            is_bf16 = str(cell["model"].get("dtype", "bfloat16")).lower() in ("bfloat16", "bf16", "float32")
-            weight_mb = 16000 if is_bf16 else 7000
-            overhead_mb = 2500
-            remaining_mb = max(1000.0, free_mb - weight_mb - overhead_mb)
-            safe_tokens = int((remaining_mb * 1024 * 1024) / max(kv_bpt, 1))
-            desired = int(cell["model"].get("max_model_len") or cell["decoding"].get("max_model_len") or 65536)
-            effective = min(max(safe_tokens, 4096), 262144, desired * 2)
-            if effective != cell["model"].get("max_model_len"):
-                cell["model"] = dict(cell["model"])
-                cell["model"]["max_model_len"] = effective
-                cell["decoding"] = dict(cell["decoding"])
-                cell["decoding"]["max_tokens"] = min(cell["decoding"].get("max_tokens", 65536), effective)
-            print(f"[VRAM] pre-free={free_mb:.0f}MiB, kv_bytes/token={kv_bpt}, "
-                  f"est remaining for KV ~{remaining_mb:.0f}MiB -> safe_max_tokens~{safe_tokens} "
-                  f"(effective max_model_len={cell['model']['max_model_len']})")
-    except Exception as _e:
-        print(f"WARN: dynamic VRAM max_model_len calc skipped ({_e})")
+    # Simplified: use fixed high max value from config (per user: no over-engineering, just set and forget)
+    # For reasoning models on MATH-500, we use a high static value (1M+) that fits comfortably on A100 80GB
+    # with the quantized models + fp8 KV. Prompts are short; the budget is for long CoT output.
+    if cell["model"].get("max_model_len", 0) < 1048576:
+        cell["model"] = dict(cell.get("model", {}))
+        cell["model"]["max_model_len"] = 1048576
+    if cell["decoding"].get("max_tokens", 0) < 1048576:
+        cell["decoding"] = dict(cell.get("decoding", {}))
+        cell["decoding"]["max_tokens"] = 1048576
+
+    print(f"Using fixed high max_model_len={cell['model']['max_model_len']}, max_tokens={cell['decoding']['max_tokens']} (simplified)")
 
     if archive_root:
         update_state(
@@ -186,7 +159,7 @@ def main() -> None:
         write_progress(archive_root, cell_id, start_idx, total, status="in_progress")
 
     llm = build_llm(model_path, cell["model"])
-    # Post-load leftover VRAM report (after weights + initial KV reservation for the max we chose)
+    # Post-load report (weights + KV for the *maximum* context we computed after the weights-phase load)
     try:
         import torch, subprocess
         if torch.cuda.is_available():
@@ -198,8 +171,9 @@ def main() -> None:
             tot_b = t * 1024*1024
         free_after_mb = free_after_b / (1024**2)
         used_mb = (tot_b - free_after_b) / (1024**2)
+        cur_max = cell["model"].get("max_model_len")
         print(f"[VRAM post-load] used={used_mb:.0f}MiB / total={tot_b/1e9:.0f}GiB, free={free_after_mb:.0f}MiB. "
-              f"Remaining headroom for generation + long reasoning traces (64k+ supported).")
+              f"Using fixed high max_context={cur_max}.")
     except Exception:
         pass
     use_chat = cell["model"].get("use_chat_template", True)
