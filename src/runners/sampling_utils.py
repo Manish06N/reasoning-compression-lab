@@ -69,6 +69,14 @@ def verify_decoding_for_vllm(
         else:
             messages.append(f"OK: {key}={params[key]}")
 
+    ref_max = QRM_REPRO_REFERENCE["max_new_tokens"]
+    if params.get("max_tokens") != ref_max:
+        messages.append(
+            f"FAIL: max_tokens={params.get('max_tokens')} != QRM repro reference {ref_max}"
+        )
+    else:
+        messages.append(f"OK: max_tokens matches QRM repro reference ({ref_max})")
+
     rp = decoding.get("repetition_penalty")
     if require_repetition_penalty:
         if rp is None:
