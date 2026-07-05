@@ -651,8 +651,10 @@ squeue -u $USER
 tail -30 outputs-hpc-2a100-main-2026-07-03/logs/level_a_qwen7b_bf16_math500_seed0.log
 wc -l outputs-hpc-2a100-main-2026-07-03/raw/*.jsonl
 
-# Resume after 48h wall (same archive — NO --fresh)
+# Resume after 48h wall (pin archive date — NO --fresh)
 cd /scratch/manishn_iitp/reasoning-compression-lab
+QREASON_OUTPUT_ROOT=$PWD/outputs-hpc-2a100-main-2026-07-03 \
+QREASON_HPC_DATE=2026-07-03 \
 bash scripts/hpc/submit_hpc_blocks.sh b01
 
 # Score after 500/500
@@ -697,4 +699,127 @@ bash scripts/hpc/submit_hpc_blocks.sh b02   # only after b01 scored + decision i
 
 ---
 
-*Last updated: 2026-07-03 (~19:35 IST). Refresh §22 after row-10 checkpoint.*
+## 25. The b01 gate — what it is and what you should know
+
+**Full detail:** §6, §19, `configs/baselines/qrm_literature_targets.yaml`, `scripts/compare_qrm_baseline.py`.
+
+### What the gate is
+
+The **b01 hard gate** asks: *“Can our HPC stack reproduce QRM Table 1 BF16 numbers before we spend GPU weeks on the quant grid?”*
+
+| Metric | Qwen-7B MATH-500 | Llama-8B MATH-500 |
+|--------|------------------|-------------------|
+| pass@1 reference | **93.9%** ± 0.7 (QRM Table 1) | **91.0%** ± 1.1 (QRM Appendix B Table 4) |
+| Tolerance | **±5 pp** absolute | **±5 pp** absolute |
+| truncation_rate max | **≤ 15%** | (same policy) |
+| parse_failure_rate max | **≤ 10%** | (same policy) |
+| Required `prompt_profile` | **`reproduction`** | **`reproduction`** |
+
+Run checker (use conda `qreason` python):
+
+```bash
+/home/manishn_iitp/.conda/envs/qreason/bin/python3 scripts/compare_qrm_baseline.py \
+  --summary outputs-hpc-2a100-main-2026-07-03/results/<cell>_summary.json
+```
+
+**Gate outcomes:**
+
+| Result | Meaning | Action |
+|--------|---------|--------|
+| `hard_passed: true` | Stack matches QRM bands | Submit **b02** one block |
+| `hard_passed: false`, high truncation | Budget exhaustion dominates | Paper 1 “deployment budget” story; optional Protocol A rerun |
+| `hard_passed: null`, profile mismatch | Wrong prompt profile for gate | Re-run with `reproduction` cell, or don’t use for QRM claim |
+| Qwen incomplete | Can’t gate yet | Resume until 500/500 scored |
+
+**Gate failure does not mean trash the run** — it means don’t open b02 claiming reproduction.
+
+### Resume trap (memorise)
+
+`submit_hpc_blocks.sh` defaults `QREASON_OUTPUT_ROOT` to **today’s date**. Resuming July 3 data on July 5 **without** pinning the archive creates an empty new folder.
+
+**Correct resume:**
+
+```bash
+cd /scratch/manishn_iitp/reasoning-compression-lab
+QREASON_OUTPUT_ROOT=$PWD/outputs-hpc-2a100-main-2026-07-03 \
+QREASON_HPC_DATE=2026-07-03 \
+bash scripts/hpc/submit_hpc_blocks.sh b01
+```
+
+Also fix `metadata/dirty_nodes.txt` if nodes are concatenated on one line (causes `Invalid node name` sbatch error).
+
+---
+
+## 26. Llama BF16 results — verification vs June & QRM (2026-07-05)
+
+### Job outcomes (86757/86758 wave)
+
+| Cell | Job | Outcome | Rows |
+|------|-----|---------|------|
+| Qwen BF16 `reproduction` | 86757 | **TIMEOUT** @ 47h | **410/500** checkpointed |
+| Llama BF16 `sober` | 86758 | **COMPLETED** | **500/500** scored |
+
+**Resume submitted:** jobs **87111** (Qwen), **87112** (Llama) on `racn116`, archive `outputs-hpc-2a100-main-2026-07-03`.
+
+### Llama July 2026 scored summary (genuine, complete run)
+
+| Metric | July 2026 (`729d773` protocol) | June 2026 (invalid archive) | QRM paper (Llama BF16) |
+|--------|-------------------------------|------------------------------|------------------------|
+| pass@1 | **19.6%** (98/500) | 21.4% | **91.0%** ± 1.1% |
+| truncation_rate | **58.0%** (290/500) | ~59% | (included in their pass@1 at 32k) |
+| parse_failure_rate | **60.4%** (302 no `pred_answer`) | ~60% | — |
+| completion_tokens p50 | **32768** (hits cap) | similar | 32k protocol |
+| finish_reason | stop=210, length=290 | — | — |
+| prompt_profile | **`sober`** (not QRM repro) | unknown / broken rep_pen | `reproduction` (QRM) |
+
+### Is July Llama genuine vs June?
+
+**Yes — more trustworthy than June, scientifically similar.**
+
+| Evidence | Interpretation |
+|----------|----------------|
+| Truncation **58% vs 59%** | Same budget-exhaustion phenomenon; not a one-off bug |
+| pass@1 **19.6% vs 21.4%** | Within June noise; **not** a dramatic fix from `repetition_penalty` |
+| 500/500 completed + scored | July run is **complete**; June had broken `repetition_penalty` wiring |
+| Median output = **32k tokens** | Models still fill the cap — ~7 min/question, ~78 tok/s |
+| Non-truncated subset pass@1 = **45.2%** (95/210) | Even **without** budget limit, still **far below QRM 91%** |
+
+**Conclusion:** July confirms June’s *shape* (high truncation, low pass@1) under fixed 32k. The `729d773` fixes made the run **valid to cite** for Paper 1 deployment metrics, but **do not** close the QRM reproduction gap.
+
+### Why Llama ≠ QRM 91% (theoretical)
+
+1. **Prompt profile:** b01 Llama uses **`sober`** (`prompts/math500.txt` — long “Therefore, the final answer is…” format), not QRM **`reproduction`** (`qrm_math500.txt`). Gate checker returns `SKIP: prompt_profile mismatch`.
+2. **Truncation → wrong:** 290 rows hit length cap → no extractable answer → scored wrong (by design, §6).
+3. **Reasoning without answer:** 100 rows have `\boxed{}` but wrong math — model reasons but errs.
+4. **Stack gap:** QRM uses Lighteval `latex_gold_metric`; we use `math_verify`. Edge-case disagreements possible.
+5. **Seed:** seed 0 vs QRM seeds 42–44.
+
+**Paper 1 framing:** This is exactly the “beyond accuracy” story — pass@1 alone hides that **58% of serves never returned a scorable answer** under deployment budget.
+
+### Qwen partial (410 rows) — early signal
+
+| Metric | Value |
+|--------|-------|
+| truncation | **94.1%** (386/410) |
+| `\boxed{}` in completion | **7.6%** |
+| vs June Qwen | 90% trunc, 7% pass@1 — **same failure mode** |
+
+Expect QRM gate **fail** on Qwen unless remaining 90 rows differ radically (unlikely).
+
+---
+
+## 27. Live snapshot (2026-07-05)
+
+| Item | Value |
+|------|-------|
+| Jobs | **87111** Qwen resume RUNNING; **87112** Llama (may skip if scored) |
+| Archive | `outputs-hpc-2a100-main-2026-07-03` |
+| Qwen progress | **410/500** durable; resume rows 411–500 (~10.5 h ETA) |
+| Llama | **500/500 scored** — `results/level_c_llama8b_bf16_math500_seed0_summary.json` |
+| b01 gate | **Not passed** (Llama profile mismatch + metrics; Qwen incomplete) |
+| b02–b06 | **Not submitted** (correct) |
+| Fixed | `dirty_nodes.txt` split across lines; resume uses pinned `QREASON_OUTPUT_ROOT` |
+
+---
+
+*Last updated: 2026-07-05. See §25 for gate; §26 for Llama analysis; §27 for live state.*

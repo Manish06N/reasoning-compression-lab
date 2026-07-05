@@ -9,7 +9,55 @@ Canonical dated record for **Paper 1: Beyond Accuracy** (`reasoning-compression-
 
 ---
 
-## Current Status Snapshot (2026-07-03, evening)
+## Current Status Snapshot (2026-07-05)
+
+| Area | Status |
+|------|--------|
+| **Active archive** | `outputs-hpc-2a100-main-2026-07-03` (protocol `729d773`: 32k tokens, rep_penalty 1.05) |
+| **b01 gate** | **NOT PASSED** — Llama scored; Qwen 410/500 after timeout |
+| **Jobs running** | **87111** Qwen resume (411→500); **87112** Llama (should skip — already scored) |
+| **Llama BF16** | **500/500 scored** — pass@1 **19.6%**, truncation **58%**, `sober` prompt (not QRM repro profile) |
+| **Qwen BF16** | **410/500** checkpointed, **94.1%** truncation on partial — resume in flight |
+| **b02–b06** | **Not submitted** (correct — gate blocks quant grid) |
+| **GitHub sync** | HPC ahead of `origin/main` — MacBook rsync needed after doc commits |
+| **Key docs** | `notes.md` §25–§27 (gate + Llama analysis), this file, `CHANGELOG.md` 2026-07-05 entry |
+
+### b01 gate quick reference (see `notes.md` §25)
+
+| Check | Qwen target | Llama target | July result |
+|-------|-------------|-------------|-------------|
+| pass@1 | 93.9% ± 5 pp | 91.0% ± 5 pp | Qwen TBD; Llama **19.6% FAIL** |
+| truncation_rate | ≤ 15% | ≤ 15% | Qwen ~94% partial; Llama **58% FAIL** |
+| prompt_profile | `reproduction` | `reproduction` | Qwen OK; Llama **`sober` SKIP** |
+
+```bash
+# Gate checker (conda qreason python)
+/home/manishn_iitp/.conda/envs/qreason/bin/python3 scripts/compare_qrm_baseline.py \
+  --summary outputs-hpc-2a100-main-2026-07-03/results/level_c_llama8b_bf16_math500_seed0_summary.json
+```
+
+### Resume command (memorise — pin archive date)
+
+```bash
+cd /scratch/manishn_iitp/reasoning-compression-lab
+QREASON_OUTPUT_ROOT=$PWD/outputs-hpc-2a100-main-2026-07-03 \
+QREASON_HPC_DATE=2026-07-03 \
+bash scripts/hpc/submit_hpc_blocks.sh b01
+```
+
+### Llama July vs June — is it genuine?
+
+| | June 2026 (invalid) | July 2026 (valid) | QRM paper |
+|--|---------------------|-------------------|-----------|
+| pass@1 | 21.4% | **19.6%** | 91.0% |
+| truncation | ~59% | **58%** | (at 32k) |
+| Trustworthy? | No (rep_pen bug) | **Yes** (500/500, `729d773`) | baseline |
+
+July **confirms** June’s truncation shape; `repetition_penalty` fix did not materially lift Llama. Non-truncated pass@1 = **45%** — gap to QRM is not only truncation.
+
+---
+
+## Historical — 2026-07-03 evening (superseded by 2026-07-05 snapshot above)
 
 | Area | Status |
 |------|--------|

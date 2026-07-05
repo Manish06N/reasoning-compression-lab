@@ -1,5 +1,47 @@
 # Changelog
 
+## 2026-07-05 — b01 wave completes (Llama), Qwen timeout + resume, first scored BF16 results
+
+### Job outcomes
+
+| Job | Cell | SLURM | Runtime | Rows | Notes |
+|-----|------|-------|---------|------|-------|
+| **86757** | `level_a_qwen7b_bf16` (reproduction) | **TIMEOUT** | ~47 h | **410/500** | Last checkpoint row 410; log reached ~419 before kill |
+| **86758** | `level_c_llama8b_bf16` (**sober**) | **COMPLETED** | ~44 h | **500/500** | Auto-scored; summary written |
+| **87111** | Qwen resume | RUNNING | — | resume 411+ | Submitted with pinned `QREASON_OUTPUT_ROOT=...2026-07-03` |
+| **87112** | Llama | RUNNING | — | skip expected | Already `status: scored` |
+
+### Llama BF16 scored results (first trustworthy July BF16 cell)
+
+Archive: `outputs-hpc-2a100-main-2026-07-03/results/level_c_llama8b_bf16_math500_seed0_summary.json`
+
+| Metric | Value | QRM ref (Llama MATH-500) | Gate |
+|--------|-------|--------------------------|------|
+| pass@1 | **19.6%** (98/500) | 91.0% ± 1.1% | **FAIL** (far outside ±5 pp) |
+| truncation_rate | **58.0%** | ≤ 15% policy | **FAIL** |
+| parse_failure_rate | **60.4%** | ≤ 10% | **FAIL** |
+| completion_tokens p50 | **32768** | 32k protocol | OK (budget honored) |
+| prompt_profile | **sober** | reproduction required | **SKIP** in `compare_qrm_baseline.py` |
+
+**Comparison to June 29 archive (invalid):** pass@1 21.4%, truncation ~59%, parse fail ~60%. July is **scientifically similar** but **methodologically stronger** (`repetition_penalty` reaches vLLM, `729d773` protocol, full 500/500).
+
+**Non-truncated subset:** 210 stop finishes, pass@1 **45.2%** — still far below QRM 91%, so gap is not truncation accounting alone.
+
+**Qwen partial (410 rows):** truncation **94.1%** — same budget-exhaustion pattern as June (~90%).
+
+### b01 gate verdict
+
+- **Hard gate: NOT PASSED** — do not submit b02–b06 claiming QRM reproduction.
+- **Paper 1 deployment metrics: VALID** for Llama row (label protocol + prompt profile honestly).
+- **Next:** Finish Qwen 90 rows → score → decide Protocol A rerun vs budget-limited paper narrative.
+
+### Ops fixes this session
+
+1. **Resume trap:** `submit_hpc_blocks.sh` defaults archive to **today’s date** — must set `QREASON_OUTPUT_ROOT` + `QREASON_HPC_DATE` when resuming an older campaign.
+2. **`dirty_nodes.txt`:** malformed single line `ragpu008ragpu004` broke sbatch exclude — split to one node per line.
+
+---
+
 ## 2026-07-03 — Campaign narrative, truncation methodology, and b01 protocol reset (commit `729d773`)
 
 This entry is the **canonical story** for the reasoning-compression-lab HPC MATH-500 campaign: what happened from June 26 through July 3, how to score truncated completions, what to do if truncation is high again, and the current active run. Read this before changing `max_tokens`, rescoring archives, or opening b02–b06.
