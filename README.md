@@ -9,23 +9,22 @@ Deployment-science evaluation harness for compressed reasoning LLMs.
 
 **Roadmap:** PhD plan V8.2 (1 Jul 2026) — see [docs/plans/2026-07-01-v82-reengineering.md](docs/plans/2026-07-01-v82-reengineering.md) and [papers/j1/protocol.yaml](papers/j1/protocol.yaml).
 
-## Current status (2026-07-01, late evening)
+## Current status (2026-07-05)
 
-**J1 engineering MVP complete; scientific validation pending b01 rerun.**
+**b01 QRM gate FAILED — Paper 1 pivot to deployment-budget science (truncation + cost).**
 
-**GitHub `main`:** `286f5e4`
+| Item | Status |
+|------|--------|
+| **Llama BF16** | 500/500 scored — pass@1 **19.6%**, truncation **58%** |
+| **Qwen BF16** | 410/500 partial — **94%** truncation; **finishing 90 rows not required** |
+| **b02–b06** | Not submitted — **next: quant grid** at same 32k protocol |
+| **Queue** | Empty |
 
-| Machine | Status | Details |
-|---------|--------|---------|
-| **5080** | **Not used for J1 publication** | J3 local transfer only — [HARDWARE_POLICY.md](docs/HARDWARE_POLICY.md) |
-| **HPC** | **b01 in queue** | Smoke job 86015 → b01 job 86016 (`afterok`); do not reset git while jobs run |
-| **MacBook** | **Synced** | Review fixes landed; **67 tests** pass in CI |
+**Policy:** HPC-only for paper numbers — [HARDWARE_POLICY.md](docs/HARDWARE_POLICY.md).
 
-**Policy:** **HPC-only** for all paper numbers (7B/8B, GSM8K, GPQA, 1.5B when queued). See [docs/HARDWARE_POLICY.md](docs/HARDWARE_POLICY.md).
+**Read first:** [progress.md](progress.md) · [notes.md](notes.md) §28 (pivot) · [CHANGELOG.md](CHANGELOG.md)
 
-**Status (canonical):** [progress.md](progress.md) · [docs/KNOWN_ISSUES.md](docs/KNOWN_ISSUES.md) · [docs/HPC_POST_MERGE_CHECKLIST.md](docs/HPC_POST_MERGE_CHECKLIST.md)
-
-**b01 gate (MATH-500, hard):** Qwen-7B **88.9–98.9%** (QRM T1 93.9), Llama-8B **86.0–96.0%** (QRM Table 4 91.0) — see [qrm_literature_targets.yaml](configs/baselines/qrm_literature_targets.yaml).
+**b01 QRM gate:** Targets Qwen **93.9%**, Llama **91%** ±5 pp, truncation ≤15% — **not met** on July BF16. Gate fail does **not** block Paper 1; see [qrm_literature_targets.yaml](configs/baselines/qrm_literature_targets.yaml).
 
 **Docs:** [docs/J1_VALIDATION_RUNBOOK.md](docs/J1_VALIDATION_RUNBOOK.md) · [docs/CODEBASE_OVERVIEW.md](docs/CODEBASE_OVERVIEW.md) · [docs/ENV_VARS.md](docs/ENV_VARS.md) · [docs/MODEL_SCOPE_DECISION.md](docs/MODEL_SCOPE_DECISION.md) · [docs/REPO_MAP.md](docs/REPO_MAP.md) · [docs/KNOWN_ISSUES.md](docs/KNOWN_ISSUES.md) · [docs/PROGRESS.md](docs/PROGRESS.md) · [progress.md](progress.md)
 

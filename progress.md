@@ -9,18 +9,32 @@ Canonical dated record for **Paper 1: Beyond Accuracy** (`reasoning-compression-
 
 ---
 
-## Current Status Snapshot (2026-07-05)
+## Current Status Snapshot (2026-07-05, post–gate-fail pivot)
 
 | Area | Status |
 |------|--------|
-| **Active archive** | `outputs-hpc-2a100-main-2026-07-03` (protocol `729d773`: 32k tokens, rep_penalty 1.05) |
-| **b01 gate** | **NOT PASSED** — Llama scored; Qwen 410/500 after timeout |
-| **Jobs running** | **87111** Qwen resume (411→500); **87112** Llama (should skip — already scored) |
-| **Llama BF16** | **500/500 scored** — pass@1 **19.6%**, truncation **58%**, `sober` prompt (not QRM repro profile) |
-| **Qwen BF16** | **410/500** checkpointed, **94.1%** truncation on partial — resume in flight |
-| **b02–b06** | **Not submitted** (correct — gate blocks quant grid) |
-| **GitHub sync** | HPC ahead of `origin/main` — MacBook rsync needed after doc commits |
-| **Key docs** | `notes.md` §25–§27 (gate + Llama analysis), this file, `CHANGELOG.md` 2026-07-05 entry |
+| **Active archive** | `outputs-hpc-2a100-main-2026-07-03` (protocol `729d773`: 32k, rep_penalty 1.05) |
+| **b01 QRM gate** | **FAILED** — do not claim reproduction; do not block Paper 1 on this |
+| **Llama BF16** | **500/500 scored** — pass@1 **19.6%**, truncation **58%**, cost/correct **~1614 s**, `sober` prompt |
+| **Qwen BF16** | **410/500** checkpointed — **94.1%** truncation; resume job **87111 FAILED** (GPU busy) |
+| **Jobs running** | **None** |
+| **Strategic pivot** | Paper 1 = **deployment budget science** (truncation + cost + calibration), not QRM repro table |
+| **b02–b06** | **Not submitted** — next decision: open quant grid **without** QRM gate (see `notes.md` §28) |
+| **GitHub sync** | HPC ahead of `origin/main` — MacBook rsync needed |
+| **Key docs** | `notes.md` §28 (pivot + next steps), `CHANGELOG.md` 2026-07-05 |
+
+### Should we finish Qwen 90 rows (~10 h)?
+
+**Recommendation: No — not necessary for any decision.**
+
+| Reason | Detail |
+|--------|--------|
+| Truncation already conclusive | 94.1% on n=410 — gate needs ≤15%; 90 more rows cannot flip narrative |
+| Gate already failed | Llama + Qwen both far from QRM bands |
+| Marginal science value | Confirms same story; costs ~10 GPU-hours + resume debugging |
+| Optional only | Finish **only** if you want symmetric n=500 in a table footnote |
+
+If resuming later: pin `QREASON_OUTPUT_ROOT` to `...2026-07-03`; ensure GPU is free (87111 died on shared VRAM).
 
 ### b01 gate quick reference (see `notes.md` §25)
 

@@ -85,7 +85,7 @@ QRM (COLM 2025)                    Your Paper 1 (this repo)
 
 ### 1.2 Why is our pass@1 much lower than QRM (~7% vs ~94%)? Is something wrong?
 
-**Short answer:** The June 2026 archive (**7% / ~90% truncation**) is **not** a valid reproduction of QRM — it had known bugs and almost every answer **ran out of token budget** before `\boxed{}`. That is **wrong for claiming QRM reproduction**, but it is **not** proof that your whole thesis is broken. The **current** run (`729d773`, jobs 86757/86758) is the first fair retry; it is too early to judge final pass@1.
+**Short answer (updated 2026-07-05):** The **b01 QRM gate failed** on July BF16: Llama **19.6%** pass@1 / **58%** truncation (500/500); Qwen **~94%** truncation on 410/500. This is **not** valid QRM reproduction, but it **is** valid Paper 1 science — fixed 32k deployment budget causes silent failure (truncation). The thesis (*Beyond Accuracy*) is **supported**, not broken. See [notes.md §28](../notes.md).
 
 #### What QRM reported vs what we measured (June 29 archive)
 

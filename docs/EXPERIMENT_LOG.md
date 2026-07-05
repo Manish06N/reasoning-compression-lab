@@ -149,18 +149,57 @@ Key numbers:  ~1-4k completion tokens/q on 1.5B; ~15 tok/s; batch 4/2/1 by model
 
 ---
 
-## Level A — Reproduction gate (pending)
+## 2026-07-05 — b01 BF16 Llama (COMPLETE, gate FAIL)
 
 ```text
-Date:
-Level:        A
+Date:         2026-07-03 → 2026-07-05
+Level:        C (b01 block; sober prompt)
+Model:        DeepSeek-R1-Distill-Llama-8B
+Quant config: BF16
+Task:         MATH-500
+Seed(s):      0
+Hardware:     A100 80GB (job 86758, racn116)
+Status:       done / scored
+Raw path:     outputs-hpc-2a100-main-2026-07-03/raw/level_c_llama8b_bf16_math500_seed0.jsonl
+Scored path:  outputs-hpc-2a100-main-2026-07-03/scored/level_c_llama8b_bf16_math500_seed0.jsonl
+Notes:        Protocol 729d773 (32k, rep_penalty 1.05). prompt_profile=sober (NOT QRM reproduction).
+              compare_qrm_baseline.py SKIP on profile. Valid for Paper 1 deployment metrics.
+Key numbers:  pass@1 19.6%, truncation 58%, parse_fail 60.4%, cost/correct ~1614s,
+              non-truncated pass@1 45.2% (210 stop finishes)
+```
+
+---
+
+## 2026-07-05 — b01 BF16 Qwen (PARTIAL, gate FAIL)
+
+```text
+Date:         2026-07-03 → 2026-07-05
+Level:        A (reproduction prompt)
 Model:        DeepSeek-R1-Distill-Qwen-7B
 Quant config: BF16
 Task:         MATH-500
 Seed(s):      0
+Hardware:     A100 80GB (job 86757 TIMEOUT; resume 87111 FAILED GPU busy)
+Status:       partial — 410/500 checkpointed; 90 rows optional
+Raw path:     outputs-hpc-2a100-main-2026-07-03/raw/level_a_qwen7b_bf16_math500_seed0.jsonl
+Notes:        94.1% truncation on 410 rows. Finishing 90 rows NOT required for decisions.
+Key numbers:  truncation ~94%, median completion 32k tokens, ~7 min/problem
+```
+
+---
+
+## Level A — Reproduction gate (FAILED 2026-07-05)
+
+```text
+Date:         2026-07-05
+Level:        A
+Model:        Qwen-7B + Llama-8B BF16
+Quant config: BF16
+Task:         MATH-500
+Seed(s):      0
 Hardware:     A100
-Status:       planned
-Notes:        First truth test. Must pass before GPTQ-4 or pilot grid.
+Status:       gate failed — pivot to Paper 1 deployment grid (see notes.md §28)
+Notes:        QRM repro not achieved. Quant grid (b02–b05) proceeds without gate pass.
 ```
 
 ---

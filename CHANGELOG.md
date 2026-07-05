@@ -1,5 +1,33 @@
 # Changelog
 
+## 2026-07-05 (evening) — Gate failed; strategic pivot to Paper 1 deployment narrative
+
+### Decision record
+
+**b01 QRM hard gate: FAILED.** Project direction **pivots** — Paper 1 does not require QRM reproduction success. The thesis question (*Beyond Accuracy*) is **supported** by high truncation + high cost-per-correct under fixed 32k.
+
+**Qwen 90-row completion: NOT REQUIRED.** 410/500 at 94.1% truncation is statistically sufficient to conclude budget exhaustion. Resume job **87111** failed in 55s (GPU busy on `racn116`). Queue empty.
+
+### What we learn (literature-aligned)
+
+| Paper / theme | What July BF16 teaches us |
+|---------------|---------------------------|
+| **QRM** (Liu et al.) | We do **not** reproduce Table 1 at 32k on our vLLM stack — document gap; move on |
+| **Cost-of-Pass** | Llama BF16: **~1614 s per correct** at 19.6% pass@1 — truncation inflates cost-of-pass |
+| **Calibrating LLMs / Sample Consistency** | Truncated rows = “confidently wrong” risk; calibration section must include them |
+| **A Sober Look** | Single seed 0; do not overclaim; variance section optional |
+| **Paper 1 design** | **Truncation_rate + cost-per-correct** are first-class — gate fail is a **result**, not project failure |
+
+### Approved next steps (priority order)
+
+1. **Reframe manuscript** — lead with deployment budget findings; QRM as attempted baseline (honest gap).
+2. **Open quant grid b02→b05** under **same 32k protocol** — hypothesis: quantization **increases** truncation at fixed budget.
+3. **Fix b01 Llama cell** — use `reproduction` profile OR label `sober` clearly in all tables.
+4. **Skip Qwen 90 rows** unless table symmetry needed.
+5. **Optional appendix** — all-500 budget sweep (8k/16k/32k/64k); Protocol A strict QRM rerun (seeds 42–44).
+
+---
+
 ## 2026-07-05 — b01 wave completes (Llama), Qwen timeout + resume, first scored BF16 results
 
 ### Job outcomes

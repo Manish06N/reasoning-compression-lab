@@ -1,9 +1,10 @@
 # J1 validation runbook — prove the pipeline before expanding
 
-**Status target:** Engineering MVP → **scientific validation pending** → pilot signal → publication draft.
+**Status (2026-07-05):** Engineering MVP **done** → b01 QRM gate **FAILED** → **pivot to Paper 1 deployment grid** (truncation + cost).
 
-**GitHub:** `286f5e4` or later for scoring gates.  
-**Active queue (2026-07-01):** smoke job 86015 → b01 job 86016 (`afterok`).
+**July BF16 result:** Llama 19.6% / 58% trunc (500/500); Qwen 410/500 ~94% trunc. Gate fail documented in [notes.md §28](../notes.md). **Quant grid (b02–b05) may proceed** without QRM reproduction.
+
+**GitHub:** sync from HPC via MacBook rsync.
 
 Use this on HPC (login + captcha required — agent cannot SSH for you).
 
@@ -191,7 +192,9 @@ b01 is **single-seed pass@1** vs QRM's **seeds 42–44 average** — expect ~1�
 
 ## Phase 4 — GPTQ-W4 reproduction
 
-After BF16 passes all checks:
+**Updated 2026-07-05:** BF16 did **not** pass QRM hard gate. Proceed if Paper 1 framing is deployment-budget (truncation across quants), not QRM Table 1 reproduction.
+
+After BF16 pipeline is trusted (July archive valid):
 
 ```bash
 bash scripts/hpc/run_hpc_2a100_publication.sh b04_parallel_gptq4

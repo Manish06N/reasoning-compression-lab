@@ -822,4 +822,82 @@ Expect QRM gate **fail** on Qwen unless remaining 90 rows differ radically (unli
 
 ---
 
-*Last updated: 2026-07-05. See §25 for gate; §26 for Llama analysis; §27 for live state.*
+## 28. Post–gate-fail pivot — future of the experiment (2026-07-05)
+
+**Gate failed. Project is NOT dead.** Paper 1 was never “reproduce QRM.” QRM was a **sanity check**. The July BF16 numbers are the **first real scientific result** for the thesis.
+
+### Finish Qwen 90 rows (~10 h)?
+
+| | Verdict |
+|--|---------|
+| **Necessary?** | **No** |
+| **Why** | 410/500 at **94.1%** truncation — gate needs ≤15%; 90 more rows cannot pass QRM gate or change Paper 1 story |
+| **Resume status** | Job **87111 FAILED** (55s, GPU busy on shared node) |
+| **Optional** | Complete 500/500 only for table symmetry (footnote: “Qwen n=410 partial”) |
+
+### What the gate failure teaches us
+
+1. **Fixed 32k is a deployment constraint, not a free hyperparameter.** Median completion = 32,768 tokens for both models — they fill the budget.
+2. **pass@1 alone is misleading.** 58% (Llama) / ~94% (Qwen) of serves produce no scorable answer under cap.
+3. **Stack ≠ QRM Lighteval at same nominal budget.** Even Llama **non-truncated** pass@1 = **45%** vs QRM **91%** — prompt profile, scorer, seeds, vLLM stack all matter.
+4. **repetition_penalty fix did not rescue Llama.** June 21.4% → July 19.6%, truncation ~59% → 58%.
+5. **Cost-of-Pass (literature)** — Llama `cost_per_correct_seconds` ≈ **1614 s** — quantization/truncation paper should foreground this.
+
+### Literature map — what to do with these results
+
+From `docs/literature/PAPER1_READING_MAP.md` and merged bundle:
+
+| Paper group | How July results fit |
+|-------------|---------------------|
+| **QRM** | Honest negative repro in §4.1; pivot main claim to deployment metrics |
+| **GPTQ / AWQ / SmoothQuant** | Proceed b02–b05 — **same 32k** — test if quants **worsen** truncation |
+| **Cost-of-Pass** | Table column: cost-per-correct vs truncation_rate; frontier shifts under budget |
+| **Calibrating LLMs / Sample Consistency** | Score calibration on truncated-as-wrong; watch “confidently wrong” loops |
+| **A Sober Look** | Report seed 0; add 42–44 only if variance section needs it |
+| **AbstentionBench** | Truncation ≈ forced abstention without `\boxed{}` — link to selective prediction |
+
+### Future of the project (3 paths — pick 1+2)
+
+**Path A — Main Paper 1 grid (recommended)**  
+Submit **b02** (FP8 pair) → **b03** (AWQ) → **b04** (GPTQ4) → **b05** (GPTQ3) one block at a time.  
+**Hypothesis:** BF16 truncation 58% → FP8/AWQ/GPTQ **equal or worse** at same 32k.  
+**Main figure:** pass@1 **and** truncation_rate **and** cost-per-correct across quants.
+
+**Path B — Budget sensitivity appendix**  
+All 500 MATH-500 at 8k / 16k / 32k / 64k (one model first). Shows **where** accuracy lives vs deployment cap.
+
+**Path C — Strict QRM debug (lower priority)**  
+Protocol A: reproduction prompt, seeds 42–44, no repetition_penalty, Lighteval scorer diff. Only if reviewer demands repro.
+
+### Immediate action list
+
+```
+[ ] Accept gate fail — update supervisor narrative (Beyond Accuracy, not QRM clone)
+[ ] SKIP Qwen 90 rows (or low-priority resume when GPU exclusive)
+[ ] Fix b01 Llama → reproduction profile OR document sober in every table
+[ ] Submit b02 FP8 when ready (same archive or fresh — label protocol)
+[ ] Draft Table 1 skeleton: Model × Quant × pass@1 × trunc_rate × cost/correct × VRAM
+[ ] Enable calibration scoring (remove --skip-calibration) on next wave
+[ ] MacBook sync HPC doc commits
+```
+
+### One-paragraph supervisor pitch
+
+> We validated the HPC harness on BF16 anchors. Under a fixed 32k deployment budget, Llama-8B achieves 19.6% pass@1 with 58% truncation; Qwen-7B shows ~94% truncation on 410 problems. We do not reproduce QRM Table 1 on our vLLM stack, but that strengthens Paper 1’s thesis: **accuracy alone hides deployment failure**. Next we run the quantization grid at the same budget to measure how compression affects truncation and cost-per-correct.
+
+---
+
+## 29. Live snapshot (2026-07-05 evening)
+
+| Item | Value |
+|------|-------|
+| Queue | **Empty** |
+| Qwen | **410/500** — resume optional, not required |
+| Llama | **500/500 scored** — gate failed, data valid for Paper 1 |
+| b01 gate | **FAILED** |
+| Next | **Path A** quant grid OR manuscript reframe |
+| Docs | §28 pivot; `progress.md`; `CHANGELOG.md` |
+
+---
+
+*Last updated: 2026-07-05 (evening). Gate failed → see §28 for pivot. §25 = gate definition.*
