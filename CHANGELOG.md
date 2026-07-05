@@ -1,5 +1,28 @@
 # Changelog
 
+## 2026-07-05 (night) — Path C canceled; official QRM repo test submitted
+
+User decision: enough signal from Path C n=20 (protocol OK, stack gap). Canceled jobs **87116**, **87117**, **87118**.
+
+| Action | Detail |
+|--------|--------|
+| **Canceled** | All Path C diagnostic jobs (Qwen/Llama 32k + Qwen 64k) |
+| **Stopped** | Telegram watcher `hpc_progress` (was watching canceled jobs) |
+| **Prepared** | MATH-500 on disk at `external/Quantized-Reasoning-Models/datasets/MATH-500` |
+| **Submitted** | Job **87130** — official `inference.py`, n=10, seed=42, 1× A100, 8h |
+| **Scripts** | `install_official_qrm_env.sh`, `run_official_inference.sh`, `submit_qrm_official_test.sh` |
+
+```bash
+squeue -j 87130
+tail -f logs/qrm_official_87130.out
+# after finish:
+python scripts/hpc/qrm_parity/compare_side_by_side.py --limit 10
+```
+
+First run installs `qrm-official` conda env + QRM lighteval/vllm submodules (may take 30–60 min in job log).
+
+---
+
 ## 2026-07-05 (late) — QRM stack parity fixes + audit tooling
 
 Path C early results (n=20) proved **protocol is correct** but **stack is not QRM-equivalent**: ~10–15% pass@1, 75–90% truncation, degeneration loops despite strict YAML.
