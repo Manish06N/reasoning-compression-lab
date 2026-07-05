@@ -1,5 +1,53 @@
 # Changelog
 
+## 2026-07-05 (late) — QRM stack parity fixes + audit tooling
+
+Path C early results (n=20) proved **protocol is correct** but **stack is not QRM-equivalent**: ~10–15% pass@1, 75–90% truncation, degeneration loops despite strict YAML.
+
+### Root cause (ranked)
+
+1. **vLLM 0.8.5 V1 + transformers 5.12.1** vs QRM Lighteval + transformers 4.47.1 — same decoding, different loop behavior
+2. **R1 repetition loops** burn 32k before `\boxed{}` (truncated rows have zero boxed answers)
+3. **Serving flags** were documented but not wired: engine `seed=None`, chunked prefill on, logprobs always on
+
+### Code fixes
+
+| Path | Change |
+|------|--------|
+| `src/runners/vllm_serving.py` | NEW — QRM `inference.py` serving defaults in `build_llm_init_kwargs()` |
+| `src/runners/vllm_runner.py` | `build_llm(..., seed=)` + serving flags |
+| `configs/decoding/repro_qrm_strict.yaml` | `capture_logprobs: false` |
+| `configs/models/*_qrm_strict.json` | `gpu_memory_utilization=0.9`, prefix caching off, chunked prefill off |
+| `tests/test_vllm_serving.py` | Parity unit tests |
+
+### New tooling
+
+| Path | Role |
+|------|------|
+| `docs/QRM_STACK_PARITY_AUDIT.md` | Full audit narrative + decision tree |
+| `scripts/hpc/qrm_parity/verify_stack_parity.py` | No-GPU parity checklist |
+| `scripts/hpc/qrm_parity/compare_side_by_side.py` | Trace comparison on first N MATH-500 IDs |
+| `scripts/hpc/qrm_parity/setup_official_qrm_repo.sh` | Clone QRM repo → `external/Quantized-Reasoning-Models` |
+| `scripts/hpc/submit_pathc_parity_pilot.sh` | n=10 Qwen parity rerun (block `d03`) |
+| `configs/cells/diag_qwen7b_bf16_math500_seed42_n10_parity.json` | Parity pilot cell |
+
+### Verify
+
+```bash
+python scripts/hpc/qrm_parity/verify_stack_parity.py   # Overall: PASS
+python scripts/hpc/qrm_parity/compare_side_by_side.py --limit 10
+bash scripts/hpc/submit_pathc_parity_pilot.sh        # after d01 jobs free a GPU
+```
+
+### Next experiment priority
+
+1. Let Path C d01/d02 finish (87116–87118)
+2. Submit **d03 parity pilot** with serving fixes
+3. Run **official QRM `inference.py`** on same 10 problems (GPU, separate env)
+4. If QRM ~90% and we ~10% → stack gap confirmed; document in Paper 1 honestly
+
+---
+
 ## 2026-07-05 — Path C diagnostic sprint launched (commit `7d46c3f`)
 
 After b01 gate failure, **Path C** (strict QRM repro diagnostic) superseded quant grid (Path A) as the active experiment track.

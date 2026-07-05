@@ -63,7 +63,7 @@ def main() -> None:
     print(f"Smoke decoding: max_tokens={cell['decoding']['max_tokens']}")
     model_path = cell["model_path"]
     print(f"Loading model from: {model_path}")
-    llm = build_llm(model_path, cell["model"])
+    llm = build_llm(model_path, cell["model"], seed=cell.get("seed"))
 
     out_path = ROOT / args.output
     out_path.parent.mkdir(parents=True, exist_ok=True)

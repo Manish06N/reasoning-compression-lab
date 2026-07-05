@@ -1,8 +1,12 @@
 # J1 validation runbook — prove the pipeline before expanding
 
-**Status (2026-07-05):** b01 gate **FAILED** → **Path C diagnostic IN FLIGHT** (jobs 87116–87118).
+**Status (2026-07-05):** b01 gate **FAILED** → **Path C IN FLIGHT** → **stack parity audit complete**.
 
-**Path C:** `bash scripts/hpc/submit_pathc_diagnostic.sh` — 50 MATH-500, strict QRM protocol. Report: `bash scripts/hpc/report_pathc_diagnostic.sh`. **Quant grid on hold** until Path C completes. See [CHANGELOG.md](../CHANGELOG.md) and [notes.md §29](../notes.md).
+**Path C:** `bash scripts/hpc/submit_pathc_diagnostic.sh` — 50 MATH-500 strict QRM. Early n=20: **not QRM reproduction** (loops, 75–90% trunc) despite correct protocol in raw JSONL.
+
+**Stack parity (new):** [QRM_STACK_PARITY_AUDIT.md](QRM_STACK_PARITY_AUDIT.md) · `python scripts/hpc/qrm_parity/verify_stack_parity.py` · `bash scripts/hpc/submit_pathc_parity_pilot.sh` (d03 n=10).
+
+**Quant grid on hold** until Path C + parity pilot. See [notes.md §30](../notes.md).
 
 **GitHub:** sync from HPC via MacBook rsync.
 

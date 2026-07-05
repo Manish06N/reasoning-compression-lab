@@ -25,6 +25,9 @@ docs/literature/paper1/ALL_PAPERS_MERGED.pdf
 *.pt
 *.gguf
 
+# Cloned upstream repos (setup via scripts/hpc/qrm_parity/setup_official_qrm_repo.sh)
+external/
+
 # Cache
 .cache/
 hf_cache/

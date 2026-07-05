@@ -146,7 +146,7 @@ def main() -> None:
         )
         write_progress(archive_root, cell_id, start_idx, total, status="in_progress")
 
-    llm = build_llm(model_path, cell["model"])
+    llm = build_llm(model_path, cell["model"], seed=cell["seed"])
     # Post-load report (weights + KV for the *maximum* context we computed after the weights-phase load)
     try:
         import torch, subprocess

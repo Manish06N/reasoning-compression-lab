@@ -894,14 +894,13 @@ Protocol A: reproduction prompt, seeds 42–44, no repetition_penalty, Lighteval
 
 | Item | Value |
 |------|-------|
-| **87116** | Qwen 32k diag — **RUNNING** `racn116` (~3h+ when checked) |
+| **87116** | Qwen 32k diag — **RUNNING** `racn116` |
 | **87117** | Llama 32k diag — **RUNNING** `racn116` |
-| **87118** | Qwen 64k diag — **PENDING** (QOS; starts after d01 frees GPU) |
+| **87118** | Qwen 64k diag — **PENDING** (QOS) |
 | Archive | `outputs-hpc-diag-pathc-2026-07-05` |
-| Raw rows | 0 until first checkpoint (every 10 rows) |
+| Early scored (n=20) | Qwen **10%** pass@1 / **90%** trunc; Llama **15%** / **75%** trunc |
 | b01 July | Gate failed; Qwen 410/500 skipped |
 | Report | `bash scripts/hpc/report_pathc_diagnostic.sh` when all 3 finish |
-| Docs | `CHANGELOG.md` Path C section · `progress.md` · `docs/PROGRESS.md` |
 
 ### Path C protocol (commit `7d46c3f`)
 
@@ -912,8 +911,58 @@ Protocol A: reproduction prompt, seeds 42–44, no repetition_penalty, Lighteval
 | d02 Qwen | `diag_qwen7b_bf16_math500_seed42_n50_64k` | same + **max_tokens=65536** |
 
 **Pass heuristic (n=50):** pass@1 ≥ **80%** and truncation ≤ **25%** on 32k → stack repro OK, consider full 500.  
-**64k:** if pass@1 jumps vs 32k Qwen → truncation was bottleneck; if still low → harness/scorer gap.
+**64k:** if pass@1 jumps vs 32k Qwen → truncation was bottleneck; if still low → stack gap (see §30).
 
 ---
 
-*Last updated: 2026-07-05 (evening). Gate failed → see §28 for pivot. §25 = gate definition.*
+## 30. QRM stack parity audit (2026-07-05) — **protocol OK, stack not equivalent**
+
+**Full doc:** [`docs/QRM_STACK_PARITY_AUDIT.md`](docs/QRM_STACK_PARITY_AUDIT.md)
+
+### Logic chain
+
+1. **July b01 failed** even with `repetition_penalty=1.05` wired → not a YAML typo.
+2. **Path C removed rep_pen** to match QRM `inference.py` exactly → loops **persist** (Qwen ~90% trunc at n=20).
+3. **Raw JSONL audit** confirms every protocol field (prompt, temp, top_p, seed 42, max_tokens 32768).
+4. **Truncated completions** have **no** `\boxed{}` → failure is generation, not `math_verify` scorer.
+5. **Clean finishes** (stop, not length) are mostly correct: Qwen 2/2, Llama 3/5 on n=20.
+6. **Therefore:** same *protocol*, different *software stack* — vLLM 0.8.5 V1 + transformers 5.12.1 vs QRM Lighteval + transformers 4.47.1.
+
+### Gaps we fixed (evening 2026-07-05)
+
+| Gap | Before | After |
+|-----|--------|-------|
+| LLM engine seed | `seed=None` in logs | `build_llm(..., seed=42)` |
+| logprobs | always `logprobs=1` | `capture_logprobs: false` in strict yaml |
+| gpu_memory_utilization | not passed | 0.9 in `*_qrm_strict.json` |
+| prefix caching / chunked prefill | vLLM defaults (on) | explicit **False** like QRM |
+
+### Tooling
+
+```bash
+python scripts/hpc/qrm_parity/verify_stack_parity.py      # Overall: PASS
+python scripts/hpc/qrm_parity/compare_side_by_side.py --limit 10
+bash scripts/hpc/submit_pathc_parity_pilot.sh               # d03 n=10 rerun
+bash scripts/hpc/qrm_parity/setup_official_qrm_repo.sh      # clone to external/
+```
+
+### Decision tree (updated)
+
+```
+Path C n=50 done
+├─ Still ~10–20% pass@1, high trunc (current)
+│   ├─ Run d03 parity pilot (serving fixes)
+│   ├─ Run official QRM inference.py on same 10 IDs
+│   │   ├─ QRM ~90%, we ~10% → document stack gap; Paper 1 leads with truncation/cost
+│   │   └─ QRM also loops → deeper investigation (weights, dataset)
+│   └─ Check 87118 64k wave
+└─ Unexpected pass → full 500 Protocol A
+```
+
+### Paper 1 framing (unchanged)
+
+We **attempted** QRM reproduction honestly. Failure under 32k **supports** the thesis: deployment metrics (truncation, cost-per-correct, calibration on truncated rows) matter beyond headline pass@1.
+
+---
+
+*Last updated: 2026-07-05 (late). §30 = stack audit. §28 = strategic pivot. §25 = gate definition.*

@@ -1,8 +1,8 @@
 # Progress — Paper 1 Experiments
 
-**Last updated:** 2026-07-05 (Path C launch)  
+**Last updated:** 2026-07-05 (Path C + stack parity audit)  
 **Repo:** https://github.com/Manish06N/reasoning-compression-lab  
-**Canonical log:** [progress.md](../progress.md) · **Session notes:** [notes.md](../notes.md) · **Ops:** [CHANGELOG.md](../CHANGELOG.md)
+**Canonical log:** [progress.md](../progress.md) · **Audit:** [QRM_STACK_PARITY_AUDIT.md](QRM_STACK_PARITY_AUDIT.md) · **Ops:** [CHANGELOG.md](../CHANGELOG.md)
 
 ---
 
@@ -11,12 +11,13 @@
 | Area | Status |
 |------|--------|
 | **Active experiment** | **Path C diagnostic** (strict QRM repro, n=50) |
-| **Archive** | `outputs-hpc-diag-pathc-2026-07-05` |
-| **Jobs** | **87116** Qwen 32k RUNNING · **87117** Llama 32k RUNNING · **87118** Qwen 64k PENDING |
-| **b01 QRM gate** | **FAILED** (July archive — see below) |
-| **Quant grid b02–b06** | **On hold** until Path C results |
+| **Early signal (n=20)** | Qwen **10%** / **90%** trunc; Llama **15%** / **75%** trunc — **not QRM reproduction** |
+| **Audit** | Protocol verified in raw JSONL; **stack gap** (vLLM 0.8.5 loops) — see [QRM_STACK_PARITY_AUDIT.md](QRM_STACK_PARITY_AUDIT.md) |
+| **Parity fixes** | `vllm_serving.py`, d03 parity pilot ready |
+| **Jobs** | **87116–87117** RUNNING · **87118** PENDING |
+| **Quant grid** | **On hold** until Path C + parity pilot |
 
-**Strategic label:** *b01 gate failed → Path C diagnostic sprint to test strict QRM protocol before further GPU spend.*
+**Strategic label:** *Protocol correct, stack not equivalent — document gap honestly; Paper 1 leads with truncation + cost.*
 
 ---
 
@@ -39,7 +40,13 @@ squeue -u $USER
 bash scripts/hpc/report_pathc_diagnostic.sh
 ```
 
-**Pass heuristic (n=50):** 32k pass@1 ≥ ~80% and truncation ≤ ~25% → stack repro OK.
+**Pass heuristic (n=50):** 32k pass@1 ≥ ~80% and truncation ≤ ~25% → stack repro OK.  
+**Current trajectory:** failing heuristic → run **d03 parity pilot** + official QRM `inference.py` cross-check.
+
+```bash
+python scripts/hpc/qrm_parity/verify_stack_parity.py
+bash scripts/hpc/submit_pathc_parity_pilot.sh
+```
 
 ---
 

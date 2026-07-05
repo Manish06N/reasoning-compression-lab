@@ -6,4 +6,5 @@ top_p: 0.95
 max_tokens: 32768
 max_model_len: 32768
 seed: 42
-notes: Path C strict QRM — matches inference.py GenerationParameters (no repetition_penalty).
+capture_logprobs: false
+notes: Path C strict QRM — matches inference.py GenerationParameters (no repetition_penalty, no logprobs unless calibration).

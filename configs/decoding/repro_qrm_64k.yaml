@@ -6,4 +6,5 @@ top_p: 0.95
 max_tokens: 65536
 max_model_len: 73728
 seed: 42
+capture_logprobs: false
 notes: Path C 64k budget sweep diagnostic (50-problem pilot).

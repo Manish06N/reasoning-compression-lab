@@ -9,18 +9,20 @@ Canonical dated record for **Paper 1: Beyond Accuracy** (`reasoning-compression-
 
 ---
 
-## Current Status Snapshot (2026-07-05, Path C diagnostic in flight)
+## Current Status Snapshot (2026-07-05, Path C + stack parity audit)
 
 | Area | Status |
 |------|--------|
 | **Active experiment** | **Path C diagnostic** — archive `outputs-hpc-diag-pathc-2026-07-05` |
 | **Jobs** | **87116** Qwen 32k **RUNNING**; **87117** Llama 32k **RUNNING**; **87118** Qwen 64k **PENDING** |
+| **Path C early signal (n=20)** | Qwen **10%** pass@1 / **90%** trunc; Llama **15%** / **75%** — **not QRM reproduction** |
+| **Audit conclusion** | Protocol correct (prompt/decoding/seed verified in raw JSONL); **stack gap** (vLLM 0.8.5 loops) |
+| **Parity fixes landed** | `vllm_serving.py`, engine seed, serving flags, `capture_logprobs: false` — see `docs/QRM_STACK_PARITY_AUDIT.md` |
+| **Next GPU experiment** | `bash scripts/hpc/submit_pathc_parity_pilot.sh` (n=10) + official QRM `inference.py` cross-check |
 | **b01 gate (July archive)** | **FAILED** — `outputs-hpc-2a100-main-2026-07-03` |
-| **Llama b01** | 500/500 scored — 19.6% pass@1, 58% trunc (`sober` prompt) |
-| **Qwen b01** | 410/500 — 94% trunc; **90 rows skipped** |
-| **b02–b06** | **On hold** until Path C report |
+| **b02–b06** | **On hold** until Path C + parity pilot report |
 | **GitHub sync** | HPC ahead of `origin/main` — MacBook rsync needed |
-| **Key docs** | `notes.md` §29, `CHANGELOG.md` Path C entry, `scripts/hpc/report_pathc_diagnostic.sh` |
+| **Key docs** | `docs/QRM_STACK_PARITY_AUDIT.md`, `notes.md` §30, `CHANGELOG.md` |
 
 ### Path C quick commands
 
@@ -30,6 +32,24 @@ tail -f outputs-hpc-diag-pathc-2026-07-05/logs/diag_qwen7b_bf16_math500_seed42_n
 bash scripts/hpc/report_pathc_diagnostic.sh   # after jobs finish
 bash ~/start-hpc-telegram-watcher.sh          # Telegram every 45 min (jobs 87116-87118)
 ```
+
+### QRM stack parity (2026-07-05 audit)
+
+**Story:** Path C strict protocol matches QRM `inference.py` on paper, but early traces show degeneration loops (`yeah yeah`, `the the the`) filling 32k. Clean finishes are mostly correct (Qwen 2/2, Llama 3/5 on n=20). Scorer is not the bottleneck — truncated rows never emit `\boxed{}`.
+
+```bash
+# No GPU
+python scripts/hpc/qrm_parity/verify_stack_parity.py
+python scripts/hpc/qrm_parity/compare_side_by_side.py --limit 10
+
+# GPU parity pilot (after d01 frees a slot)
+bash scripts/hpc/submit_pathc_parity_pilot.sh
+
+# Official QRM cross-check (GPU, separate env)
+bash scripts/hpc/qrm_parity/setup_official_qrm_repo.sh
+```
+
+Full narrative: **`docs/QRM_STACK_PARITY_AUDIT.md`**
 
 ### Should we finish Qwen 90 rows (~10 h)?
 

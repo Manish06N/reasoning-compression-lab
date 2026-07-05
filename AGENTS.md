@@ -187,17 +187,14 @@ git log --oneline -3
 - Do not re-download the model, redo HF login, or rerun earlier setup gates unless logs show they broke.
 - Keep `models/`, `hf_cache/`, `runs/`, `results/`, and `logs/` out of GitHub.
 
-### Current Experiment Gate
+### Current Experiment Gate (2026-07-05)
 
-- The project is at the **smoke test gate**.
-- Setup already validated:
-  - HPC repo exists.
-  - Python/conda environment works.
-  - A100 GPU path works.
-  - vLLM imports on GPU.
-  - Hugging Face/model download path exists.
-  - MATH-500 dataset path is part of the project config.
-- Do not start full MATH-500 until smoke passes.
+- **Active:** Path C diagnostic (jobs **87116–87118**, archive `outputs-hpc-diag-pathc-2026-07-05`).
+- **b01 QRM gate:** **FAILED** (July archive `outputs-hpc-2a100-main-2026-07-03`).
+- **Path C early signal (n=20):** Qwen **10%** pass@1 / **90%** trunc; Llama **15%** / **75%** trunc — protocol correct, **stack not QRM-equivalent**.
+- **Stack parity fixes landed:** `src/runners/vllm_serving.py`, d03 parity pilot — see `docs/QRM_STACK_PARITY_AUDIT.md`.
+- **Quant grid b02–b06:** **On hold** until Path C + parity pilot + optional official QRM cross-check.
+- **Do not** claim QRM Table 1 reproduction without `compare_qrm_baseline.py` hard_passed on strict protocol runs.
 
 ### Important Jobs From 2026-06-26 and 2026-06-27
 

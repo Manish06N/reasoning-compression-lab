@@ -11,11 +11,32 @@ Operational issues that can break paper results if ignored, plus known software 
 | Item | Status |
 |------|--------|
 | **Active** | **Path C diagnostic** — jobs **87116–87118**, archive `outputs-hpc-diag-pathc-2026-07-05` |
+| **Early Path C (n=20)** | **Not QRM reproduction** — loops, 75–90% truncation despite strict protocol |
+| **Stack parity fixes** | Landed — see [QRM_STACK_PARITY_AUDIT.md](QRM_STACK_PARITY_AUDIT.md) |
 | b01 QRM gate | **FAILED** — July archive `outputs-hpc-2a100-main-2026-07-03` |
-| Qwen b01 90 rows | **Skipped** (not required) |
-| Quant grid | **On hold** until `report_pathc_diagnostic.sh` |
+| Quant grid | **On hold** until Path C + parity pilot |
 
-See [notes.md §29](../notes.md) · [CHANGELOG.md](../CHANGELOG.md) Path C entry.
+See [notes.md §30](../notes.md) · [CHANGELOG.md](../CHANGELOG.md) parity entry.
+
+---
+
+## QRM stack parity — not a config bug (2026-07-05)
+
+**Symptom:** Path C strict QRM protocol gives ~10–15% pass@1 and 75–90% truncation with degeneration loops (`yeah yeah`, `the the the`).
+
+**Verified NOT the cause:**
+- Wrong prompt (raw rows show `reproduction` + `qrm_math500.txt`)
+- Wrong decoding (temp 0.6, top_p 0.95, max_tokens 32768, seed 42, rep_pen null)
+- Scorer alone (truncated rows have **no** `\boxed{}`)
+
+**Likely cause:** **Inference stack mismatch** — vLLM 0.8.5 V1 + transformers 5.12.1 vs QRM Lighteval + transformers 4.47.1. Clean finishes (stop reason) are mostly correct (Qwen 2/2, Llama 3/5 on n=20).
+
+**Fixes applied:**
+- `src/runners/vllm_serving.py` — QRM serving defaults in `build_llm()`
+- `capture_logprobs: false` in `repro_qrm_strict.yaml`
+- Parity pilot: `bash scripts/hpc/submit_pathc_parity_pilot.sh`
+
+**Cross-check:** Run official QRM `inference.py` on same 10 problems — `bash scripts/hpc/qrm_parity/setup_official_qrm_repo.sh`
 
 ---
 

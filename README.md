@@ -11,22 +11,27 @@ Deployment-science evaluation harness for compressed reasoning LLMs.
 
 ## Current status (2026-07-05)
 
-**Path C diagnostic IN FLIGHT** — strict QRM repro sprint (50 problems) after b01 gate failed.
+**Path C diagnostic IN FLIGHT** — strict QRM repro sprint (50 problems) after b01 gate failed.  
+**Stack parity audit complete** — protocol verified correct; early n=20 shows **stack gap** (loops, 75–90% trunc), not config typo.
 
 | Item | Status |
 |------|--------|
 | **Path C jobs** | **87116** Qwen 32k RUNNING · **87117** Llama 32k RUNNING · **87118** Qwen 64k PENDING |
-| **Archive** | `outputs-hpc-diag-pathc-2026-07-05` |
+| **Early signal (n=20)** | Qwen **10%** pass@1 / **90%** trunc; Llama **15%** / **75%** trunc |
+| **Audit** | [`docs/QRM_STACK_PARITY_AUDIT.md`](docs/QRM_STACK_PARITY_AUDIT.md) — protocol OK, vLLM 0.8.5 stack differs from QRM |
+| **Parity fixes** | Engine seed, serving flags, `capture_logprobs: false` — `bash scripts/hpc/submit_pathc_parity_pilot.sh` |
 | **b01 (July)** | Gate **FAILED** — Llama 19.6%/58% trunc; Qwen 410/500 ~94% trunc |
-| **b02–b06** | **On hold** until `report_pathc_diagnostic.sh` |
+| **b02–b06** | **On hold** until Path C + parity pilot |
 
 ```bash
-bash scripts/hpc/report_pathc_diagnostic.sh   # after jobs finish
+bash scripts/hpc/report_pathc_diagnostic.sh
+python scripts/hpc/qrm_parity/verify_stack_parity.py
+python scripts/hpc/qrm_parity/compare_side_by_side.py --limit 10
 ```
 
 **Policy:** HPC-only for paper numbers — [HARDWARE_POLICY.md](docs/HARDWARE_POLICY.md).
 
-**Read first:** [progress.md](progress.md) · [notes.md](notes.md) §28 (pivot) · [CHANGELOG.md](CHANGELOG.md)
+**Read first:** [docs/QRM_STACK_PARITY_AUDIT.md](docs/QRM_STACK_PARITY_AUDIT.md) · [progress.md](progress.md) · [notes.md](notes.md) §30 · [CHANGELOG.md](CHANGELOG.md)
 
 **b01 QRM gate:** Targets Qwen **93.9%**, Llama **91%** ±5 pp, truncation ≤15% — **not met** on July BF16. Gate fail does **not** block Paper 1; see [qrm_literature_targets.yaml](configs/baselines/qrm_literature_targets.yaml).
 

@@ -106,7 +106,7 @@ def main() -> None:
 
     model_path = cell["model_path"]
     use_chat = cell["model"].get("use_chat_template", True)
-    llm = build_llm(model_path, cell["model"])
+    llm = build_llm(model_path, cell["model"], seed=cell["seed"])
     checkpoint_every = max(1, args.checkpoint_every)
     run_provenance = provenance_fields(cell, run_spec=run_spec)
 

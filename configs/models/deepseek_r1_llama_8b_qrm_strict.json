@@ -8,6 +8,9 @@
   "trust_remote_code": true,
   "use_chat_template": true,
   "enforce_eager": true,
+  "gpu_memory_utilization": 0.9,
+  "enable_prefix_caching": false,
+  "enable_chunked_prefill": false,
   "revision": "6a6f4aa4197940add57724a7707d069478df56b1",
-  "notes": "Path C strict QRM: enforce_eager=true like QRM inference.py"
+  "notes": "Path C strict QRM: serving flags match QRM inference.py VLLMModelConfig"
 }

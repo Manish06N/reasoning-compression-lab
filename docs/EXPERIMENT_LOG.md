@@ -221,7 +221,43 @@ Task:         MATH-500
 Seed(s):      0
 Hardware:     A100
 Status:       gate failed — pivot to Paper 1 deployment grid (see notes.md §28)
-Notes:        QRM repro not achieved. Quant grid (b02–b05) proceeds without gate pass.
+Notes:        QRM repro not achieved. Quant grid (b02–b05) on hold until Path C.
+```
+
+---
+
+## Path C — Strict QRM diagnostic (RUNNING 2026-07-05)
+
+```text
+Date:         2026-07-05
+Level:        diagnostic (pre-quant)
+Model:        Qwen-7B + Llama-8B BF16 (+ Qwen 64k wave)
+Quant config: BF16
+Task:         MATH-500
+Seed(s):      42
+Hardware:     A100 (jobs 87116, 87117, 87118)
+Status:       running — early n=20 scored
+Archive:      outputs-hpc-diag-pathc-2026-07-05
+Protocol:     reproduction prompt, repro_qrm_strict.yaml, no rep_pen, enforce_eager=true
+Key numbers:  Qwen 10% pass@1, 90% trunc; Llama 15% pass@1, 75% trunc (n=20)
+Notes:        Protocol verified in raw JSONL. Loops dominate failures. Clean finishes mostly correct.
+              Stack audit: docs/QRM_STACK_PARITY_AUDIT.md
+```
+
+---
+
+## Path C — Parity pilot d03 (READY 2026-07-05)
+
+```text
+Date:         2026-07-05
+Level:        diagnostic
+Model:        Qwen-7B BF16
+Task:         MATH-500 (n=10)
+Seed(s):      42
+Status:       ready to submit — bash scripts/hpc/submit_pathc_parity_pilot.sh
+Cell:         diag_qwen7b_bf16_math500_seed42_n10_parity
+Notes:        Serving fixes: engine seed, gpu_mem=0.9, prefix_caching off, logprobs off.
+              Cross-check: official QRM inference.py on same 10 IDs.
 ```
 
 ---

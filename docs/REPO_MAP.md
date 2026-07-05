@@ -12,6 +12,7 @@ Quick navigation for `reasoning-compression-lab`. For the full high-level overvi
 | Run on HPC | [BEGINNER_HPC_GUIDE.md](BEGINNER_HPC_GUIDE.md) |
 | See current status | [PROGRESS.md](PROGRESS.md) |
 | Avoid known traps | [KNOWN_ISSUES.md](KNOWN_ISSUES.md) |
+| QRM repro / stack parity | [QRM_STACK_PARITY_AUDIT.md](QRM_STACK_PARITY_AUDIT.md) |
 | Decide which models to add | [MODEL_SCOPE_DECISION.md](MODEL_SCOPE_DECISION.md) |
 | Find HF IDs and env vars | [MODEL_ROSTER.md](MODEL_ROSTER.md) |
 | Full change history | [../CHANGELOG.md](../CHANGELOG.md) |
@@ -55,6 +56,7 @@ reasoning-compression-lab/
 │   ├── j2/                 # Method pilot manifest
 │   ├── j3/                 # Indic preflight, local transfer
 │   └── hpc/                # PARAM Rudra orchestration
+│       └── qrm_parity/     # Stack parity verify, side-by-side, QRM repo setup
 ├── slurm/                  # SLURM job files
 ├── tests/                  # 31 unit tests (2026-07-01)
 ├── dashboards/             # HTML dashboard output

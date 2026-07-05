@@ -17,6 +17,7 @@
 | [BEGINNER_HPC_GUIDE.md](BEGINNER_HPC_GUIDE.md) | HPC workflow step-by-step |
 | [HARDWARE_POLICY.md](HARDWARE_POLICY.md) | J1 HPC-only; RTX for J3 transfer |
 | [KNOWN_ISSUES.md](KNOWN_ISSUES.md) | **Critical** — resume trap, bad archive, limitations |
+| [QRM_STACK_PARITY_AUDIT.md](QRM_STACK_PARITY_AUDIT.md) | **QRM repro troubleshooting** — protocol vs stack gap, parity fixes |
 | [REPO_MAP.md](REPO_MAP.md) | Directory map and pipeline flow |
 | [PROGRESS.md](PROGRESS.md) | Live status + pre-rerun checklist |
 | [V8_2_ARCHITECTURE.md](V8_2_ARCHITECTURE.md) | V8.2 module layout (J1–J3) |

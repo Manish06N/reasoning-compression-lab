@@ -10,6 +10,7 @@ from src.extraction.math_extractor import normalize_completion_text
 from src.profiling.gpu_stats import snapshot_vram_bytes, track_gpu
 from src.runners.logprob_confidence import confidence_from_vllm_logprobs
 from src.runners.sampling_utils import build_sampling_params_dict
+from src.runners.vllm_serving import build_llm_init_kwargs
 
 _TOKENIZER_CACHE: dict[tuple[str, bool], Any] = {}
 
@@ -86,7 +87,7 @@ def compute_kv_bytes_per_token(model_path: str, kv_cache_dtype: str = "fp8") -> 
     return 2 * n_layers * n_kv_heads * head_dim * elem_bytes
 
 
-def build_llm(model_path: str, model_cfg: Dict[str, Any]):
+def build_llm(model_path: str, model_cfg: Dict[str, Any], *, seed: int | None = None):
 
     _ensure_tokenizer_compatibility()
 
@@ -96,33 +97,7 @@ def build_llm(model_path: str, model_cfg: Dict[str, Any]):
 
 
 
-    llm_kwargs: Dict[str, Any] = {
-
-        "model": model_path,
-
-        "dtype": model_cfg.get("dtype", "bfloat16"),
-
-        "max_model_len": model_cfg.get("max_model_len", 40960),
-
-        "tensor_parallel_size": model_cfg.get("tensor_parallel_size", 1),
-
-        "enforce_eager": model_cfg.get("enforce_eager", False),
-
-        "trust_remote_code": model_cfg.get("trust_remote_code", True),
-
-    }
-
-    if model_cfg.get("quantization"):
-
-        llm_kwargs["quantization"] = model_cfg["quantization"]
-
-    if model_cfg.get("kv_cache_dtype"):
-
-        llm_kwargs["kv_cache_dtype"] = model_cfg["kv_cache_dtype"]
-
-    if model_cfg.get("gpu_memory_utilization") is not None:
-
-        llm_kwargs["gpu_memory_utilization"] = model_cfg["gpu_memory_utilization"]
+    llm_kwargs = build_llm_init_kwargs(model_path, model_cfg, seed=seed)
 
 
 

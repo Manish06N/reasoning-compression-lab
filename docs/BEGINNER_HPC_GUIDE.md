@@ -85,7 +85,11 @@ QRM (COLM 2025)                    Your Paper 1 (this repo)
 
 ### 1.2 Why is our pass@1 much lower than QRM (~7% vs ~94%)? Is something wrong?
 
-**Short answer (updated 2026-07-05):** The **b01 QRM gate failed** on July BF16. We are now running **Path C diagnostic** (jobs **87116–87118**): 50 MATH-500 problems per cell under **strict QRM protocol** (reproduction prompt, seed 42, no `repetition_penalty`, `enforce_eager=true`). Submit/report: `scripts/hpc/submit_pathc_diagnostic.sh` / `report_pathc_diagnostic.sh`. Archive: `outputs-hpc-diag-pathc-2026-07-05`. See [notes.md §29](../notes.md) and [CHANGELOG.md](../CHANGELOG.md).
+**Short answer (updated 2026-07-05 late):** The **b01 QRM gate failed** on July BF16. **Path C** (jobs **87116–87118**) tested **strict QRM protocol** on 50 problems. Early n=20: Qwen **10%** pass@1 / **90%** truncation; Llama **15%** / **75%** — **still not QRM reproduction**.
+
+**Key finding:** Raw JSONL proves prompt/decoding/seed are **correct**. Failures are **degeneration loops** (`yeah yeah`, `the the the`) burning 32k before `\boxed{}`. When generation stops cleanly, accuracy is much higher (Qwen 2/2, Llama 3/5 on n=20). **Conclusion:** protocol parity achieved; **vLLM 0.8.5 stack** behaves differently from QRM's Lighteval path.
+
+**Full audit:** [QRM_STACK_PARITY_AUDIT.md](QRM_STACK_PARITY_AUDIT.md) · **Tools:** `scripts/hpc/qrm_parity/verify_stack_parity.py`, `compare_side_by_side.py`, `submit_pathc_parity_pilot.sh`
 
 #### What QRM reported vs what we measured (June 29 archive)
 
@@ -127,14 +131,15 @@ Rescoring that archive cannot fix truncated raw text.
 | “We can never publish” | **No** — you can publish **pass@1 + truncation_rate** under a fixed budget; that is deployment science |
 | “We must match 93.9% for Paper 1” | **No** for the **main** contribution — only for the **Level A hard gate** before opening b02 |
 
-**Decision rule:**
+**Decision rule (updated after Path C audit):**
 
-1. Finish **current** b01 at `max_tokens=32768` with commit `729d773`.
-2. Run `compare_qrm_baseline.py` on scored summaries.
-3. If **truncation ≤ 15%** and pass@1 near 93.9% → reproduction **passed**, proceed b02–b06.
-4. If **truncation still ~90%** → reproduction **failed**, but report honestly: *“Under our vLLM stack and 32k budget, pass@1 is X with Y% truncation.”* Then investigate stack diff vs QRM or run a **separate** all-500 budget sweep (8k/16k/32k/64k) — never rescue only truncated items.
+1. Let Path C d01/d02 finish (`report_pathc_diagnostic.sh`).
+2. Run **d03 parity pilot** with serving-stack fixes (`submit_pathc_parity_pilot.sh`).
+3. Run **official QRM `inference.py`** on same 10 problems (`setup_official_qrm_repo.sh`).
+4. If QRM ~90% and we ~10% on same IDs → **stack gap confirmed** — document honestly in Paper 1; lead with truncation + cost-per-correct.
+5. If 64k Qwen (87118) jumps vs 32k → budget was binding; still document 32k deployment story.
 
-See also [CHANGELOG.md](../CHANGELOG.md) §2026-07-03 (truncation methodology) and [qrm_literature_targets.yaml](../configs/baselines/qrm_literature_targets.yaml).
+See [QRM_STACK_PARITY_AUDIT.md](QRM_STACK_PARITY_AUDIT.md), [CHANGELOG.md](../CHANGELOG.md), [qrm_literature_targets.yaml](../configs/baselines/qrm_literature_targets.yaml).
 
 ---
 
