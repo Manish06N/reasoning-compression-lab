@@ -9,28 +9,26 @@ Canonical dated record for **Paper 1: Beyond Accuracy** (`reasoning-compression-
 
 ---
 
-## Current Status Snapshot (2026-07-05, Path C + stack parity audit)
+## Current Status Snapshot (2026-07-05, official QRM repo test)
 
 | Area | Status |
 |------|--------|
-| **Active experiment** | **Path C diagnostic** — archive `outputs-hpc-diag-pathc-2026-07-05` |
-| **Jobs** | **87116** Qwen 32k **RUNNING**; **87117** Llama 32k **RUNNING**; **87118** Qwen 64k **PENDING** |
-| **Path C early signal (n=20)** | Qwen **10%** pass@1 / **90%** trunc; Llama **15%** / **75%** — **not QRM reproduction** |
-| **Audit conclusion** | Protocol correct (prompt/decoding/seed verified in raw JSONL); **stack gap** (vLLM 0.8.5 loops) |
-| **Parity fixes landed** | `vllm_serving.py`, engine seed, serving flags, `capture_logprobs: false` — see `docs/QRM_STACK_PARITY_AUDIT.md` |
-| **Next GPU experiment** | `bash scripts/hpc/submit_pathc_parity_pilot.sh` (n=10) + official QRM `inference.py` cross-check |
+| **Active experiment** | **Official QRM `inference.py`** — job **87130** on `ragpu004` |
+| **Path C** | **CANCELED** (87116–87118) — n=20 sufficient; archive kept for comparison |
+| **Path C signal** | Qwen **10%** / **90%** trunc; protocol OK, **stack gap** |
+| **Official test** | n=10 MATH-500, seed=42, Qwen-7B BF16, env `qrm-official` |
+| **Output** | `outputs-hpc-qrm-official-2026-07-05/` |
 | **b01 gate (July archive)** | **FAILED** — `outputs-hpc-2a100-main-2026-07-03` |
 | **b02–b06** | **On hold** until Path C + parity pilot report |
 | **GitHub sync** | HPC ahead of `origin/main` — MacBook rsync needed |
 | **Key docs** | `docs/QRM_STACK_PARITY_AUDIT.md`, `notes.md` §30, `CHANGELOG.md` |
 
-### Path C quick commands
+### Official QRM test commands
 
 ```bash
-squeue -u $USER
-tail -f outputs-hpc-diag-pathc-2026-07-05/logs/diag_qwen7b_bf16_math500_seed42_n50.log
-bash scripts/hpc/report_pathc_diagnostic.sh   # after jobs finish
-bash ~/start-hpc-telegram-watcher.sh          # Telegram every 45 min (jobs 87116-87118)
+squeue -j 87130
+tail -f logs/qrm_official_87130.out
+python scripts/hpc/qrm_parity/compare_side_by_side.py --limit 10
 ```
 
 ### QRM stack parity (2026-07-05 audit)
