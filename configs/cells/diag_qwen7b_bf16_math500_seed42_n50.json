@@ -1,0 +1,10 @@
+{
+  "cell_id": "diag_qwen7b_bf16_math500_seed42_n50",
+  "model_config": "configs/models/deepseek_r1_qwen_7b_qrm_strict.json",
+  "task_config": "configs/tasks/math500.json",
+  "quant_config": "bf16",
+  "decoding_config": "configs/decoding/repro_qrm_strict.yaml",
+  "seed": 42,
+  "prompt_profile": "reproduction",
+  "notes": "Path C diagnostic: 50 MATH-500, strict QRM protocol, seed 42."
+}

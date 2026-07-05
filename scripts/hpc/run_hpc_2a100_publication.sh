@@ -216,10 +216,17 @@ run_one_cell() {
   scored="$SCORED/${cell_id}.jsonl"
   summary="$RESULTS/${cell_id}_summary.json"
 
+  local -a limit_args=()
+  local expected_limit_args=()
+  if [[ -n "${QREASON_INFERENCE_LIMIT:-}" ]]; then
+    limit_args=(--limit "$QREASON_INFERENCE_LIMIT")
+    expected_limit_args=(--limit "$QREASON_INFERENCE_LIMIT")
+  fi
+
   if [[ -f "$out" ]]; then
     local got want
     got="$(wc -l < "$out" | tr -d ' ')"
-    want="$(python scripts/expected_rows.py --cell-config "$cell_cfg")"
+    want="$(python scripts/expected_rows.py --cell-config "$cell_cfg" "${expected_limit_args[@]}")"
     if [[ "$got" -ge "$want" ]]; then
       if [[ ! -f "$summary" || ! -f "$scored" ]]; then
         echo "[gpu $gpu_id][score-only] $cell_id raw complete ($got/$want rows), scoring..."
@@ -258,6 +265,7 @@ run_one_cell() {
       --decoding-config "$DECODING" \
       --batch-size "$BATCH_SIZE" \
       --checkpoint-every "$CHECKPOINT_EVERY" \
+      "${limit_args[@]}" \
       $FRESH_FLAG \
       --output "$out"
   ) 2>&1 | tee "$log"
@@ -335,6 +343,11 @@ list_blocks() {
   echo "  b08_qwen15b_bf16_fp8       2×A100  ~12–24h  Qwen-1.5B BF16 + FP8 MATH"
   echo "  b09_qwen15b_awq4_gptq4     2×A100  ~12–24h  Qwen-1.5B AWQ-4 + GPTQ-4 MATH"
   echo ""
+  echo "Path C diagnostics (50 MATH-500, strict QRM protocol):"
+  echo "  d01_pathc_32k_diagnostic   2×A100  ~6–12h   Qwen + Llama BF16 @ 32k seed 42"
+  echo "  d02_pathc_64k_qwen           1×A100  ~8–16h   Qwen BF16 @ 64k seed 42"
+  echo ""
+  echo "Submit: bash scripts/hpc/submit_pathc_diagnostic.sh"
   echo "b08-b09 are future HPC-only lower-bound jobs; do not submit until current queue strategy allows."
 }
 
@@ -378,6 +391,12 @@ case "$BLOCK" in
     ;;
   b09|b09_qwen15b_awq4_gptq4)
     run_block "$BLOCK_DIR/b09_qwen15b_awq4_gptq4.sh"
+    ;;
+  d01|d01_pathc_32k_diagnostic)
+    run_block "$BLOCK_DIR/d01_pathc_32k_diagnostic.sh"
+    ;;
+  d02|d02_pathc_64k_qwen)
+    run_block "$BLOCK_DIR/d02_pathc_64k_qwen.sh"
     ;;
   *)
     echo "Unknown block: $BLOCK"

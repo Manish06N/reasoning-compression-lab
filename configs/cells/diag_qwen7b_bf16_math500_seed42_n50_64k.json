@@ -1,0 +1,10 @@
+{
+  "cell_id": "diag_qwen7b_bf16_math500_seed42_n50_64k",
+  "model_config": "configs/models/deepseek_r1_qwen_7b_qrm_strict.json",
+  "task_config": "configs/tasks/math500.json",
+  "quant_config": "bf16",
+  "decoding_config": "configs/decoding/repro_qrm_64k.yaml",
+  "seed": 42,
+  "prompt_profile": "reproduction",
+  "notes": "Path C budget diagnostic: same 50 problems, max_tokens=65536."
+}

@@ -79,6 +79,8 @@ resolve_slurm_excludes() {
 SBATCH_EXCLUDE_ARGS=()
 resolve_slurm_excludes
 
+SLURM_TIME="${QREASON_SLURM_TIME:-47:00:00}"
+
 ensure_autopush() {
   if [[ "${QREASON_ENABLE_AUTOPUSH:-}" != "1" ]]; then
     echo "HPC output autopush disabled (set QREASON_ENABLE_AUTOPUSH=1 to enable)."
@@ -118,7 +120,7 @@ submit_split_2gpu() {
       --job-name="qreason-${cell_id}" \
       --output="logs/slurm/${block}_${cell_id}_%j.out" \
       --error="logs/slurm/${block}_${cell_id}_%j.err" \
-      --time=47:00:00 \
+      --time="$SLURM_TIME" \
       "${SBATCH_EXCLUDE_ARGS[@]}" \
       --partition=gpu \
       --cpus-per-task=8 \
@@ -141,7 +143,7 @@ submit_single_cell() {
     --job-name="qreason-${cell_id}" \
     --output="logs/slurm/single_${cell_id}_%j.out" \
     --error="logs/slurm/single_${cell_id}_%j.err" \
-    --time=47:00:00 \
+    --time="$SLURM_TIME" \
     "${SBATCH_EXCLUDE_ARGS[@]}" \
     --partition=gpu \
     --cpus-per-task=8 \
@@ -165,7 +167,7 @@ submit_2gpu_block() {
     --job-name="qreason-${block}" \
     --output="logs/slurm/${block}_%j.out" \
     --error="logs/slurm/${block}_%j.err" \
-    --time=47:00:00 \
+    --time="$SLURM_TIME" \
     "${SBATCH_EXCLUDE_ARGS[@]}" \
     --partition=gpu \
     --cpus-per-task="$cpus_per_task" \
@@ -194,7 +196,7 @@ submit_1gpu() {
     --job-name="qreason-${block}" \
     --output="logs/slurm/${block}_%j.out" \
     --error="logs/slurm/${block}_%j.err" \
-    --time=47:00:00 \
+    --time="$SLURM_TIME" \
     "${SBATCH_EXCLUDE_ARGS[@]}" \
     --partition=gpu \
     --cpus-per-task=8 \
@@ -240,6 +242,12 @@ case "$BLOCK" in
   b07|b07_gpqa_fp8) submit_1gpu b07_gpqa_fp8 ;;
   b08|b08_qwen15b_bf16_fp8) submit_2gpu b08_qwen15b_bf16_fp8 ;;
   b09|b09_qwen15b_awq4_gptq4) submit_2gpu b09_qwen15b_awq4_gptq4 ;;
+  d01|d01_pathc_32k_diagnostic) submit_2gpu d01_pathc_32k_diagnostic ;;
+  d02|d02_pathc_64k_qwen) submit_1gpu d02_pathc_64k_qwen ;;
+  pathc|pathc_diagnostic)
+    echo "Use: bash scripts/hpc/submit_pathc_diagnostic.sh"
+    exit 0
+    ;;
   *)
     echo "Unknown block: $BLOCK"
     bash scripts/hpc/run_hpc_2a100_publication.sh list

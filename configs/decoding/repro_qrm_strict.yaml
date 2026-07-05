@@ -1,0 +1,9 @@
+# Strict QRM reproduction (Quantized-Reasoning-Models inference.py defaults).
+# Path C diagnostic: no repetition_penalty, max_model_len=32768 like QRM paper §3.1.
+
+temperature: 0.6
+top_p: 0.95
+max_tokens: 32768
+max_model_len: 32768
+seed: 42
+notes: Path C strict QRM — matches inference.py GenerationParameters (no repetition_penalty).

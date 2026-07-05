@@ -1,0 +1,9 @@
+# Path C budget diagnostic: test whether truncation explains low pass@1 at 32k.
+# Labeled separate protocol — do not mix with 32k publication rows.
+
+temperature: 0.6
+top_p: 0.95
+max_tokens: 65536
+max_model_len: 73728
+seed: 42
+notes: Path C 64k budget sweep diagnostic (50-problem pilot).
