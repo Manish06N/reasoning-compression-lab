@@ -1,6 +1,6 @@
 # Progress — Paper 1 Experiments
 
-**Last updated:** 2026-07-05 (evening)  
+**Last updated:** 2026-07-05 (Path C launch)  
 **Repo:** https://github.com/Manish06N/reasoning-compression-lab  
 **Canonical log:** [progress.md](../progress.md) · **Session notes:** [notes.md](../notes.md) · **Ops:** [CHANGELOG.md](../CHANGELOG.md)
 
@@ -10,38 +10,50 @@
 
 | Area | Status |
 |------|--------|
-| **b01 QRM gate** | **FAILED** — pivot to Paper 1 deployment narrative |
-| **Llama BF16** | **500/500 scored** — 19.6% pass@1, 58% truncation, sober prompt |
-| **Qwen BF16** | **410/500** — 94% truncation; **90-row finish optional, not required** |
-| **Quant grid b02–b06** | **Not started** — recommended next step |
-| **Queue** | Empty |
+| **Active experiment** | **Path C diagnostic** (strict QRM repro, n=50) |
+| **Archive** | `outputs-hpc-diag-pathc-2026-07-05` |
+| **Jobs** | **87116** Qwen 32k RUNNING · **87117** Llama 32k RUNNING · **87118** Qwen 64k PENDING |
+| **b01 QRM gate** | **FAILED** (July archive — see below) |
+| **Quant grid b02–b06** | **On hold** until Path C results |
 
-**Strategic label:** *Gate failed; first trustworthy BF16 deployment metrics obtained; proceed to quantization grid.*
-
-**Read:** [notes.md §28](../notes.md) (pivot + literature map) · [J1_VALIDATION_RUNBOOK.md](J1_VALIDATION_RUNBOOK.md)
+**Strategic label:** *b01 gate failed → Path C diagnostic sprint to test strict QRM protocol before further GPU spend.*
 
 ---
 
-## b01 gate result
+## Path C diagnostic (active)
 
-| Cell | pass@1 | truncation | Gate |
-|------|--------|------------|------|
-| Llama BF16 (`sober`) | 19.6% | 58% | FAIL (profile + metrics) |
-| Qwen BF16 (`reproduction`, n=410) | TBD | ~94% | FAIL (truncation) |
+| Wave | Job | Cell | Settings |
+|------|-----|------|----------|
+| d01 | 87116 | `diag_qwen7b_bf16_math500_seed42_n50` | 32k, seed 42, reproduction, no rep_pen, eager |
+| d01 | 87117 | `diag_llama8b_bf16_math500_seed42_n50` | same |
+| d02 | 87118 | `diag_qwen7b_bf16_math500_seed42_n50_64k` | 64k output cap, n=50 |
 
-Checker: `compare_qrm_baseline.py` — Llama returns `SKIP` (prompt_profile mismatch).
+```bash
+# Submit (already done)
+bash scripts/hpc/submit_pathc_diagnostic.sh
+
+# Monitor
+squeue -u $USER
+
+# Report when complete
+bash scripts/hpc/report_pathc_diagnostic.sh
+```
+
+**Pass heuristic (n=50):** 32k pass@1 ≥ ~80% and truncation ≤ ~25% → stack repro OK.
 
 ---
 
-## Next steps (approved)
+## b01 July archive (complete / failed gate)
 
-1. Reframe Paper 1 — truncation + cost-per-correct as main findings.
-2. Submit **b02 FP8** one block (same 32k protocol).
-3. Skip Qwen 90 rows unless table symmetry needed.
-4. Fix Llama b01 cell prompt profile for future repro attempts.
+| Cell | Result |
+|------|--------|
+| Llama BF16 | 500/500 — pass@1 **19.6%**, trunc **58%**, `sober` prompt |
+| Qwen BF16 | 410/500 — trunc **~94%** (90 rows not run) |
+
+Archive: `outputs-hpc-2a100-main-2026-07-03`
 
 ---
 
 ## Historical entries
 
-Earlier snapshots (2026-07-02 split b01, P0 audit, etc.) remain in [progress.md](../progress.md) below the 2026-07-05 section.
+Earlier snapshots remain in [progress.md](../progress.md) and [CHANGELOG.md](../CHANGELOG.md).

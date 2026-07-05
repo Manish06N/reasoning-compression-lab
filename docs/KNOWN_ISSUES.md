@@ -10,13 +10,12 @@ Operational issues that can break paper results if ignored, plus known software 
 
 | Item | Status |
 |------|--------|
-| b01 QRM gate | **FAILED** — Llama 19.6%/58% trunc; Qwen 410/500 ~94% trunc |
-| Trustworthy archive | `outputs-hpc-2a100-main-2026-07-03` (protocol `729d773`) |
-| Qwen 90 rows | **Optional** — not required after 94% trunc on n=410 |
-| Resume trap | Must set `QREASON_OUTPUT_ROOT` + `QREASON_HPC_DATE` when resuming old archive |
-| b01 Llama prompt | Uses **`sober`** not `reproduction` — gate checker SKIPs |
+| **Active** | **Path C diagnostic** — jobs **87116–87118**, archive `outputs-hpc-diag-pathc-2026-07-05` |
+| b01 QRM gate | **FAILED** — July archive `outputs-hpc-2a100-main-2026-07-03` |
+| Qwen b01 90 rows | **Skipped** (not required) |
+| Quant grid | **On hold** until `report_pathc_diagnostic.sh` |
 
-See [notes.md §28](../notes.md) for pivot and next steps.
+See [notes.md §29](../notes.md) · [CHANGELOG.md](../CHANGELOG.md) Path C entry.
 
 ---
 

@@ -149,6 +149,28 @@ Key numbers:  ~1-4k completion tokens/q on 1.5B; ~15 tok/s; batch 4/2/1 by model
 
 ---
 
+## 2026-07-05 — Path C diagnostic (RUNNING)
+
+```text
+Date:         2026-07-05
+Level:        diagnostic (Path C)
+Archive:      outputs-hpc-diag-pathc-2026-07-05
+Hardware:     A100 80GB (racn116)
+Status:       running
+Jobs:         87116 Qwen 32k, 87117 Llama 32k, 87118 Qwen 64k (pending)
+Cells:
+  - diag_qwen7b_bf16_math500_seed42_n50     (strict QRM 32k, n=50, seed 42)
+  - diag_llama8b_bf16_math500_seed42_n50    (same)
+  - diag_qwen7b_bf16_math500_seed42_n50_64k (64k budget test, n=50)
+Protocol:     repro_qrm_strict.yaml / repro_qrm_64k.yaml
+              reproduction prompt, no repetition_penalty, enforce_eager=true
+Submit:       bash scripts/hpc/submit_pathc_diagnostic.sh
+Report:       bash scripts/hpc/report_pathc_diagnostic.sh
+Notes:        Launched after b01 gate fail. Supersedes quant grid until results known.
+```
+
+---
+
 ## 2026-07-05 — b01 BF16 Llama (COMPLETE, gate FAIL)
 
 ```text

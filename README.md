@@ -11,14 +11,18 @@ Deployment-science evaluation harness for compressed reasoning LLMs.
 
 ## Current status (2026-07-05)
 
-**b01 QRM gate FAILED — Paper 1 pivot to deployment-budget science (truncation + cost).**
+**Path C diagnostic IN FLIGHT** — strict QRM repro sprint (50 problems) after b01 gate failed.
 
 | Item | Status |
 |------|--------|
-| **Llama BF16** | 500/500 scored — pass@1 **19.6%**, truncation **58%** |
-| **Qwen BF16** | 410/500 partial — **94%** truncation; **finishing 90 rows not required** |
-| **b02–b06** | Not submitted — **next: quant grid** at same 32k protocol |
-| **Queue** | Empty |
+| **Path C jobs** | **87116** Qwen 32k RUNNING · **87117** Llama 32k RUNNING · **87118** Qwen 64k PENDING |
+| **Archive** | `outputs-hpc-diag-pathc-2026-07-05` |
+| **b01 (July)** | Gate **FAILED** — Llama 19.6%/58% trunc; Qwen 410/500 ~94% trunc |
+| **b02–b06** | **On hold** until `report_pathc_diagnostic.sh` |
+
+```bash
+bash scripts/hpc/report_pathc_diagnostic.sh   # after jobs finish
+```
 
 **Policy:** HPC-only for paper numbers — [HARDWARE_POLICY.md](docs/HARDWARE_POLICY.md).
 

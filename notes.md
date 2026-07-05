@@ -887,16 +887,18 @@ Protocol A: reproduction prompt, seeds 42–44, no repetition_penalty, Lighteval
 
 ---
 
-## 29. Live snapshot (2026-07-05 evening)
+## 29. Live snapshot (2026-07-05, Path C running)
 
 | Item | Value |
 |------|-------|
-| Queue | **Empty** |
-| Qwen b01 | **410/500** — skipped (not required) |
-| Llama b01 | **500/500 scored** — gate failed |
-| **Path C diagnostic** | **SUBMITTED** jobs **87116** Qwen 32k, **87117** Llama 32k, **87118** Qwen 64k |
+| **87116** | Qwen 32k diag — **RUNNING** `racn116` (~3h+ when checked) |
+| **87117** | Llama 32k diag — **RUNNING** `racn116` |
+| **87118** | Qwen 64k diag — **PENDING** (QOS; starts after d01 frees GPU) |
 | Archive | `outputs-hpc-diag-pathc-2026-07-05` |
-| Report | `bash scripts/hpc/report_pathc_diagnostic.sh` when jobs finish |
+| Raw rows | 0 until first checkpoint (every 10 rows) |
+| b01 July | Gate failed; Qwen 410/500 skipped |
+| Report | `bash scripts/hpc/report_pathc_diagnostic.sh` when all 3 finish |
+| Docs | `CHANGELOG.md` Path C section · `progress.md` · `docs/PROGRESS.md` |
 
 ### Path C protocol (commit `7d46c3f`)
 

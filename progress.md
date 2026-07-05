@@ -9,19 +9,26 @@ Canonical dated record for **Paper 1: Beyond Accuracy** (`reasoning-compression-
 
 ---
 
-## Current Status Snapshot (2026-07-05, post–gate-fail pivot)
+## Current Status Snapshot (2026-07-05, Path C diagnostic in flight)
 
 | Area | Status |
 |------|--------|
-| **Active archive** | `outputs-hpc-2a100-main-2026-07-03` (protocol `729d773`: 32k, rep_penalty 1.05) |
-| **b01 QRM gate** | **FAILED** — do not claim reproduction; do not block Paper 1 on this |
-| **Llama BF16** | **500/500 scored** — pass@1 **19.6%**, truncation **58%**, cost/correct **~1614 s**, `sober` prompt |
-| **Qwen BF16** | **410/500** checkpointed — **94.1%** truncation; resume job **87111 FAILED** (GPU busy) |
-| **Jobs running** | **None** |
-| **Strategic pivot** | Paper 1 = **deployment budget science** (truncation + cost + calibration), not QRM repro table |
-| **b02–b06** | **Not submitted** — next decision: open quant grid **without** QRM gate (see `notes.md` §28) |
+| **Active experiment** | **Path C diagnostic** — archive `outputs-hpc-diag-pathc-2026-07-05` |
+| **Jobs** | **87116** Qwen 32k **RUNNING**; **87117** Llama 32k **RUNNING**; **87118** Qwen 64k **PENDING** |
+| **b01 gate (July archive)** | **FAILED** — `outputs-hpc-2a100-main-2026-07-03` |
+| **Llama b01** | 500/500 scored — 19.6% pass@1, 58% trunc (`sober` prompt) |
+| **Qwen b01** | 410/500 — 94% trunc; **90 rows skipped** |
+| **b02–b06** | **On hold** until Path C report |
 | **GitHub sync** | HPC ahead of `origin/main` — MacBook rsync needed |
-| **Key docs** | `notes.md` §28 (pivot + next steps), `CHANGELOG.md` 2026-07-05 |
+| **Key docs** | `notes.md` §29, `CHANGELOG.md` Path C entry, `scripts/hpc/report_pathc_diagnostic.sh` |
+
+### Path C quick commands
+
+```bash
+squeue -u $USER
+tail -f outputs-hpc-diag-pathc-2026-07-05/logs/diag_qwen7b_bf16_math500_seed42_n50.log
+bash scripts/hpc/report_pathc_diagnostic.sh   # after jobs finish
+```
 
 ### Should we finish Qwen 90 rows (~10 h)?
 

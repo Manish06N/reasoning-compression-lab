@@ -85,7 +85,7 @@ QRM (COLM 2025)                    Your Paper 1 (this repo)
 
 ### 1.2 Why is our pass@1 much lower than QRM (~7% vs ~94%)? Is something wrong?
 
-**Short answer (updated 2026-07-05):** The **b01 QRM gate failed** on July BF16: Llama **19.6%** pass@1 / **58%** truncation (500/500); Qwen **~94%** truncation on 410/500. This is **not** valid QRM reproduction, but it **is** valid Paper 1 science — fixed 32k deployment budget causes silent failure (truncation). The thesis (*Beyond Accuracy*) is **supported**, not broken. See [notes.md §28](../notes.md).
+**Short answer (updated 2026-07-05):** The **b01 QRM gate failed** on July BF16. We are now running **Path C diagnostic** (jobs **87116–87118**): 50 MATH-500 problems per cell under **strict QRM protocol** (reproduction prompt, seed 42, no `repetition_penalty`, `enforce_eager=true`). Submit/report: `scripts/hpc/submit_pathc_diagnostic.sh` / `report_pathc_diagnostic.sh`. Archive: `outputs-hpc-diag-pathc-2026-07-05`. See [notes.md §29](../notes.md) and [CHANGELOG.md](../CHANGELOG.md).
 
 #### What QRM reported vs what we measured (June 29 archive)
 

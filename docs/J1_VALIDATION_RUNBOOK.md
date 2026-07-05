@@ -1,8 +1,8 @@
 # J1 validation runbook — prove the pipeline before expanding
 
-**Status (2026-07-05):** Engineering MVP **done** → b01 QRM gate **FAILED** → **pivot to Paper 1 deployment grid** (truncation + cost).
+**Status (2026-07-05):** b01 gate **FAILED** → **Path C diagnostic IN FLIGHT** (jobs 87116–87118).
 
-**July BF16 result:** Llama 19.6% / 58% trunc (500/500); Qwen 410/500 ~94% trunc. Gate fail documented in [notes.md §28](../notes.md). **Quant grid (b02–b05) may proceed** without QRM reproduction.
+**Path C:** `bash scripts/hpc/submit_pathc_diagnostic.sh` — 50 MATH-500, strict QRM protocol. Report: `bash scripts/hpc/report_pathc_diagnostic.sh`. **Quant grid on hold** until Path C completes. See [CHANGELOG.md](../CHANGELOG.md) and [notes.md §29](../notes.md).
 
 **GitHub:** sync from HPC via MacBook rsync.
 

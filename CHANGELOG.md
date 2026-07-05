@@ -1,5 +1,55 @@
 # Changelog
 
+## 2026-07-05 — Path C diagnostic sprint launched (commit `7d46c3f`)
+
+After b01 gate failure, **Path C** (strict QRM repro diagnostic) superseded quant grid (Path A) as the active experiment track.
+
+### What Path C tests
+
+| Wave | Jobs | Cell | Protocol |
+|------|------|------|----------|
+| **d01 32k** | **87116**, **87117** | Qwen + Llama BF16 | `repro_qrm_strict.yaml`: 32k, seed **42**, **no** `repetition_penalty`, `enforce_eager=true`, **`reproduction`** prompt, **n=50** |
+| **d02 64k** | **87118** (queued) | Qwen BF16 only | `repro_qrm_64k.yaml`: max_tokens **65536**, same prompt/seed, **n=50** |
+
+**Archive:** `outputs-hpc-diag-pathc-2026-07-05`  
+**Submit:** `bash scripts/hpc/submit_pathc_diagnostic.sh`  
+**Report:** `bash scripts/hpc/report_pathc_diagnostic.sh`
+
+### New files
+
+| Path | Role |
+|------|------|
+| `configs/decoding/repro_qrm_strict.yaml` | QRM `inference.py` parity (32k, no rep_pen) |
+| `configs/decoding/repro_qrm_64k.yaml` | Budget diagnostic (64k cap) |
+| `configs/models/deepseek_r1_*_qrm_strict.json` | `enforce_eager: true` |
+| `configs/cells/diag_*_seed42_n50*.json` | Three diagnostic cells |
+| `configs/machine_split/hpc_blocks/d01_*.sh`, `d02_*.sh` | SLURM blocks |
+| `scripts/hpc/submit_pathc_diagnostic.sh` | One-command submit |
+| `scripts/hpc/report_pathc_diagnostic.sh` | Post-run summary table |
+
+### Infrastructure
+
+- `QREASON_INFERENCE_LIMIT` wired through `run_hpc_2a100_publication.sh` → `run_inference.py --limit`
+- `QREASON_SLURM_TIME` supported in `submit_hpc_blocks.sh` (12h for d01, 24h for d02)
+
+### Interpretation (n=50)
+
+| 32k outcome | Next step |
+|-------------|-----------|
+| pass@1 ≥ ~80%, trunc ≤ ~25% | Run full 500 under Protocol C; then quant grid |
+| Still ~20% pass@1, high trunc | Check 64k wave; if still low → QRM official repo on cluster |
+
+| 64k outcome | Meaning |
+|-------------|---------|
+| pass@1 **jumps** vs 32k Qwen | Truncation was main bottleneck |
+| pass@1 **stays low** | Harness/scorer/stack gap |
+
+### Job status (check: `squeue -u $USER`)
+
+Updated at submit + ~3 min: **87116/87117 RUNNING** `racn116` (model load); **87118 PENDING** (QOS — starts when d01 frees a GPU).
+
+---
+
 ## 2026-07-05 (evening) — Gate failed; strategic pivot to Paper 1 deployment narrative
 
 ### Decision record
@@ -18,13 +68,13 @@
 | **A Sober Look** | Single seed 0; do not overclaim; variance section optional |
 | **Paper 1 design** | **Truncation_rate + cost-per-correct** are first-class — gate fail is a **result**, not project failure |
 
-### Approved next steps (priority order)
+### Approved next steps (updated — Path C now active)
 
-1. **Reframe manuscript** — lead with deployment budget findings; QRM as attempted baseline (honest gap).
-2. **Open quant grid b02→b05** under **same 32k protocol** — hypothesis: quantization **increases** truncation at fixed budget.
-3. **Fix b01 Llama cell** — use `reproduction` profile OR label `sober` clearly in all tables.
-4. **Skip Qwen 90 rows** unless table symmetry needed.
-5. **Optional appendix** — all-500 budget sweep (8k/16k/32k/64k); Protocol A strict QRM rerun (seeds 42–44).
+1. **Path C diagnostic** — jobs **87116–87118** (`submit_pathc_diagnostic.sh`) — **IN FLIGHT**
+2. **After Path C report** — decide: full 500 repro, QRM repo test, or budget-limited paper
+3. **Skip Qwen b01 90 rows** — not required
+4. **Quant grid b02–b05** — **hold** until Path C 32k diagnostic passes or 64k explains gap
+5. **Reframe manuscript** — lead with deployment metrics; QRM as honest baseline attempt
 
 ---
 
@@ -36,8 +86,8 @@
 |-----|------|-------|---------|------|-------|
 | **86757** | `level_a_qwen7b_bf16` (reproduction) | **TIMEOUT** | ~47 h | **410/500** | Last checkpoint row 410; log reached ~419 before kill |
 | **86758** | `level_c_llama8b_bf16` (**sober**) | **COMPLETED** | ~44 h | **500/500** | Auto-scored; summary written |
-| **87111** | Qwen resume | RUNNING | — | resume 411+ | Submitted with pinned `QREASON_OUTPUT_ROOT=...2026-07-03` |
-| **87112** | Llama | RUNNING | — | skip expected | Already `status: scored` |
+| **87111** | Qwen resume | **FAILED** | 55s | — | GPU busy on `racn116` |
+| **87112** | Llama | **COMPLETED** | 53s | skip | Already scored |
 
 ### Llama BF16 scored results (first trustworthy July BF16 cell)
 
