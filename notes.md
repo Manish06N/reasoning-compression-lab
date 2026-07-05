@@ -892,11 +892,22 @@ Protocol A: reproduction prompt, seeds 42–44, no repetition_penalty, Lighteval
 | Item | Value |
 |------|-------|
 | Queue | **Empty** |
-| Qwen | **410/500** — resume optional, not required |
-| Llama | **500/500 scored** — gate failed, data valid for Paper 1 |
-| b01 gate | **FAILED** |
-| Next | **Path A** quant grid OR manuscript reframe |
-| Docs | §28 pivot; `progress.md`; `CHANGELOG.md` |
+| Qwen b01 | **410/500** — skipped (not required) |
+| Llama b01 | **500/500 scored** — gate failed |
+| **Path C diagnostic** | **SUBMITTED** jobs **87116** Qwen 32k, **87117** Llama 32k, **87118** Qwen 64k |
+| Archive | `outputs-hpc-diag-pathc-2026-07-05` |
+| Report | `bash scripts/hpc/report_pathc_diagnostic.sh` when jobs finish |
+
+### Path C protocol (commit `7d46c3f`)
+
+| Wave | Cell | Settings |
+|------|------|----------|
+| d01 Qwen | `diag_qwen7b_bf16_math500_seed42_n50` | reproduction prompt, seed 42, 32k, no rep_pen, eager=true, **n=50** |
+| d01 Llama | `diag_llama8b_bf16_math500_seed42_n50` | same |
+| d02 Qwen | `diag_qwen7b_bf16_math500_seed42_n50_64k` | same + **max_tokens=65536** |
+
+**Pass heuristic (n=50):** pass@1 ≥ **80%** and truncation ≤ **25%** on 32k → stack repro OK, consider full 500.  
+**64k:** if pass@1 jumps vs 32k Qwen → truncation was bottleneck; if still low → harness/scorer gap.
 
 ---
 
