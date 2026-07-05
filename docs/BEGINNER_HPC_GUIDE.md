@@ -85,7 +85,7 @@ QRM (COLM 2025)                    Your Paper 1 (this repo)
 
 ### 1.2 Why is our pass@1 much lower than QRM (~7% vs ~94%)? Is something wrong?
 
-**Short answer (updated 2026-07-05 late):** The **b01 QRM gate failed** on July BF16. **Path C** (jobs **87116–87118**) tested **strict QRM protocol** on 50 problems. Early n=20: Qwen **10%** pass@1 / **90%** truncation; Llama **15%** / **75%** — **still not QRM reproduction**.
+**Short answer (updated 2026-07-05 night):** The **b01 QRM gate failed** on July BF16. **Path C** on our harness (strict protocol, n=20) showed the same failure — protocol OK, **~10% pass@1 / ~90% trunc**. Path C jobs were **canceled**; we are now running **Experiment A** (job **87130**): the **authors' own** `inference.py` on the same 10 problems.
 
 **Key finding:** Raw JSONL proves prompt/decoding/seed are **correct**. Failures are **degeneration loops** (`yeah yeah`, `the the the`) burning 32k before `\boxed{}`. When generation stops cleanly, accuracy is much higher (Qwen 2/2, Llama 3/5 on n=20). **Conclusion:** protocol parity achieved; **vLLM 0.8.5 stack** behaves differently from QRM's Lighteval path.
 

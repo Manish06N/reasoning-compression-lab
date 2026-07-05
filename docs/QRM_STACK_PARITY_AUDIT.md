@@ -136,7 +136,9 @@ Typical row: `test/precalculus/807.json` → trunc=True, 32,699 tokens, `yeah-lo
 | `scripts/hpc/qrm_parity/verify_stack_parity.py` | No-GPU checklist (must print `Overall: PASS`) |
 | `scripts/hpc/qrm_parity/compare_side_by_side.py` | Compare traces on first N MATH-500 IDs |
 | `scripts/hpc/qrm_parity/setup_official_qrm_repo.sh` | Clone QRM repo to `external/Quantized-Reasoning-Models` |
-| `scripts/hpc/submit_pathc_parity_pilot.sh` | Submit n=10 Qwen parity rerun |
+| `scripts/hpc/submit_pathc_parity_pilot.sh` | Submit n=10 Qwen parity rerun (Experiment B — optional) |
+| `scripts/hpc/submit_qrm_official_test.sh` | Submit **Experiment A** (job 87130) |
+| `slurm/qrm_official_math500_n10.slurm` | SLURM wrapper for official `inference.py` |
 | `configs/cells/diag_qwen7b_bf16_math500_seed42_n10_parity.json` | Parity pilot cell |
 | `configs/machine_split/hpc_blocks/d03_pathc_parity_pilot.sh` | SLURM block |
 
@@ -156,36 +158,50 @@ python scripts/hpc/qrm_parity/compare_side_by_side.py \
   --parity-archive outputs-hpc-diag-pathc-parity-$(date +%Y-%m-%d) --limit 10
 ```
 
-### Official QRM cross-check (GPU, separate env recommended)
+### Experiment A — official QRM cross-check (**ACTIVE**, job 87130)
 
 ```bash
-bash scripts/hpc/qrm_parity/setup_official_qrm_repo.sh
-export MODEL=$PWD/models/DeepSeek-R1-Distill-Qwen-7B
-cd external/Quantized-Reasoning-Models
-python inference.py --model "$MODEL" --dataset MATH-500 --max_samples 10 --seed 42
+bash scripts/hpc/submit_qrm_official_test.sh
+squeue -j 87130
+tail -f logs/qrm_official_87130.out
+python scripts/hpc/qrm_parity/compare_side_by_side.py --limit 10
 ```
 
-**Decision rule:** If official QRM gets `\boxed{}` on problems where we loop → stack parity is confirmed as root cause.
+Installs `qrm-official` conda env + QRM lighteval/vllm submodules on first run (30–60 min).  
+Output: `outputs-hpc-qrm-official-2026-07-05/`
+
+**Decision rule:** If official QRM gets `\boxed{}` and high pass@1 where we looped → **stack gap confirmed**.
 
 ---
 
-## 6. Decision tree
+## 6. Experiments A–D (status 2026-07-05)
+
+| ID | Tests | Stack | Status |
+|----|-------|-------|--------|
+| **A** | Authors' `inference.py` on 10 MATH-500 IDs | QRM Lighteval + QRM vLLM | **RUNNING** (87130) |
+| **B** | `capture_logprobs: false` on our harness | Our vLLM 0.8.5 | Code fixed; **not rerun** |
+| **C** | `repetition_penalty` none vs 1.05 | Our harness | **Answered** — both fail (~90% trunc) |
+| **D** | Qwen 64k max_tokens | Our harness | **Canceled** (87118) |
+
+Path C (our strict QRM protocol, n=50) was **canceled** at n=20 — sufficient to justify A.
+
+Plain English: [notes.md §31](../notes.md)
+
+---
+
+## 7. Decision tree (current)
 
 ```
-Path C n=50 completes
-├─ pass@1 ≥ 80% AND trunc ≤ 25%  → full 500 × seeds 42–44; then quant grid
-├─ Still low pass@1 + high trunc (current trajectory)
-│   ├─ Run parity pilot (d03) with serving fixes
-│   ├─ Run official QRM inference.py on same 10 IDs
-│   │   ├─ QRM ~90%, we ~10%  → fix stack (vLLM/transformers/Lighteval path)
-│   │   └─ QRM also loops     → investigate weights / dataset / paper claim
-│   └─ Check 64k wave (87118): jump → budget story; flat → stack story
-└─ Document gap honestly in Paper 1; lead with truncation + cost-per-correct
+Path C canceled at n=20
+└─ Experiment A (87130) in flight
+    ├─ QRM high pass@1, we low  → document stack gap; Paper 1 truncation/cost story
+    ├─ QRM also fails           → deeper env/weights investigation
+    └─ Then: quant grid b02 OR budget-limited paper only
 ```
 
 ---
 
-## 7. What Paper 1 claims (unchanged)
+## 8. What Paper 1 claims (unchanged)
 
 - We **attempted** QRM reproduction under fixed 32k deployment budget.
 - We **document** the gap (truncation, parse failure, cost-per-correct inflation).
@@ -193,10 +209,10 @@ Path C n=50 completes
 
 ---
 
-## 8. References
+## 9. References
 
 - `configs/baselines/qrm_literature_targets.yaml`
-- `notes.md` §18–19, §29
+- `notes.md` §18–19, §29–31
 - `CHANGELOG.md` 2026-07-05 parity entry
 - `progress.md` current snapshot
 - External: `external/Quantized-Reasoning-Models/` (cloned via setup script)

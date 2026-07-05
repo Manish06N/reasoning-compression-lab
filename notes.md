@@ -588,10 +588,10 @@ Use **two labeled protocols** (already sketched in `configs/baselines/qrm_litera
 | Item | Status |
 |------|--------|
 | Script | `~/start-hpc-telegram-watcher.sh` (repo copy: `scripts/hpc/telegram/`) |
-| Watches | Jobs **87116**, **87117**, **87118** (Path C diagnostic) |
-| Archive | `outputs-hpc-diag-pathc-2026-07-05` |
+| Watches | Restart for **87130** (Experiment A) when needed — Path C watcher **stopped** |
+| Archive | `outputs-hpc-qrm-official-2026-07-05` (official QRM) or Path C partial archive |
 | Interval | **45 min** (`RUNNING_PROGRESS_INTERVAL=2700`) |
-| Restart | `bash ~/start-hpc-telegram-watcher.sh` |
+| Restart | `WATCH_JOB_IDS=87130 OUTPUT_ROOT=.../outputs-hpc-qrm-official-... bash ~/start-hpc-telegram-watcher.sh` |
 | Preview | `OUTPUT_ROOT=.../outputs-hpc-diag-pathc-2026-07-05 ~/send-hpc-progress-telegram.sh preview` |
 | Caveat | Login node must resolve `api.telegram.org` (compute nodes cannot) |
 
@@ -890,17 +890,15 @@ Protocol A: reproduction prompt, seeds 42–44, no repetition_penalty, Lighteval
 
 ---
 
-## 29. Live snapshot (2026-07-05, Path C running)
+## 29. Live snapshot (2026-07-05, Experiment A active)
 
 | Item | Value |
 |------|-------|
-| **87116** | Qwen 32k diag — **RUNNING** `racn116` |
-| **87117** | Llama 32k diag — **RUNNING** `racn116` |
-| **87118** | Qwen 64k diag — **PENDING** (QOS) |
-| Archive | `outputs-hpc-diag-pathc-2026-07-05` |
-| Early scored (n=20) | Qwen **10%** pass@1 / **90%** trunc; Llama **15%** / **75%** trunc |
-| b01 July | Gate failed; Qwen 410/500 skipped |
-| Report | `bash scripts/hpc/report_pathc_diagnostic.sh` when all 3 finish |
+| **87130** | Official QRM `inference.py` — **RUNNING** `ragpu004` |
+| **87116–87118** | Path C — **CANCELED** (user: enough signal at n=20) |
+| Path C archive | `outputs-hpc-diag-pathc-2026-07-05` (~20 rows each; partial) |
+| Official output | `outputs-hpc-qrm-official-2026-07-05/` |
+| Monitor | `tail -f logs/qrm_official_87130.out` |
 
 ### Path C protocol (commit `7d46c3f`)
 
@@ -946,17 +944,14 @@ bash scripts/hpc/submit_pathc_parity_pilot.sh               # d03 n=10 rerun
 bash scripts/hpc/qrm_parity/setup_official_qrm_repo.sh      # clone to external/
 ```
 
-### Decision tree (updated)
+### Decision tree (updated — Path C canceled)
 
 ```
-Path C n=50 done
-├─ Still ~10–20% pass@1, high trunc (current)
-│   ├─ Run d03 parity pilot (serving fixes)
-│   ├─ Run official QRM inference.py on same 10 IDs
-│   │   ├─ QRM ~90%, we ~10% → document stack gap; Paper 1 leads with truncation/cost
-│   │   └─ QRM also loops → deeper investigation (weights, dataset)
-│   └─ Check 87118 64k wave
-└─ Unexpected pass → full 500 Protocol A
+Path C stopped at n=20 (sufficient)
+└─ Experiment A running (87130): official QRM inference.py, same 10 IDs
+    ├─ QRM ~90%, we ~10% → stack gap confirmed → Paper 1: truncation + cost
+    ├─ QRM also loops → investigate weights/dataset/env
+    └─ Then decide: quant grid (b02) vs budget-limited paper only
 ```
 
 ### Paper 1 framing (unchanged)
@@ -965,4 +960,37 @@ We **attempted** QRM reproduction honestly. Failure under 32k **supports** the t
 
 ---
 
-*Last updated: 2026-07-05 (late). §30 = stack audit. §28 = strategic pivot. §25 = gate definition.*
+## 31. Experiments A, B, C, D — plain English
+
+After Path C showed our **protocol is correct** but **results are wrong**, we planned four small tests. **Only A is running now.**
+
+| Letter | Name | One-line question | What actually runs | Status |
+|--------|------|-------------------|-------------------|--------|
+| **A** | Official QRM repo | Does **their** code get ~94% on the same 10 problems? | `inference.py` + Lighteval + QRM vLLM fork, job **87130** | **ACTIVE** |
+| **B** | No logprobs | Did asking for logprobs change generation on **our** stack? | Our `run_inference.py`, `capture_logprobs: false` | **Skipped** (fixed in code) |
+| **C** | rep_pen ablation | Does `repetition_penalty=1.05` fix the loops? | Our harness, compare none vs 1.05 | **Done** — July had 1.05 (still ~94% trunc); Path C had none (still ~90% trunc) |
+| **D** | 64k budget | Would Qwen answer if cap were 65536 not 32768? | Qwen cell `repro_qrm_64k.yaml`, job 87118 | **Canceled** |
+
+**Why A is decisive:** B/C/D test pieces of **our** harness. A tests whether the **authors' full stack** works on the same model and problems. If A passes and we failed → our stack is the gap. If A also fails → not just our YAML.
+
+**Commands:**
+
+```bash
+# A (active)
+squeue -j 87130
+tail -f logs/qrm_official_87130.out
+python scripts/hpc/qrm_parity/compare_side_by_side.py --limit 10
+
+# A (resubmit)
+bash scripts/hpc/submit_qrm_official_test.sh
+
+# B (optional, not scheduled)
+bash scripts/hpc/submit_pathc_parity_pilot.sh
+
+# Partial Path C data (for compare)
+ls outputs-hpc-diag-pathc-2026-07-05/raw/
+```
+
+---
+
+*Last updated: 2026-07-05 (night). §31 = A–D explainer. §30 = stack audit. §29 = live snapshot.*

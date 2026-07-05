@@ -465,8 +465,8 @@ flowchart TD
 | HPC block grid b01–b09 | ✅ Wired (seed 0) |
 | Reproduction seeds 42–44 | ✅ Cell configs exist |
 | Manual audit tooling | ✅ |
-| **Fresh HPC publication runs** | ⏳ Path C diagnostic (87116–87118); b01 gate **failed** |
-| **QRM stack parity** | ✅ Fixes + audit — [QRM_STACK_PARITY_AUDIT.md](QRM_STACK_PARITY_AUDIT.md); d03 parity pilot ready |
+| **Fresh HPC publication runs** | ⏳ **Experiment A** (official QRM, job 87130); Path C **canceled** |
+| **QRM stack parity** | ✅ Audit + Experiment A — [QRM_STACK_PARITY_AUDIT.md](QRM_STACK_PARITY_AUDIT.md); notes §31 |
 | QRM baseline yaml | ✅ Fixed task-specific bands (`286f5e4`, amd-002) |
 | Valid calibration numbers | ⏳ Requires logprobs patch or maj@5 after repro |
 | LiveCodeBench integration | ❌ Not yet wired |

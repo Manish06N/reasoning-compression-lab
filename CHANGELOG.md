@@ -21,6 +21,8 @@ python scripts/hpc/qrm_parity/compare_side_by_side.py --limit 10
 
 First run installs `qrm-official` conda env + QRM lighteval/vllm submodules (may take 30–60 min in job log).
 
+**Experiments A–D** documented in `notes.md` §31 and `docs/QRM_STACK_PARITY_AUDIT.md` §6. Only **A** is active; B skipped, C answered, D canceled.
+
 ---
 
 ## 2026-07-05 (late) — QRM stack parity fixes + audit tooling

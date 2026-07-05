@@ -1,12 +1,14 @@
 # J1 validation runbook — prove the pipeline before expanding
 
-**Status (2026-07-05):** b01 gate **FAILED** → **Path C IN FLIGHT** → **stack parity audit complete**.
+**Status (2026-07-05):** b01 gate **FAILED** → Path C **canceled** at n=20 → **Experiment A IN FLIGHT** (job **87130**).
 
-**Path C:** `bash scripts/hpc/submit_pathc_diagnostic.sh` — 50 MATH-500 strict QRM. Early n=20: **not QRM reproduction** (loops, 75–90% trunc) despite correct protocol in raw JSONL.
+**Experiment A:** Official QRM `inference.py` on 10 MATH-500 problems (authors' stack vs ours). Submit/monitor: `bash scripts/hpc/submit_qrm_official_test.sh` · `tail -f logs/qrm_official_*.out`
 
-**Stack parity (new):** [QRM_STACK_PARITY_AUDIT.md](QRM_STACK_PARITY_AUDIT.md) · `python scripts/hpc/qrm_parity/verify_stack_parity.py` · `bash scripts/hpc/submit_pathc_parity_pilot.sh` (d03 n=10).
+**Path C (canceled):** Partial archive `outputs-hpc-diag-pathc-2026-07-05` — protocol OK, ~10% pass@1, ~90% trunc on our vLLM 0.8.5 stack.
 
-**Quant grid on hold** until Path C + parity pilot. See [notes.md §30](../notes.md).
+**Experiments A–D:** [notes.md §31](../notes.md) · [QRM_STACK_PARITY_AUDIT.md](QRM_STACK_PARITY_AUDIT.md)
+
+**Quant grid on hold** until Experiment A completes.
 
 **GitHub:** sync from HPC via MacBook rsync.
 

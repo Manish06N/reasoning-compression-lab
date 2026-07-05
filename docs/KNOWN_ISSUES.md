@@ -10,13 +10,13 @@ Operational issues that can break paper results if ignored, plus known software 
 
 | Item | Status |
 |------|--------|
-| **Active** | **Path C diagnostic** — jobs **87116–87118**, archive `outputs-hpc-diag-pathc-2026-07-05` |
-| **Early Path C (n=20)** | **Not QRM reproduction** — loops, 75–90% truncation despite strict protocol |
-| **Stack parity fixes** | Landed — see [QRM_STACK_PARITY_AUDIT.md](QRM_STACK_PARITY_AUDIT.md) |
+| **Active** | **Experiment A** — job **87130**, official QRM `inference.py`, n=10 |
+| **Path C** | **CANCELED** (87116–87118); partial archive kept |
+| **Our harness (n=20)** | Not QRM reproduction — loops, 75–90% trunc despite correct protocol |
 | b01 QRM gate | **FAILED** — July archive `outputs-hpc-2a100-main-2026-07-03` |
-| Quant grid | **On hold** until Path C + parity pilot |
+| Quant grid | **On hold** until Experiment A completes |
 
-See [notes.md §30](../notes.md) · [CHANGELOG.md](../CHANGELOG.md) parity entry.
+See [notes.md §31](../notes.md) (A–D explainer) · [QRM_STACK_PARITY_AUDIT.md](QRM_STACK_PARITY_AUDIT.md)
 
 ---
 
@@ -36,7 +36,7 @@ See [notes.md §30](../notes.md) · [CHANGELOG.md](../CHANGELOG.md) parity entry
 - `capture_logprobs: false` in `repro_qrm_strict.yaml`
 - Parity pilot: `bash scripts/hpc/submit_pathc_parity_pilot.sh`
 
-**Cross-check:** Run official QRM `inference.py` on same 10 problems — `bash scripts/hpc/qrm_parity/setup_official_qrm_repo.sh`
+**Cross-check (Experiment A — in flight):** Job **87130** — `bash scripts/hpc/submit_qrm_official_test.sh`
 
 ---
 

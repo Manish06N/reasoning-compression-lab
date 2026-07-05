@@ -189,11 +189,12 @@ git log --oneline -3
 
 ### Current Experiment Gate (2026-07-05)
 
-- **Active:** Path C diagnostic (jobs **87116–87118**, archive `outputs-hpc-diag-pathc-2026-07-05`).
+- **Active:** **Experiment A** — official QRM `inference.py` (job **87130**, archive `outputs-hpc-qrm-official-2026-07-05`).
+- **Path C:** **CANCELED** (87116–87118). Partial data in `outputs-hpc-diag-pathc-2026-07-05` (~20 rows).
 - **b01 QRM gate:** **FAILED** (July archive `outputs-hpc-2a100-main-2026-07-03`).
-- **Path C early signal (n=20):** Qwen **10%** pass@1 / **90%** trunc; Llama **15%** / **75%** trunc — protocol correct, **stack not QRM-equivalent**.
-- **Stack parity fixes landed:** `src/runners/vllm_serving.py`, d03 parity pilot — see `docs/QRM_STACK_PARITY_AUDIT.md`.
-- **Quant grid b02–b06:** **On hold** until Path C + parity pilot + optional official QRM cross-check.
+- **Path C signal:** Protocol OK in raw JSONL; Qwen **10%** / **90%** trunc at n=20 — **stack gap**, not config typo.
+- **Experiments B/C/D:** B skipped (code fixed); C already answered (rep_pen on/off both fail); D canceled (64k).
+- **Quant grid b02–b06:** **On hold** until Experiment A completes. See `notes.md` §31, `docs/QRM_STACK_PARITY_AUDIT.md`.
 - **Do not** claim QRM Table 1 reproduction without `compare_qrm_baseline.py` hard_passed on strict protocol runs.
 
 ### Important Jobs From 2026-06-26 and 2026-06-27

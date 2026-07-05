@@ -11,27 +11,28 @@ Deployment-science evaluation harness for compressed reasoning LLMs.
 
 ## Current status (2026-07-05)
 
-**Path C diagnostic IN FLIGHT** — strict QRM repro sprint (50 problems) after b01 gate failed.  
-**Stack parity audit complete** — protocol verified correct; early n=20 shows **stack gap** (loops, 75–90% trunc), not config typo.
+**Active: Experiment A** — official QRM `inference.py` cross-check (job **87130**).  
+**Path C canceled** (87116–87118) after n=20 showed protocol OK but **~10% pass@1 / ~90% trunc** on our stack.
 
 | Item | Status |
 |------|--------|
-| **Path C jobs** | **87116** Qwen 32k RUNNING · **87117** Llama 32k RUNNING · **87118** Qwen 64k PENDING |
-| **Early signal (n=20)** | Qwen **10%** pass@1 / **90%** trunc; Llama **15%** / **75%** trunc |
-| **Audit** | [`docs/QRM_STACK_PARITY_AUDIT.md`](docs/QRM_STACK_PARITY_AUDIT.md) — protocol OK, vLLM 0.8.5 stack differs from QRM |
-| **Parity fixes** | Engine seed, serving flags, `capture_logprobs: false` — `bash scripts/hpc/submit_pathc_parity_pilot.sh` |
+| **Active job** | **87130** — official QRM repo, MATH-500 **n=10**, seed **42**, Qwen-7B BF16 |
+| **Path C** | **CANCELED** — partial archive `outputs-hpc-diag-pathc-2026-07-05` (~20 rows) kept for comparison |
+| **Why pivot** | Enough signal from our harness; **Experiment A** runs authors' code to isolate stack vs config |
 | **b01 (July)** | Gate **FAILED** — Llama 19.6%/58% trunc; Qwen 410/500 ~94% trunc |
-| **b02–b06** | **On hold** until Path C + parity pilot |
+| **b02–b06** | **On hold** until Experiment A result |
 
 ```bash
-bash scripts/hpc/report_pathc_diagnostic.sh
-python scripts/hpc/qrm_parity/verify_stack_parity.py
-python scripts/hpc/qrm_parity/compare_side_by_side.py --limit 10
+squeue -j 87130
+tail -f logs/qrm_official_87130.out
+python scripts/hpc/qrm_parity/compare_side_by_side.py --limit 10   # after 87130 finishes
 ```
+
+**Experiments A–D explained:** [notes.md §31](notes.md) · full audit: [docs/QRM_STACK_PARITY_AUDIT.md](docs/QRM_STACK_PARITY_AUDIT.md)
 
 **Policy:** HPC-only for paper numbers — [HARDWARE_POLICY.md](docs/HARDWARE_POLICY.md).
 
-**Read first:** [docs/QRM_STACK_PARITY_AUDIT.md](docs/QRM_STACK_PARITY_AUDIT.md) · [progress.md](progress.md) · [notes.md](notes.md) §30 · [CHANGELOG.md](CHANGELOG.md)
+**Read first:** [progress.md](progress.md) · [notes.md](notes.md) §30–31 · [CHANGELOG.md](CHANGELOG.md)
 
 **b01 QRM gate:** Targets Qwen **93.9%**, Llama **91%** ±5 pp, truncation ≤15% — **not met** on July BF16. Gate fail does **not** block Paper 1; see [qrm_literature_targets.yaml](configs/baselines/qrm_literature_targets.yaml).
 

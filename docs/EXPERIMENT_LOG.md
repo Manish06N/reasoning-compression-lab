@@ -226,38 +226,57 @@ Notes:        QRM repro not achieved. Quant grid (b02–b05) on hold until Path 
 
 ---
 
-## Path C — Strict QRM diagnostic (RUNNING 2026-07-05)
+## Path C — Strict QRM diagnostic (CANCELED 2026-07-05)
 
 ```text
 Date:         2026-07-05
 Level:        diagnostic (pre-quant)
-Model:        Qwen-7B + Llama-8B BF16 (+ Qwen 64k wave)
-Quant config: BF16
-Task:         MATH-500
-Seed(s):      42
-Hardware:     A100 (jobs 87116, 87117, 87118)
-Status:       running — early n=20 scored
-Archive:      outputs-hpc-diag-pathc-2026-07-05
+Model:        Qwen-7B + Llama-8B BF16 (+ Qwen 64k wave planned)
+Jobs:         87116, 87117, 87118 — all CANCELED
+Archive:      outputs-hpc-diag-pathc-2026-07-05 (partial ~20 rows)
 Protocol:     reproduction prompt, repro_qrm_strict.yaml, no rep_pen, enforce_eager=true
 Key numbers:  Qwen 10% pass@1, 90% trunc; Llama 15% pass@1, 75% trunc (n=20)
-Notes:        Protocol verified in raw JSONL. Loops dominate failures. Clean finishes mostly correct.
-              Stack audit: docs/QRM_STACK_PARITY_AUDIT.md
+Notes:        Protocol verified in raw JSONL. Canceled → Experiment A (official QRM repo).
 ```
 
 ---
 
-## Path C — Parity pilot d03 (READY 2026-07-05)
+## Path C — CANCELED (2026-07-05)
 
 ```text
 Date:         2026-07-05
-Level:        diagnostic
-Model:        Qwen-7B BF16
-Task:         MATH-500 (n=10)
+Jobs:         87116, 87117, 87118
+Status:       CANCELED by user after n=20 (~3h GPU each on 87116/87117)
+Reason:       Sufficient signal; pivot to Experiment A
+Partial data: outputs-hpc-diag-pathc-2026-07-05/raw/ (~20 rows per 32k cell)
+```
+
+---
+
+## Experiment A — Official QRM inference.py (RUNNING 2026-07-05)
+
+```text
+Date:         2026-07-05
+Level:        diagnostic (stack cross-check)
+Model:        DeepSeek-R1-Distill-Qwen-7B BF16
+Task:         MATH-500 (n=10 pilot)
 Seed(s):      42
-Status:       ready to submit — bash scripts/hpc/submit_pathc_parity_pilot.sh
-Cell:         diag_qwen7b_bf16_math500_seed42_n10_parity
-Notes:        Serving fixes: engine seed, gpu_mem=0.9, prefix_caching off, logprobs off.
-              Cross-check: official QRM inference.py on same 10 IDs.
+Hardware:     A100 job 87130 on ragpu004
+Status:       RUNNING — installing qrm-official env + submodules
+Submit:       bash scripts/hpc/submit_qrm_official_test.sh
+Output:       outputs-hpc-qrm-official-2026-07-05/
+Compare:      python scripts/hpc/qrm_parity/compare_side_by_side.py --limit 10
+Notes:        Authors' Lighteval + QRM vLLM path — decisive test vs our harness.
+```
+
+---
+
+## Experiment B — Parity pilot d03 (READY, not scheduled)
+
+```text
+Date:         2026-07-05
+Status:       ready — bash scripts/hpc/submit_pathc_parity_pilot.sh
+Notes:        Our stack with serving fixes (Experiment B). Skipped in favor of A.
 ```
 
 ---
