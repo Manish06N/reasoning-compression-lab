@@ -184,11 +184,30 @@ build_message() {
   declare -A seen_cells=()
   local -a active_bases=()
   local id jname base
+  cell_base_from_job() {
+    local jname="$1"
+    case "$jname" in
+      qreason-d02_pathc_64k_qwen)
+        echo "diag_qwen7b_bf16_math500_seed42_n50_64k"
+        ;;
+      qreason-diag_*|qreason-level_*)
+        echo "${jname#qreason-}"
+        ;;
+      *)
+        echo ""
+        ;;
+    esac
+  }
+
   for id in $WATCH_JOB_IDS; do
     [[ -z "$id" ]] && continue
     jname=$(squeue -j "$id" -h -o '%j' 2>/dev/null | head -n1 || true)
-    if [[ "$jname" == qreason-* ]]; then
-      base="${jname#qreason-}"
+    if [[ -z "$jname" ]]; then
+      jname=$(sacct -j "$id" -n -X -o JobName 2>/dev/null | awk 'NF {print $1; exit}' || true)
+    fi
+    base=$(cell_base_from_job "$jname")
+    if [[ -n "$base" ]]; then
+      [[ -n "${seen_cells[$base]:-}" ]] && continue
       active_bases+=("$base")
       seen_cells["$base"]=1
     fi
