@@ -20,11 +20,29 @@ extract_var() {
 TG_TOKEN="${TG_TOKEN:-$(extract_var TG_TOKEN)}"
 TG_CHAT_ID="${TG_CHAT_ID:-$(extract_var TG_CHAT_ID)}"
 
+html_escape() {
+  local s="$1"
+  s="${s//&/&amp;}"
+  s="${s//</&lt;}"
+  s="${s//>/&gt;}"
+  printf '%s' "$s"
+}
+
 send_telegram() {
-  curl -sS -X POST "https://api.telegram.org/bot${TG_TOKEN}/sendMessage" \
+  local text="$1" resp
+  resp=$(curl -sS -X POST "https://api.telegram.org/bot${TG_TOKEN}/sendMessage" \
     -d chat_id="${TG_CHAT_ID}" \
-    -d text="$1" \
-    -d parse_mode="Markdown" >/dev/null
+    --data-urlencode "text=${text}" \
+    -d parse_mode="HTML")
+  if python3 -c "import json,sys; sys.exit(0 if json.loads(sys.argv[1]).get('ok') else 1)" "$resp" 2>/dev/null; then
+    return 0
+  fi
+  echo "[telegram] HTML send failed: $resp" >&2
+  resp=$(curl -sS -X POST "https://api.telegram.org/bot${TG_TOKEN}/sendMessage" \
+    -d chat_id="${TG_CHAT_ID}" \
+    --data-urlencode "text=${text}")
+  python3 -c "import json,sys; sys.exit(0 if json.loads(sys.argv[1]).get('ok') else 1)" "$resp" 2>/dev/null \
+    || { echo "[telegram] plain send failed: $resp" >&2; return 1; }
 }
 
 latest_marker() {
@@ -81,14 +99,14 @@ job_line() {
     [[ -z "$id" ]] && continue
     line=$(squeue -j "$id" -h -o '%i %T %M %l %R' 2>/dev/null | head -n 1 || true)
     if [[ -n "$line" ]]; then
-      echo "\`$line\`"
+      echo "<code>$(html_escape "$line")</code>"
       continue
     fi
     final=$(sacct -j "$id" -n -X -o State,ExitCode,Elapsed 2>/dev/null | awk 'NF {print $1 " " $2 " " $3; exit}' || true)
     if [[ -n "$final" ]]; then
-      echo "\`$id $final\`"
+      echo "<code>$(html_escape "$id $final")</code>"
     else
-      echo "\`$id (not in queue/accounting)\`"
+      echo "<code>$(html_escape "$id (not in queue/accounting)")</code>"
     fi
   done
 }
@@ -178,7 +196,7 @@ build_message() {
 
   local watched queue cell_lines
   watched=$(job_line)
-  queue=$(squeue -u "$USER" -h -o '%i %T %j %R' 2>/dev/null | grep -E 'qreason-|level_|b0[0-9]|diag|pathc|d0[0-9]' | sed 's/^/`/; s/$/`/' | head -n 10 || true)
+  queue=$(squeue -u "$USER" -h -o '%i %T %j %R' 2>/dev/null | grep -E 'qreason-|level_|b0[0-9]|diag|pathc|d0[0-9]' | head -n 10 | while IFS= read -r line; do echo "<code>$(html_escape "$line")</code>"; done || true)
 
   # Cells tied to WATCH_JOB_IDS (from Slurm job names) plus any with raw rows.
   declare -A seen_cells=()
@@ -239,7 +257,7 @@ build_message() {
     rep=$(repetition_status "$raw/${base}.jsonl" 2>/dev/null || true)
     summ="$results/${base}_summary.json"
     result=$(summary_line "$summ" 2>/dev/null || true)
-    cell_lines+=$'• '"${name}"$': `'"${rows}/${want}"'`'${marker:+ (log:${marker})}${rep:+ ($rep)}${result:+ → $result}$'\n'
+    cell_lines+=$'• <code>'"${name}"$'</code>: <code>'"${rows}/${want}"'</code>'${marker:+ (log:${marker})}${rep:+ ($(html_escape "$rep"))}${result:+ → $(html_escape "$result")}$'\n'
   done
 
   if [[ -z "$cell_lines" ]]; then
@@ -247,19 +265,20 @@ build_message() {
   fi
 
   cat <<MSG
-📊 *PARAM Rudra HPC progress* (current batch)
+📊 <b>PARAM Rudra HPC progress</b> (current batch)
 
-*Watched:* $watched
-*Task:* $WATCH_LABEL
-*Archive:* \`$(basename "$OUTPUT_ROOT")\`
+<b>Watched:</b>
+${watched}
+<b>Task:</b> $(html_escape "$WATCH_LABEL")
+<b>Archive:</b> <code>$(html_escape "$(basename "$OUTPUT_ROOT")")</code>
 
-*Cell progress:*
+<b>Cell progress:</b>
 ${cell_lines}
 
-*Recent queue (yours):*
+<b>Recent queue (yours):</b>
 ${queue:-none}
 
-*Time:* $(date +'%Y-%m-%d %H:%M')
+<b>Time:</b> $(date +'%Y-%m-%d %H:%M')
 MSG
 }
 
