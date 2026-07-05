@@ -28,6 +28,7 @@ Canonical dated record for **Paper 1: Beyond Accuracy** (`reasoning-compression-
 squeue -u $USER
 tail -f outputs-hpc-diag-pathc-2026-07-05/logs/diag_qwen7b_bf16_math500_seed42_n50.log
 bash scripts/hpc/report_pathc_diagnostic.sh   # after jobs finish
+bash ~/start-hpc-telegram-watcher.sh          # Telegram every 45 min (jobs 87116-87118)
 ```
 
 ### Should we finish Qwen 90 rows (~10 h)?

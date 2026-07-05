@@ -44,9 +44,15 @@ After b01 gate failure, **Path C** (strict QRM repro diagnostic) superseded quan
 | pass@1 **jumps** vs 32k Qwen | Truncation was main bottleneck |
 | pass@1 **stays low** | Harness/scorer/stack gap |
 
+### Telegram watcher (45 min)
+
+Restarted for Path C: `bash ~/start-hpc-telegram-watcher.sh`  
+Watches **87116–87118**, archive `outputs-hpc-diag-pathc-2026-07-05`, ping every **45 min**.  
+Repo copies: `scripts/hpc/telegram/start-hpc-telegram-watcher.sh`, `send-hpc-progress-telegram.sh`
+
 ### Job status (check: `squeue -u $USER`)
 
-Updated at submit + ~3 min: **87116/87117 RUNNING** `racn116` (model load); **87118 PENDING** (QOS — starts when d01 frees a GPU).
+**87116/87117** RUNNING · **87118** PENDING (QOS).
 
 ---
 

@@ -587,10 +587,13 @@ Use **two labeled protocols** (already sketched in `configs/baselines/qrm_litera
 
 | Item | Status |
 |------|--------|
-| Script | `~/start-hpc-telegram-watcher.sh` |
-| Watches | Jobs **86757**, **86758** |
-| Archive | `outputs-hpc-2a100-main-2026-07-03` |
-| Caveat | Compute nodes may not resolve `api.telegram.org` — watcher can fail DNS-side; use `squeue` + logs as ground truth |
+| Script | `~/start-hpc-telegram-watcher.sh` (repo copy: `scripts/hpc/telegram/`) |
+| Watches | Jobs **87116**, **87117**, **87118** (Path C diagnostic) |
+| Archive | `outputs-hpc-diag-pathc-2026-07-05` |
+| Interval | **45 min** (`RUNNING_PROGRESS_INTERVAL=2700`) |
+| Restart | `bash ~/start-hpc-telegram-watcher.sh` |
+| Preview | `OUTPUT_ROOT=.../outputs-hpc-diag-pathc-2026-07-05 ~/send-hpc-progress-telegram.sh preview` |
+| Caveat | Login node must resolve `api.telegram.org` (compute nodes cannot) |
 
 ### 48h SLURM walltime
 
