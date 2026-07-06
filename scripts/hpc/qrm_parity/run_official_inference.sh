@@ -2,6 +2,8 @@
 # Run official QRM inference.py on MATH-500 (n=10 pilot).
 set -euo pipefail
 
+export PATH="/usr/bin:/bin:${PATH}"
+
 QR="${QR:-/scratch/$USER/reasoning-compression-lab}"
 QRM_DIR="${QRM_REPO_DIR:-$QR/external/Quantized-Reasoning-Models}"
 MODEL="${QRM_MODEL_PATH:-$QR/models/DeepSeek-R1-Distill-Qwen-7B}"

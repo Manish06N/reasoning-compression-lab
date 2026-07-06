@@ -16,6 +16,12 @@ else
     https://github.com/ruikangliu/Quantized-Reasoning-Models.git "$DEST"
 fi
 
+echo "=== Initializing QRM submodules (login node; compute nodes lack git) ==="
+git -C "$DEST" submodule update --init --recursive \
+  third-party/lighteval \
+  third-party/vllm \
+  third-party/fast-hadamard-transform
+
 echo ""
 echo "Official QRM repo ready at: $DEST"
 echo ""
