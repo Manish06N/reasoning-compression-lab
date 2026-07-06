@@ -2,6 +2,7 @@
 #SBATCH --job-name=qreason-qrm_official_n10
 #SBATCH --partition=gpu
 #SBATCH --gres=gpu:1
+#SBATCH --exclusive
 #SBATCH --time=08:00:00
 #SBATCH --output=/scratch/%u/reasoning-compression-lab/logs/qrm_official_%j.out
 #SBATCH --error=/scratch/%u/reasoning-compression-lab/logs/qrm_official_%j.err

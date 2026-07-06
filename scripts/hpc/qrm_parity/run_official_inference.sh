@@ -31,6 +31,18 @@ export VLLM_WORKER_MULTIPROC_METHOD=spawn
 export TORCH_COMPILE_DISABLE=1
 export TORCHDYNAMO_DISABLE=1
 
+QRM_MIN_FREE_GPU_MB="${QRM_MIN_FREE_GPU_MB:-40000}"
+if command -v nvidia-smi >/dev/null 2>&1; then
+  echo "=== GPU memory preflight (require >= ${QRM_MIN_FREE_GPU_MB} MiB free) ==="
+  nvidia-smi --query-compute-apps=pid,process_name,used_memory --format=csv 2>/dev/null || true
+  FREE_GPU_MB="$(nvidia-smi --query-gpu=memory.free --format=csv,noheader,nounits | head -n 1 | tr -d ' ')"
+  echo "GPU free memory: ${FREE_GPU_MB:-unknown} MiB"
+  if [[ -n "$FREE_GPU_MB" && "$FREE_GPU_MB" -lt "$QRM_MIN_FREE_GPU_MB" ]]; then
+    echo "ERROR: only ${FREE_GPU_MB} MiB GPU memory free; need ${QRM_MIN_FREE_GPU_MB} MiB before vLLM load." >&2
+    exit 75
+  fi
+fi
+
 bash "$QR/scripts/hpc/qrm_parity/prepare_qrm_datasets.sh"
 
 mkdir -p "$OUTPUT_ROOT"
