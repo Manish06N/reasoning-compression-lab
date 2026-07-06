@@ -4,7 +4,9 @@ Last updated: **2026-07-06**
 
 Chronological record of every failed attempt, diagnosis, and fix while bringing up **Experiment A** (official QRM `inference.py`, n=10 MATH-500, seed=42) on PARAM Rudra. Use this before re-running or extending the `qrm-official` conda env.
 
-**Related docs:** [QRM_STACK_PARITY_AUDIT.md](QRM_STACK_PARITY_AUDIT.md) · [KNOWN_ISSUES.md](KNOWN_ISSUES.md) · [PARAM_RUDRA_SLURM.md](PARAM_RUDRA_SLURM.md)
+**Same repo, not a separate project:** all paths are under `reasoning-compression-lab/`. The main paper harness uses conda env **`qreason`** (`scripts/run_inference.py`, vLLM 0.8.5). Experiment A uses conda env **`qrm-official`** only — do not mix packages between them.
+
+**Related docs:** [QRM_STACK_PARITY_AUDIT.md](QRM_STACK_PARITY_AUDIT.md) · [KNOWN_ISSUES.md](KNOWN_ISSUES.md) · [PARAM_RUDRA_SLURM.md](PARAM_RUDRA_SLURM.md) · [README.md](../README.md) § “One repo, two conda envs”
 
 ---
 
@@ -41,7 +43,7 @@ bash scripts/hpc/submit_qrm_official_test.sh
 | **87193** | 2026-07-06 | ragpu006 | ~2 min | FAILED | Wrong vLLM precompiled wheel |
 | **87196** | 2026-07-06 | ragpu006 | ~2 min | FAILED | GitPython / missing git |
 | **87213** | 2026-07-06 | racn115 | ~4 min | FAILED | Shared GPU CUDA OOM |
-| **87216** | 2026-07-06 | — | — | PENDING | Exclusive GPU + preflight (latest) |
+| **87216** | 2026-07-06 | — | — | **PENDING (Resources)** | Exclusive GPU + preflight (latest) |
 
 Logs: `logs/qrm_official_<JOBID>.out` / `.err`
 
@@ -435,5 +437,5 @@ Output directory: `outputs-hpc-qrm-official-<date>/`
 |------|-------|
 | Env install | **Verified** on login node (marker `2026-07-06-conda-gcc12-nvcc124-vllm070wheel`) |
 | GPU inference | **Validated through vLLM CUDA import** (job 87213); blocked by shared-GPU OOM |
-| Latest job | **87216** — exclusive + preflight; check `squeue -j 87216` |
+| Latest job | **87216** — `PENDING (Resources)` waiting for exclusive A100; env is ready |
 | GitHub sync | HPC commits **not yet** on `origin/main` — MacBook rsync required |

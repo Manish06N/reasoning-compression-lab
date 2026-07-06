@@ -253,20 +253,22 @@ Partial data: outputs-hpc-diag-pathc-2026-07-05/raw/ (~20 rows per 32k cell)
 
 ---
 
-## Experiment A — Official QRM inference.py (RUNNING 2026-07-05)
+## Experiment A — Official QRM inference.py (QUEUED 2026-07-06)
 
 ```text
-Date:         2026-07-05
+Date:         2026-07-06
 Level:        diagnostic (stack cross-check)
 Model:        DeepSeek-R1-Distill-Qwen-7B BF16
 Task:         MATH-500 (n=10 pilot)
 Seed(s):      42
-Hardware:     A100 job 87130 on ragpu004
-Status:       RUNNING — installing qrm-official env + submodules
+Env:          qrm-official (NOT qreason — vLLM 0.7.0 fork)
+Hardware:     A100 job 87216 — PENDING (Resources), --exclusive
+Status:       Env install VERIFIED on login node; waiting for exclusive GPU
 Submit:       bash scripts/hpc/submit_qrm_official_test.sh
-Output:       outputs-hpc-qrm-official-2026-07-05/
+Output:       outputs-hpc-qrm-official-2026-07-06/
 Compare:      python scripts/hpc/qrm_parity/compare_side_by_side.py --limit 10
-Notes:        Authors' Lighteval + QRM vLLM path — decisive test vs our harness.
+Debug log:    docs/QRM_OFFICIAL_HPC_TROUBLESHOOTING.md (jobs 87130–87216)
+Notes:        Same repo as main harness; separate conda env. Decisive test vs our stack.
 ```
 
 ---

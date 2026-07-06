@@ -9,26 +9,54 @@ Deployment-science evaluation harness for compressed reasoning LLMs.
 
 **Roadmap:** PhD plan V8.2 (1 Jul 2026) — see [docs/plans/2026-07-01-v82-reengineering.md](docs/plans/2026-07-01-v82-reengineering.md) and [papers/j1/protocol.yaml](papers/j1/protocol.yaml).
 
-## Current status (2026-07-05)
+## Current status (2026-07-06)
 
-**Active: Experiment A** — official QRM `inference.py` cross-check (job **87130**).  
+**Active: Experiment A** — official QRM `inference.py` cross-check (job **87216**, waiting for exclusive GPU).  
 **Path C canceled** (87116–87118) after n=20 showed protocol OK but **~10% pass@1 / ~90% trunc** on our stack.
 
 | Item | Status |
 |------|--------|
-| **Active job** | **87130** — official QRM repo, MATH-500 **n=10**, seed **42**, Qwen-7B BF16 |
+| **Active job** | **87216** — `PENDING (Resources)` — exclusive 1× A100, MATH-500 **n=10**, seed **42** |
+| **qrm-official env** | **Installed & verified** on login node (see troubleshooting doc below) |
 | **Path C** | **CANCELED** — partial archive `outputs-hpc-diag-pathc-2026-07-05` (~20 rows) kept for comparison |
 | **Why pivot** | Enough signal from our harness; **Experiment A** runs authors' code to isolate stack vs config |
 | **b01 (July)** | Gate **FAILED** — Llama 19.6%/58% trunc; Qwen 410/500 ~94% trunc |
 | **b02–b06** | **On hold** until Experiment A result |
 
 ```bash
-squeue -j 87130
-tail -f logs/qrm_official_87130.out
-python scripts/hpc/qrm_parity/compare_side_by_side.py --limit 10   # after 87130 finishes
+squeue -j 87216
+tail -f logs/qrm_official_87216.out
+python scripts/hpc/qrm_parity/compare_side_by_side.py --limit 10   # after job finishes
 ```
 
-**Experiments A–D explained:** [notes.md §31](notes.md) · full audit: [docs/QRM_STACK_PARITY_AUDIT.md](docs/QRM_STACK_PARITY_AUDIT.md)
+**Experiments A–D explained:** [notes.md §31](notes.md) · full audit: [docs/QRM_STACK_PARITY_AUDIT.md](docs/QRM_STACK_PARITY_AUDIT.md) · env debug log: [docs/QRM_OFFICIAL_HPC_TROUBLESHOOTING.md](docs/QRM_OFFICIAL_HPC_TROUBLESHOOTING.md)
+
+---
+
+## One repo, two conda envs (do not mix)
+
+Everything lives in **this** repo (`reasoning-compression-lab`). Experiment A is **not** a separate project — it is a diagnostic track inside the same tree, using a **second conda env** so vLLM versions do not collide.
+
+| Track | Conda env | vLLM | Entry point | Outputs |
+|-------|-----------|------|-------------|---------|
+| **Main harness** (b01–b09, smoke, Path C) | `qreason` | 0.8.5 | `scripts/run_inference.py` | `outputs-hpc-2a100-main-*`, `outputs-hpc-diag-*` |
+| **Experiment A** (official QRM cross-check) | `qrm-official` | 0.7.0 fork | `external/.../inference.py` | `outputs-hpc-qrm-official-*` |
+
+| Path | Purpose |
+|------|---------|
+| `src/`, `scripts/run_inference.py` | **Our** evaluation harness (`qreason`) |
+| `external/Quantized-Reasoning-Models/` | **Authors'** cloned repo (lighteval + vLLM 0.7.0 submodules) |
+| `scripts/hpc/qrm_parity/` | Install, run, and compare official QRM stack |
+| `models/DeepSeek-R1-Distill-Qwen-7B/` | Shared model weights (both tracks) |
+
+```bash
+# Main grid — always qreason
+conda activate qreason
+bash scripts/hpc/run_hpc_2a100_publication.sh b01_parallel_bf16_anchors
+
+# Experiment A only — separate env, never pip-install into qreason
+bash scripts/hpc/submit_qrm_official_test.sh   # uses qrm-official inside the job
+```
 
 **Policy:** HPC-only for paper numbers — [HARDWARE_POLICY.md](docs/HARDWARE_POLICY.md).
 

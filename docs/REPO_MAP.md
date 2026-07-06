@@ -58,6 +58,8 @@ reasoning-compression-lab/
 │   ├── j3/                 # Indic preflight, local transfer
 │   └── hpc/                # PARAM Rudra orchestration
 │       └── qrm_parity/     # Stack parity verify, side-by-side, QRM repo setup
+├── external/
+│   └── Quantized-Reasoning-Models/   # Authors' repo clone (Experiment A only; qrm-official env)
 ├── slurm/                  # SLURM job files
 ├── tests/                  # 31 unit tests (2026-07-01)
 ├── dashboards/             # HTML dashboard output

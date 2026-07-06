@@ -525,7 +525,14 @@ flowchart TB
 
 **Sync protocol:** HPC cannot push to GitHub. MacBook pushes → HPC `git reset --hard origin/main`. See [RUNBOOK.md](RUNBOOK.md).
 
-**Validated HPC stack:** Python 3.11, PyTorch 2.6+cu124, vLLM 0.8.5, conda env `qreason`.
+**Validated HPC stack (main harness):** Python 3.11, PyTorch 2.6+cu124, vLLM 0.8.5, conda env **`qreason`**.
+
+**Experiment A (official QRM cross-check):** separate conda env **`qrm-official`** — torch 2.5.1, vLLM **0.7.0** fork, authors' `inference.py` in `external/Quantized-Reasoning-Models/`. Same repo; **never mix** the two envs. See [QRM_OFFICIAL_HPC_TROUBLESHOOTING.md](QRM_OFFICIAL_HPC_TROUBLESHOOTING.md).
+
+| Track | Env | Inference entry |
+|-------|-----|-----------------|
+| Paper 1 grid (b01–b09), smoke, Path C | `qreason` | `scripts/run_inference.py` |
+| Experiment A — stack parity | `qrm-official` | `external/Quantized-Reasoning-Models/inference.py` |
 
 ---
 
