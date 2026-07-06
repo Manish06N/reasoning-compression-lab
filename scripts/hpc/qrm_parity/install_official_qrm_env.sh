@@ -10,7 +10,7 @@ QRM_DIR="${QRM_REPO_DIR:-$QR/external/Quantized-Reasoning-Models}"
 ENV_NAME="${QRM_CONDA_ENV:-qrm-official}"
 CONDA_ROOT="${CONDA_ROOT:-/home/apps/MSCC/miniconda3}"
 MARKER="$QR/.qrm_official_env_ready"
-INSTALL_REV="2026-07-06-fast-hadamard-vllm07"
+INSTALL_REV="2026-07-06-conda-nvcc-vllm07"
 
 if [[ ! -d "$QRM_DIR/.git" ]]; then
   bash "$QR/scripts/hpc/qrm_parity/setup_official_qrm_repo.sh"
@@ -56,13 +56,22 @@ pip install -U pip wheel setuptools
 
 echo "=== Installing QRM base requirements (pins torch 2.5.1; overwrites bad pip vllm fallback) ==="
 pip install -r "$QRM_DIR/requirements.txt"
-pip uninstall -y vllm 2>/dev/null || true
+# Remove packages left by the failed pip vllm==0.8.5 fallback (job 87130).
+pip uninstall -y vllm torchvision torchaudio xformers 2>/dev/null || true
 
-echo "=== Installing fast-hadamard-transform (QRM submodule; needs nvcc on GPU nodes) ==="
+echo "=== Ensuring CUDA compiler (nvcc) — HPC GPU nodes have drivers only, no system toolkit ==="
 if ! command -v nvcc >/dev/null 2>&1; then
-  echo "ERROR: nvcc not found. Run this install on a GPU compute node (SLURM job), not the login node." >&2
+  conda install -y -c nvidia cuda-nvcc=12.4 cuda-cudart-dev=12.4
+fi
+export CUDA_HOME="${CUDA_HOME:-$CONDA_PREFIX}"
+export PATH="$CONDA_PREFIX/bin:$PATH"
+if ! command -v nvcc >/dev/null 2>&1; then
+  echo "ERROR: nvcc still missing after conda cuda-nvcc install (CUDA_HOME=$CUDA_HOME)" >&2
   exit 1
 fi
+echo "Using nvcc: $(command -v nvcc)"
+
+echo "=== Installing fast-hadamard-transform (QRM submodule) ==="
 pip install --no-build-isolation -e "$QRM_DIR/third-party/fast-hadamard-transform"
 
 echo "=== Installing lighteval (QRM fork) ==="
