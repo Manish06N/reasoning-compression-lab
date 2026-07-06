@@ -15,6 +15,11 @@ CONDA_ROOT="${CONDA_ROOT:-/home/apps/MSCC/miniconda3}"
 source "$CONDA_ROOT/etc/profile.d/conda.sh"
 conda activate "${QRM_CONDA_ENV:-qrm-official}"
 export PATH="$CONDA_PREFIX/bin:/usr/bin:/bin:${PATH}"
+if [[ -x "$CONDA_PREFIX/bin/git" ]]; then
+  export GIT_PYTHON_GIT_EXECUTABLE="$CONDA_PREFIX/bin/git"
+elif command -v git >/dev/null 2>&1; then
+  export GIT_PYTHON_GIT_EXECUTABLE="$(command -v git)"
+fi
 export CC="${CC:-$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-gcc}"
 export CXX="${CXX:-$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-g++}"
 export CUDAHOSTCXX="${CUDAHOSTCXX:-$CXX}"

@@ -76,7 +76,7 @@ pip uninstall -y vllm torchvision torchaudio xformers 2>/dev/null || true
 
 echo "=== Ensuring host + CUDA toolchain (compute nodes lack g++; nvcc 12.4 needs gcc<=13) ==="
 conda install -y -c conda-forge -c nvidia \
-  gcc_linux-64=12 gxx_linux-64=12 sysroot_linux-64 \
+  gcc_linux-64=12 gxx_linux-64=12 sysroot_linux-64 git \
   cuda-nvcc=12.4 cuda-cudart-dev=12.4 cuda-cudart=12.4 cuda-cccl=12.4
 
 export CC="$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-gcc"
