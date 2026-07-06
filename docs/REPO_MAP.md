@@ -13,6 +13,7 @@ Quick navigation for `reasoning-compression-lab`. For the full high-level overvi
 | See current status | [PROGRESS.md](PROGRESS.md) |
 | Avoid known traps | [KNOWN_ISSUES.md](KNOWN_ISSUES.md) |
 | QRM repro / stack parity | [QRM_STACK_PARITY_AUDIT.md](QRM_STACK_PARITY_AUDIT.md) |
+| QRM official env HPC debug log | [QRM_OFFICIAL_HPC_TROUBLESHOOTING.md](QRM_OFFICIAL_HPC_TROUBLESHOOTING.md) |
 | Decide which models to add | [MODEL_SCOPE_DECISION.md](MODEL_SCOPE_DECISION.md) |
 | Find HF IDs and env vars | [MODEL_ROSTER.md](MODEL_ROSTER.md) |
 | Full change history | [../CHANGELOG.md](../CHANGELOG.md) |

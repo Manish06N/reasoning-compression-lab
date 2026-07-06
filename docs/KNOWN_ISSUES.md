@@ -1,6 +1,6 @@
 # Known issues and limitations
 
-Last updated: 2026-07-05
+Last updated: 2026-07-06
 
 Operational issues that can break paper results if ignored, plus known software limitations.
 
@@ -10,13 +10,14 @@ Operational issues that can break paper results if ignored, plus known software 
 
 | Item | Status |
 |------|--------|
-| **Active** | **Experiment A** — job **87130**, official QRM `inference.py`, n=10 |
+| **Active** | **Experiment A** — official QRM `inference.py`, n=10 (job **87216** pending exclusive GPU) |
+| **qrm-official env** | **Installed & verified** on login node — see [QRM_OFFICIAL_HPC_TROUBLESHOOTING.md](QRM_OFFICIAL_HPC_TROUBLESHOOTING.md) |
 | **Path C** | **CANCELED** (87116–87118); partial archive kept |
 | **Our harness (n=20)** | Not QRM reproduction — loops, 75–90% trunc despite correct protocol |
 | b01 QRM gate | **FAILED** — July archive `outputs-hpc-2a100-main-2026-07-03` |
 | Quant grid | **On hold** until Experiment A completes |
 
-See [notes.md §31](../notes.md) (A–D explainer) · [QRM_STACK_PARITY_AUDIT.md](QRM_STACK_PARITY_AUDIT.md)
+See [notes.md §31](../notes.md) (A–D explainer) · [QRM_STACK_PARITY_AUDIT.md](QRM_STACK_PARITY_AUDIT.md) · **[QRM_OFFICIAL_HPC_TROUBLESHOOTING.md](QRM_OFFICIAL_HPC_TROUBLESHOOTING.md)** (full job-by-job debug log)
 
 ---
 
@@ -36,7 +37,25 @@ See [notes.md §31](../notes.md) (A–D explainer) · [QRM_STACK_PARITY_AUDIT.md
 - `capture_logprobs: false` in `repro_qrm_strict.yaml`
 - Parity pilot: `bash scripts/hpc/submit_pathc_parity_pilot.sh`
 
-**Cross-check (Experiment A — in flight):** Job **87130** — `bash scripts/hpc/submit_qrm_official_test.sh`
+**Cross-check (Experiment A):** `bash scripts/hpc/submit_qrm_official_test.sh` — env install debug history in [QRM_OFFICIAL_HPC_TROUBLESHOOTING.md](QRM_OFFICIAL_HPC_TROUBLESHOOTING.md).
+
+---
+
+## QRM official env install on PARAM Rudra — **fixed 2026-07-06**
+
+**Symptom:** Jobs 87130–87213 failed during `install_official_qrm_env.sh` or first GPU inference (missing `fast_hadamard_transform`, compile errors, wrong vLLM wheel, git missing, shared-GPU OOM).
+
+**Not a science bug** — HPC toolchain and scheduling gaps on compute nodes (no system CUDA toolkit, incomplete gcc, shared A100 memory).
+
+**Fix summary:**
+- Conda `gcc_linux-64=12`, `gxx_linux-64=12`, `cuda-nvcc=12.4`, aligned `cuda-cccl=12.4`, `git`
+- `CPATH` includes pip `nvidia/*/include` for `fast-hadamard-transform` build
+- `VLLM_PRECOMPILED_WHEEL_LOCATION` → official PyPI **vllm-0.7.0** wheel (not v1.0 nightly default)
+- Versioned marker `.qrm_official_env_ready` + import verification
+- `set -eo pipefail` (not `-u`) in QRM slurm/scripts
+- `#SBATCH --exclusive` + GPU memory preflight (40 GB) for inference job
+
+**Full chronology (jobs 87130 → 87216):** [QRM_OFFICIAL_HPC_TROUBLESHOOTING.md](QRM_OFFICIAL_HPC_TROUBLESHOOTING.md)
 
 ---
 
