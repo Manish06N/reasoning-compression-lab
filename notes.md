@@ -1006,9 +1006,26 @@ Experiment A (official QRM reproduction check on MATH-500 n=10, seed=42) success
 ### 2. Confirmed Stack Gap
 This results verify that the protocol parameters (prompt, temperature=0.6, top_p=0.95, seeds) are correct. The failure of our baseline Path C (10% accuracy, 90% truncation) is purely a **software stack gap** between the modern vLLM 0.8.5 + transformers 5.12.1 stack (which experiences severe token repetition loops on Distill-Qwen-7B) and the authors' original pinned stack (vLLM 0.7.0 fork + transformers 4.47.1), which correctly stops.
 
-### 3. Execution Modifications
-- **SLURM Setup:** 1 GPU (`--gres=gpu:1`), non-exclusive, 16 CPUs (`--cpus-per-task=16` to allocate sufficient CPU memory/RAM).
-- **Memory preflight:** Modified `run_official_inference.sh` to check for >= 62GB free memory, and set `gpu_memory_utilization` to `0.75` (allocating 60GB VRAM). This allowed the job to load successfully on the shared node `ragpu006` which had ~63-65GB free.
-- **Dynamic Requeue:** Added logic to update the job's `ExcNodeList` via `scontrol` and requeue the job back to `PENDING` if it gets scheduled on a node with insufficient VRAM (e.g. `racn116`), routing it to other clean nodes automatically.
+### 3. Detailed Code Modifications & Rationales
+
+#### A. SLURM Allocation Adjustments
+* **File:** [slurm/qrm_official_math500_n10.slurm](file:///scratch/manishn_iitp/reasoning-compression-lab/slurm/qrm_official_math500_n10.slurm#L4-L7)
+* **Change:** Removed `#SBATCH --exclusive` and added `#SBATCH --cpus-per-task=16`.
+* **Rationale:** Requesting exclusive access to a 2-GPU node consumes 2 GPUs and hits the user's `QOSMaxGRESPerUser` limit. By removing exclusive access, we only allocate **1 GPU** under our quota. Adding `--cpus-per-task=16` ensures SLURM allocates a proportional share of host RAM (CPU memory) so vLLM and PyTorch can load weights without hitting system-level cgroup memory bounds.
+
+#### B. Preflight Rule Alignment
+* **File:** [scripts/hpc/qrm_parity/verify_qrm_official_preflight.sh](file:///scratch/manishn_iitp/reasoning-compression-lab/scripts/hpc/qrm_parity/verify_qrm_official_preflight.sh#L37-L40)
+* **Change:** Updated the preflight assertion. Replaced the check requiring `--exclusive` with checks asserting that `--gres=gpu:1` is used and that `--exclusive` is **not** present.
+* **Rationale:** Keeps the automated validation suite in sync with our optimized non-exclusive 1-GPU execution config.
+
+#### C. vLLM Memory Footprint Scaling
+* **File:** [scripts/hpc/qrm_parity/run_official_inference.sh](file:///scratch/manishn_iitp/reasoning-compression-lab/scripts/hpc/qrm_parity/run_official_inference.sh#L35) & [L97](file:///scratch/manishn_iitp/reasoning-compression-lab/scripts/hpc/qrm_parity/run_official_inference.sh#L97)
+* **Change:** Changed default `QRM_GPU_MEMORY_UTILIZATION` from `0.9` to `0.75` and `QRM_MIN_FREE_GPU_MB` from `40000` to `62000`.
+* **Rationale:** By default, vLLM attempts to pre-allocate 90% of the A100's 80GB VRAM (72GB). On a shared node, this causes immediate CUDA OOM crashes if even a small process is running. Changing the utilization to `0.75` restricts the VRAM allocation to a safe **60GB** (leaving plenty of room on `ragpu006` GPU 0 which had 62GB free). This configuration yields mathematically identical output tokens, as the KV cache pool remains large enough for batch-size-1 inference.
+
+#### D. Dynamic Node Exclusion and Requeue Logic
+* **File:** [scripts/hpc/qrm_parity/run_official_inference.sh](file:///scratch/manishn_iitp/reasoning-compression-lab/scripts/hpc/qrm_parity/run_official_inference.sh#L66-L79)
+* **Change:** Added post-requeue `scontrol` updates. When the preflight VRAM check fails, the script calls `scontrol requeue "$SLURM_JOB_ID"` to return the job to `PENDING` state, and immediately calls `scontrol update job "$SLURM_JOB_ID" ExcNodeList=...` to exclude the current node.
+* **Rationale:** If the job lands on a node with a dirty GPU (like `racn116` which had only 3GB free), it automatically marks that node as excluded and returns to the queue. When the scheduler selects the job again, it is forced to select a different, clean node (such as `ragpu006` where the run successfully finished). Calling `scontrol update` *after* the `requeue` call ensures the job is in a `PENDING` state, allowing the property modification to succeed.
 
 *Last updated: 2026-07-06 (night). §32 = QRM official run success. §31 = A–D explainer. §30 = stack audit.*
