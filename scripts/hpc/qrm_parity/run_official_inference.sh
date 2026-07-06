@@ -10,6 +10,7 @@ MODEL="${QRM_MODEL_PATH:-$QR/models/DeepSeek-R1-Distill-Qwen-7B}"
 SEED="${QRM_SEED:-42}"
 MAX_SAMPLES="${QRM_MAX_SAMPLES:-10}"
 OUTPUT_ROOT="${QRM_OUTPUT_ROOT:-$QR/outputs-hpc-qrm-official-$(date +%Y-%m-%d)}"
+OFFICIAL_RUN_DIR="$OUTPUT_ROOT/inference/$(basename "$MODEL")-seed${SEED}"
 
 CONDA_ROOT="${CONDA_ROOT:-/home/apps/MSCC/miniconda3}"
 source "$CONDA_ROOT/etc/profile.d/conda.sh"
@@ -31,14 +32,54 @@ export VLLM_WORKER_MULTIPROC_METHOD=spawn
 export TORCH_COMPILE_DISABLE=1
 export TORCHDYNAMO_DISABLE=1
 
-QRM_MIN_FREE_GPU_MB="${QRM_MIN_FREE_GPU_MB:-40000}"
+QRM_MIN_FREE_GPU_MB="${QRM_MIN_FREE_GPU_MB:-62000}"
 if command -v nvidia-smi >/dev/null 2>&1; then
   echo "=== GPU memory preflight (require >= ${QRM_MIN_FREE_GPU_MB} MiB free) ==="
+  echo "CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-unset}"
   nvidia-smi --query-compute-apps=pid,process_name,used_memory --format=csv 2>/dev/null || true
-  FREE_GPU_MB="$(nvidia-smi --query-gpu=memory.free --format=csv,noheader,nounits | head -n 1 | tr -d ' ')"
-  echo "GPU free memory: ${FREE_GPU_MB:-unknown} MiB"
+
+  GPU_QUERY_IDS="${CUDA_VISIBLE_DEVICES:-0}"
+  IFS=',' read -r -a QRM_VISIBLE_GPUS <<<"$GPU_QUERY_IDS"
+  FREE_GPU_MB=""
+  for gpu_id in "${QRM_VISIBLE_GPUS[@]}"; do
+    gpu_id="${gpu_id//[[:space:]]/}"
+    [[ -z "$gpu_id" ]] && continue
+    gpu_free="$(nvidia-smi -i "$gpu_id" --query-gpu=memory.free --format=csv,noheader,nounits 2>/dev/null | head -n 1 | tr -d ' ')"
+    if [[ -n "$gpu_free" ]]; then
+      echo "GPU ${gpu_id} free memory: ${gpu_free} MiB"
+      if [[ -z "$FREE_GPU_MB" || "$gpu_free" -lt "$FREE_GPU_MB" ]]; then
+        FREE_GPU_MB="$gpu_free"
+      fi
+    fi
+  done
+  if [[ -z "$FREE_GPU_MB" ]]; then
+    FREE_GPU_MB="$(nvidia-smi --query-gpu=memory.free --format=csv,noheader,nounits | head -n 1 | tr -d ' ')"
+    echo "GPU free memory fallback: ${FREE_GPU_MB:-unknown} MiB"
+  fi
+
   if [[ -n "$FREE_GPU_MB" && "$FREE_GPU_MB" -lt "$QRM_MIN_FREE_GPU_MB" ]]; then
     echo "ERROR: only ${FREE_GPU_MB} MiB GPU memory free; need ${QRM_MIN_FREE_GPU_MB} MiB before vLLM load." >&2
+    if [[ -n "${SLURM_JOB_ID:-}" && "${QRM_REQUEUE_ON_DIRTY_GPU:-1}" == "1" ]]; then
+      restarts="${SLURM_RESTART_COUNT:-0}"
+      max_requeues="${QRM_MAX_DIRTY_GPU_REQUEUES:-3}"
+      if [[ "$restarts" -lt "$max_requeues" ]]; then
+        echo "Requeueing job ${SLURM_JOB_ID} instead of failing on a dirty GPU (restart ${restarts}/${max_requeues})." >&2
+        if scontrol requeue "$SLURM_JOB_ID"; then
+          if [[ -n "${SLURM_JOB_NODELIST:-}" ]]; then
+            current_exc="$(scontrol show job "${SLURM_JOB_ID}" | grep -o 'ExcNodeList=[^ ]*' | cut -d= -f2 || true)"
+            if [[ -n "$current_exc" && "$current_exc" != "(null)" ]]; then
+              new_exc="${current_exc},${SLURM_JOB_NODELIST}"
+            else
+              new_exc="${SLURM_JOB_NODELIST}"
+            fi
+            echo "Excluding dirty node(s) ${new_exc} from future scheduling of job ${SLURM_JOB_ID}." >&2
+            scontrol update job "${SLURM_JOB_ID}" ExcNodeList="${new_exc}" || echo "WARN: failed to update ExcNodeList" >&2
+          fi
+          exit 0
+        fi
+        echo "WARN: scontrol requeue failed; exiting with retryable code 75." >&2
+      fi
+    fi
     exit 75
   fi
 fi
@@ -46,21 +87,25 @@ fi
 bash "$QR/scripts/hpc/qrm_parity/prepare_qrm_datasets.sh"
 
 mkdir -p "$OUTPUT_ROOT"
+mkdir -p "$OFFICIAL_RUN_DIR"
 cd "$QRM_DIR"
 
 echo "Model: $MODEL"
 echo "Output: $OUTPUT_ROOT"
 echo "max_samples=$MAX_SAMPLES seed=$SEED"
 
+QRM_GPU_MEMORY_UTILIZATION="${QRM_GPU_MEMORY_UTILIZATION:-0.75}"
+
 python inference.py \
   --model "$MODEL" \
   --dataset MATH-500 \
   --max_samples "$MAX_SAMPLES" \
   --seed "$SEED" \
-  --output_dir "$OUTPUT_ROOT/inference" \
+  --output_dir "$OFFICIAL_RUN_DIR" \
+  --gpu_memory_utilization "$QRM_GPU_MEMORY_UTILIZATION" \
   --overwrite
 
-RESULT_JSON="$OUTPUT_ROOT/inference/$(basename "$MODEL")-seed${SEED}/MATH-500.json"
+RESULT_JSON="$OFFICIAL_RUN_DIR/MATH-500.jsonl"
 if [[ -f "$RESULT_JSON" ]]; then
   python3 - "$RESULT_JSON" <<'PY'
 import json, sys

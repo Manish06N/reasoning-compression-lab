@@ -10,6 +10,8 @@ PENDING_INTERVAL="${PENDING_PROGRESS_INTERVAL:-21600}"  # 6h when mostly pending
 RUNNING_INTERVAL="${RUNNING_PROGRESS_INTERVAL:-2700}"   # 45m when jobs are running
 STATE_POLL_INTERVAL="${STATE_POLL_INTERVAL:-300}"
 LOG_PROGRESS_INTERVAL="${LOG_PROGRESS_INTERVAL:-25}"  # send on log marker advance (e.g. 1-25/500)
+QRM_OFFICIAL_MODE="${QRM_OFFICIAL_MODE:-0}"
+QRM_OFFICIAL_MAX_SAMPLES="${QRM_OFFICIAL_MAX_SAMPLES:-${QREASON_INFERENCE_LIMIT:-10}}"
 TG_SOURCE="$HOME/watch-job-52772.sh"
 
 extract_var() {
@@ -189,6 +191,177 @@ with open(path, 'r', encoding='utf-8') as f:
 PY_REP
 }
 
+is_qrm_official_job() {
+  local jname="$1"
+  [[ "$jname" == qreason-qrm_official* ]]
+}
+
+qrm_official_mode_active() {
+  [[ "$QRM_OFFICIAL_MODE" == "1" ]] && return 0
+  local id jname
+  for id in $WATCH_JOB_IDS; do
+    [[ -z "$id" ]] && continue
+    jname=$(squeue -j "$id" -h -o '%j' 2>/dev/null | head -n1 || true)
+    if [[ -z "$jname" ]]; then
+      jname=$(sacct -j "$id" -n -X -o JobName 2>/dev/null | awk 'NF {print $1; exit}' || true)
+    fi
+    is_qrm_official_job "$jname" && return 0
+  done
+  return 1
+}
+
+refresh_qrm_watch_job_ids() {
+  local merged="$WATCH_JOB_IDS" id
+  for id in $(squeue -u "$USER" -h -o '%i %j' 2>/dev/null | awk '/qreason-qrm_official/ {print $1}' || true); do
+    [[ -z "$id" ]] && continue
+    [[ " $merged " == *" $id "* ]] || merged="$merged $id"
+  done
+  if [[ -f "$PROJECT_DIR/.qrm_official_llama_job_submitted" ]]; then
+    id=$(tr -d '[:space:]' < "$PROJECT_DIR/.qrm_official_llama_job_submitted")
+    [[ -n "$id" ]] && [[ " $merged " != *" $id "* ]] && merged="$merged $id"
+  fi
+  WATCH_JOB_IDS="${merged# }"
+}
+
+qrm_official_model_label() {
+  local jname="$1"
+  case "$jname" in
+    *llama*) echo "Llama-8B" ;;
+    *) echo "Qwen-7B" ;;
+  esac
+}
+
+qrm_official_phase_for_job() {
+  local id="$1"
+  local out="$PROJECT_DIR/logs/qrm_official_${id}.out"
+  local err="$PROJECT_DIR/logs/qrm_official_${id}.err"
+  [[ -f "$out" ]] || { echo "queued"; return; }
+  if grep -q "=== Done ===" "$out" 2>/dev/null; then
+    echo "done"
+  elif grep -q "Official QRM results:" "$out" 2>/dev/null; then
+    echo "scoring"
+  elif grep -q "QRM official inference.py" "$out" 2>/dev/null || grep -q "python inference.py" "$out" 2>/dev/null; then
+    echo "inferring"
+  elif grep -q "Installing QRM vLLM fork" "$out" 2>/dev/null || grep -q "pip install" "$err" 2>/dev/null; then
+    echo "pip_install"
+  elif grep -q "Initializing QRM submodules" "$out" 2>/dev/null; then
+    echo "submodules"
+  elif grep -q "QRM official stack install" "$out" 2>/dev/null; then
+    echo "install"
+  else
+    echo "starting"
+  fi
+}
+
+qrm_official_tail_hint() {
+  local id="$1"
+  local out="$PROJECT_DIR/logs/qrm_official_${id}.out"
+  [[ -f "$out" ]] || return 0
+  grep -E '^(===|Model:|Output:|Official QRM|max_samples=|Cloning|Installing|QRM official env ready)' "$out" 2>/dev/null | tail -n 1 | sed 's/^/last: /' || true
+}
+
+qrm_official_rows_in_json() {
+  local json="$1"
+  [[ -f "$json" ]] || { echo 0; return; }
+  python3 - "$json" <<'PY_ROWS'
+import json, sys
+try:
+    with open(sys.argv[1], encoding="utf-8") as f:
+        data = json.load(f)
+    print(len(data) if isinstance(data, list) else 0)
+except Exception:
+    print(0)
+PY_ROWS
+}
+
+qrm_official_result_json_for_job() {
+  local id="$1"
+  local jname="$2"
+  local -a roots=()
+  local root pat json
+
+  if [[ -n "${OUTPUT_ROOT:-}" ]]; then
+    roots+=("$OUTPUT_ROOT")
+  fi
+  if [[ -n "${OUTPUT_ROOT_LLAMA:-}" ]]; then
+    roots+=("$OUTPUT_ROOT_LLAMA")
+  fi
+  for root in "$PROJECT_DIR"/outputs-hpc-qrm-official-*; do
+    [[ -d "$root" ]] || continue
+    roots+=("$root")
+  done
+
+  pat="qrm_official_math500_n${QRM_OFFICIAL_MAX_SAMPLES}_seed*.json"
+  if [[ "$jname" == *llama* ]]; then
+    for root in "${roots[@]}"; do
+      [[ "$root" == *llama* ]] || continue
+      for json in "$root"/$pat "$root"/inference/*/*MATH-500.json; do
+        [[ -f "$json" ]] && { echo "$json"; return 0; }
+      done
+    done
+  else
+    for root in "${roots[@]}"; do
+      [[ "$root" == *llama* ]] && continue
+      for json in "$root"/$pat "$root"/inference/*/*MATH-500.json; do
+        [[ -f "$json" ]] && { echo "$json"; return 0; }
+      done
+    done
+  fi
+  return 1
+}
+
+qrm_official_boxed_count() {
+  local json="$1"
+  [[ -f "$json" ]] || { echo 0; return; }
+  python3 - "$json" <<'PY_BOX'
+import json, sys
+try:
+    with open(sys.argv[1], encoding="utf-8") as f:
+        rows = json.load(f)
+    if not isinstance(rows, list):
+        print(0)
+    else:
+        print(sum(1 for r in rows if "\\boxed" in (r.get("generated_text") or "")))
+except Exception:
+    print(0)
+PY_BOX
+}
+
+build_qrm_official_lines() {
+  local id jname model phase rows want json boxed env_marker lines=""
+  want="${QRM_OFFICIAL_MAX_SAMPLES:-10}"
+  env_marker="pending"
+  [[ -f "$PROJECT_DIR/.qrm_official_env_ready" ]] && env_marker="ready"
+
+  for id in $WATCH_JOB_IDS; do
+    [[ -z "$id" ]] && continue
+    jname=$(squeue -j "$id" -h -o '%j' 2>/dev/null | head -n1 || true)
+    if [[ -z "$jname" ]]; then
+      jname=$(sacct -j "$id" -n -X -o JobName 2>/dev/null | awk 'NF {print $1; exit}' || true)
+    fi
+    is_qrm_official_job "$jname" || continue
+    model=$(qrm_official_model_label "$jname")
+    phase=$(qrm_official_phase_for_job "$id")
+    rows=0
+    boxed=0
+    if json=$(qrm_official_result_json_for_job "$id" "$jname" 2>/dev/null); then
+      rows=$(qrm_official_rows_in_json "$json")
+      boxed=$(qrm_official_boxed_count "$json")
+    fi
+    lines+=$'• <code>'"${model}"$'</code> job <code>'"${id}"$'</code>: phase=<code>'"${phase}"'</code>, results=<code>'"${rows}/${want}"'</code>'
+    if (( boxed > 0 )); then
+      lines+=$', boxed=<code>'"${boxed}"$'</code>'
+    fi
+    lines+=$'\n'
+  done
+
+  if [[ -z "$lines" ]]; then
+    lines="No official QRM jobs in WATCH_JOB_IDS yet."
+  fi
+  lines+=$'• shared env: <code>'"${env_marker}"$'</code>\n'
+  printf '%s' "$lines"
+}
+
 build_message() {
   local raw="$OUTPUT_ROOT/raw"
   local logs="$OUTPUT_ROOT/logs"
@@ -196,7 +369,7 @@ build_message() {
 
   local watched queue cell_lines
   watched=$(job_line)
-  queue=$(squeue -u "$USER" -h -o '%i %T %j %R' 2>/dev/null | grep -E 'qreason-|level_|b0[0-9]|diag|pathc|d0[0-9]' | head -n 10 | while IFS= read -r line; do echo "<code>$(html_escape "$line")</code>"; done || true)
+  queue=$(squeue -u "$USER" -h -o '%i %T %j %R' 2>/dev/null | grep -E 'qreason-|qrm_official|level_|b0[0-9]|diag|pathc|d0[0-9]' | head -n 10 | while IFS= read -r line; do echo "<code>$(html_escape "$line")</code>"; done || true)
 
   # Cells tied to WATCH_JOB_IDS (from Slurm job names) plus any with raw rows.
   declare -A seen_cells=()
@@ -260,8 +433,15 @@ build_message() {
     cell_lines+=$'• <code>'"${name}"$'</code>: <code>'"${rows}/${want}"'</code>'${marker:+ (log:${marker})}${rep:+ ($(html_escape "$rep"))}${result:+ → $(html_escape "$result")}$'\n'
   done
 
-  if [[ -z "$cell_lines" ]]; then
+  if qrm_official_mode_active; then
+    cell_lines="$(build_qrm_official_lines)"
+  elif [[ -z "$cell_lines" ]]; then
     cell_lines="No active cell logs or .jsonl in archive yet."
+  fi
+
+  local progress_title="Cell progress:"
+  if qrm_official_mode_active; then
+    progress_title="Official QRM progress:"
   fi
 
   cat <<MSG
@@ -272,7 +452,7 @@ ${watched}
 <b>Task:</b> $(html_escape "$WATCH_LABEL")
 <b>Archive:</b> <code>$(html_escape "$(basename "$OUTPUT_ROOT")")</code>
 
-<b>Cell progress:</b>
+<b>${progress_title}</b>
 ${cell_lines}
 
 <b>Recent queue (yours):</b>
@@ -306,6 +486,41 @@ case "${1:-once}" in
 
     progress_changed() {
       local changed=0 threshold="${LOG_PROGRESS_INTERVAL:-25}"
+
+      if qrm_official_mode_active; then
+        local marker_path="$PROJECT_DIR/.qrm_official_env_ready"
+        local prev_marker="${last_qrm_env_marker:-missing}"
+        if [[ -f "$marker_path" ]]; then
+          [[ "$prev_marker" == "ready" ]] || changed=1
+          last_qrm_env_marker="ready"
+        else
+          last_qrm_env_marker="pending"
+        fi
+        local id jname phase prev_phase json rows prev_rows
+        for id in $WATCH_JOB_IDS; do
+          [[ -z "$id" ]] && continue
+          phase=$(qrm_official_phase_for_job "$id")
+          prev_phase="${last_qrm_phases[$id]:-}"
+          if [[ "$phase" != "$prev_phase" ]]; then
+            changed=1
+          fi
+          last_qrm_phases["$id"]="$phase"
+          jname=$(squeue -j "$id" -h -o '%j' 2>/dev/null | head -n1 || true)
+          if [[ -z "$jname" ]]; then
+            jname=$(sacct -j "$id" -n -X -o JobName 2>/dev/null | awk 'NF {print $1; exit}' || true)
+          fi
+          if json=$(qrm_official_result_json_for_job "$id" "$jname" 2>/dev/null); then
+            rows=$(qrm_official_rows_in_json "$json")
+            prev_rows=${last_qrm_rows["$json"]:-0}
+            if (( rows > prev_rows )); then
+              changed=1
+            fi
+            last_qrm_rows["$json"]=$rows
+          fi
+        done
+        (( changed == 1 )) && return 0
+      fi
+
       for f in "$OUTPUT_ROOT"/raw/diag_*.jsonl "$OUTPUT_ROOT"/raw/*math500*.jsonl "$OUTPUT_ROOT"/raw/*_seed*.jsonl; do
         [[ -f "$f" ]] || continue
         local cur prev
@@ -344,6 +559,9 @@ case "${1:-once}" in
     }
 
     while true; do
+      if [[ "$QRM_OFFICIAL_MODE" == "1" ]]; then
+        refresh_qrm_watch_job_ids
+      fi
       state="$(current_job_state)"
       interval="$(next_interval "$state")"
       now="$(date +%s)"
