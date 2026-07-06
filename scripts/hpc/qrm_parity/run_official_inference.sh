@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Run official QRM inference.py on MATH-500 (n=10 pilot).
-set -euo pipefail
+set -eo pipefail
 
 export PATH="/usr/bin:/bin:${PATH}"
 
@@ -14,6 +14,11 @@ OUTPUT_ROOT="${QRM_OUTPUT_ROOT:-$QR/outputs-hpc-qrm-official-$(date +%Y-%m-%d)}"
 CONDA_ROOT="${CONDA_ROOT:-/home/apps/MSCC/miniconda3}"
 source "$CONDA_ROOT/etc/profile.d/conda.sh"
 conda activate "${QRM_CONDA_ENV:-qrm-official}"
+export PATH="$CONDA_PREFIX/bin:/usr/bin:/bin:${PATH}"
+export CC="${CC:-$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-gcc}"
+export CXX="${CXX:-$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-g++}"
+export CUDAHOSTCXX="${CUDAHOSTCXX:-$CXX}"
+export CUDA_HOME="${CUDA_HOME:-$CONDA_PREFIX}"
 
 export HF_HOME="${HF_HOME:-$QR/hf_cache}"
 export HF_DATASETS_CACHE="$HF_HOME/datasets"

@@ -6,7 +6,7 @@
 #SBATCH --output=/scratch/%u/reasoning-compression-lab/logs/qrm_official_%j.out
 #SBATCH --error=/scratch/%u/reasoning-compression-lab/logs/qrm_official_%j.err
 
-set -euo pipefail
+set -eo pipefail
 
 QR="/scratch/${USER}/reasoning-compression-lab"
 cd "$QR"
