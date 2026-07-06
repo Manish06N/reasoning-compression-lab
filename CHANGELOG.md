@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-07-06 (night) — Official QRM parity run successfully completed (Job 87302)
+
+Experiment A (official QRM reproduction check on MATH-500 n=10, seed=42) successfully completed under job **87302** on node `ragpu006` GPU 0.
+
+### Key Results
+- **Pass@1 Accuracy:** **100.0% (10/10 correct)** vs. 10.0% (1/10) in our vLLM 0.8.5 baseline.
+- **Truncation / Loops:** **0.0% (0/10 loops)** vs. 90.0% (9/10 loops) in our vLLM 0.8.5 baseline.
+- **Confirmed Stack Gap:** DeepSeek-R1-Distill-Qwen-7B behaves radically differently between vLLM 0.8.5 + transformers 5.12.1 (which suffers from infinite output repetition loops) and the QRM official stack using vLLM 0.7.0 fork + transformers 4.47.1 (which correctly terminates generation upon producing a valid answer).
+
+### Code Modifications & Optimizations
+- **1-GPU Non-Exclusive Constraint:** Fixed the scheduler quota trap by requesting 1 GPU (`#SBATCH --gres=gpu:1`) non-exclusively and requesting 16 CPUs (`#SBATCH --cpus-per-task=16`) to ensure SLURM allocates sufficient host RAM.
+- **Dynamic Node Exclusion & Requeue:** Modified [run_official_inference.sh](file:///scratch/manishn_iitp/reasoning-compression-lab/scripts/hpc/qrm_parity/run_official_inference.sh) to check for >= 62GB free memory (since `gpu_memory_utilization=0.75` pre-allocates 60GB VRAM). If the VRAM check fails, the script uses `scontrol` to add the current node to the job's `ExcNodeList` and requeues the job back to `PENDING` to find a clean node.
+- **Memory Scaling:** Configured vLLM memory utilization (`gpu_memory_utilization`) to `0.75` (60GB allocation target) in both [run_official_inference.sh](file:///scratch/manishn_iitp/reasoning-compression-lab/scripts/hpc/qrm_parity/run_official_inference.sh) and [inference.py](file:///scratch/manishn_iitp/reasoning-compression-lab/external/Quantized-Reasoning-Models/inference.py).
+- **Preflight Verification:** Updated [verify_qrm_official_preflight.sh](file:///scratch/manishn_iitp/reasoning-compression-lab/scripts/hpc/qrm_parity/verify_qrm_official_preflight.sh) to verify non-exclusive and 1-GPU resource checks.
+
+---
+
 ## 2026-07-05 (night) — Path C canceled; official QRM repo test submitted
 
 User decision: enough signal from Path C n=20 (protocol OK, stack gap). Canceled jobs **87116**, **87117**, **87118**.

@@ -193,10 +193,9 @@ Plain English: [notes.md §31](../notes.md)
 
 ```
 Path C canceled at n=20
-└─ Experiment A (87130) in flight
-    ├─ QRM high pass@1, we low  → document stack gap; Paper 1 truncation/cost story
-    ├─ QRM also fails           → deeper env/weights investigation
-    └─ Then: quant grid b02 OR budget-limited paper only
+└─ Experiment A COMPLETED successfully (Job 87302)
+    └─ QRM got 10/10 (100% correct, 0% loops) vs. our stack 1/10 (10% correct, 90% loops)
+        └─ [RESULT] Stack gap confirmed. Document stack differences in paper methods; open Quant Grid (b02).
 ```
 
 ---

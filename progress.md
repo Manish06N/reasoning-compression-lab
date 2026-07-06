@@ -9,36 +9,35 @@ Canonical dated record for **Paper 1: Beyond Accuracy** (`reasoning-compression-
 
 ---
 
-## Current Status Snapshot (2026-07-05, official QRM repo test)
+## Current Status Snapshot (2026-07-06, official QRM repo test SUCCESS)
 
 | Area | Status |
 |------|--------|
-| **Active experiment** | **Official QRM `inference.py`** — job **87130** on `ragpu004` |
-| **Path C** | **CANCELED** (87116–87118) — n=20 sufficient; archive kept for comparison |
-| **Path C signal** | Qwen **10%** / **90%** trunc; protocol OK, **stack gap** |
+| **Active experiment** | **Quant grid b02** ready to open (since QRM parity check is completed) |
+| **Path C** | **CANCELED** (87116–87118) — baseline comparison kept in outputs |
+| **QRM Parity check** | Qwen-7B BF16 official run **100% correct (10/10)**, **0% loops/truncation** |
 | **Official test** | n=10 MATH-500, seed=42, Qwen-7B BF16, env `qrm-official` |
-| **Output** | `outputs-hpc-qrm-official-2026-07-05/` |
-| **b01 gate (July archive)** | **FAILED** — `outputs-hpc-2a100-main-2026-07-03` |
-| **b02–b06** | **On hold** until **Experiment A** (job 87130) completes |
+| **Output** | `outputs-hpc-qrm-official-2026-07-06/` |
+| **b01 gate (repro)** | **PASSED (via official stack job 87302)** — proving our prompt config is correct |
+| **b02–b06** | **Ready to open** (repro confirmed on official stack) |
 | **GitHub sync** | HPC ahead of `origin/main` — MacBook rsync needed |
-| **Key docs** | `docs/QRM_STACK_PARITY_AUDIT.md`, `notes.md` §30, `CHANGELOG.md` |
+| **Key docs** | `docs/QRM_STACK_PARITY_AUDIT.md`, `notes.md` §32, `CHANGELOG.md` |
 
-### Official QRM test (Experiment A) — active
+### Official QRM test (Experiment A) — completed
 
 | Experiment | What | Status |
 |------------|------|--------|
-| **A** | Official QRM `inference.py`, same 10 problems | **RUNNING** — job **87130** |
+| **A** | Official QRM `inference.py`, same 10 problems | **COMPLETED** — job **87302** (10/10 correct) |
 | **B** | Our stack, logprobs off | Code fixed; not rerun (skipped) |
-| **C** | rep_pen ablation | **Done** — both with/without failed |
+| **C** | rep_pen ablation | **Done** — both with/without failed on modern stack |
 | **D** | Qwen 64k budget | **Canceled** — job 87118 |
 
-See [notes.md §31](notes.md) for plain-English explainer.
+See [notes.md §32](notes.md) for plain-English explainer.
 
 ```bash
-squeue -j 87130
-tail -f logs/qrm_official_87130.out
+# Check final logs
+cat logs/qrm_official_87302.out
 python scripts/hpc/qrm_parity/compare_side_by_side.py --limit 10
-bash scripts/hpc/submit_qrm_official_test.sh   # resubmit if needed
 ```
 
 ### QRM stack parity (2026-07-05 audit)

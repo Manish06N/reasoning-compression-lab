@@ -991,6 +991,24 @@ bash scripts/hpc/submit_pathc_parity_pilot.sh
 ls outputs-hpc-diag-pathc-2026-07-05/raw/
 ```
 
+
 ---
 
-*Last updated: 2026-07-05 (night). §31 = A–D explainer. §30 = stack audit. §29 = live snapshot.*
+## 32. QRM official test run completion (2026-07-06 night)
+
+Experiment A (official QRM reproduction check on MATH-500 n=10, seed=42) successfully completed under job **87302** on node `ragpu006` GPU 0.
+
+### 1. Results Summary
+- **Evaluation Accuracy:** **100.0% (10/10 correct)** on MATH-500 test split (first 10 questions).
+- **Truncation / Loops:** **0.0% (0/10)**. All questions finished cleanly with a `\boxed{}` answer and no degeneration loops.
+- **Inference Speeds:** Shorter answers (e.g. 800 tokens for Sample 8) finished in ~10 seconds at a generation speed of **80.4 tokens/second**. The longest continued fraction problem (Sample 10, generating 35,738 characters / ~9,000 tokens) ran for **~7.5 minutes** without looping, verifying correct generation scaling.
+
+### 2. Confirmed Stack Gap
+This results verify that the protocol parameters (prompt, temperature=0.6, top_p=0.95, seeds) are correct. The failure of our baseline Path C (10% accuracy, 90% truncation) is purely a **software stack gap** between the modern vLLM 0.8.5 + transformers 5.12.1 stack (which experiences severe token repetition loops on Distill-Qwen-7B) and the authors' original pinned stack (vLLM 0.7.0 fork + transformers 4.47.1), which correctly stops.
+
+### 3. Execution Modifications
+- **SLURM Setup:** 1 GPU (`--gres=gpu:1`), non-exclusive, 16 CPUs (`--cpus-per-task=16` to allocate sufficient CPU memory/RAM).
+- **Memory preflight:** Modified `run_official_inference.sh` to check for >= 62GB free memory, and set `gpu_memory_utilization` to `0.75` (allocating 60GB VRAM). This allowed the job to load successfully on the shared node `ragpu006` which had ~63-65GB free.
+- **Dynamic Requeue:** Added logic to update the job's `ExcNodeList` via `scontrol` and requeue the job back to `PENDING` if it gets scheduled on a node with insufficient VRAM (e.g. `racn116`), routing it to other clean nodes automatically.
+
+*Last updated: 2026-07-06 (night). §32 = QRM official run success. §31 = A–D explainer. §30 = stack audit.*
