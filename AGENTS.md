@@ -148,7 +148,7 @@ Use this section when working in:
 ### Current Sync State
 
 - GitHub and HPC include the FP8 KV-cache fix as of **2026-08-13**; MacBook was last verified at `319cc56` and should pull latest `origin/main` before editing.
-- Verified synced commit across all three places:
+- Relevant pushed code-fix commit on GitHub/HPC:
 
 ```text
 542f622 Fix FP8 KV cache dtype for vLLM
@@ -391,10 +391,11 @@ ls -l slurm/smoke_test_quick_exclusive.slurm
 
 #### Current Known Good Sync
 
-- Last verified synced commit across GitHub, MacBook, and HPC:
+- Current repository baseline to verify with `git log -3`:
 
 ```text
-dff36c1 Sync HPC smoke fixes: tokenizer shim, memory preflight, quick smoke SLURM.
+995355e Docs: update b02 FP8 retry status
+542f622 Fix FP8 KV cache dtype for vLLM
 ```
 
 - If future agents see local HPC commits ahead of `origin/main`, preserve them
