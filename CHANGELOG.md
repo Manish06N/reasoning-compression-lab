@@ -1,5 +1,48 @@
 # Changelog
 
+## 2026-08-13 - Fix FP8 KV-cache incompatibility and resubmit b02
+
+The first b02 submit failed before writing raw rows:
+
+| Job | Cell | Result |
+|-----|------|--------|
+| **96084** | `level_b_qwen7b_fp8_math500_seed0` | FAILED after model init hit `ValueError: fp8_e5m2 kv-cache is not supported with fp8 checkpoints` |
+| **96085** | `level_c_llama8b_fp8_math500_seed0` | FAILED with the same vLLM FP8 KV-cache error |
+
+Fix committed and pushed as **542f622**: FP8 checkpoint model configs now use `kv_cache_dtype: auto` instead of `fp8_e5m2` for Qwen-7B FP8, Llama-8B FP8, and Qwen-1.5B FP8. JSON validation passed with the `qreason` interpreter.
+
+Resubmitted b02 with `--fresh` into the same archive `outputs-hpc-2a100-main-2026-08-13`:
+
+| Job | Cell | State at submit |
+|-----|------|-----------------|
+| **96086** | `level_b_qwen7b_fp8_math500_seed0` | RUNNING on `ragpu004`, passed FP8 model load with `kv_cache_dtype=auto`, started generation |
+| **96087** | `level_c_llama8b_fp8_math500_seed0` | PENDING (Resources), non-exclusive 1x A100 |
+
+No raw rows existed from the failed first attempt, so the retry is the valid b02 attempt to monitor.
+
+
+## 2026-08-13 - GitHub sync complete; b02 FP8 deployment block submitted
+
+GitHub, MacBook, and HPC are aligned at commit **319cc56** (`Docs: expand notes.md section 32 with detailed code change breakdowns`). Leave `.qrm_official_env_ready` untracked on HPC.
+
+Submitted fresh b02 with the main paper stack (`qreason`, vLLM 0.8.5):
+
+| Job | Cell | State at submit | Archive |
+|-----|------|-----------------|---------|
+| **96084** | `level_b_qwen7b_fp8_math500_seed0` | RUNNING on `ragpu004` | `outputs-hpc-2a100-main-2026-08-13` |
+| **96085** | `level_c_llama8b_fp8_math500_seed0` | PENDING (Resources) | `outputs-hpc-2a100-main-2026-08-13` |
+
+Both jobs request non-exclusive **1x A100** (`--gres=gpu:1`). Qwen job preflight showed ~81 GB free VRAM and passed archive checks.
+
+### Correctness boundary
+
+- Official QRM parity job **87302** proved the prompt/protocol on the pinned `qrm-official` stack: 10/10 correct, 0 truncation.
+- Path C proved the modern `qreason` stack loops/truncates under the same nominal protocol.
+- b02 therefore asks whether **FP8 weights change the modern-stack behavior**. It is valid for pass@1, truncation, latency/VRAM, and cost-per-correct.
+- b02 is **not** valid for Brier/AURC/ECE because launcher scoring uses `--skip-calibration`.
+- Do **not** submit b03/b04 until both b02 cells finish and summaries are reviewed against BF16 Path C/July numbers.
+
+
 ## 2026-07-06 (night) — Official QRM parity run successfully completed (Job 87302)
 
 Experiment A (official QRM reproduction check on MATH-500 n=10, seed=42) successfully completed under job **87302** on node `ragpu006` GPU 0.
@@ -647,7 +690,7 @@ a3414a4 Simplify HPC inference: native 128k context, soft git gate, lighter pref
 4da8913 Fix Triton JIT on compute nodes: use conda gcc with C headers.
 ```
 
-**Sync:** HPC cannot push directly. Part 1 done (local commits). User runs MacBook rsync → push → HPC `git reset --hard origin/main`.
+**Sync at that time:** Part 1 was local HPC commits, then MacBook rsync/push, then HPC `git reset --hard origin/main`. As of 2026-08-13, HPC can also push directly when credentials are intentionally configured and runtime markers are excluded.
 
 ---
 

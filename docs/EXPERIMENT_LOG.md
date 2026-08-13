@@ -149,15 +149,15 @@ Key numbers:  ~1-4k completion tokens/q on 1.5B; ~15 tok/s; batch 4/2/1 by model
 
 ---
 
-## 2026-07-05 — Path C diagnostic (RUNNING)
+## 2026-07-05 - Path C diagnostic (CANCELED at n=20)
 
 ```text
 Date:         2026-07-05
 Level:        diagnostic (Path C)
 Archive:      outputs-hpc-diag-pathc-2026-07-05
 Hardware:     A100 80GB (racn116)
-Status:       running
-Jobs:         87116 Qwen 32k, 87117 Llama 32k, 87118 Qwen 64k (pending)
+Status:       canceled after n=20 on 32k cells
+Jobs:         87116 Qwen 32k, 87117 Llama 32k, 87118 Qwen 64k (canceled)
 Cells:
   - diag_qwen7b_bf16_math500_seed42_n50     (strict QRM 32k, n=50, seed 42)
   - diag_llama8b_bf16_math500_seed42_n50    (same)
@@ -166,7 +166,7 @@ Protocol:     repro_qrm_strict.yaml / repro_qrm_64k.yaml
               reproduction prompt, no repetition_penalty, enforce_eager=true
 Submit:       bash scripts/hpc/submit_pathc_diagnostic.sh
 Report:       bash scripts/hpc/report_pathc_diagnostic.sh
-Notes:        Launched after b01 gate fail. Supersedes quant grid until results known.
+Notes:        Launched after b01 gate fail. n=20 was enough: Qwen 10%/90% trunc, Llama 15%/75% trunc. Superseded by official QRM Experiment A.
 ```
 
 ---
@@ -221,7 +221,7 @@ Task:         MATH-500
 Seed(s):      0
 Hardware:     A100
 Status:       gate failed — pivot to Paper 1 deployment grid (see notes.md §28)
-Notes:        QRM repro not achieved. Quant grid (b02–b05) on hold until Path C.
+Notes:        Main qreason BF16 did not reproduce QRM. Official QRM Experiment A later passed the prompt/protocol check, so b02 was opened as a deployment-stack FP8 test, not as a QRM Table 1 claim.
 ```
 
 ---
@@ -253,7 +253,7 @@ Partial data: outputs-hpc-diag-pathc-2026-07-05/raw/ (~20 rows per 32k cell)
 
 ---
 
-## Experiment A — Official QRM inference.py (QUEUED 2026-07-06)
+## Experiment A - Official QRM inference.py (COMPLETED 2026-07-06)
 
 ```text
 Date:         2026-07-06
@@ -261,14 +261,36 @@ Level:        diagnostic (stack cross-check)
 Model:        DeepSeek-R1-Distill-Qwen-7B BF16
 Task:         MATH-500 (n=10 pilot)
 Seed(s):      42
-Env:          qrm-official (NOT qreason — vLLM 0.7.0 fork)
-Hardware:     A100 job 87216 — PENDING (Resources), --exclusive
-Status:       Env install VERIFIED on login node; waiting for exclusive GPU
+Env:          qrm-official (NOT qreason - vLLM 0.7.0 fork)
+Hardware:     A100 job 87302, ragpu006 GPU 0
+Status:       completed / stack gap confirmed
 Submit:       bash scripts/hpc/submit_qrm_official_test.sh
 Output:       outputs-hpc-qrm-official-2026-07-06/
 Compare:      python scripts/hpc/qrm_parity/compare_side_by_side.py --limit 10
-Debug log:    docs/QRM_OFFICIAL_HPC_TROUBLESHOOTING.md (jobs 87130–87216)
-Notes:        Same repo as main harness; separate conda env. Decisive test vs our stack.
+Debug log:    docs/QRM_OFFICIAL_HPC_TROUBLESHOOTING.md (jobs 87130-87302)
+Key numbers:  10/10 correct, 0 truncation, no degeneration loops
+Notes:        Same repo as main harness; separate conda env. Proves prompt/protocol and isolates a modern-stack generation behavior gap.
+```
+
+---
+
+## 2026-08-13 - b02 FP8 deployment block (SUBMITTED)
+
+```text
+Date:         2026-08-13
+Level:        B/C deployment stack
+Models:       DeepSeek-R1-Distill-Qwen-7B-FP8 + DeepSeek-R1-Distill-Llama-8B-FP8
+Task:         MATH-500
+Seed(s):      0
+Env:          qreason (vLLM 0.8.5)
+Hardware:     PARAM Rudra A100, non-exclusive 1x GPU per cell
+Status:       running/pending
+Jobs:         96086 Qwen FP8 running on ragpu004; passed FP8 model load and started generation; 96087 Llama FP8 pending/resources
+First attempt: 96084/96085 failed before raw rows with `fp8_e5m2 kv-cache is not supported with fp8 checkpoints`; fixed in commit 542f622.
+Archive:      outputs-hpc-2a100-main-2026-08-13
+Submit:       bash scripts/hpc/submit_hpc_blocks.sh --fresh b02
+Notes:        Valid for pass@1, truncation, latency/VRAM, and cost-per-correct. Not valid for calibration claims because launcher scoring uses --skip-calibration.
+Next gate:    Wait for both summaries; do not submit b03/b04 until b02 is reviewed vs BF16 Path C/July numbers.
 ```
 
 ---

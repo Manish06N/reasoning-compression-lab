@@ -1,10 +1,14 @@
 # HPC 2× A100 (80 GB) — Publication Plan
 
 **SLURM limit:** 48 hours max per job  
-**Rule:** RTX 5080 runs **only** cells expected to finish in **≤24 h each** (Qwen-1.5B). Everything else → HPC.  
-**Protocol (both machines):** `repro_qrm.yaml`, batch_size=1, full datasets, seed 0
+**Rule:** Paper 1/J1 publication numbers run on PARAM Rudra HPC. RTX 5080 outputs are historical or J3 local-transfer only.
+**Protocol:** `repro_qrm.yaml`, batch_size=1, full datasets, seed 0 for the main HPC grid; b02 currently scores with `--skip-calibration`.
 
 GitHub: [reasoning-compression-lab](https://github.com/Manish06N/reasoning-compression-lab)
+
+**Current status (2026-08-13):** b02 FP8 is submitted in `outputs-hpc-2a100-main-2026-08-13` as jobs **96086** and **96087**. Do not submit b03/b04 until b02 pass@1, truncation, latency/VRAM, and cost are reviewed. b02 uses `--skip-calibration`, so calibration claims remain gated on valid confidence rows.
+
+First b02 attempt jobs **96084/96085** failed before raw rows with the vLLM FP8 checkpoint plus FP8 KV-cache incompatibility; commit `542f622` fixes FP8 configs to `kv_cache_dtype: auto`.
 
 ---
 
@@ -12,14 +16,14 @@ GitHub: [reasoning-compression-lab](https://github.com/Manish06N/reasoning-compr
 
 | Machine | VRAM | Role | Entry script |
 |---------|------|------|--------------|
-| **RTX 5080** | 16 GB | Qwen-1.5B × 4 quants × MATH-500 (~1 day/cell, ~4 days total) | `scripts/local/run_5080_publication.sh` |
+| **RTX 5080** | 16 GB | Historical/J3 local-transfer only; not J1 publication numbers | archived local scripts |
 | **HPC 2× A100** | 160 GB total | All 7B/8B cells, GSM8K, GPQA | `scripts/hpc/run_hpc_2a100_publication.sh` |
 
 **Do NOT run on 5080:** Qwen-7B, Llama-8B (any quant), GSM8K, BF16 anchors — they OOM or take weeks at batch_size=1.
 
 ---
 
-## RTX 5080 cells (4 inference + smoke)
+## RTX 5080 cells (historical/J3 only)
 
 Queue: `configs/machine_split/5080_cells.sh`
 
@@ -31,26 +35,35 @@ Queue: `configs/machine_split/5080_cells.sh`
 | 3 | level_c_qwen15b_awq4 | 1.5B AWQ-4 | MATH-500 | 500 | ~≤24 h |
 | 4 | level_c_qwen15b_gptq4 | 1.5B GPTQ-4 | MATH-500 | 500 | ~≤24 h |
 
-**Archive:** `outputs-win5080-main-YYYY-MM-DD/`
+**Archive:** `outputs-win5080-main-YYYY-MM-DD/` (historical only for J1)
 
 ```bash
-# Windows / WSL
+# Historical/J3 only - do not use for current J1 paper numbers
 bash scripts/local/run_5080_publication.sh --skip-download
 bash scripts/local/start_5080_main.sh
 ```
 
 ---
 
-## HPC blocks (each ≤ 47 h)
+## HPC blocks (each <= 47 h)
 
-Submit all ready blocks:
+Current monitor commands:
 
 ```bash
 export QR=/scratch/$USER/reasoning-compression-lab
-cd $QR && git pull
-bash scripts/hpc/submit_hpc_blocks.sh        # b01–b06
-bash scripts/hpc/submit_hpc_blocks.sh b01    # one block
+cd $QR
+squeue -u $USER
+tail -f logs/slurm/b02_parallel_fp8_level_b_qwen7b_fp8_math500_seed0_96086.out
 ```
+
+Submit later blocks only after b02 review:
+
+```bash
+# after b02 finishes and summaries are reviewed
+bash scripts/hpc/submit_hpc_blocks.sh b03
+bash scripts/hpc/submit_hpc_blocks.sh b04
+```
+
 
 ### b01 — 2× A100 parallel (~12–24 h)
 
@@ -139,7 +152,7 @@ Blocks b02–b06 use `submit_hpc_blocks.sh` (inline `--wrap` sbatch).
 ssh manishn_iitp@paramrudra.iitp.ac.in -p 4422
 export QR=/scratch/$USER/reasoning-compression-lab
 cd $QR
-git pull origin main
+git fetch origin && git reset --hard origin/main
 
 source /home/apps/MSCC/miniconda3/etc/profile.d/conda.sh
 conda activate qreason
@@ -149,7 +162,7 @@ bash scripts/hpc/02_download_model.sh   # Qwen-7B + quants
 # Llama-8B BF16 if missing:
 # huggingface-cli download deepseek-ai/DeepSeek-R1-Distill-Llama-8B ...
 
-bash scripts/hpc/submit_hpc_blocks.sh
+# b02 is already submitted on 2026-08-13; monitor first
 squeue -u $USER
 ```
 

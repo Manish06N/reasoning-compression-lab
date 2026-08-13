@@ -1,18 +1,23 @@
 # J1 validation runbook — prove the pipeline before expanding
 
-**Status (2026-07-05):** b01 gate **FAILED** → Path C **canceled** at n=20 → **Experiment A IN FLIGHT** (job **87130**).
+**Status (2026-08-13):** official QRM parity **completed** -> b02 FP8 deployment block **submitted** (jobs **96086/96087**) in `outputs-hpc-2a100-main-2026-08-13`.
 
-**Experiment A:** Official QRM `inference.py` on 10 MATH-500 problems (authors' stack vs ours). Submit/monitor: `bash scripts/hpc/submit_qrm_official_test.sh` · `tail -f logs/qrm_official_*.out`
+**Current b02:** Qwen FP8 job 96086 is running; Llama FP8 job 96087 is pending/resources. Both use the main paper stack (`qreason`, vLLM 0.8.5), not `qrm-official`.
 
-**Path C (canceled):** Partial archive `outputs-hpc-diag-pathc-2026-07-05` — protocol OK, ~10% pass@1, ~90% trunc on our vLLM 0.8.5 stack.
+First b02 attempt jobs **96084/96085** failed before raw rows with the vLLM FP8 checkpoint plus FP8 KV-cache incompatibility; commit `542f622` fixes FP8 configs to `kv_cache_dtype: auto`.
 
-**Experiments A–D:** [notes.md §31](../notes.md) · [QRM_STACK_PARITY_AUDIT.md](QRM_STACK_PARITY_AUDIT.md)
+**Official QRM parity:** job 87302 completed in `qrm-official`: Qwen-7B BF16 n=10, seed 42, 10/10 correct, 0 truncation. This proves the prompt/protocol and confirms a stack gap versus `qreason` Path C.
 
-**Quant grid on hold** until Experiment A completes.
+**Path C (canceled):** Partial archive `outputs-hpc-diag-pathc-2026-07-05` - protocol OK, Qwen 10%/90% trunc and Llama 15%/75% trunc at n=20 on our vLLM 0.8.5 stack.
 
-**GitHub:** sync from HPC via MacBook rsync.
+**Experiments A-D:** [notes.md sections 31-33](../notes.md) . [QRM_STACK_PARITY_AUDIT.md](QRM_STACK_PARITY_AUDIT.md)
 
-Use this on HPC (login + captcha required — agent cannot SSH for you).
+**Quant grid rule:** b02 is open as an FP8 stack-behavior test. Do **not** submit b03/b04 until both b02 cells finish and truncation, pass@1, and cost are reviewed against the BF16 Path C/July numbers.
+
+**GitHub:** GitHub/HPC include the FP8 KV-cache fix (`542f622`); MacBook should pull latest `origin/main`; leave `.qrm_official_env_ready` untracked.
+
+Use this on HPC (login + captcha required - agent cannot SSH for you).
+
 
 ---
 
@@ -235,7 +240,7 @@ python scripts/rescore_archive.py --archive "$ROOT"
 
 ## Phase 6 — Valid calibration (before Brier/AURC claims)
 
-**Hard gate before b02:** logprobs must be stored in raw JSONL (patch + smoke test).
+**Hard gate before calibration claims:** rows must carry a valid `confidence_source` from logprobs or maj@5. b02 can be used now for pass@1, truncation, latency/VRAM, and cost because the launcher scores with `--skip-calibration`.
 
 Until then:
 

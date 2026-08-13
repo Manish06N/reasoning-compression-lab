@@ -9,36 +9,41 @@ Canonical dated record for **Paper 1: Beyond Accuracy** (`reasoning-compression-
 
 ---
 
-## Current Status Snapshot (2026-07-06, official QRM repo test SUCCESS)
+## Current Status Snapshot (2026-08-13, b02 FP8 submitted)
 
 | Area | Status |
 |------|--------|
-| **Active experiment** | **Quant grid b02** ready to open (since QRM parity check is completed) |
-| **Path C** | **CANCELED** (87116–87118) — baseline comparison kept in outputs |
-| **QRM Parity check** | Qwen-7B BF16 official run **100% correct (10/10)**, **0% loops/truncation** |
-| **Official test** | n=10 MATH-500, seed=42, Qwen-7B BF16, env `qrm-official` |
-| **Output** | `outputs-hpc-qrm-official-2026-07-06/` |
-| **b01 gate (repro)** | **PASSED (via official stack job 87302)** — proving our prompt config is correct |
-| **b02–b06** | **Ready to open** (repro confirmed on official stack) |
-| **GitHub sync** | HPC ahead of `origin/main` — MacBook rsync needed |
-| **Key docs** | `docs/QRM_STACK_PARITY_AUDIT.md`, `notes.md` §32, `CHANGELOG.md` |
+| **Active experiment** | **b02 FP8 deployment block** under `qreason` vLLM 0.8.5 |
+| **Archive** | `outputs-hpc-2a100-main-2026-08-13` |
+| **Qwen FP8** | Job **96086** - `level_b_qwen7b_fp8_math500_seed0`, running on `ragpu004`, 1x A100; passed FP8 model load with `kv_cache_dtype=auto` and started generation |
+| **Llama FP8** | Job **96087** - `level_c_llama8b_fp8_math500_seed0`, pending/resources, 1x A100 |
+| **b02 first attempt** | Jobs **96084/96085** failed before raw rows with `fp8_e5m2 kv-cache is not supported with fp8 checkpoints`; fixed in `542f622` by setting FP8 checkpoint KV cache to `auto` |
+| **Official QRM parity** | Job **87302** completed: Qwen-7B BF16 official stack, n=10, seed 42, **10/10 correct**, **0 truncation** |
+| **Path C** | **CANCELED** (87116-87118) - Qwen 10%/90% trunc, Llama 15%/75% trunc at n=20 on `qreason` |
+| **b01 gate interpretation** | Official stack passed the prompt/protocol check; the main `qreason` BF16 stack failed and is a deployment-stack finding |
+| **GitHub sync** | GitHub/HPC include the FP8 KV-cache fix (`542f622`); MacBook should pull latest `origin/main`; only `.qrm_official_env_ready` should remain untracked |
+| **Calibration boundary** | b02 is scored with `--skip-calibration`; use for pass@1/truncation/cost, not Brier/AURC/ECE |
 
-### Official QRM test (Experiment A) — completed
+### b02 monitor and next gate
+
+```bash
+squeue -u $USER
+tail -f logs/slurm/b02_parallel_fp8_level_b_qwen7b_fp8_math500_seed0_96086.out
+tail -f logs/slurm/b02_parallel_fp8_level_c_llama8b_fp8_math500_seed0_96087.out
+```
+
+Do **not** submit b03/b04 until both b02 summaries are available and truncation, pass@1, latency/VRAM, and cost-per-correct are compared against BF16 Path C/July numbers.
+
+### Official QRM test (Experiment A) - completed
 
 | Experiment | What | Status |
 |------------|------|--------|
-| **A** | Official QRM `inference.py`, same 10 problems | **COMPLETED** — job **87302** (10/10 correct) |
+| **A** | Official QRM `inference.py`, same 10 problems | **COMPLETED** - job **87302** (10/10 correct, 0 truncation) |
 | **B** | Our stack, logprobs off | Code fixed; not rerun (skipped) |
-| **C** | rep_pen ablation | **Done** — both with/without failed on modern stack |
-| **D** | Qwen 64k budget | **Canceled** — job 87118 |
+| **C** | rep_pen ablation | **Done** - both with/without failed on modern stack |
+| **D** | Qwen 64k budget | **Canceled** - no longer needed after A confirmed stack gap |
 
-See [notes.md §32](notes.md) for plain-English explainer.
-
-```bash
-# Check final logs
-cat logs/qrm_official_87302.out
-python scripts/hpc/qrm_parity/compare_side_by_side.py --limit 10
-```
+See [notes.md section 34](notes.md) for the current b02 decision record.
 
 ### QRM stack parity (2026-07-05 audit)
 

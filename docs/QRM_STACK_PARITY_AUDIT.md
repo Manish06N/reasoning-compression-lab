@@ -1,4 +1,4 @@
-# QRM Stack Parity Audit (2026-07-05)
+# QRM Stack Parity Audit (updated 2026-08-13)
 
 **Purpose:** Explain why Path C strict QRM protocol reproduces the *failure mode* but not QRM Table 1 numbers, what we verified, what we fixed, and what experiments come next.
 
@@ -158,34 +158,31 @@ python scripts/hpc/qrm_parity/compare_side_by_side.py \
   --parity-archive outputs-hpc-diag-pathc-parity-$(date +%Y-%m-%d) --limit 10
 ```
 
-### Experiment A — official QRM cross-check (**ACTIVE**, job 87130)
+### Experiment A - official QRM cross-check (**COMPLETED**, job 87302)
 
 ```bash
-bash scripts/hpc/submit_qrm_official_test.sh
-squeue -j 87130
-tail -f logs/qrm_official_87130.out
+tail -n 120 logs/qrm_official_87302.out
 python scripts/hpc/qrm_parity/compare_side_by_side.py --limit 10
 ```
 
-Installs `qrm-official` conda env + QRM lighteval/vllm submodules on first run (30–60 min).  
-Output: `outputs-hpc-qrm-official-2026-07-05/`
+Output: `outputs-hpc-qrm-official-2026-07-06/`
 
-**Decision rule:** If official QRM gets `\boxed{}` and high pass@1 where we looped → **stack gap confirmed**.
+**Result:** official QRM got 10/10 correct with 0 truncation on the same first 10 MATH-500 items. Our Path C comparison on the modern `qreason` stack was 1/10 with 90% truncation. The decision is made: stack gap confirmed. b02 FP8 is now submitted as jobs 96086/96087.
 
 ---
 
-## 6. Experiments A–D (status 2026-07-05)
+## 6. Experiments A-D (status 2026-08-13)
 
 | ID | Tests | Stack | Status |
 |----|-------|-------|--------|
-| **A** | Authors' `inference.py` on 10 MATH-500 IDs | QRM Lighteval + QRM vLLM | **RUNNING** (87130) |
+| **A** | Official `inference.py` on 10 MATH-500 IDs | QRM Lighteval + QRM vLLM | **COMPLETED** - 87302, 10/10 correct, 0 truncation |
 | **B** | `capture_logprobs: false` on our harness | Our vLLM 0.8.5 | Code fixed; **not rerun** |
 | **C** | `repetition_penalty` none vs 1.05 | Our harness | **Answered** — both fail (~90% trunc) |
 | **D** | Qwen 64k max_tokens | Our harness | **Canceled** (87118) |
 
 Path C (our strict QRM protocol, n=50) was **canceled** at n=20 — sufficient to justify A.
 
-Plain English: [notes.md §31](../notes.md)
+Plain English: [notes.md sections 31-34](../notes.md)
 
 ---
 
@@ -195,7 +192,7 @@ Plain English: [notes.md §31](../notes.md)
 Path C canceled at n=20
 └─ Experiment A COMPLETED successfully (Job 87302)
     └─ QRM got 10/10 (100% correct, 0% loops) vs. our stack 1/10 (10% correct, 90% loops)
-        └─ [RESULT] Stack gap confirmed. Document stack differences in paper methods; open Quant Grid (b02).
+        └─ [RESULT] Stack gap confirmed. b02 FP8 is now submitted as jobs 96086/96087; wait for both summaries before b03/b04.
 ```
 
 ---

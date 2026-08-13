@@ -13,7 +13,7 @@
 | Doc | Purpose |
 |-----|---------|
 | [CODEBASE_OVERVIEW.md](CODEBASE_OVERVIEW.md) | **High-level overview** — thesis alignment, architecture, modules, paper status |
-| [J1_VALIDATION_RUNBOOK.md](J1_VALIDATION_RUNBOOK.md) | **Next steps** — fresh b01 rerun on HPC |
+| [J1_VALIDATION_RUNBOOK.md](J1_VALIDATION_RUNBOOK.md) | **Next steps** - monitor/score b02 FP8 jobs 96086/96087, then decide b03/b04 |
 | [BEGINNER_HPC_GUIDE.md](BEGINNER_HPC_GUIDE.md) | HPC workflow step-by-step |
 | [HARDWARE_POLICY.md](HARDWARE_POLICY.md) | J1 HPC-only; RTX for J3 transfer |
 | [KNOWN_ISSUES.md](KNOWN_ISSUES.md) | **Critical** — resume trap, bad archive, limitations |

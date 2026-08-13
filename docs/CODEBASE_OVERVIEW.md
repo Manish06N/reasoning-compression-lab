@@ -6,7 +6,7 @@
 
 This document is the canonical high-level map of the entire codebase: what it does, how pieces connect, what is implemented today, and how the three-paper thesis plan maps onto directories and scripts. For day-to-day HPC operations, start with [BEGINNER_HPC_GUIDE.md](BEGINNER_HPC_GUIDE.md). For live execution status, see [PROGRESS.md](PROGRESS.md).
 
-**J1 status (2026-07-01):** **Engineering MVP complete; scientific validation pending** fresh HPC b01 rerun. See [J1_VALIDATION_RUNBOOK.md](J1_VALIDATION_RUNBOOK.md).
+**J1 status (2026-08-13):** official QRM parity completed; b02 FP8 deployment block is running/pending in `outputs-hpc-2a100-main-2026-08-13`. See [J1_VALIDATION_RUNBOOK.md](J1_VALIDATION_RUNBOOK.md).
 
 ---
 
@@ -357,7 +357,7 @@ Implemented in `src/evaluation/calibration/`:
 | Reliability diagram bins | `reliability.py` | For plotting |
 | AURC / AUROC | via `src/metrics/calibration.py` | Selective prediction |
 
-**Calibration confidence (fail-closed):** `score_run.py` does **not** treat parse success as publication confidence. Use `--skip-calibration` for repro scoring; `--require-calibration` before analysis; maj@5 or logprobs for Brier/AURC claims. **Logprobs not yet stored in raw JSONL** — hard gate before b02. See [KNOWN_ISSUES.md](KNOWN_ISSUES.md) §4, §8.
+**Calibration confidence (fail-closed):** `score_run.py` does **not** treat parse success as publication confidence. Use `--skip-calibration` for pass@1/truncation/cost scoring; use `--require-calibration` before Brier/AURC/ECE analysis. b02 may run because it is explicitly a pass@1/truncation/cost block. Valid calibration claims still require maj@5 or logprob-backed rows with a valid `confidence_source`. See [KNOWN_ISSUES.md](KNOWN_ISSUES.md) section 4.
 
 **QRM baseline bands (fixed `286f5e4`):** MATH-500 gates are ~88–98%, not 45–65% (AIME-scale error). Comparator prints provenance banner at score time.
 
@@ -446,7 +446,7 @@ flowchart TD
 | **Novelty** | No competing paper claims same joint study | Manual — template in roadmap Appendix C |
 | **Scale** | 7B/8B story stable before 14B/32B | Config policy in `papers/j1/protocol.yaml` |
 
-**Current blocker (2026-07-01):** Scientific validation pending b01 rerun (jobs 86015/86016). June-29 archive diagnostic only (~7% pass@1). Score with `286f5e4+` yaml. See [KNOWN_ISSUES.md](KNOWN_ISSUES.md).
+**Current gate (2026-08-13):** wait for b02 jobs 96086/96087 to finish, then review pass@1, truncation, latency/VRAM, and cost-per-correct before submitting b03/b04. June/July diagnostic archives remain useful for stack-gap context, not for QRM reproduction claims.
 
 ---
 
@@ -465,8 +465,8 @@ flowchart TD
 | HPC block grid b01–b09 | ✅ Wired (seed 0) |
 | Reproduction seeds 42–44 | ✅ Cell configs exist |
 | Manual audit tooling | ✅ |
-| **Fresh HPC publication runs** | ⏳ **Experiment A** (official QRM, job 87130); Path C **canceled** |
-| **QRM stack parity** | ✅ Audit + Experiment A — [QRM_STACK_PARITY_AUDIT.md](QRM_STACK_PARITY_AUDIT.md); notes §31 |
+| **Fresh HPC publication runs** | b02 FP8 submitted - jobs **96086/96087**, archive `outputs-hpc-2a100-main-2026-08-13` |
+| **QRM stack parity** | Confirmed by official job **87302** - see [QRM_STACK_PARITY_AUDIT.md](QRM_STACK_PARITY_AUDIT.md), notes sections 31-34 |
 | QRM baseline yaml | ✅ Fixed task-specific bands (`286f5e4`, amd-002) |
 | Valid calibration numbers | ⏳ Requires logprobs patch or maj@5 after repro |
 | LiveCodeBench integration | ❌ Not yet wired |
@@ -523,7 +523,7 @@ flowchart TB
 | **5080** | Not used for J1/J2 paper numbers; **J3 local transfer only** |
 | **external_repos/** | Read-only clones of QRM, vLLM baselines, J2/J3 references | `../external_repos/` — never develop here |
 
-**Sync protocol:** HPC cannot push to GitHub. MacBook pushes → HPC `git reset --hard origin/main`. See [RUNBOOK.md](RUNBOOK.md).
+**Sync protocol:** Preferred path is MacBook push -> HPC `git fetch`/reset. If credentials are intentionally configured on HPC, small project-doc/code commits may be pushed directly after status review and after excluding runtime markers. See [RUNBOOK.md](RUNBOOK.md).
 
 **Validated HPC stack (main harness):** Python 3.11, PyTorch 2.6+cu124, vLLM 0.8.5, conda env **`qreason`**.
 

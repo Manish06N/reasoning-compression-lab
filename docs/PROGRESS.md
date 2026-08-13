@@ -1,62 +1,47 @@
 # Progress — Paper 1 Experiments
 
-**Last updated:** 2026-07-06 (Experiment A — env ready, job queued)
+**Last updated:** 2026-08-13 (b02 FP8 submitted; official QRM parity completed)
 **Repo:** https://github.com/Manish06N/reasoning-compression-lab  
-**Canonical log:** [progress.md](../progress.md) · **Audit:** [QRM_STACK_PARITY_AUDIT.md](QRM_STACK_PARITY_AUDIT.md) · **Ops:** [CHANGELOG.md](../CHANGELOG.md)
+**Canonical log:** [progress.md](../progress.md) . **Audit:** [QRM_STACK_PARITY_AUDIT.md](QRM_STACK_PARITY_AUDIT.md) . **Ops:** [CHANGELOG.md](../CHANGELOG.md)
 
 ---
 
-## Summary (2026-07-05)
+## Summary (2026-08-13)
 
 | Area | Status |
 |------|--------|
-| **Active experiment** | **Experiment A** — official QRM `inference.py` (job **87216**, `PENDING`) |
-| **qrm-official env** | **Ready** — marker `2026-07-06-conda-gcc12-nvcc124-vllm070wheel` |
-| **Path C** | **CANCELED** (87116–87118) — n=20 sufficient |
-| **Path C archive** | `outputs-hpc-diag-pathc-2026-07-05` (~20 rows; kept for side-by-side) |
-| **Our harness signal** | Qwen **10%** / **90%** trunc — protocol OK, **stack gap** (`qreason` env) |
-| **Official test** | n=10, seed=42, Qwen-7B, env **`qrm-official`** (not `qreason`), output `outputs-hpc-qrm-official-2026-07-06/` |
-| **Quant grid** | **On hold** until Experiment A result |
+| **Active experiment** | **b02 FP8 deployment block** in fresh archive `outputs-hpc-2a100-main-2026-08-13` |
+| **Qwen FP8** | Job **96086** - `level_b_qwen7b_fp8_math500_seed0`, running on `ragpu004`, 1x A100; passed FP8 model load with `kv_cache_dtype=auto` and started generation |
+| **Llama FP8** | Job **96087** - `level_c_llama8b_fp8_math500_seed0`, pending/resources, 1x A100 |
+| **b02 first attempt** | Jobs **96084/96085** failed before raw rows with `fp8_e5m2 kv-cache is not supported with fp8 checkpoints`; fixed in `542f622` by setting FP8 checkpoint KV cache to `auto` |
+| **qreason stack** | vLLM **0.8.5**; this is the stack that looped/truncated on BF16 |
+| **Official QRM parity** | Job **87302** completed under `qrm-official`: **10/10 correct**, **0 truncation** on Qwen-7B BF16 n=10 |
+| **Path C archive** | `outputs-hpc-diag-pathc-2026-07-05` (~20 rows; kept for side-by-side stack-gap evidence) |
+| **Git sync** | GitHub/HPC include the FP8 KV-cache fix (`542f622`); MacBook should pull latest `origin/main`; keep `.qrm_official_env_ready` untracked |
+| **Calibration** | b02 auto-scoring uses `--skip-calibration`; valid for pass@1/truncation/cost, not Brier/AURC/ECE |
 
-**Strategic label:** *Run authors' code (A) to decide stack vs config — then document honestly for Paper 1.*
+**Strategic label:** *b02 asks whether FP8 changes the modern-stack loop/truncation behavior. It is not a calibration run and not a QRM Table 1 reproduction claim.*
 
----
+## Experiments A-D (diagnostic matrix)
 
-## Experiments A–D (diagnostic matrix)
+| ID | Question | What ran | Status |
+|----|----------|----------|--------|
+| **A** | Does official QRM code score well on the same 10 problems? | `external/Quantized-Reasoning-Models/inference.py` (`qrm-official`) | **COMPLETED** - job 87302, 10/10 correct, 0 truncation |
+| **B** | Did logprobs break our stack? | Our harness, `capture_logprobs: false` | Code fixed; not rerun |
+| **C** | Does `repetition_penalty` explain failure? | Our harness, with vs without | **Answered** - both fail |
+| **D** | Is 32k budget too tight? | Qwen 64k max_tokens | **Canceled** - not needed after A |
 
-| ID | Question | What runs | Status |
-|----|----------|-----------|--------|
-| **A** | Does **official QRM code** score well on same 10 problems? | `external/Quantized-Reasoning-Models/inference.py` (`qrm-official`) | **QUEUED** — 87216 (exclusive GPU) |
-| **B** | Did **logprobs** break our stack? | Our harness, `capture_logprobs: false` | Code fixed; **not rerun** |
-| **C** | Does **repetition_penalty** explain failure? | Our harness, with vs without | **Answered** — both fail |
-| **D** | Is **32k budget** too tight? | Qwen 64k max_tokens | **Canceled** (87118) |
+Plain English: [notes.md sections 31-34](../notes.md)
 
-Plain English: [notes.md §31](../notes.md)
-
----
-
-## One repo, two envs
-
-| Env | Use for |
-|-----|---------|
-| **`qreason`** | Main harness — `run_inference.py`, b01–b09, smoke, Path C |
-| **`qrm-official`** | Experiment A only — authors' `inference.py`, vLLM 0.7.0 fork |
-
-Same repo: `reasoning-compression-lab`. Authors' code: `external/Quantized-Reasoning-Models/`.  
-**Do not** install QRM packages into `qreason` or our vLLM 0.8.5 into `qrm-official`.
-
-Troubleshooting: [QRM_OFFICIAL_HPC_TROUBLESHOOTING.md](QRM_OFFICIAL_HPC_TROUBLESHOOTING.md)
-
----
-
-## Monitor Experiment A
+## Monitor b02
 
 ```bash
-squeue -j 87216
-tail -f logs/qrm_official_87216.out
-# after finish:
-python scripts/hpc/qrm_parity/compare_side_by_side.py --limit 10
+squeue -u $USER
+tail -f logs/slurm/b02_parallel_fp8_level_b_qwen7b_fp8_math500_seed0_96086.out
+tail -f logs/slurm/b02_parallel_fp8_level_c_llama8b_fp8_math500_seed0_96087.out
 ```
+
+Do **not** submit b03/b04 until both b02 cells finish and pass@1, truncation, latency/VRAM, and cost-per-correct are reviewed against BF16 Path C/July numbers.
 
 ---
 

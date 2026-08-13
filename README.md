@@ -9,27 +9,31 @@ Deployment-science evaluation harness for compressed reasoning LLMs.
 
 **Roadmap:** PhD plan V8.2 (1 Jul 2026) — see [docs/plans/2026-07-01-v82-reengineering.md](docs/plans/2026-07-01-v82-reengineering.md) and [papers/j1/protocol.yaml](papers/j1/protocol.yaml).
 
-## Current status (2026-07-06)
+## Current status (2026-08-13)
 
-**Active: Experiment A** — official QRM `inference.py` cross-check (job **87216**, waiting for exclusive GPU).  
-**Path C canceled** (87116–87118) after n=20 showed protocol OK but **~10% pass@1 / ~90% trunc** on our stack.
+**Active: b02 FP8 deployment block** - fresh archive `outputs-hpc-2a100-main-2026-08-13`.
+Official QRM parity completed successfully, so b02 is now testing whether FP8 changes the loop/truncation behavior seen in the `qreason` vLLM 0.8.5 stack.
 
 | Item | Status |
 |------|--------|
-| **Active job** | **87216** — `PENDING (Resources)` — exclusive 1× A100, MATH-500 **n=10**, seed **42** |
-| **qrm-official env** | **Installed & verified** on login node (see troubleshooting doc below) |
-| **Path C** | **CANCELED** — partial archive `outputs-hpc-diag-pathc-2026-07-05` (~20 rows) kept for comparison |
-| **Why pivot** | Enough signal from our harness; **Experiment A** runs authors' code to isolate stack vs config |
-| **b01 (July)** | Gate **FAILED** — Llama 19.6%/58% trunc; Qwen 410/500 ~94% trunc |
-| **b02–b06** | **On hold** until Experiment A result |
+| **Git sync** | GitHub and HPC include the FP8 KV-cache fix (`542f622`); MacBook should pull latest `origin/main`; `.qrm_official_env_ready` remains untracked on HPC |
+| **b02 Qwen FP8** | Job **96086** - `level_b_qwen7b_fp8_math500_seed0`, 1x A100, running on `ragpu004`; passed FP8 model load with `kv_cache_dtype=auto` and started generation |
+| **b02 Llama FP8** | Job **96087** - `level_c_llama8b_fp8_math500_seed0`, 1x A100, pending/resources |
+| **b02 first attempt** | Jobs **96084/96085** failed before raw rows with `fp8_e5m2 kv-cache is not supported with fp8 checkpoints`; fixed in `542f622` by setting FP8 checkpoint KV cache to `auto` |
+| **Official QRM parity** | Job **87302** completed: Qwen-7B BF16, n=10 MATH-500, seed 42, **10/10 correct**, **0 truncation** |
+| **Path C / our stack** | Canceled at n=20 after Qwen **10% pass@1 / 90% trunc** and Llama **15% pass@1 / 75% trunc** |
+| **b01 July archive** | Deployment-stack BF16 evidence: Llama 500/500 **19.6% pass@1 / 58% trunc**; Qwen 410/500 about 94% trunc |
+| **Next gate** | Wait for both b02 jobs to finish, score summaries, then compare truncation/pass@1/cost vs BF16 Path C/July numbers |
+| **Calibration boundary** | b02 launcher scores with `--skip-calibration`; do not use b02 for Brier/AURC/ECE claims until valid confidence exists |
 
 ```bash
-squeue -j 87216
-tail -f logs/qrm_official_87216.out
-python scripts/hpc/qrm_parity/compare_side_by_side.py --limit 10   # after job finishes
+squeue -u $USER
+tail -f logs/slurm/b02_parallel_fp8_level_b_qwen7b_fp8_math500_seed0_96086.out
+# after both jobs finish:
+python scripts/build_paper_tables.py --archive outputs-hpc-2a100-main-2026-08-13
 ```
 
-**Experiments A–D explained:** [notes.md §31](notes.md) · full audit: [docs/QRM_STACK_PARITY_AUDIT.md](docs/QRM_STACK_PARITY_AUDIT.md) · env debug log: [docs/QRM_OFFICIAL_HPC_TROUBLESHOOTING.md](docs/QRM_OFFICIAL_HPC_TROUBLESHOOTING.md)
+**Experiments A-D explained:** [notes.md sections 31-34](notes.md) . full audit: [docs/QRM_STACK_PARITY_AUDIT.md](docs/QRM_STACK_PARITY_AUDIT.md) . env debug log: [docs/QRM_OFFICIAL_HPC_TROUBLESHOOTING.md](docs/QRM_OFFICIAL_HPC_TROUBLESHOOTING.md)
 
 ---
 
@@ -130,7 +134,7 @@ Do not expand the queue before seeing seed0 results. First finish b01-b09, score
 
 ## Push to GitHub
 
-MacBook: commit code/docs → `git push origin main`. HPC: `git fetch && git reset --hard origin/main` (HPC cannot push).
+Preferred: MacBook commits code/docs and runs `git push origin main`; HPC then runs `git fetch && git reset --hard origin/main`. If credentials are intentionally configured on HPC, HPC may push small project-doc/code commits directly after checking `git status` and excluding runtime markers such as `.qrm_official_env_ready`.
 
 Credentials: [docs/GIT_CREDENTIALS.md](docs/GIT_CREDENTIALS.md). Windows setup notes: [docs/archive/GITHUB_PUSH.md](docs/archive/GITHUB_PUSH.md).
 

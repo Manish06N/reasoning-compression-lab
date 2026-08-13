@@ -1,6 +1,6 @@
 # PARAM Rudra SLURM — GPU quota and `--exclusive` trap
 
-Last updated: 2026-07-03
+Last updated: 2026-08-13
 
 ## User GPU quota
 
@@ -9,7 +9,7 @@ Last updated: 2026-07-03
 | `MaxTRESPerUser` (gpu QOS) | **`gres/gpu=2`** |
 | ragpu node layout | **2× A100 80GB** per node (`Gres=gpu:2`) |
 
-You can run **two parallel 1-GPU inference jobs** (e.g. b01 Qwen + Llama split cells).
+You can run **two parallel 1-GPU inference jobs** (e.g. b02 Qwen FP8 + Llama FP8 split cells). Current b02 jobs **96086/96087** use this non-exclusive `--gres=gpu:1` pattern.
 
 ## The `--exclusive` trap (do not repeat)
 

@@ -37,7 +37,8 @@ Personal backup of findings, decisions, and learnings from the July 3 working se
 
 ### Current run label
 
-Jobs **86757** / **86758** = **Protocol B pilot, seed 0**. Let finish; do **not** cancel for strict QRM mid-run. If gate fails after score → see decision tree in **§19**.
+Jobs **96086** / **96087** = **b02 FP8 deployment block**, seed 0, main `qreason` stack, fresh archive `outputs-hpc-2a100-main-2026-08-13`. Let both finish; do **not** submit b03/b04 until b02 pass@1, truncation, latency/VRAM, and cost-per-correct are reviewed against BF16 Path C/July numbers. b02 is not a calibration run.
+First attempt jobs **96084/96085** failed before raw rows because vLLM 0.8.5 rejects `fp8_e5m2` KV cache with FP8 checkpoints. Commit `542f622` fixes the FP8 configs to `kv_cache_dtype: auto`; 96086/96087 are the retry to monitor.
 
 ### Verified good news (QRM GitHub audit)
 
@@ -944,14 +945,13 @@ bash scripts/hpc/submit_pathc_parity_pilot.sh               # d03 n=10 rerun
 bash scripts/hpc/qrm_parity/setup_official_qrm_repo.sh      # clone to external/
 ```
 
-### Decision tree (updated — Path C canceled)
+### Decision tree (updated - b02 active)
 
-```
+```text
 Path C stopped at n=20 (sufficient)
-└─ Experiment A running (87130): official QRM inference.py, same 10 IDs
-    ├─ QRM ~90%, we ~10% → stack gap confirmed → Paper 1: truncation + cost
-    ├─ QRM also loops → investigate weights/dataset/env
-    └─ Then decide: quant grid (b02) vs budget-limited paper only
+└─ Experiment A completed (87302): official QRM inference.py, same 10 IDs
+    └─ Official QRM: 10/10 correct, 0 truncation; our qreason Path C: ~10% and high truncation
+        └─ Stack gap confirmed -> b02 FP8 submitted as jobs 96086/96087
 ```
 
 ### Paper 1 framing (unchanged)
@@ -962,11 +962,11 @@ We **attempted** QRM reproduction honestly. Failure under 32k **supports** the t
 
 ## 31. Experiments A, B, C, D — plain English
 
-After Path C showed our **protocol is correct** but **results are wrong**, we planned four small tests. **Only A is running now.**
+After Path C showed our **protocol is correct** but **results are wrong**, we planned four small tests. **A is now completed and b02 is active.**
 
 | Letter | Name | One-line question | What actually runs | Status |
 |--------|------|-------------------|-------------------|--------|
-| **A** | Official QRM repo | Does **their** code get ~94% on the same 10 problems? | `inference.py` + Lighteval + QRM vLLM fork, job **87130** | **ACTIVE** |
+| **A** | Official QRM repo | Does the official stack get high accuracy on the same 10 problems? | `inference.py` + Lighteval + QRM vLLM fork, job **87302** | **COMPLETED** - 10/10 correct, 0 truncation |
 | **B** | No logprobs | Did asking for logprobs change generation on **our** stack? | Our `run_inference.py`, `capture_logprobs: false` | **Skipped** (fixed in code) |
 | **C** | rep_pen ablation | Does `repetition_penalty=1.05` fix the loops? | Our harness, compare none vs 1.05 | **Done** — July had 1.05 (still ~94% trunc); Path C had none (still ~90% trunc) |
 | **D** | 64k budget | Would Qwen answer if cap were 65536 not 32768? | Qwen cell `repro_qrm_64k.yaml`, job 87118 | **Canceled** |
@@ -976,9 +976,9 @@ After Path C showed our **protocol is correct** but **results are wrong**, we pl
 **Commands:**
 
 ```bash
-# A (active)
-squeue -j 87130
-tail -f logs/qrm_official_87130.out
+# A (completed)
+squeue -j 87302
+tail -n 120 logs/qrm_official_87302.out
 python scripts/hpc/qrm_parity/compare_side_by_side.py --limit 10
 
 # A (resubmit)
@@ -1028,4 +1028,42 @@ This results verify that the protocol parameters (prompt, temperature=0.6, top_p
 * **Change:** Added post-requeue `scontrol` updates. When the preflight VRAM check fails, the script calls `scontrol requeue "$SLURM_JOB_ID"` to return the job to `PENDING` state, and immediately calls `scontrol update job "$SLURM_JOB_ID" ExcNodeList=...` to exclude the current node.
 * **Rationale:** If the job lands on a node with a dirty GPU (like `racn116` which had only 3GB free), it automatically marks that node as excluded and returns to the queue. When the scheduler selects the job again, it is forced to select a different, clean node (such as `ragpu006` where the run successfully finished). Calling `scontrol update` *after* the `requeue` call ensures the job is in a `PENDING` state, allowing the property modification to succeed.
 
-*Last updated: 2026-07-06 (night). §32 = QRM official run success. §31 = A–D explainer. §30 = stack audit.*
+
+
+## 33. b02 FP8 launch and current decision gate (2026-08-13)
+
+After initial GitHub/MacBook/HPC sync at **319cc56**, followed by HPC/GitHub FP8 fix `542f622`, we submitted the fresh **b02 FP8** deployment block from HPC.
+
+| Item | Status |
+|------|--------|
+| Archive | `outputs-hpc-2a100-main-2026-08-13` |
+| Qwen FP8 | Job **96086**, `level_b_qwen7b_fp8_math500_seed0`, running on `ragpu004` |
+| Llama FP8 | Job **96087**, `level_c_llama8b_fp8_math500_seed0`, pending/resources |
+| Stack | `qreason`, vLLM **0.8.5** |
+| Resource shape | Non-exclusive **1x A100** per cell, `--gres=gpu:1` |
+| Calibration | Skipped by launcher; do not cite Brier/AURC/ECE from this block |
+
+**Why this is correct:** job 87302 already proved the QRM prompt/protocol under the official stack. Path C showed the modern `qreason` stack loops/truncates under the same nominal protocol. b02 is therefore the right next experiment: it tests whether FP8 changes that deployment-stack loop/truncation behavior and what it does to pass@1, latency/VRAM, and cost-per-correct.
+
+**Next:** wait for both b02 jobs to finish, score/check summaries, then decide b03/b04. Do not submit the next quant blocks before this review.
+
+
+
+
+## 34. b02 FP8 first-attempt failure and retry (2026-08-13)
+
+The first b02 submit did **not** produce science rows.
+
+| Job | Cell | Result |
+|-----|------|--------|
+| **96084** | Qwen-7B FP8 MATH-500 | Failed during vLLM model init |
+| **96085** | Llama-8B FP8 MATH-500 | Failed during vLLM model init |
+
+Both failed with `ValueError: fp8_e5m2 kv-cache is not supported with fp8 checkpoints.` This is a config compatibility issue, not an experimental result.
+
+**Fix:** commit `542f622` changes FP8 checkpoint model configs from `kv_cache_dtype: fp8_e5m2` to `kv_cache_dtype: auto` for Qwen-7B FP8, Llama-8B FP8, and Qwen-1.5B FP8.
+
+**Retry:** `bash scripts/hpc/submit_hpc_blocks.sh --fresh b02` submitted **96086** (Qwen FP8, running on `ragpu004`) and **96087** (Llama FP8, pending/resources) into the same archive `outputs-hpc-2a100-main-2026-08-13`. Monitor these, not 96084/96085.
+
+
+*Last updated: 2026-08-13. §34 = b02 FP8 retry after KV-cache fix. §33 = b02 FP8 launch/current gate. §32 = QRM official run success. §31 = A-D explainer. §30 = stack audit.*

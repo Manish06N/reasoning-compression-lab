@@ -1,6 +1,6 @@
 # QRM official stack — HPC debugging & troubleshooting log
 
-Last updated: **2026-07-06**
+Last updated: **2026-08-13**
 
 Chronological record of every failed attempt, diagnosis, and fix while bringing up **Experiment A** (official QRM `inference.py`, n=10 MATH-500, seed=42) on PARAM Rudra. Use this before re-running or extending the `qrm-official` conda env.
 
@@ -43,7 +43,8 @@ bash scripts/hpc/submit_qrm_official_test.sh
 | **87193** | 2026-07-06 | ragpu006 | ~2 min | FAILED | Wrong vLLM precompiled wheel |
 | **87196** | 2026-07-06 | ragpu006 | ~2 min | FAILED | GitPython / missing git |
 | **87213** | 2026-07-06 | racn115 | ~4 min | FAILED | Shared GPU CUDA OOM |
-| **87216** | 2026-07-06 | — | — | **PENDING (Resources)** | Exclusive GPU + preflight (latest) |
+| **87216** | 2026-07-06 | - | - | SUPERSEDED | Exclusive GPU attempt waited in queue |
+| **87302** | 2026-07-06 | ragpu006 | completed | **COMPLETED** | Final non-exclusive 1-GPU official QRM run: 10/10 correct, 0 truncation |
 
 Logs: `logs/qrm_official_<JOBID>.out` / `.err`
 
@@ -294,15 +295,14 @@ SLURM `--gres=gpu:1` without `--exclusive` can land on a **shared** GPU (same ph
 
 ### Fix
 
-1. `#SBATCH --exclusive` in `slurm/qrm_official_math500_n10.slurm`
-2. GPU memory preflight in `run_official_inference.sh`:
+Final working approach:
 
-```bash
-QRM_MIN_FREE_GPU_MB="${QRM_MIN_FREE_GPU_MB:-40000}"
-# nvidia-smi check; exit 75 if insufficient (SLURM retry-friendly)
-```
+1. Keep the job non-exclusive with `--gres=gpu:1` and `--cpus-per-task=16` so it does not consume both GPUs under the user quota.
+2. Lower `gpu_memory_utilization` to `0.75` and require about 62 GB free VRAM before vLLM starts.
+3. If a GPU is dirty, update `ExcNodeList` and requeue the job so SLURM can place it on a cleaner GPU.
 
-**Note:** `--exclusive` on 2-GPU ragpu nodes counts as 2 GPUs toward `QOSMaxGRESPerUser` — job may sit `PENDING (Resources)` longer. This is acceptable for a one-shot parity run.
+This replaced the earlier exclusive-GPU idea, which avoided dirty GPUs but could sit behind QOS/resource limits on 2-GPU nodes.
+
 
 ---
 
@@ -342,17 +342,11 @@ bash scripts/hpc/qrm_parity/install_official_qrm_env.sh
 | `scripts/hpc/qrm_parity/install_official_qrm_env.sh` | Full stack install + verification |
 | `scripts/hpc/qrm_parity/setup_official_qrm_repo.sh` | Submodule init on login node |
 | `scripts/hpc/qrm_parity/run_official_inference.sh` | git, compilers, GPU preflight |
-| `slurm/qrm_official_math500_n10.slurm` | `--exclusive`, `set -eo pipefail` |
+| `slurm/qrm_official_math500_n10.slurm` | Non-exclusive `--gres=gpu:1`, `--cpus-per-task=16`, `set -eo pipefail` |
 
-### HPC git commits (local, ahead of origin/main)
+### Git sync status
 
-```
-fe1376b  Request exclusive GPU and preflight free memory for QRM official run
-9352d9e  Install conda git for lighteval on PARAM Rudra compute nodes
-e77d8f4  Fix QRM official env build on PARAM Rudra compute nodes
-```
-
-Sync to GitHub via MacBook rsync workflow before resetting HPC to `origin/main`.
+The QRM official fixes and follow-up docs are synced to GitHub. As of 2026-08-13, GitHub/HPC include the FP8 KV-cache fix (`542f622`); MacBook should pull latest `origin/main`. Leave `.qrm_official_env_ready` untracked.
 
 ---
 
@@ -436,6 +430,9 @@ Output directory: `outputs-hpc-qrm-official-<date>/`
 | Item | Value |
 |------|-------|
 | Env install | **Verified** on login node (marker `2026-07-06-conda-gcc12-nvcc124-vllm070wheel`) |
-| GPU inference | **Validated through vLLM CUDA import** (job 87213); blocked by shared-GPU OOM |
-| Latest job | **87216** — `PENDING (Resources)` waiting for exclusive A100; env is ready |
-| GitHub sync | HPC commits **not yet** on `origin/main` — MacBook rsync required |
+| GPU inference | **Validated end-to-end** by job **87302** |
+| Official result | Qwen-7B BF16, MATH-500 n=10, seed 42: **10/10 correct**, **0 truncation** |
+| Science conclusion | Prompt/protocol are correct; modern `qreason` stack behavior differs from QRM official stack |
+| Follow-up | b02 FP8 deployment block submitted as jobs **96086/96087** in `outputs-hpc-2a100-main-2026-08-13` |
+| GitHub sync | Complete at `319cc56`; `.qrm_official_env_ready` remains untracked |
+| Calibration | b02 is not a calibration run; use it for pass@1/truncation/cost only |

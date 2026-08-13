@@ -1,61 +1,62 @@
 # Known issues and limitations
 
-Last updated: 2026-07-06
+Last updated: 2026-08-13
 
 Operational issues that can break paper results if ignored, plus known software limitations.
 
 ---
 
-## Current campaign status (2026-07-05)
+## Current campaign status (2026-08-13)
 
 | Item | Status |
 |------|--------|
-| **Active** | **Experiment A** — official QRM `inference.py`, n=10 (job **87216** pending exclusive GPU) |
-| **qrm-official env** | **Installed & verified** on login node — see [QRM_OFFICIAL_HPC_TROUBLESHOOTING.md](QRM_OFFICIAL_HPC_TROUBLESHOOTING.md) |
-| **Path C** | **CANCELED** (87116–87118); partial archive kept |
-| **Our harness (n=20)** | Not QRM reproduction — loops, 75–90% trunc despite correct protocol |
-| b01 QRM gate | **FAILED** — July archive `outputs-hpc-2a100-main-2026-07-03` |
-| Quant grid | **On hold** until Experiment A completes |
+| **Active** | **b02 FP8 deployment block** in `outputs-hpc-2a100-main-2026-08-13` |
+| **Jobs** | **96086** Qwen FP8 running; passed FP8 model load and started generation; **96087** Llama FP8 pending/resources; both request `--gres=gpu:1` |
+| **b02 retry reason** | Jobs **96084/96085** failed before raw rows because vLLM 0.8.5 rejects `fp8_e5m2` KV cache with FP8 checkpoints; fixed by `542f622` (`kv_cache_dtype: auto`) |
+| **Official QRM parity** | **COMPLETED** - job **87302**, Qwen-7B BF16 n=10, **10/10 correct**, **0 truncation** in `qrm-official` |
+| **qreason stack gap** | Confirmed by Path C: Qwen **10%/90% trunc**, Llama **15%/75% trunc** on n=20 strict protocol |
+| **b01 July archive** | Gate failed on `qreason`; useful as BF16 deployment-stack evidence, not as QRM reproduction |
+| **Calibration** | Current b02 scoring is `--skip-calibration`; valid for pass@1/truncation/cost only |
 
-See [notes.md §31](../notes.md) (A–D explainer) · [QRM_STACK_PARITY_AUDIT.md](QRM_STACK_PARITY_AUDIT.md) · **[QRM_OFFICIAL_HPC_TROUBLESHOOTING.md](QRM_OFFICIAL_HPC_TROUBLESHOOTING.md)** (full job-by-job debug log)
+See [notes.md sections 31-34](../notes.md) . [QRM_STACK_PARITY_AUDIT.md](QRM_STACK_PARITY_AUDIT.md) . **[QRM_OFFICIAL_HPC_TROUBLESHOOTING.md](QRM_OFFICIAL_HPC_TROUBLESHOOTING.md)** (full job-by-job debug log)
 
 ---
 
-## QRM stack parity — not a config bug (2026-07-05)
+## QRM stack parity - deployment stack finding (2026-08-13)
 
-**Symptom:** Path C strict QRM protocol gives ~10–15% pass@1 and 75–90% truncation with degeneration loops (`yeah yeah`, `the the the`).
+**Symptom:** Path C strict QRM protocol gives ~10-15% pass@1 and 75-90% truncation with degeneration loops (`yeah yeah`, `the the the`) under `qreason` vLLM 0.8.5.
 
 **Verified NOT the cause:**
 - Wrong prompt (raw rows show `reproduction` + `qrm_math500.txt`)
 - Wrong decoding (temp 0.6, top_p 0.95, max_tokens 32768, seed 42, rep_pen null)
-- Scorer alone (truncated rows have **no** `\boxed{}`)
+- Scorer alone (truncated rows have no `\boxed{}`)
 
-**Likely cause:** **Inference stack mismatch** — vLLM 0.8.5 V1 + transformers 5.12.1 vs QRM Lighteval + transformers 4.47.1. Clean finishes (stop reason) are mostly correct (Qwen 2/2, Llama 3/5 on n=20).
+**Official cross-check result:** job **87302** under `qrm-official` vLLM 0.7.0 fork completed 10/10 correct with 0 truncation. This confirms the prompt/protocol and isolates a software-stack behavior gap.
 
-**Fixes applied:**
-- `src/runners/vllm_serving.py` — QRM serving defaults in `build_llm()`
+**Current b02 question:** In the modern `qreason` stack, do FP8 weights change the loop/truncation, pass@1, latency/VRAM, or cost-per-correct pattern versus BF16 Path C/July numbers?
+
+**Fixes applied before the cross-check:**
+- `src/runners/vllm_serving.py` - QRM serving defaults in `build_llm()`
 - `capture_logprobs: false` in `repro_qrm_strict.yaml`
-- Parity pilot: `bash scripts/hpc/submit_pathc_parity_pilot.sh`
-
-**Cross-check (Experiment A):** `bash scripts/hpc/submit_qrm_official_test.sh` — env install debug history in [QRM_OFFICIAL_HPC_TROUBLESHOOTING.md](QRM_OFFICIAL_HPC_TROUBLESHOOTING.md).
+- Parity tooling under `scripts/hpc/qrm_parity/`
 
 ---
 
-## QRM official env install on PARAM Rudra — **fixed 2026-07-06**
+## QRM official env install on PARAM Rudra - **fixed and validated 2026-07-06**
 
-**Symptom:** Jobs 87130–87213 failed during `install_official_qrm_env.sh` or first GPU inference (missing `fast_hadamard_transform`, compile errors, wrong vLLM wheel, git missing, shared-GPU OOM).
+**Symptom:** Jobs 87130-87213 failed during `install_official_qrm_env.sh` or first GPU inference (missing `fast_hadamard_transform`, compile errors, wrong vLLM wheel, git missing, shared-GPU OOM).
 
-**Not a science bug** — HPC toolchain and scheduling gaps on compute nodes (no system CUDA toolkit, incomplete gcc, shared A100 memory).
+**Not a science bug** - HPC toolchain and scheduling gaps on compute nodes (no system CUDA toolkit, incomplete gcc, shared A100 memory).
 
-**Fix summary:**
+**Final fix summary:**
 - Conda `gcc_linux-64=12`, `gxx_linux-64=12`, `cuda-nvcc=12.4`, aligned `cuda-cccl=12.4`, `git`
 - `CPATH` includes pip `nvidia/*/include` for `fast-hadamard-transform` build
-- `VLLM_PRECOMPILED_WHEEL_LOCATION` → official PyPI **vllm-0.7.0** wheel (not v1.0 nightly default)
-- Versioned marker `.qrm_official_env_ready` + import verification
+- `VLLM_PRECOMPILED_WHEEL_LOCATION` points to official PyPI **vllm-0.7.0** wheel
+- Versioned marker `.qrm_official_env_ready` + import verification; leave marker untracked
 - `set -eo pipefail` (not `-u`) in QRM slurm/scripts
-- `#SBATCH --exclusive` + GPU memory preflight (40 GB) for inference job
+- Final successful run used non-exclusive `--gres=gpu:1`, `--cpus-per-task=16`, `gpu_memory_utilization=0.75`, and VRAM preflight/requeue safeguards
 
-**Full chronology (jobs 87130 → 87216):** [QRM_OFFICIAL_HPC_TROUBLESHOOTING.md](QRM_OFFICIAL_HPC_TROUBLESHOOTING.md)
+**Full chronology (jobs 87130 -> 87302):** [QRM_OFFICIAL_HPC_TROUBLESHOOTING.md](QRM_OFFICIAL_HPC_TROUBLESHOOTING.md)
 
 ---
 

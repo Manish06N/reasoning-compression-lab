@@ -147,21 +147,20 @@ Use this section when working in:
 
 ### Current Sync State
 
-- GitHub, MacBook, and HPC were synced on **2026-06-27**.
+- GitHub and HPC include the FP8 KV-cache fix as of **2026-08-13**; MacBook was last verified at `319cc56` and should pull latest `origin/main` before editing.
 - Verified synced commit across all three places:
 
 ```text
-dff36c1 Sync HPC smoke fixes: tokenizer shim, memory preflight, quick smoke SLURM.
+542f622 Fix FP8 KV cache dtype for vLLM
 ```
 
-- Verified locations:
-  - GitHub `origin/main`: `dff36c1`.
-  - MacBook repo: `dff36c1`, clean, `## main...origin/main`.
-  - HPC repo: `dff36c1`, clean, `## main...origin/main`.
+- Expected HPC status:
+  - Branch `main` is up to date with `origin/main`.
+  - `.qrm_official_env_ready` may be untracked and must stay out of Git.
 - Future sessions should read project memory before major actions:
   - `/scratch/manishn_iitp/reasoning-compression-lab/AGENTS.md`
   - `/scratch/manishn_iitp/reasoning-compression-lab/CHANGELOG.md`
-  - This `/home/manishn_iitp/CODEX.md` section.
+  - the matching `/home/manishn_iitp/*` assistant handoff file.
 
 - Verify with:
 
@@ -170,8 +169,6 @@ cd /scratch/manishn_iitp/reasoning-compression-lab
 git status -sb
 git log --oneline -3
 ```
-
-- Expected status: branch `main` is up to date with `origin/main`, working tree clean.
 
 ### Project-Specific Environment
 
@@ -187,15 +184,18 @@ git log --oneline -3
 - Do not re-download the model, redo HF login, or rerun earlier setup gates unless logs show they broke.
 - Keep `models/`, `hf_cache/`, `runs/`, `results/`, and `logs/` out of GitHub.
 
-### Current Experiment Gate (2026-07-05)
+### Current Experiment Gate (2026-08-13)
 
-- **Active:** **Experiment A** — official QRM `inference.py` (job **87130**, archive `outputs-hpc-qrm-official-2026-07-05`).
-- **Path C:** **CANCELED** (87116–87118). Partial data in `outputs-hpc-diag-pathc-2026-07-05` (~20 rows).
-- **b01 QRM gate:** **FAILED** (July archive `outputs-hpc-2a100-main-2026-07-03`).
-- **Path C signal:** Protocol OK in raw JSONL; Qwen **10%** / **90%** trunc at n=20 — **stack gap**, not config typo.
-- **Experiments B/C/D:** B skipped (code fixed); C already answered (rep_pen on/off both fail); D canceled (64k).
-- **Quant grid b02–b06:** **On hold** until Experiment A completes. See `notes.md` §31, `docs/QRM_STACK_PARITY_AUDIT.md`.
-- **Do not** claim QRM Table 1 reproduction without `compare_qrm_baseline.py` hard_passed on strict protocol runs.
+- **Active:** **b02 FP8 deployment block** in `outputs-hpc-2a100-main-2026-08-13`.
+- **Jobs:** **96086** Qwen FP8 (`level_b_qwen7b_fp8_math500_seed0`) running on `ragpu004`; passed FP8 model load with `kv_cache_dtype=auto` and started generation; **96087** Llama FP8 (`level_c_llama8b_fp8_math500_seed0`) pending/resources.
+- **b02 retry reason:** jobs **96084/96085** failed before raw rows because vLLM 0.8.5 rejects `fp8_e5m2` KV cache with FP8 checkpoints; commit `542f622` sets FP8 checkpoint configs to `kv_cache_dtype: auto`.
+- **Stack:** `qreason`, vLLM **0.8.5**. This intentionally uses the modern stack that looped/truncated on BF16.
+- **Official QRM parity:** job **87302** completed under `qrm-official` with **10/10 correct** and **0 truncation** on Qwen-7B BF16 n=10, seed 42.
+- **Path C:** canceled at n=20 after Qwen **10%/90% trunc** and Llama **15%/75% trunc**; partial archive `outputs-hpc-diag-pathc-2026-07-05` remains comparison evidence.
+- **Interpretation:** prompt/protocol are correct; the main `qreason` stack has a generation-behavior gap vs QRM official. b02 asks whether FP8 changes that behavior.
+- **Do not submit b03/b04** until both b02 cells finish and pass@1, truncation, latency/VRAM, and cost-per-correct are reviewed.
+- **Calibration boundary:** b02 is scored with `--skip-calibration`; do not cite Brier/AURC/ECE from it.
+- **Git:** GitHub/HPC include the FP8 KV-cache fix (`542f622`); MacBook should pull latest `origin/main`; leave `.qrm_official_env_ready` untracked.
 
 ### Important Jobs From 2026-06-26 and 2026-06-27
 
@@ -286,9 +286,10 @@ Only after the 10-question debug passes should the full Level A BF16 MATH-500 ru
 
 ### Sync Workflow
 
-- HPC cannot push to GitHub directly. The canonical sync path is:
+- Preferred sync path is MacBook -> GitHub -> HPC. If HPC credentials are intentionally configured, HPC may push small project-doc/code commits directly after status review. The canonical fallback path is:
 
 ```text
+MacBook git commit/push -> HPC fetch/reset
 HPC local changes -> MacBook rsync -> MacBook git commit/push -> HPC fetch/reset
 ```
 

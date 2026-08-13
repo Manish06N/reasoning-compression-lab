@@ -1,4 +1,14 @@
-# Runbook — MacBook ↔ HPC
+# Runbook - MacBook <-> HPC
+
+## Current project state (2026-08-13)
+
+- GitHub/HPC include the FP8 KV-cache fix (`542f622`); MacBook should pull latest `origin/main`; `.qrm_official_env_ready` should remain untracked on HPC.
+- Active jobs: b02 FP8 jobs **96086** (Qwen running; passed FP8 model load) and **96087** (Llama pending/resources) in `outputs-hpc-2a100-main-2026-08-13`.
+- First b02 attempt jobs **96084/96085** failed before raw rows with the vLLM FP8 checkpoint plus FP8 KV-cache incompatibility; commit `542f622` fixes FP8 configs to `kv_cache_dtype: auto`.
+- Official QRM parity job **87302** completed 10/10 correct with 0 truncation under `qrm-official`; this confirmed prompt/protocol and isolated a `qreason` stack behavior gap.
+- Next gate: wait for both b02 summaries, then review pass@1, truncation, latency/VRAM, and cost before submitting b03/b04.
+- Calibration claims still require valid confidence rows; b02 uses `--skip-calibration`.
+
 
 ## MacBook (control room)
 
@@ -16,7 +26,7 @@ Use for: model download, vLLM, BF16/FP8/GPTQ/AWQ inference, quantization, benchm
 
 ## Windows RTX 5080 (WSL2 pilot lab)
 
-Use for: quant grid pilots, pipeline smoke, 1.5B verifier, 7B/8B **quantized** runs that fit 16 GB VRAM.
+Use for: historical pilots and J3 local transfer only. Paper 1/J1 publication numbers run on PARAM Rudra HPC.
 
 **Project root (WSL):**
 
@@ -25,7 +35,7 @@ cd "/mnt/g/ALL MY Projects/2026/03-paper1-experiments"
 source scripts/local/env.sh
 ```
 
-**Recommended first pass:**
+**Historical 5080 commands:**
 
 ```bash
 bash scripts/local/start_5080_pilot.sh      # background
@@ -33,7 +43,7 @@ bash scripts/local/resume_5080_pilot.sh     # foreground / after reboot
 bash scripts/local/backup_5080_archive.sh --snapshot
 ```
 
-Full repro (days) or HPC for BF16 anchors — 5080 retired; see [archive/RTX5080_EXECUTION_PLAN.md](archive/RTX5080_EXECUTION_PLAN.md).
+5080 is retired for J1 publication numbers; see [archive/RTX5080_EXECUTION_PLAN.md](archive/RTX5080_EXECUTION_PLAN.md).
 
 ---
 
@@ -122,7 +132,7 @@ Plot on MacBook from `results/*.csv` → `paper_figures/`.
 
 ## Gate rules
 
-- No full grid before reproduction works.
-- No 14B before Qwen-7B pilot works.
-- No energy claims before latency/VRAM/cost-per-correct works.
-- No Paper 2 before Paper 1 pilot exists.
+- Do not submit b03/b04 until b02 jobs 96086/96087 finish and summaries are reviewed.
+- Do not cite Brier/AURC/ECE until rows have valid confidence from logprobs or maj@5.
+- Do not use June/July diagnostic archives as QRM reproduction claims; use them as deployment-stack evidence only.
+- No 14B or Paper 2 expansion before the 7B/8B MATH-500 b02 signal is understood.
