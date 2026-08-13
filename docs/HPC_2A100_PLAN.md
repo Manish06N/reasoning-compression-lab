@@ -6,7 +6,7 @@
 
 GitHub: [reasoning-compression-lab](https://github.com/Manish06N/reasoning-compression-lab)
 
-**Current status (2026-08-13):** b02 FP8 is submitted in `outputs-hpc-2a100-main-2026-08-13` as jobs **96086** and **96087**. Do not submit b03/b04 until b02 pass@1, truncation, latency/VRAM, and cost are reviewed. b02 uses `--skip-calibration`, so calibration claims remain gated on valid confidence rows.
+**Current status (2026-08-13):** modern-stack b02 jobs **96086/96087** were canceled for unhealthy output. Exact-stack FP8 pilots **96093/96094** passed 10/10 for both models. The next allowed action is `scripts/hpc/submit_qrm_fp8_full.sh`; do not submit b03/b04 before reviewing the full correctness results. Calibration and deployment telemetry remain separate gates.
 
 First b02 attempt jobs **96084/96085** failed before raw rows with the vLLM FP8 checkpoint plus FP8 KV-cache incompatibility; commit `542f622` fixes FP8 configs to `kv_cache_dtype: auto`.
 

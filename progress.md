@@ -9,14 +9,14 @@ Canonical dated record for **Paper 1: Beyond Accuracy** (`reasoning-compression-
 
 ---
 
-## Current Status Snapshot (2026-08-13, b02 FP8 submitted)
+## Current Status Snapshot (2026-08-13, invalid b02 stopped; exact-stack validation passed)
 
 | Area | Status |
 |------|--------|
-| **Active experiment** | **b02 FP8 deployment block** under `qreason` vLLM 0.8.5 |
-| **Archive** | `outputs-hpc-2a100-main-2026-08-13` |
-| **Qwen FP8** | Job **96086** - `level_b_qwen7b_fp8_math500_seed0`, running on `ragpu004`, 1x A100; passed FP8 model load with `kv_cache_dtype=auto` and started generation |
-| **Llama FP8** | Job **96087** - `level_c_llama8b_fp8_math500_seed0`, pending/resources, 1x A100 |
+| **Latest gate** | Exact `qrm-official` stack validation of the Qwen-7B and Llama-8B FP8 checkpoints, MATH-500 n=10: **PASSED** |
+| **Validation jobs** | **96093** Qwen FP8 on `ragpu008` completed in 5m29s; **96094** Llama FP8 on `ragpu004` completed in 4m52s |
+| **Validation archive** | `outputs-hpc-qrm-official-fp8-validation-2026-08-13` |
+| **Stopped b02 jobs** | **96086/96087** were canceled after the generated output was shown to be unhealthy; no full replacement job has been submitted |
 | **b02 first attempt** | Jobs **96084/96085** failed before raw rows with `fp8_e5m2 kv-cache is not supported with fp8 checkpoints`; fixed in `542f622` by setting FP8 checkpoint KV cache to `auto` |
 | **Official QRM parity** | Job **87302** completed: Qwen-7B BF16 official stack, n=10, seed 42, **10/10 correct**, **0 truncation** |
 | **Path C** | **CANCELED** (87116-87118) - Qwen 10%/90% trunc, Llama 15%/75% trunc at n=20 on `qreason` |
@@ -24,15 +24,62 @@ Canonical dated record for **Paper 1: Beyond Accuracy** (`reasoning-compression-
 | **GitHub sync** | GitHub/HPC include the FP8 KV-cache fix (`542f622`); MacBook should pull latest `origin/main`; only `.qrm_official_env_ready` should remain untracked |
 | **Calibration boundary** | b02 is scored with `--skip-calibration`; use for pass@1/truncation/cost, not Brier/AURC/ECE |
 
-### b02 monitor and next gate
+### 2026-08-13 run diagnosis: what worked, what did not, and why
+
+#### Confirmed successful reference: job 87302
+
+Job **87302** is the last confirmed clean QRM baseline duplicate. It ran on `ragpu006` from 2026-07-06 21:58:40 to 22:10:57 (12m17s) and produced **10/10 correct, 10/10 boxed answers, and no observed truncation or degeneration loops**.
+
+| Setting | Successful value |
+|---------|------------------|
+| Model | `models/DeepSeek-R1-Distill-Qwen-7B` (BF16) |
+| Entrypoint | QRM authors' `external/Quantized-Reasoning-Models/inference.py` through Lighteval |
+| Environment | `qrm-official` |
+| Core versions | torch `2.5.1+cu124`; transformers `4.47.1`; vLLM `0.7.0+precompiled`; Lighteval `0.8.0`; datasets `3.3.1`; compressed-tensors `0.9.0` |
+| Task | MATH-500, first 10 samples |
+| Sampling | seed `42`; temperature `0.6`; top-p `0.95`; max new tokens `32768`; no repetition penalty |
+| Engine | BF16; max model length `32768`; GPU memory utilization `0.75`; `enforce_eager=true`; prefix caching off; chunked prefill off; chat template on |
+| Runtime | `VLLM_WORKER_MULTIPROC_METHOD=spawn`; `TORCH_COMPILE_DISABLE=1`; `TORCHDYNAMO_DISABLE=1` |
+| Resources | non-exclusive 1x A100, 16 CPUs |
+| Output | `outputs-hpc-qrm-official-2026-07-06/` |
+
+#### Attempts that did not work
+
+| Jobs | Attempt | Observed result | Why it was rejected |
+|------|---------|-----------------|---------------------|
+| **96084/96085** | FP8 models on `qreason` with `kv_cache_dtype=fp8_e5m2` | Failed before any raw row | vLLM 0.8.5 rejects FP8 KV cache with these FP8 checkpoints. Commit `542f622` changed the KV cache to `auto`; this fixed model loading only. |
+| **96086/96087** | Full b02 FP8 on `qreason`, vLLM 0.8.5 V1 | Qwen checkpoint reached 10 rows: 2/10 correct, 8/10 length-truncated, 8/10 parse failures; repeated fragments such as `yeah`, `which0`, `The`, and Chinese text. Llama had no durable checkpoint row before cancellation. | Output failed the quality gate. The modern stack/harness used seed 0, repetition penalty 1.05, 40960 model length, and vLLM 0.8.5; it did not reproduce the known-good official execution path. Both jobs were canceled at 15:13 IST. |
+| **96091/96092** | Same `qreason` FP8 path with `VLLM_USE_V1=0`, n=2 | Qwen saved 1/2 before cancellation; Llama saved 2/2. Short answers had malformed boxed syntax; one Llama answer hit exactly 32768 tokens and ended in a `the the` loop. Llama post-scoring also failed because the partial-n summary emitted `None` for a numeric schema field. | Disabling V1 alone does not restore QRM parity: versions, Lighteval integration, prompt-token path, and sampling/harness behavior still differ from job 87302. |
+| **96093/96094** | FP8 checkpoints with the exact job-87302 environment, wrapper, Lighteval path, seed, and decoding | **PASSED.** Both produced 10/10 correct and 10/10 boxed; zero 32768-token cap hits and zero repetition flags. | This confirms the checkpoints are healthy on the pinned official path. The failure was the modern execution stack/path, not FP8 weights alone. |
+
+The partial archives are retained as diagnostic evidence:
+
+- `outputs-hpc-2a100-main-2026-08-13` for canceled jobs 96086/96087.
+- `outputs-hpc-diag-v0-fp8-2026-08-13` for V0 probes 96091/96092.
+- `outputs-hpc-qrm-official-fp8-validation-2026-08-13` for current jobs 96093/96094.
+
+#### Exact-stack FP8 validation results
+
+| Model | Job | Correct | Boxed | Completion tokens | Cap hits | Repetition flags |
+|-------|-----|---------|-------|-------------------|----------|------------------|
+| Qwen-7B FP8 | 96093 | 10/10 | 10/10 | min 1,111; mean 4,393.1; max 12,729 | 0 | 0 |
+| Llama-8B FP8 | 96094 | 10/10 | 10/10 | min 1,163; mean 3,580.8; max 8,638 | 0 | 0 |
+
+Both result sets use the identical ten prompts and gold answers as job 87302. Raw tails end in the correct boxed answer. The Qwen response with the largest same-token run contained decimal zeros inside a calculation, not a terminal loop.
+
+The runner is now hardened in two ways:
+
+1. Top-level result copies include the model name, preventing concurrent Qwen/Llama jobs from overwriting the same alias.
+2. `validate_official_results.py` enforces row count and can gate accuracy, boxed rate, token-cap hits, and repeated-word runs. `submit_qrm_fp8_full.sh` refuses to submit unless both saved n=10 pilots pass the strict gate.
+
+### Current monitor and next gate
 
 ```bash
-squeue -u $USER
-tail -f logs/slurm/b02_parallel_fp8_level_b_qwen7b_fp8_math500_seed0_96086.out
-tail -f logs/slurm/b02_parallel_fp8_level_c_llama8b_fp8_math500_seed0_96087.out
+python scripts/hpc/qrm_parity/validate_official_results.py --help
+bash scripts/hpc/submit_qrm_fp8_full.sh
 ```
 
-Do **not** submit b03/b04 until both b02 summaries are available and truncation, pass@1, latency/VRAM, and cost-per-correct are compared against BF16 Path C/July numbers.
+The n=10 gate has passed. The next allowed action is the gated full FP8 correctness run; b03/b04 remain blocked pending review of the full results. This official-stack run does not by itself replace the main harness's latency, VRAM, energy, or calibration telemetry.
 
 ### Official QRM test (Experiment A) - completed
 

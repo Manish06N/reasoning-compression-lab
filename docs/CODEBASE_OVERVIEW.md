@@ -465,8 +465,8 @@ flowchart TD
 | HPC block grid b01–b09 | ✅ Wired (seed 0) |
 | Reproduction seeds 42–44 | ✅ Cell configs exist |
 | Manual audit tooling | ✅ |
-| **Fresh HPC publication runs** | b02 FP8 submitted - jobs **96086/96087**, archive `outputs-hpc-2a100-main-2026-08-13` |
-| **QRM stack parity** | Confirmed by official job **87302** - see [QRM_STACK_PARITY_AUDIT.md](QRM_STACK_PARITY_AUDIT.md), notes sections 31-34 |
+| **Fresh HPC publication runs** | Modern b02 **96086/96087 canceled** for unhealthy output; do not treat that archive as complete |
+| **QRM stack parity** | BF16 job **87302** and FP8 pilots **96093/96094** passed - see [QRM_STACK_PARITY_AUDIT.md](QRM_STACK_PARITY_AUDIT.md), notes sections 31-35 |
 | QRM baseline yaml | ✅ Fixed task-specific bands (`286f5e4`, amd-002) |
 | Valid calibration numbers | ⏳ Requires logprobs patch or maj@5 after repro |
 | LiveCodeBench integration | ❌ Not yet wired |

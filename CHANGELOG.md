@@ -1,5 +1,31 @@
 # Changelog
 
+## 2026-08-13 - Stop unhealthy b02 output and validate FP8 on the known-good QRM stack
+
+Jobs **96086/96087** were canceled before further GPU time was spent. The Qwen FP8 checkpoint had reached 10 durable rows, but canonical scoring found only **2/10 correct**, with **8/10 length truncations** and **8/10 parse failures**. Raw tails contained sustained repetition (`yeah`, `which0`, `The`) and unrelated Chinese fragments. Llama had not reached its first 10-row checkpoint.
+
+A smaller V0-only probe did not fix the behavior:
+
+| Job | Result |
+|-----|--------|
+| **96091** Qwen FP8 | Saved 1/2 rows, then canceled; the short response was conceptually plausible but malformed for boxed-answer extraction. |
+| **96092** Llama FP8 | Saved 2/2; one response was short but malformed, while the other consumed all 32768 tokens and ended in a `the the` loop. Post-scoring then failed on a separate partial-n summary-schema error. |
+
+This rules out `VLLM_USE_V1=0` as a sufficient fix. It does not recreate the successful QRM stack because the modern environment, harness, Lighteval path, tokenizer integration, seed, and sampling details still differ.
+
+The last confirmed successful duplicate remains job **87302**: Qwen-7B BF16, MATH-500 n=10, seed 42, authors' `inference.py`, `qrm-official` (torch 2.5.1+cu124, transformers 4.47.1, vLLM 0.7.0+precompiled, Lighteval 0.8.0), temperature 0.6, top-p 0.95, 32768 generation/model length, no repetition penalty, eager mode, and GPU memory utilization 0.75. It produced **10/10 correct and 10/10 boxed answers without observed loops**.
+
+Two bounded FP8 validations were then submitted using the same known-good environment and execution path; only the model paths changed:
+
+| Job | Model | State at documentation time | Archive |
+|-----|-------|-----------------------------|---------|
+| **96093** | Qwen-7B FP8 | COMPLETED: 10/10 correct, 10/10 boxed, 0 cap hits, 0 repetition flags | `outputs-hpc-qrm-official-fp8-validation-2026-08-13` |
+| **96094** | Llama-8B FP8 | COMPLETED: 10/10 correct, 10/10 boxed, 0 cap hits, 0 repetition flags | `outputs-hpc-qrm-official-fp8-validation-2026-08-13` |
+
+Qwen completions ranged from 1,111 to 12,729 tokens (mean 4,393.1); Llama ranged from 1,163 to 8,638 (mean 3,580.8). Both used the same prompts/gold answers as job 87302, and raw tails ended with correct boxed answers.
+
+The official runner now writes model-qualified top-level copies so concurrent models cannot overwrite one another. New `validate_official_results.py` and `submit_qrm_fp8_full.sh` add a strict pilot gate before full submission. Unit/integration subset: 7 tests passed; both saved pilots independently passed the real strict gate. No full job had been submitted at the time of this documentation update.
+
 ## 2026-08-13 - Fix FP8 KV-cache incompatibility and resubmit b02
 
 The first b02 submit failed before writing raw rows:

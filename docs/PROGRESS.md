@@ -1,6 +1,6 @@
 # Progress — Paper 1 Experiments
 
-**Last updated:** 2026-08-13 (b02 FP8 submitted; official QRM parity completed)
+**Last updated:** 2026-08-13 (bad b02 stopped; exact official-stack FP8 validation passed)
 **Repo:** https://github.com/Manish06N/reasoning-compression-lab  
 **Canonical log:** [progress.md](../progress.md) . **Audit:** [QRM_STACK_PARITY_AUDIT.md](QRM_STACK_PARITY_AUDIT.md) . **Ops:** [CHANGELOG.md](../CHANGELOG.md)
 
@@ -10,17 +10,19 @@
 
 | Area | Status |
 |------|--------|
-| **Active experiment** | **b02 FP8 deployment block** in fresh archive `outputs-hpc-2a100-main-2026-08-13` |
-| **Qwen FP8** | Job **96086** - `level_b_qwen7b_fp8_math500_seed0`, running on `ragpu004`, 1x A100; passed FP8 model load with `kv_cache_dtype=auto` and started generation |
-| **Llama FP8** | Job **96087** - `level_c_llama8b_fp8_math500_seed0`, pending/resources, 1x A100 |
+| **Latest gate** | n=10 FP8 validation on the exact successful `qrm-official` stack: **PASSED** |
+| **Validation jobs** | **96093** Qwen FP8: 10/10 correct, 0 cap hits; **96094** Llama FP8: 10/10 correct, 0 cap hits |
+| **Validation archive** | `outputs-hpc-qrm-official-fp8-validation-2026-08-13` |
+| **Stopped b02** | Jobs **96086/96087** canceled after Qwen's first 10 rows showed 2/10 correct, 8/10 truncation, and repetition loops |
 | **b02 first attempt** | Jobs **96084/96085** failed before raw rows with `fp8_e5m2 kv-cache is not supported with fp8 checkpoints`; fixed in `542f622` by setting FP8 checkpoint KV cache to `auto` |
-| **qreason stack** | vLLM **0.8.5**; this is the stack that looped/truncated on BF16 |
+| **V0 probe** | Jobs **96091/96092** showed that `VLLM_USE_V1=0` alone is insufficient: malformed answers and a 32768-token repetition loop remained |
+| **qreason stack** | vLLM **0.8.5** + transformers **5.12.1**; both V1 and V0 probes failed output-quality checks |
 | **Official QRM parity** | Job **87302** completed under `qrm-official`: **10/10 correct**, **0 truncation** on Qwen-7B BF16 n=10 |
 | **Path C archive** | `outputs-hpc-diag-pathc-2026-07-05` (~20 rows; kept for side-by-side stack-gap evidence) |
 | **Git sync** | GitHub/HPC include the FP8 KV-cache fix (`542f622`); MacBook should pull latest `origin/main`; keep `.qrm_official_env_ready` untracked |
 | **Calibration** | b02 auto-scoring uses `--skip-calibration`; valid for pass@1/truncation/cost, not Brier/AURC/ECE |
 
-**Strategic label:** *b02 asks whether FP8 changes the modern-stack loop/truncation behavior. It is not a calibration run and not a QRM Table 1 reproduction claim.*
+**Strategic label:** *The modern-stack b02 run is stopped. Jobs 96093/96094 prove both FP8 checkpoints generate healthy answers on the known-good official stack. A full run may now be submitted only through the strict pilot gate.* Exact settings and failure reasons are recorded in [the canonical progress log](../progress.md#2026-08-13-run-diagnosis-what-worked-what-did-not-and-why).
 
 ## Experiments A-D (diagnostic matrix)
 
@@ -33,15 +35,13 @@
 
 Plain English: [notes.md sections 31-34](../notes.md)
 
-## Monitor b02
+## Next gated action
 
 ```bash
-squeue -u $USER
-tail -f logs/slurm/b02_parallel_fp8_level_b_qwen7b_fp8_math500_seed0_96086.out
-tail -f logs/slurm/b02_parallel_fp8_level_c_llama8b_fp8_math500_seed0_96087.out
+bash scripts/hpc/submit_qrm_fp8_full.sh
 ```
 
-Do **not** submit b03/b04 until both b02 cells finish and pass@1, truncation, latency/VRAM, and cost-per-correct are reviewed against BF16 Path C/July numbers.
+The submitter revalidates both n=10 outputs before calling `sbatch`. Do not submit b03/b04 until the full FP8 correctness results are reviewed. The official path does not provide all main-harness deployment telemetry.
 
 ---
 

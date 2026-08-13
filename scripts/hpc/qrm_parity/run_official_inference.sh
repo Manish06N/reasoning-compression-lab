@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Run official QRM inference.py on MATH-500 (n=10 pilot).
+# Run official QRM inference.py on MATH-500.
 set -eo pipefail
 
 export PATH="/usr/bin:/bin:${PATH}"
@@ -11,6 +11,7 @@ SEED="${QRM_SEED:-42}"
 MAX_SAMPLES="${QRM_MAX_SAMPLES:-10}"
 OUTPUT_ROOT="${QRM_OUTPUT_ROOT:-$QR/outputs-hpc-qrm-official-$(date +%Y-%m-%d)}"
 OFFICIAL_RUN_DIR="$OUTPUT_ROOT/inference/$(basename "$MODEL")-seed${SEED}"
+MODEL_NAME="$(basename "$MODEL")"
 
 CONDA_ROOT="${CONDA_ROOT:-/home/apps/MSCC/miniconda3}"
 source "$CONDA_ROOT/etc/profile.d/conda.sh"
@@ -107,22 +108,25 @@ python inference.py \
 
 RESULT_JSON="$OFFICIAL_RUN_DIR/MATH-500.jsonl"
 if [[ -f "$RESULT_JSON" ]]; then
-  python3 - "$RESULT_JSON" <<'PY'
-import json, sys
-path = sys.argv[1]
-rows = json.load(open(path))
-print(f"Official QRM results: {len(rows)} rows")
-boxed = sum(1 for r in rows if "\\boxed" in (r.get("generated_text") or ""))
-print(f"Rows with \\boxed: {boxed}/{len(rows)}")
-if rows:
-    m0 = rows[0].get("metrics", {})
-    print(f"Sample metrics keys: {list(m0.keys())[:5]}")
-PY
-  cp "$RESULT_JSON" "$OUTPUT_ROOT/qrm_official_math500_n${MAX_SAMPLES}_seed${SEED}.json"
-  echo "Copied to $OUTPUT_ROOT/qrm_official_math500_n${MAX_SAMPLES}_seed${SEED}.json"
+  RESULT_COPY="$OUTPUT_ROOT/qrm_official_${MODEL_NAME}_math500_n${MAX_SAMPLES}_seed${SEED}.json"
+  VALIDATION_REPORT="$OUTPUT_ROOT/validation/${MODEL_NAME}_math500_n${MAX_SAMPLES}_seed${SEED}.json"
+  mkdir -p "$(dirname "$VALIDATION_REPORT")"
+  python3 "$QR/scripts/hpc/qrm_parity/validate_official_results.py" \
+    --result "$RESULT_JSON" \
+    --model "$MODEL" \
+    --expected-rows "$MAX_SAMPLES" \
+    --min-accuracy "${QRM_MIN_ACCURACY:-0}" \
+    --min-boxed-rate "${QRM_MIN_BOXED_RATE:-0}" \
+    --max-new-tokens 32768 \
+    --max-token-limit-hits "${QRM_MAX_TOKEN_LIMIT_HITS:-$MAX_SAMPLES}" \
+    --max-repetition-rows "${QRM_MAX_REPETITION_ROWS:-$MAX_SAMPLES}" \
+    --report "$VALIDATION_REPORT"
+  cp "$RESULT_JSON" "$RESULT_COPY"
+  echo "Copied to $RESULT_COPY"
 else
-  echo "WARN: expected result file missing: $RESULT_JSON" >&2
+  echo "ERROR: expected result file missing: $RESULT_JSON" >&2
   find "$OUTPUT_ROOT" -name '*.json' | head -5
+  exit 1
 fi
 
 echo ""

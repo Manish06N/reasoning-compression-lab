@@ -10,10 +10,11 @@ Operational issues that can break paper results if ignored, plus known software 
 
 | Item | Status |
 |------|--------|
-| **Active** | **b02 FP8 deployment block** in `outputs-hpc-2a100-main-2026-08-13` |
-| **Jobs** | **96086** Qwen FP8 running; passed FP8 model load and started generation; **96087** Llama FP8 pending/resources; both request `--gres=gpu:1` |
+| **Stopped modern b02** | Jobs **96086/96087** canceled after Qwen showed 2/10 correct, 8/10 truncation, and repetition loops |
+| **V0 result** | Jobs **96091/96092** prove disabling vLLM V1 alone is insufficient |
 | **b02 retry reason** | Jobs **96084/96085** failed before raw rows because vLLM 0.8.5 rejects `fp8_e5m2` KV cache with FP8 checkpoints; fixed by `542f622` (`kv_cache_dtype: auto`) |
 | **Official QRM parity** | **COMPLETED** - job **87302**, Qwen-7B BF16 n=10, **10/10 correct**, **0 truncation** in `qrm-official` |
+| **FP8 exact-stack gate** | **COMPLETED** - jobs **96093/96094**, both models 10/10 correct/boxed, no token-cap or repetition flags |
 | **qreason stack gap** | Confirmed by Path C: Qwen **10%/90% trunc**, Llama **15%/75% trunc** on n=20 strict protocol |
 | **b01 July archive** | Gate failed on `qreason`; useful as BF16 deployment-stack evidence, not as QRM reproduction |
 | **Calibration** | Current b02 scoring is `--skip-calibration`; valid for pass@1/truncation/cost only |
@@ -33,7 +34,7 @@ See [notes.md sections 31-34](../notes.md) . [QRM_STACK_PARITY_AUDIT.md](QRM_STA
 
 **Official cross-check result:** job **87302** under `qrm-official` vLLM 0.7.0 fork completed 10/10 correct with 0 truncation. This confirms the prompt/protocol and isolates a software-stack behavior gap.
 
-**Current b02 question:** In the modern `qreason` stack, do FP8 weights change the loop/truncation, pass@1, latency/VRAM, or cost-per-correct pattern versus BF16 Path C/July numbers?
+**Current conclusion:** FP8 weights alone are not the cause: both FP8 checkpoints are healthy on the pinned official path. The modern `qreason` execution path remains invalid for these correctness runs until its generation gap is resolved.
 
 **Fixes applied before the cross-check:**
 - `src/runners/vllm_serving.py` - QRM serving defaults in `build_llm()`

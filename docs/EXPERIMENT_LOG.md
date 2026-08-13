@@ -284,13 +284,33 @@ Task:         MATH-500
 Seed(s):      0
 Env:          qreason (vLLM 0.8.5)
 Hardware:     PARAM Rudra A100, non-exclusive 1x GPU per cell
-Status:       running/pending
-Jobs:         96086 Qwen FP8 running on ragpu004; passed FP8 model load and started generation; 96087 Llama FP8 pending/resources
+Status:       CANCELED / invalid as a full run
+Jobs:         96086 Qwen FP8 canceled after unhealthy first-10 output; 96087 Llama FP8 canceled before a durable checkpoint row
 First attempt: 96084/96085 failed before raw rows with `fp8_e5m2 kv-cache is not supported with fp8 checkpoints`; fixed in commit 542f622.
 Archive:      outputs-hpc-2a100-main-2026-08-13
 Submit:       bash scripts/hpc/submit_hpc_blocks.sh --fresh b02
-Notes:        Valid for pass@1, truncation, latency/VRAM, and cost-per-correct. Not valid for calibration claims because launcher scoring uses --skip-calibration.
-Next gate:    Wait for both summaries; do not submit b03/b04 until b02 is reviewed vs BF16 Path C/July numbers.
+Notes:        Qwen first 10: 2/10 correct, 8/10 truncation, repetition loops. Preserve as diagnostic evidence only. Not valid for calibration claims.
+Next gate:    Superseded by exact-stack FP8 health jobs 96093/96094 below.
+```
+
+---
+
+## 2026-08-13 - Exact-stack FP8 health gate (COMPLETED)
+
+```text
+Date:         2026-08-13
+Level:        diagnostic pre-submit gate
+Models:       DeepSeek-R1-Distill-Qwen-7B-FP8 + DeepSeek-R1-Distill-Llama-8B-FP8
+Task:         MATH-500 (same first 10 prompts/gold as job 87302)
+Seed(s):      42
+Env:          qrm-official; vLLM 0.7.0; transformers 4.47.1; Lighteval 0.8.0
+Jobs:         96093 Qwen on ragpu008; 96094 Llama on ragpu004
+Status:       COMPLETED / strict output gate passed
+Results:      both 10/10 correct, 10/10 boxed, 0 token-cap hits, 0 repetition flags
+Token counts: Qwen 1,111-12,729 (mean 4,393.1); Llama 1,163-8,638 (mean 3,580.8)
+Archive:      outputs-hpc-qrm-official-fp8-validation-2026-08-13
+Conclusion:   FP8 checkpoints are healthy on the pinned official path; modern-stack failure is not caused by FP8 weights alone.
+Next:         scripts/hpc/submit_qrm_fp8_full.sh (strictly revalidates both pilots before sbatch)
 ```
 
 ---

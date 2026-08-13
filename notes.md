@@ -945,13 +945,14 @@ bash scripts/hpc/submit_pathc_parity_pilot.sh               # d03 n=10 rerun
 bash scripts/hpc/qrm_parity/setup_official_qrm_repo.sh      # clone to external/
 ```
 
-### Decision tree (updated - b02 active)
+### Decision tree (updated - bad b02 stopped, official FP8 gate passed)
 
 ```text
 Path C stopped at n=20 (sufficient)
 └─ Experiment A completed (87302): official QRM inference.py, same 10 IDs
     └─ Official QRM: 10/10 correct, 0 truncation; our qreason Path C: ~10% and high truncation
-        └─ Stack gap confirmed -> b02 FP8 submitted as jobs 96086/96087
+        └─ Modern b02 96086/96087 stopped for bad output
+            └─ Exact-stack FP8 pilots 96093/96094 passed 10/10 for both models
 ```
 
 ### Paper 1 framing (unchanged)
@@ -1037,15 +1038,15 @@ After initial GitHub/MacBook/HPC sync at **319cc56**, followed by HPC/GitHub FP8
 | Item | Status |
 |------|--------|
 | Archive | `outputs-hpc-2a100-main-2026-08-13` |
-| Qwen FP8 | Job **96086**, `level_b_qwen7b_fp8_math500_seed0`, running on `ragpu004` |
-| Llama FP8 | Job **96087**, `level_c_llama8b_fp8_math500_seed0`, pending/resources |
+| Qwen FP8 | Job **96086**, `level_b_qwen7b_fp8_math500_seed0`, canceled after unhealthy first-10 output |
+| Llama FP8 | Job **96087**, `level_c_llama8b_fp8_math500_seed0`, canceled with no durable checkpoint row |
 | Stack | `qreason`, vLLM **0.8.5** |
 | Resource shape | Non-exclusive **1x A100** per cell, `--gres=gpu:1` |
 | Calibration | Skipped by launcher; do not cite Brier/AURC/ECE from this block |
 
 **Why this is correct:** job 87302 already proved the QRM prompt/protocol under the official stack. Path C showed the modern `qreason` stack loops/truncates under the same nominal protocol. b02 is therefore the right next experiment: it tests whether FP8 changes that deployment-stack loop/truncation behavior and what it does to pass@1, latency/VRAM, and cost-per-correct.
 
-**Next:** wait for both b02 jobs to finish, score/check summaries, then decide b03/b04. Do not submit the next quant blocks before this review.
+**Superseded by §35:** these modern-stack jobs were stopped; the next allowed run is the gated official-stack FP8 full correctness run.
 
 
 
@@ -1063,7 +1064,15 @@ Both failed with `ValueError: fp8_e5m2 kv-cache is not supported with fp8 checkp
 
 **Fix:** commit `542f622` changes FP8 checkpoint model configs from `kv_cache_dtype: fp8_e5m2` to `kv_cache_dtype: auto` for Qwen-7B FP8, Llama-8B FP8, and Qwen-1.5B FP8.
 
-**Retry:** `bash scripts/hpc/submit_hpc_blocks.sh --fresh b02` submitted **96086** (Qwen FP8, running on `ragpu004`) and **96087** (Llama FP8, pending/resources) into the same archive `outputs-hpc-2a100-main-2026-08-13`. Monitor these, not 96084/96085.
+**Retry outcome:** `bash scripts/hpc/submit_hpc_blocks.sh --fresh b02` submitted **96086** and **96087** into `outputs-hpc-2a100-main-2026-08-13`. Both were later canceled for unhealthy output; see §35. Do not resume this archive as a valid full run.
 
 
-*Last updated: 2026-08-13. §34 = b02 FP8 retry after KV-cache fix. §33 = b02 FP8 launch/current gate. §32 = QRM official run success. §31 = A-D explainer. §30 = stack audit.*
+## 35. Bad b02 stopped; exact-stack FP8 gate passed (2026-08-13)
+
+Jobs **96086/96087** were stopped after Qwen's first 10 rows showed 2/10 correct, 8/10 truncation, and obvious repetition. Jobs **96091/96092** tested vLLM 0.8.5 V0 and showed that switching off V1 alone was not sufficient.
+
+The controlled fix was to reuse the entire successful job-87302 execution path, not just one engine flag. Jobs **96093** (Qwen FP8) and **96094** (Llama FP8) ran in `qrm-official` with vLLM 0.7.0, transformers 4.47.1, Lighteval, seed 42, temperature 0.6, top-p 0.95, 32768-token/model limits, no repetition penalty, eager mode, and GPU memory utilization 0.75.
+
+Both passed: 10/10 correct, 10/10 boxed, zero token-cap hits, and zero repetition flags. Qwen completion tokens ranged 1,111-12,729 (mean 4,393.1); Llama ranged 1,163-8,638 (mean 3,580.8). The result-copy collision found during the concurrent validation is fixed by model-qualified filenames. Full submission is guarded by `scripts/hpc/submit_qrm_fp8_full.sh` and `validate_official_results.py`.
+
+*Last updated: 2026-08-13. §35 = exact-stack FP8 validation. §34 = b02 FP8 retry after KV-cache fix. §33 = b02 FP8 launch. §32 = QRM official run success. §31 = A-D explainer. §30 = stack audit.*

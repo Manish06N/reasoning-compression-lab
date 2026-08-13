@@ -1,18 +1,20 @@
 # J1 validation runbook — prove the pipeline before expanding
 
-**Status (2026-08-13):** official QRM parity **completed** -> b02 FP8 deployment block **submitted** (jobs **96086/96087**) in `outputs-hpc-2a100-main-2026-08-13`.
+**Status (2026-08-13):** unhealthy modern-stack b02 stopped; exact-official-stack FP8 n=10 gate **passed** for both models.
 
-**Current b02:** Qwen FP8 job 96086 is running; Llama FP8 job 96087 is pending/resources. Both use the main paper stack (`qreason`, vLLM 0.8.5), not `qrm-official`.
+**Stopped b02:** Jobs 96086/96087 were canceled. Qwen's first 10 rows were 2/10 correct with 8/10 truncations and repetition loops. A V0-only probe (96091/96092) was also unhealthy.
 
 First b02 attempt jobs **96084/96085** failed before raw rows with the vLLM FP8 checkpoint plus FP8 KV-cache incompatibility; commit `542f622` fixes FP8 configs to `kv_cache_dtype: auto`.
 
 **Official QRM parity:** job 87302 completed in `qrm-official`: Qwen-7B BF16 n=10, seed 42, 10/10 correct, 0 truncation. This proves the prompt/protocol and confirms a stack gap versus `qreason` Path C.
 
+**FP8 health gate:** jobs 96093/96094 ran the Qwen/Llama FP8 checkpoints through the exact job-87302 path. Both completed 10/10 correct and boxed with no token-cap hits or repetition flags. Use `bash scripts/hpc/submit_qrm_fp8_full.sh`; it reruns this strict gate before submission.
+
 **Path C (canceled):** Partial archive `outputs-hpc-diag-pathc-2026-07-05` - protocol OK, Qwen 10%/90% trunc and Llama 15%/75% trunc at n=20 on our vLLM 0.8.5 stack.
 
 **Experiments A-D:** [notes.md sections 31-33](../notes.md) . [QRM_STACK_PARITY_AUDIT.md](QRM_STACK_PARITY_AUDIT.md)
 
-**Quant grid rule:** b02 is open as an FP8 stack-behavior test. Do **not** submit b03/b04 until both b02 cells finish and truncation, pass@1, and cost are reviewed against the BF16 Path C/July numbers.
+**Quant grid rule:** a gated full official-stack FP8 correctness run is allowed. Do **not** submit b03/b04 until it finishes and is reviewed. Deployment telemetry still requires a separately validated main-harness path.
 
 **GitHub:** GitHub/HPC include the FP8 KV-cache fix (`542f622`); MacBook should pull latest `origin/main`; leave `.qrm_official_env_ready` untracked.
 

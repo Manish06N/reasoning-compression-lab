@@ -45,8 +45,36 @@ bash scripts/hpc/submit_qrm_official_test.sh
 | **87213** | 2026-07-06 | racn115 | ~4 min | FAILED | Shared GPU CUDA OOM |
 | **87216** | 2026-07-06 | - | - | SUPERSEDED | Exclusive GPU attempt waited in queue |
 | **87302** | 2026-07-06 | ragpu006 | completed | **COMPLETED** | Final non-exclusive 1-GPU official QRM run: 10/10 correct, 0 truncation |
+| **96084/96085** | 2026-08-13 | ragpu004 | short | FAILED | Modern-stack FP8 jobs rejected incompatible `fp8_e5m2` KV cache before output |
+| **96086/96087** | 2026-08-13 | ragpu004/ragpu008 | 1h06m/39m | CANCELED | FP8 model load fixed, but generated output looped/truncated; stopped before full run |
+| **96091/96092** | 2026-08-13 | ragpu004/ragpu008 | 11m/11m | CANCELED/FAILED | vLLM 0.8.5 V0 probe; malformed answer(s), one full-length loop, then partial-n scoring schema failure |
+| **96093/96094** | 2026-08-13 | ragpu008/ragpu004 | 5m29s/4m52s | **COMPLETED** | Exact-stack FP8 validation: both 10/10 correct, 10/10 boxed, no cap hits or repetition flags |
 
 Logs: `logs/qrm_official_<JOBID>.out` / `.err`
+
+---
+
+## 2026-08-13 FP8 follow-up: do not confuse model loading with healthy generation
+
+Changing `kv_cache_dtype` from `fp8_e5m2` to `auto` fixed the immediate model-initialization error in the modern `qreason` environment, but it did **not** establish a valid inference run. Jobs 96086/96087 used vLLM 0.8.5, transformers 5.12.1, seed 0, max model length 40960, and repetition penalty 1.05. Qwen's first 10 saved rows were 2/10 correct with 8/10 truncations and obvious repetition. The jobs were canceled rather than allowing the 500-row run to continue.
+
+Setting `VLLM_USE_V1=0` in jobs 96091/96092 was also insufficient. That changes the vLLM engine implementation but leaves the rest of the modern environment and project harness in place. The output still included malformed boxed answers and a Llama completion that exhausted all 32768 tokens in a repetition loop.
+
+The known-good control is job 87302, not merely "vLLM V0":
+
+| Component | Job 87302 value |
+|-----------|-----------------|
+| Model | Qwen-7B BF16 |
+| Harness | QRM authors' `inference.py` + Lighteval custom MATH-500 task |
+| Env | `qrm-official` |
+| Versions | torch 2.5.1+cu124; transformers 4.47.1; vLLM 0.7.0+precompiled; Lighteval 0.8.0; datasets 3.3.1; compressed-tensors 0.9.0 |
+| Sampling | seed 42; temperature 0.6; top-p 0.95; max new tokens 32768; no repetition penalty |
+| Engine | BF16; max model length 32768; eager mode; prefix caching off; chunked prefill off; GPU memory utilization 0.75 |
+| Result | 10/10 extractive match; 10/10 contained `\\boxed`; no observed truncation/loop |
+
+Jobs 96093/96094 used that entire execution path with n=10 and replaced only the model path with the Qwen-7B FP8 or Llama-8B FP8 checkpoint. Both completed 10/10 correct and boxed, with no token-cap hits or repetition flags. Qwen token counts were 1,111-12,729 (mean 4,393.1); Llama counts were 1,163-8,638 (mean 3,580.8). Their archive is `outputs-hpc-qrm-official-fp8-validation-2026-08-13`.
+
+One output-handling bug was exposed: both concurrent jobs copied their model-specific result to the same top-level filename. The model-specific files under `inference/` remained intact, but the convenience alias was overwritten by the later Qwen copy. `run_official_inference.sh` now includes the model basename in copied filenames, and `validate_official_results.py` records/gates output health. Use `submit_qrm_fp8_full.sh`; it refuses to call `sbatch` until both pilots pass strict validation.
 
 ---
 
@@ -433,6 +461,6 @@ Output directory: `outputs-hpc-qrm-official-<date>/`
 | GPU inference | **Validated end-to-end** by job **87302** |
 | Official result | Qwen-7B BF16, MATH-500 n=10, seed 42: **10/10 correct**, **0 truncation** |
 | Science conclusion | Prompt/protocol are correct; modern `qreason` stack behavior differs from QRM official stack |
-| Follow-up | b02 FP8 deployment block submitted as jobs **96086/96087** in `outputs-hpc-2a100-main-2026-08-13` |
+| Follow-up | Modern-stack b02 jobs **96086/96087** stopped; exact-stack FP8 n=10 jobs **96093/96094** passed 10/10; gated full run is next |
 | GitHub sync | Complete at `319cc56`; `.qrm_official_env_ready` remains untracked |
 | Calibration | b02 is not a calibration run; use it for pass@1/truncation/cost only |

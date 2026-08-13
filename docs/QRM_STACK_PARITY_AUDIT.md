@@ -167,7 +167,7 @@ python scripts/hpc/qrm_parity/compare_side_by_side.py --limit 10
 
 Output: `outputs-hpc-qrm-official-2026-07-06/`
 
-**Result:** official QRM got 10/10 correct with 0 truncation on the same first 10 MATH-500 items. Our Path C comparison on the modern `qreason` stack was 1/10 with 90% truncation. The decision is made: stack gap confirmed. b02 FP8 is now submitted as jobs 96086/96087.
+**Result:** official QRM got 10/10 correct with 0 truncation on the same first 10 MATH-500 items. Our Path C comparison on the modern `qreason` stack was 1/10 with 90% truncation. Later modern-stack FP8 jobs 96086/96087 were also unhealthy and canceled; exact-official-stack FP8 pilots 96093/96094 then passed 10/10 for both models.
 
 ---
 
@@ -182,7 +182,7 @@ Output: `outputs-hpc-qrm-official-2026-07-06/`
 
 Path C (our strict QRM protocol, n=50) was **canceled** at n=20 — sufficient to justify A.
 
-Plain English: [notes.md sections 31-34](../notes.md)
+Plain English: [notes.md sections 31-35](../notes.md)
 
 ---
 
@@ -192,7 +192,8 @@ Plain English: [notes.md sections 31-34](../notes.md)
 Path C canceled at n=20
 └─ Experiment A COMPLETED successfully (Job 87302)
     └─ QRM got 10/10 (100% correct, 0% loops) vs. our stack 1/10 (10% correct, 90% loops)
-        └─ [RESULT] Stack gap confirmed. b02 FP8 is now submitted as jobs 96086/96087; wait for both summaries before b03/b04.
+        └─ Modern-stack FP8 96086/96087 failed output health and was stopped
+            └─ Exact-stack FP8 96093/96094 passed; gated full correctness run is next
 ```
 
 ---

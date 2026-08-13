@@ -278,7 +278,7 @@ qrm_official_result_json_for_job() {
   local id="$1"
   local jname="$2"
   local -a roots=()
-  local root pat json
+  local root json
 
   if [[ -n "${OUTPUT_ROOT:-}" ]]; then
     roots+=("$OUTPUT_ROOT")
@@ -291,18 +291,17 @@ qrm_official_result_json_for_job() {
     roots+=("$root")
   done
 
-  pat="qrm_official_math500_n${QRM_OFFICIAL_MAX_SAMPLES}_seed*.json"
   if [[ "$jname" == *llama* ]]; then
     for root in "${roots[@]}"; do
-      [[ "$root" == *llama* ]] || continue
-      for json in "$root"/$pat "$root"/inference/*/*MATH-500.json; do
+      for json in "$root"/qrm_official_*Llama*"_math500_n${QRM_OFFICIAL_MAX_SAMPLES}_seed"*.json \
+        "$root"/inference/*Llama*/MATH-500.jsonl; do
         [[ -f "$json" ]] && { echo "$json"; return 0; }
       done
     done
   else
     for root in "${roots[@]}"; do
-      [[ "$root" == *llama* ]] && continue
-      for json in "$root"/$pat "$root"/inference/*/*MATH-500.json; do
+      for json in "$root"/qrm_official_*Qwen*"_math500_n${QRM_OFFICIAL_MAX_SAMPLES}_seed"*.json \
+        "$root"/inference/*Qwen*/MATH-500.jsonl; do
         [[ -f "$json" ]] && { echo "$json"; return 0; }
       done
     done

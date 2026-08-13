@@ -186,14 +186,14 @@ git log --oneline -3
 
 ### Current Experiment Gate (2026-08-13)
 
-- **Active:** **b02 FP8 deployment block** in `outputs-hpc-2a100-main-2026-08-13`.
-- **Jobs:** **96086** Qwen FP8 (`level_b_qwen7b_fp8_math500_seed0`) running on `ragpu004`; passed FP8 model load with `kv_cache_dtype=auto` and started generation; **96087** Llama FP8 (`level_c_llama8b_fp8_math500_seed0`) pending/resources.
+- **Stopped:** modern-stack b02 jobs **96086/96087** were canceled after Qwen's first 10 rows showed 2/10 correct, 8/10 truncation, and repetition loops. Preserve `outputs-hpc-2a100-main-2026-08-13` as diagnostic evidence.
+- **V0 probe:** jobs **96091/96092** showed `VLLM_USE_V1=0` alone is insufficient; malformed output and a 32768-token repetition loop remained.
 - **b02 retry reason:** jobs **96084/96085** failed before raw rows because vLLM 0.8.5 rejects `fp8_e5m2` KV cache with FP8 checkpoints; commit `542f622` sets FP8 checkpoint configs to `kv_cache_dtype: auto`.
-- **Stack:** `qreason`, vLLM **0.8.5**. This intentionally uses the modern stack that looped/truncated on BF16.
+- **Validated fix path:** jobs **96093/96094** used the exact `qrm-official` job-87302 stack with FP8 model paths. Both completed 10/10 correct, 10/10 boxed, with zero token-cap hits and zero repetition flags.
 - **Official QRM parity:** job **87302** completed under `qrm-official` with **10/10 correct** and **0 truncation** on Qwen-7B BF16 n=10, seed 42.
 - **Path C:** canceled at n=20 after Qwen **10%/90% trunc** and Llama **15%/75% trunc**; partial archive `outputs-hpc-diag-pathc-2026-07-05` remains comparison evidence.
-- **Interpretation:** prompt/protocol are correct; the main `qreason` stack has a generation-behavior gap vs QRM official. b02 asks whether FP8 changes that behavior.
-- **Do not submit b03/b04** until both b02 cells finish and pass@1, truncation, latency/VRAM, and cost-per-correct are reviewed.
+- **Interpretation:** the FP8 checkpoints are healthy on the pinned official path; the bad output is specific to the modern stack/execution path, not FP8 weights alone.
+- **Next:** use `bash scripts/hpc/submit_qrm_fp8_full.sh`; it strictly revalidates both pilots before submission. Do not submit b03/b04 before full-result review.
 - **Calibration boundary:** b02 is scored with `--skip-calibration`; do not cite Brier/AURC/ECE from it.
 - **Git:** GitHub/HPC include the FP8 KV-cache fix (`542f622`); MacBook should pull latest `origin/main`; leave `.qrm_official_env_ready` untracked.
 

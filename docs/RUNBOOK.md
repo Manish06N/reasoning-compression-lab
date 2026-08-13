@@ -3,10 +3,11 @@
 ## Current project state (2026-08-13)
 
 - GitHub/HPC include the FP8 KV-cache fix (`542f622`); MacBook should pull latest `origin/main`; `.qrm_official_env_ready` should remain untracked on HPC.
-- Active jobs: b02 FP8 jobs **96086** (Qwen running; passed FP8 model load) and **96087** (Llama pending/resources) in `outputs-hpc-2a100-main-2026-08-13`.
+- Modern-stack b02 jobs **96086/96087** were canceled after unhealthy generated output; retain `outputs-hpc-2a100-main-2026-08-13` as evidence.
 - First b02 attempt jobs **96084/96085** failed before raw rows with the vLLM FP8 checkpoint plus FP8 KV-cache incompatibility; commit `542f622` fixes FP8 configs to `kv_cache_dtype: auto`.
 - Official QRM parity job **87302** completed 10/10 correct with 0 truncation under `qrm-official`; this confirmed prompt/protocol and isolated a `qreason` stack behavior gap.
-- Next gate: wait for both b02 summaries, then review pass@1, truncation, latency/VRAM, and cost before submitting b03/b04.
+- Exact-stack FP8 validation jobs **96093/96094** both passed 10/10 correct, 10/10 boxed, with no cap hits or repetition flags.
+- Next gate: `bash scripts/hpc/submit_qrm_fp8_full.sh`; do not submit b03/b04 before full-result review.
 - Calibration claims still require valid confidence rows; b02 uses `--skip-calibration`.
 
 
