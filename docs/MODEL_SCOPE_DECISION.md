@@ -1,8 +1,10 @@
 # Model Scope Decision — Paper 1 (J1)
 
-**Status:** Frozen (2026-07-01)  
+**Status:** Model-family scope remains frozen; experimental protocol revised 2026-08-14
 **Roadmap:** PhD V8.2 §6, scale gate §6.9  
 **Companion:** [MODEL_ROSTER.md](MODEL_ROSTER.md) (HF IDs, paths, env vars)
+
+**Current authority:** [PUBLICATION_READINESS.md](PUBLICATION_READINESS.md) and [plans/2026-08-14-publication-recovery.md](plans/2026-08-14-publication-recovery.md). The old seed-0 expansion order is superseded.
 
 This document records **what models are in scope, out of scope, and gated for later** for Paper 1. It exists to prevent scope creep from model-inventory research (6×5 quant matrices, Qwen3, base Llama, 70B BF16 grids, etc.).
 
@@ -33,7 +35,7 @@ No other model families in the main J1 grid.
 | Config ID | Method | Canonical HF source (see MODEL_ROSTER) |
 |-----------|--------|----------------------------------------|
 | `bf16` | Full precision baseline | `deepseek-ai/DeepSeek-R1-Distill-*` |
-| `fp8` | RedHatAI FP8-dynamic (compressed-tensors) | `RedHatAI/*-FP8-dynamic` |
+| `fp8` | FP8 checkpoint; A100 executes weight-only Marlin fallback | `RedHatAI/*-FP8-dynamic` |
 | `awq4` | AWQ W4G128 | `jakiAJK/*_AWQ` or `casperhansen/*-awq` per roster |
 | `gptq4` | GPTQ W4G128 (QRM-aligned) | `ruikangliu/*-GPTQ-W4G128` |
 | `gptq3` | Bit-width stress | `irish-quant/*-3bit` (Qwen-7B); roster for others |
@@ -54,8 +56,8 @@ No other model families in the main J1 grid.
 | Level | Scope | Gate |
 |-------|-------|------|
 | **A** | Qwen-7B × {BF16, GPTQ-4} × MATH-500 × repro seeds | Reproduction gate |
-| **B** | Qwen-7B × 5 quants × {MATH-500, GPQA, GSM8K} × seed 0 | Pilot signal |
-| **C** | 3 models × 5 quants × tasks × seeds | After Level A/B clean |
+| **B** | Qwen-7B + Llama-8B × {BF16, FP8, AWQ4, GPTQ4} × MATH-500 × seeds 42–44 | Discriminating pilot after recovery P0/P1 |
+| **C** | Five-seed headline cells plus gated breadth | Only after contribution selection |
 
 ### Hardware policy
 
@@ -101,7 +103,7 @@ Add nothing below until **V8.2 scale gate** passes: core 7B/8B results stable an
 | **Qwen-32B** | 14B validation informative + compute budget | BF16 TP=1 or 2; **not** full 5-quant grid |
 | **Llama-70B** | Explicit extension paragraph only | **GPTQ-4 or AWQ-4 only** on 1× A100; no BF16 32k |
 | **One Qwen3-14B cell** | Novelty re-check + supervisor sign-off | Single “current-model” validation run |
-| **Multi-seed (1–4)** | Pilot shows rank reversal or wide CIs | **Key cells only:** Qwen-7B + Llama-8B × {BF16, FP8, AWQ-4, GPTQ-4} × MATH-500 |
+| **Five-seed confirmation** | Three-seed pilot selects a contribution | **Key cells only:** Qwen-7B + Llama-8B × {BF16, FP8, AWQ-4, GPTQ-4} × MATH-500 × seeds 42–46 |
 | **LiveCodeBench** | Extraction gate passed on math/code | Fixed repo date; subset only |
 | **W8A8 INT8** | FP8/A100 behavior documented | Optional appendix column — not headline |
 
@@ -113,13 +115,13 @@ Add nothing below until **V8.2 scale gate** passes: core 7B/8B results stable an
 
 Run in this order; stop expanding if lower tiers are not scored.
 
-1. Qwen-7B × {BF16, GPTQ-4, AWQ-4, FP8} × MATH-500 × seed 0  
-2. Llama-8B × same quants × MATH-500 × seed 0  
-3. Qwen-7B × GPQA-D + GSM8K (seed 0)  
-4. GPTQ-3 stress (Qwen-7B)  
-5. Qwen-1.5B scale cells (b08–b09)  
-6. Extra seeds — paired stats on key 7B/8B cells only  
-7. Gated extensions (14B, etc.)
+1. Recovery Phase 0: reproducibility, schema, validators, telemetry, tests.
+2. Qwen-7B + Llama-8B × {BF16, FP8} × MATH-500 × seed 42.
+3. Same models × {BF16, FP8, AWQ-4, GPTQ-4} × MATH-500 × seeds 42–44.
+4. Contribution-selection gate and supervisor approval.
+5. Extend headline cells to seeds 42–46.
+6. Gated GPQA/GSM8K breadth.
+7. GPTQ-3/scale/extensions only if the selected story requires them.
 
 ---
 
@@ -156,6 +158,7 @@ To add a model or quant format to J1:
 | Keep DeepSeek-R1-Distill only? | **Yes** |
 | Add Qwen3 / Llama 3.1 base? | **No** (J1) |
 | Run 70B BF16 on 2× A100? | **No** |
-| Minimum publishable set? | Qwen-7B + Llama-8B × {BF16, GPTQ-4, AWQ-4, FP8} × MATH-500 |
+| Minimum pilot set? | Qwen-7B + Llama-8B × {BF16, GPTQ-4, AWQ-4, FP8} × MATH-500 × seeds 42–44 |
+| Minimum publishable evidence? | Pilot plus selected five-seed headline cells, valid reliability/calibration/systems fields, paired analysis, and clean artifacts |
 | Where are HF IDs? | [MODEL_ROSTER.md](MODEL_ROSTER.md) |
 | Where is full codebase map? | [CODEBASE_OVERVIEW.md](CODEBASE_OVERVIEW.md) |

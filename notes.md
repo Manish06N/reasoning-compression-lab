@@ -37,8 +37,9 @@ Personal backup of findings, decisions, and learnings from the July 3 working se
 
 ### Current run label
 
-Jobs **96086** / **96087** = **b02 FP8 deployment block**, seed 0, main `qreason` stack, fresh archive `outputs-hpc-2a100-main-2026-08-13`. Let both finish; do **not** submit b03/b04 until b02 pass@1, truncation, latency/VRAM, and cost-per-correct are reviewed against BF16 Path C/July numbers. b02 is not a calibration run.
-First attempt jobs **96084/96085** failed before raw rows because vLLM 0.8.5 rejects `fp8_e5m2` KV cache with FP8 checkpoints. Commit `542f622` fixes the FP8 configs to `kv_cache_dtype: auto`; 96086/96087 are the retry to monitor.
+Jobs **96100** / **96101** = gated exact-stack FP8 full correctness runs, MATH-500 n=500, seed 42, `qrm-official`, archive `outputs-hpc-qrm-official-fp8-full-2026-08-13`. At 16:00:56 IST they had processed at least 27/500 and 45/500 prompts. Do **not** submit b03/b04 until both final outputs and validation reports are reviewed.
+
+Historical boundary: **96084/96085** failed FP8 KV-cache initialization; `542f622` fixed model loading. **96086/96087** then generated unhealthy modern-stack output and were canceled. **96091/96092** showed V0 alone was insufficient. Exact-stack pilots **96093/96094** passed 10/10 for both models. Commit `4796614` adds the strict gate and collision-safe outputs used for the active jobs.
 
 ### Verified good news (QRM GitHub audit)
 
@@ -1075,4 +1076,25 @@ The controlled fix was to reuse the entire successful job-87302 execution path, 
 
 Both passed: 10/10 correct, 10/10 boxed, zero token-cap hits, and zero repetition flags. Qwen completion tokens ranged 1,111-12,729 (mean 4,393.1); Llama ranged 1,163-8,638 (mean 3,580.8). The result-copy collision found during the concurrent validation is fixed by model-qualified filenames. Full submission is guarded by `scripts/hpc/submit_qrm_fp8_full.sh` and `validate_official_results.py`.
 
-*Last updated: 2026-08-13. §35 = exact-stack FP8 validation. §34 = b02 FP8 retry after KV-cache fix. §33 = b02 FP8 launch. §32 = QRM official run success. §31 = A-D explainer. §30 = stack audit.*
+## 36. Gated full FP8 correctness jobs launched (2026-08-13)
+
+Commit **4796614** added the strict result validator, collision-safe model-qualified result copies, guarded full submitter, watcher support, tests, and synchronized documentation; it was pushed before submission. The full pytest suite passed. Both saved n=10 outputs passed the strict gate again immediately before `sbatch`.
+
+| Model | Job | Node | Run | Verified live progress at 16:00:56 IST |
+|-------|-----|------|-----|----------------------------------------|
+| Qwen-7B FP8 | **96100** | `ragpu008` | MATH-500 n=500, seed 42 | >=27/500 |
+| Llama-8B FP8 | **96101** | `ragpu004` | MATH-500 n=500, seed 42 | >=45/500 |
+
+Both jobs use `qrm-official` and the exact successful job-87302 execution path. Archive: `outputs-hpc-qrm-official-fp8-full-2026-08-13`. Lighteval writes the result array only at the end, so the prompt counter in the `.err` logs is not a durable checkpoint. Keep b03/b04 blocked until the final per-model results and validation reports are inspected.
+
+## 37. Publication-readiness audit and recovery decision (2026-08-14)
+
+Jobs **96100/96101 completed successfully**. Qwen scored **472/500 (94.4%)** and Llama **445/500 (89.0%)** on MATH-500, seed 42, using the pinned `qrm-official` path. Both results are compatible with their existing FP8 model-card values, so they are useful replication/control rows.
+
+The result is **not a standalone publishable finding**. It has no same-stack BF16 control, one seed, one task, no valid calibration/confidence, and no controlled latency/VRAM/energy/cost telemetry. A100 used vLLM's weight-only Marlin fallback for the FP8 checkpoints. Row-level review found six likely near-cap traces and phrase-level degeneration that the saved validator underreports; `finish_reason` and token IDs were not captured. The external QRM checkout also contains necessary uncommitted patches.
+
+Decision: **Needs revision**. Use the current values only in an appendix or control table. Do not launch b03/b04 or the old broad seed-0 grid. First execute [`docs/plans/2026-08-14-publication-recovery.md`](docs/plans/2026-08-14-publication-recovery.md): repair reproducibility/observability, run four matched BF16/FP8 seed-42 cells, then a 24-cell three-seed BF16/FP8/AWQ4/GPTQ4 pilot. That pilot selects either a quantization reliability–cost paper, a controlled serving-stack paper, or a negative-results artifact. Headline claims require five seeds.
+
+Full evidence and claims boundary: [`docs/PUBLICATION_READINESS.md`](docs/PUBLICATION_READINESS.md).
+
+*Last updated: 2026-08-14. §37 = publication audit/recovery decision. §36 = gated FP8 full launch. §35 = exact-stack FP8 validation. §34 = b02 FP8 retry. §33 = b02 FP8 launch. §32 = QRM official run success. §31 = A-D explainer. §30 = stack audit.*

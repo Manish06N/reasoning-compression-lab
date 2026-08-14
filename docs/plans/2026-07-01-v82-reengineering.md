@@ -1,8 +1,10 @@
 # V8.2 Codebase Re-engineering Plan
 
-> **Status: COMPLETE** (codebase architecture — 1 July 2026)
+> **Status: COMPLETE** (codebase architecture — 1 July 2026). Scientific execution order was superseded on 14 August 2026 by [the publication-recovery plan](2026-08-14-publication-recovery.md).
 
 **Goal:** Align `reasoning-compression-lab` with PhD Roadmap V8.2 while keeping HPC entrypoints stable.
+
+This document proves intended architecture, not publication readiness. The 2026-08-14 audit found unmatched controls, missing termination/telemetry fields, and unreproduced external patches that recovery Phase 0 must resolve.
 
 See also: [V8_2_ARCHITECTURE.md](../V8_2_ARCHITECTURE.md)
 

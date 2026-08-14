@@ -1,12 +1,12 @@
 # Known issues and limitations
 
-Last updated: 2026-08-13
+Last updated: 2026-08-14
 
 Operational issues that can break paper results if ignored, plus known software limitations.
 
 ---
 
-## Current campaign status (2026-08-13)
+## Current campaign status (2026-08-14)
 
 | Item | Status |
 |------|--------|
@@ -15,11 +15,31 @@ Operational issues that can break paper results if ignored, plus known software 
 | **b02 retry reason** | Jobs **96084/96085** failed before raw rows because vLLM 0.8.5 rejects `fp8_e5m2` KV cache with FP8 checkpoints; fixed by `542f622` (`kv_cache_dtype: auto`) |
 | **Official QRM parity** | **COMPLETED** - job **87302**, Qwen-7B BF16 n=10, **10/10 correct**, **0 truncation** in `qrm-official` |
 | **FP8 exact-stack gate** | **COMPLETED** - jobs **96093/96094**, both models 10/10 correct/boxed, no token-cap or repetition flags |
+| **Completed full correctness** | 96100 Qwen: 472/500 (94.4%); 96101 Llama: 445/500 (89.0%); both n=500, seed 42 |
+| **Publication verdict** | **Needs revision**; replication/control evidence only |
+| **Next gate** | Recovery Phase 0; no b03/b04 or broad-grid submission |
 | **qreason stack gap** | Confirmed by Path C: Qwen **10%/90% trunc**, Llama **15%/75% trunc** on n=20 strict protocol |
 | **b01 July archive** | Gate failed on `qreason`; useful as BF16 deployment-stack evidence, not as QRM reproduction |
-| **Calibration** | Current b02 scoring is `--skip-calibration`; valid for pass@1/truncation/cost only |
+| **Calibration/systems** | `--skip-calibration` supports diagnostic correctness/trace scoring only; no valid calibration or controlled cost/performance claim |
 
-See [notes.md sections 31-34](../notes.md) . [QRM_STACK_PARITY_AUDIT.md](QRM_STACK_PARITY_AUDIT.md) . **[QRM_OFFICIAL_HPC_TROUBLESHOOTING.md](QRM_OFFICIAL_HPC_TROUBLESHOOTING.md)** (full job-by-job debug log)
+See [PUBLICATION_READINESS.md](PUBLICATION_READINESS.md) · [recovery plan](plans/2026-08-14-publication-recovery.md) · [notes.md sections 31-37](../notes.md) · [QRM_STACK_PARITY_AUDIT.md](QRM_STACK_PARITY_AUDIT.md) · **[QRM_OFFICIAL_HPC_TROUBLESHOOTING.md](QRM_OFFICIAL_HPC_TROUBLESHOOTING.md)**.
+
+---
+
+## Publication blockers discovered 2026-08-14
+
+1. **No matched control:** current full result is FP8 only; no same-stack BF16 causal contrast.
+2. **Single seed/task:** seed 42 on MATH-500 cannot support seed stability or breadth claims.
+3. **Misleading FP8 shorthand:** A100 used weight-only Marlin fallback; do not claim native FP8/W8A8 execution.
+4. **Missing termination evidence:** saved rows omit `finish_reason` and token IDs; six traces are only “likely near-cap.”
+5. **Weak phrase-loop detection:** consecutive identical words miss repeated sentences and phrases.
+6. **Permissive full validator:** `passed: true` permits zero accuracy/boxing and all rows flagged for cap/repetition unless explicit thresholds are supplied.
+7. **No valid calibration:** no defensible confidence source for Brier/ECE/AURC.
+8. **No controlled systems telemetry:** Slurm wall time is confounded; Llama logged 900+ recomputations; energy accounting was unavailable/zero.
+9. **Dirty external dependency:** required QRM patches are uncommitted and not fully reproduced by setup.
+10. **Protocol mixing:** exact-QRM seed-42 output must not be combined with seed-0 `qreason` main-grid output.
+
+These issues are blocking for publication, not reasons to discard the completed replication.
 
 ---
 
@@ -35,6 +55,8 @@ See [notes.md sections 31-34](../notes.md) . [QRM_STACK_PARITY_AUDIT.md](QRM_STA
 **Official cross-check result:** job **87302** under `qrm-official` vLLM 0.7.0 fork completed 10/10 correct with 0 truncation. This confirms the prompt/protocol and isolates a software-stack behavior gap.
 
 **Current conclusion:** FP8 weights alone are not the cause: both FP8 checkpoints are healthy on the pinned official path. The modern `qreason` execution path remains invalid for these correctness runs until its generation gap is resolved.
+
+**Official-output limitation (historical lesson):** Lighteval writes the full result array only after the batch completes. During a future running batch, log progress is not a durable partial result; a temporarily missing `MATH-500.jsonl` is not by itself failure evidence.
 
 **Fixes applied before the cross-check:**
 - `src/runners/vllm_serving.py` - QRM serving defaults in `build_llm()`
@@ -155,6 +177,8 @@ Analysis should filter by `schema_version` or rerun fresh archives for publicati
 | `sober` | Level B/C main grid | Long sober-reasoning template |
 
 Comparing Level A to Level B pass@1 directly confounds prompt + quant — compare within profile.
+
+**2026-08-14 rule:** Protocol R (QRM replication) and Protocol P1-2026-08 (publication) are separate analysis strata. Historical seed-0 rows are engineering evidence only. Publication comparisons use seeds 42–44 for the pilot and 42–46 for headline cells with identical protocol hashes.
 
 ### 7. GPQA answer shuffle
 

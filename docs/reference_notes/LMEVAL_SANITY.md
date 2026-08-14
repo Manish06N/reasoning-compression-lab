@@ -6,7 +6,7 @@ One-time validation that our harness pass@1 is in the same ballpark as EleutherA
 
 ## When to run
 
-After the first clean Qwen-7B BF16 cell on HPC — not required for publication pipeline.
+After recovery Phase 0 and the first matched Qwen-7B BF16 cell on HPC. It remains a sanity cross-check, not a replacement for the frozen publication harness. Do not install it into or mutate the controlled environment without an isolated compatibility test.
 
 ## HPC
 

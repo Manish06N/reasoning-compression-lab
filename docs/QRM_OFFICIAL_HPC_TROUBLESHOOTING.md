@@ -1,12 +1,14 @@
 # QRM official stack — HPC debugging & troubleshooting log
 
-Last updated: **2026-08-13**
+Last updated: **2026-08-14**
 
 Chronological record of every failed attempt, diagnosis, and fix while bringing up **Experiment A** (official QRM `inference.py`, n=10 MATH-500, seed=42) on PARAM Rudra. Use this before re-running or extending the `qrm-official` conda env.
 
 **Same repo, not a separate project:** all paths are under `reasoning-compression-lab/`. The main paper harness uses conda env **`qreason`** (`scripts/run_inference.py`, vLLM 0.8.5). Experiment A uses conda env **`qrm-official`** only — do not mix packages between them.
 
 **Related docs:** [QRM_STACK_PARITY_AUDIT.md](QRM_STACK_PARITY_AUDIT.md) · [KNOWN_ISSUES.md](KNOWN_ISSUES.md) · [PARAM_RUDRA_SLURM.md](PARAM_RUDRA_SLURM.md) · [README.md](../README.md) § “One repo, two conda envs”
+
+**Publication boundary:** the environment successfully produced the completed 96100/96101 replication, but a clean checkout does not yet recreate every required local QRM patch. Treat this document as troubleshooting history; use [PUBLICATION_READINESS.md](PUBLICATION_READINESS.md) and the [recovery plan](plans/2026-08-14-publication-recovery.md) for current scientific actions.
 
 ---
 
@@ -49,6 +51,7 @@ bash scripts/hpc/submit_qrm_official_test.sh
 | **96086/96087** | 2026-08-13 | ragpu004/ragpu008 | 1h06m/39m | CANCELED | FP8 model load fixed, but generated output looped/truncated; stopped before full run |
 | **96091/96092** | 2026-08-13 | ragpu004/ragpu008 | 11m/11m | CANCELED/FAILED | vLLM 0.8.5 V0 probe; malformed answer(s), one full-length loop, then partial-n scoring schema failure |
 | **96093/96094** | 2026-08-13 | ragpu008/ragpu004 | 5m29s/4m52s | **COMPLETED** | Exact-stack FP8 validation: both 10/10 correct, 10/10 boxed, no cap hits or repetition flags |
+| **96100/96101** | 2026-08-13 | ragpu008/ragpu004 | 22m12s/40m28s | **COMPLETED** | Qwen 472/500 (94.4%); Llama 445/500 (89.0%); audited as replication/control |
 
 Logs: `logs/qrm_official_<JOBID>.out` / `.err`
 
@@ -75,6 +78,8 @@ The known-good control is job 87302, not merely "vLLM V0":
 Jobs 96093/96094 used that entire execution path with n=10 and replaced only the model path with the Qwen-7B FP8 or Llama-8B FP8 checkpoint. Both completed 10/10 correct and boxed, with no token-cap hits or repetition flags. Qwen token counts were 1,111-12,729 (mean 4,393.1); Llama counts were 1,163-8,638 (mean 3,580.8). Their archive is `outputs-hpc-qrm-official-fp8-validation-2026-08-13`.
 
 One output-handling bug was exposed: both concurrent jobs copied their model-specific result to the same top-level filename. The model-specific files under `inference/` remained intact, but the convenience alias was overwritten by the later Qwen copy. `run_official_inference.sh` now includes the model basename in copied filenames, and `validate_official_results.py` records/gates output health. Use `submit_qrm_fp8_full.sh`; it refuses to call `sbatch` until both pilots pass strict validation.
+
+Commit `4796614` contains and tests those safeguards. The guarded submitter launched full jobs 96100/96101 into `outputs-hpc-qrm-official-fp8-full-2026-08-13`; both completed. The official Lighteval evaluator wrote its result array only after all 500 prompts. The 2026-08-14 audit found Qwen 94.4% and Llama 89.0%, six likely near-cap traces, underdetected phrase loops, and missing `finish_reason`/token IDs. These are healthy replication results, not a publication gate.
 
 ---
 
@@ -374,7 +379,7 @@ bash scripts/hpc/qrm_parity/install_official_qrm_env.sh
 
 ### Git sync status
 
-The QRM official fixes and follow-up docs are synced to GitHub. As of 2026-08-13, GitHub/HPC include the FP8 KV-cache fix (`542f622`); MacBook should pull latest `origin/main`. Leave `.qrm_official_env_ready` untracked.
+Baseline gate/runner commit `4796614` is on GitHub/HPC. The 2026-08-14 audit/plan and synchronized documentation are currently uncommitted on HPC and must be preserved for the next sync. Leave `.qrm_official_env_ready` untracked.
 
 ---
 
@@ -460,7 +465,9 @@ Output directory: `outputs-hpc-qrm-official-<date>/`
 | Env install | **Verified** on login node (marker `2026-07-06-conda-gcc12-nvcc124-vllm070wheel`) |
 | GPU inference | **Validated end-to-end** by job **87302** |
 | Official result | Qwen-7B BF16, MATH-500 n=10, seed 42: **10/10 correct**, **0 truncation** |
-| Science conclusion | Prompt/protocol are correct; modern `qreason` stack behavior differs from QRM official stack |
-| Follow-up | Modern-stack b02 jobs **96086/96087** stopped; exact-stack FP8 n=10 jobs **96093/96094** passed 10/10; gated full run is next |
-| GitHub sync | Complete at `319cc56`; `.qrm_official_env_ready` remains untracked |
-| Calibration | b02 is not a calibration run; use it for pass@1/truncation/cost only |
+| Full FP8 result | **COMPLETED** — Qwen 472/500 (94.4%); Llama 445/500 (89.0%) |
+| Science conclusion | Healthy replication; no matched BF16 or causal stack claim yet |
+| Reproducibility debt | Required external-QRM edits must become tracked patches and be tested from a clean clone |
+| Follow-up | Recovery Phase 0; do not submit b03/b04 or broad grid |
+| Repository | Baseline `4796614` pushed; current audit/docs uncommitted; `.qrm_official_env_ready` remains untracked |
+| Calibration/systems | Replication rows support correctness/trace audit only; no calibration or controlled cost/performance claim |

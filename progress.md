@@ -9,19 +9,27 @@ Canonical dated record for **Paper 1: Beyond Accuracy** (`reasoning-compression-
 
 ---
 
-## Current Status Snapshot (2026-08-13, invalid b02 stopped; exact-stack validation passed)
+## Current Status Snapshot (2026-08-14, audit complete; publication recovery required)
 
 | Area | Status |
 |------|--------|
-| **Latest gate** | Exact `qrm-official` stack validation of the Qwen-7B and Llama-8B FP8 checkpoints, MATH-500 n=10: **PASSED** |
+| **Publication verdict** | **Needs revision** — current FP8 results are appendix/control evidence, not a standalone paper |
+| **Scientific authority** | [Publication Readiness Audit](docs/PUBLICATION_READINESS.md) |
+| **Execution authority** | [2026-08-14 Publication-Recovery Plan](docs/plans/2026-08-14-publication-recovery.md) |
+| **Latest gate** | Exact `qrm-official` stack validation and full FP8 replication completed; matched causal comparison still absent |
 | **Validation jobs** | **96093** Qwen FP8 on `ragpu008` completed in 5m29s; **96094** Llama FP8 on `ragpu004` completed in 4m52s |
 | **Validation archive** | `outputs-hpc-qrm-official-fp8-validation-2026-08-13` |
-| **Stopped b02 jobs** | **96086/96087** were canceled after the generated output was shown to be unhealthy; no full replacement job has been submitted |
+| **Completed full jobs** | **96100** Qwen: 472/500 (**94.4%**), 22m12s; **96101** Llama: 445/500 (**89.0%**), 40m28s |
+| **Full archive** | `outputs-hpc-qrm-official-fp8-full-2026-08-13` |
+| **Result interpretation** | Compatible with existing FP8 model-card values; replication evidence only; no matched BF16 |
+| **Trace audit** | Six likely near-cap endings; phrase-level loops underdetected; `finish_reason` and token IDs absent |
+| **Runtime interpretation** | A100 used weight-only Marlin FP8-checkpoint fallback; Llama logged 900+ recomputations, so wall times are not a controlled performance comparison |
+| **Stopped b02 jobs** | **96086/96087** were canceled after the generated output was shown to be unhealthy; archive retained as diagnostic only |
 | **b02 first attempt** | Jobs **96084/96085** failed before raw rows with `fp8_e5m2 kv-cache is not supported with fp8 checkpoints`; fixed in `542f622` by setting FP8 checkpoint KV cache to `auto` |
 | **Official QRM parity** | Job **87302** completed: Qwen-7B BF16 official stack, n=10, seed 42, **10/10 correct**, **0 truncation** |
 | **Path C** | **CANCELED** (87116-87118) - Qwen 10%/90% trunc, Llama 15%/75% trunc at n=20 on `qreason` |
 | **b01 gate interpretation** | Official stack passed the prompt/protocol check; the main `qreason` BF16 stack failed and is a deployment-stack finding |
-| **GitHub sync** | GitHub/HPC include the FP8 KV-cache fix (`542f622`); MacBook should pull latest `origin/main`; only `.qrm_official_env_ready` should remain untracked |
+| **Repository state** | Baseline `4796614` is pushed; the audit/plan and synchronized run-status docs are uncommitted on HPC and must be preserved for sync |
 | **Calibration boundary** | b02 is scored with `--skip-calibration`; use for pass@1/truncation/cost, not Brier/AURC/ECE |
 
 ### 2026-08-13 run diagnosis: what worked, what did not, and why
@@ -72,14 +80,19 @@ The runner is now hardened in two ways:
 1. Top-level result copies include the model name, preventing concurrent Qwen/Llama jobs from overwriting the same alias.
 2. `validate_official_results.py` enforces row count and can gate accuracy, boxed rate, token-cap hits, and repeated-word runs. `submit_qrm_fp8_full.sh` refuses to submit unless both saved n=10 pilots pass the strict gate.
 
-### Current monitor and next gate
+Commit **`4796614`** (`Gate QRM FP8 runs on validated output`) contains the gate, collision fix, submitter, tests, and synchronized documentation and is pushed to `origin/main`. The full submitter re-ran both strict gates successfully before creating jobs 96100/96101.
 
-```bash
-python scripts/hpc/qrm_parity/validate_official_results.py --help
-bash scripts/hpc/submit_qrm_fp8_full.sh
-```
+### Current gate
 
-The n=10 gate has passed. The next allowed action is the gated full FP8 correctness run; b03/b04 remain blocked pending review of the full results. This official-stack run does not by itself replace the main harness's latency, VRAM, energy, or calibration telemetry.
+The full jobs are complete and audited. **b03/b04 and all broad-grid launches remain blocked.** Execute recovery Phase 0 first: pin and track the QRM patches, prove a clean environment recreation, capture finish/token/timing/telemetry fields, improve phrase/termination validation, add tests, and then run only tiny smoke cells. The next scientific run after Phase 0 is four matched BF16/FP8 seed-42 cells.
+
+### Documentation synchronization coverage
+
+The 2026-08-14 audit is being synchronized across all live scientific and operational Markdown. Generated literature extracts, credential instructions, provider cards, and archived historical guides remain unchanged by design; `docs/PUBLICATION_READINESS.md` records the evidence boundary.
+
+### 2026-08-14 publication-readiness audit
+
+The row-level and provenance audit confirmed exact dataset coverage and credible accuracy while rejecting a standalone publication claim. Qwen scored 472/500 (94.4%, Wilson 95% CI 92.03–96.10%); Llama scored 445/500 (89.0%, 85.95–91.45%). The values reproduce existing FP8 references. Missing matched BF16, multi-seed data, valid confidence, controlled systems telemetry, clean external patches, and trace termination fields are blocking issues. The recovery plan replaces the old “finish seed 0, then expand” rule with instrumentation → matched seed-42 controls → three-seed pilot → contribution gate → five-seed confirmation.
 
 ### Official QRM test (Experiment A) - completed
 

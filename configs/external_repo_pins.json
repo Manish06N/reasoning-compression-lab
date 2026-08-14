@@ -1,0 +1,14 @@
+{
+  "qrm_repo": {
+    "url": "https://github.com/ruikangliu/Quantized-Reasoning-Models.git",
+    "commit": "bf947e29f52e3f666e3263efac149dae0ac18d00",
+    "patch": "patches/qrm_hpc_compat.patch"
+  },
+  "submodules": {
+    "lighteval": {
+      "path": "third-party/lighteval",
+      "commit": "eee93d7967a6b8c965960f4cada163635691b93e",
+      "patch": "patches/lighteval_local_dataset.patch"
+    }
+  }
+}

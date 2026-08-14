@@ -1,8 +1,10 @@
-# QRM Stack Parity Audit (updated 2026-08-13)
+# QRM Stack Parity Audit (updated 2026-08-14)
 
 **Purpose:** Explain why Path C strict QRM protocol reproduces the *failure mode* but not QRM Table 1 numbers, what we verified, what we fixed, and what experiments come next.
 
 **Paper 1 is not a QRM reproduction paper.** QRM (Liu et al., COLM 2025) is a **sanity baseline**. This audit documents an honest reproduction attempt and isolates the stack gap.
+
+**Final full-run decision:** jobs 96100/96101 completed at 94.4% Qwen and 89.0% Llama. These values validate the checkpoints/official path and reproduce existing FP8 references. They do not establish a quantization effect or a causal stack effect. See [PUBLICATION_READINESS.md](PUBLICATION_READINESS.md).
 
 ---
 
@@ -171,7 +173,7 @@ Output: `outputs-hpc-qrm-official-2026-07-06/`
 
 ---
 
-## 6. Experiments A-D (status 2026-08-13)
+## 6. Experiments A-D and full FP8 follow-up (status 2026-08-14)
 
 | ID | Tests | Stack | Status |
 |----|-------|-------|--------|
@@ -179,6 +181,7 @@ Output: `outputs-hpc-qrm-official-2026-07-06/`
 | **B** | `capture_logprobs: false` on our harness | Our vLLM 0.8.5 | Code fixed; **not rerun** |
 | **C** | `repetition_penalty` none vs 1.05 | Our harness | **Answered** — both fail (~90% trunc) |
 | **D** | Qwen 64k max_tokens | Our harness | **Canceled** (87118) |
+| **FP8 full** | Exact-stack Qwen/Llama FP8 n=500, seed 42 | QRM stack | **COMPLETED** — 94.4% / 89.0%; replication only |
 
 Path C (our strict QRM protocol, n=50) was **canceled** at n=20 — sufficient to justify A.
 
@@ -193,16 +196,22 @@ Path C canceled at n=20
 └─ Experiment A COMPLETED successfully (Job 87302)
     └─ QRM got 10/10 (100% correct, 0% loops) vs. our stack 1/10 (10% correct, 90% loops)
         └─ Modern-stack FP8 96086/96087 failed output health and was stopped
-            └─ Exact-stack FP8 96093/96094 passed; gated full correctness run is next
+            └─ Exact-stack FP8 96093/96094 passed
+                └─ Gated full correctness jobs 96100/96101 completed
+                    └─ Accuracy replicated; publication audit found unmatched design and observability gaps
+                        └─ Recovery Phase 0 before any broad grid
 ```
 
 ---
 
-## 8. What Paper 1 claims (unchanged)
+## 8. Paper 1 claims boundary after full audit
 
-- We **attempted** QRM reproduction under fixed 32k deployment budget.
-- We **document** the gap (truncation, parse failure, cost-per-correct inflation).
-- Our contribution remains **beyond accuracy**: calibration, cost, truncation under deployment constraints — not hitting 93.9% in every table.
+- Supported: the pinned QRM path produces healthy FP8 output and reproduces known MATH-500 accuracy.
+- Supported: the modern and pinned paths exhibit a stack-sensitive behavior gap worth controlled study.
+- Not supported: FP8-vs-BF16 effects, native FP8 performance, calibration, cost, or causal stack attribution.
+- Candidate contribution: matched reliability–cost effects under quantization and controlled stack shift, selected only after the three-seed pilot.
+
+The old broad “beyond accuracy” statement is a motivation, not a completed contribution.
 
 ---
 

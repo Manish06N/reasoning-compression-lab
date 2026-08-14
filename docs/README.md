@@ -6,14 +6,18 @@
 
 **Live status:** [PROGRESS.md](PROGRESS.md) (short) · [../progress.md](../progress.md) (full history) · [../CHANGELOG.md](../CHANGELOG.md) (ops detail)
 
+**Scientific decision:** [PUBLICATION_READINESS.md](PUBLICATION_READINESS.md) · **execution plan:** [plans/2026-08-14-publication-recovery.md](plans/2026-08-14-publication-recovery.md)
+
 ---
 
 ## Essential (use these)
 
 | Doc | Purpose |
 |-----|---------|
+| [PUBLICATION_READINESS.md](PUBLICATION_READINESS.md) | **Controlling 2026-08-14 verdict** — exact parameters, audited results, claims boundary, blockers, and novelty decision |
+| [plans/2026-08-14-publication-recovery.md](plans/2026-08-14-publication-recovery.md) | **Current execution authority** — Phase 0 instrumentation through matched pilot, contribution gate, final analysis, and manuscript |
 | [CODEBASE_OVERVIEW.md](CODEBASE_OVERVIEW.md) | **High-level overview** — thesis alignment, architecture, modules, paper status |
-| [J1_VALIDATION_RUNBOOK.md](J1_VALIDATION_RUNBOOK.md) | **Next steps** - monitor/score b02 FP8 jobs 96086/96087, then decide b03/b04 |
+| [J1_VALIDATION_RUNBOOK.md](J1_VALIDATION_RUNBOOK.md) | Operational validation procedures; broad grid is blocked pending recovery Phase 0 |
 | [BEGINNER_HPC_GUIDE.md](BEGINNER_HPC_GUIDE.md) | HPC workflow step-by-step |
 | [HARDWARE_POLICY.md](HARDWARE_POLICY.md) | J1 HPC-only; RTX for J3 transfer |
 | [KNOWN_ISSUES.md](KNOWN_ISSUES.md) | **Critical** — resume trap, bad archive, limitations |

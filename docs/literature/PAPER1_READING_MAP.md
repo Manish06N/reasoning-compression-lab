@@ -1,5 +1,7 @@
 Core Paper 1 literature groups:
 
+**Updated 2026-08-14:** the local merged bundle is incomplete for the current novelty decision. Add the primary sources below to the supervisor/manuscript review even if they are not yet present in `ALL_PAPERS_MERGED.md`.
+
 1. Quantized reasoning baseline
 - Quantization Hurts Reasoning?
 - Quantization Meets Reasoning
@@ -28,6 +30,14 @@ Core Paper 1 literature groups:
 - AbstentionBench
 - Know Your Limits
 
+7. Current quantized reliability and failure modes
+- Quantized LLMs Can Still Be Calibrated (ACL 2025): https://aclanthology.org/2025.acl-long.1473/
+- Reliability Scaling Laws for Quantized LLMs (2026): https://arxiv.org/abs/2607.10855
+- Quantization Inflates Reasoning (2026): https://arxiv.org/abs/2606.25519
+- Extreme Low-Bit Failure Modes (2026): https://arxiv.org/abs/2606.02011
+- Calibrated e-CUSUM for quantized reasoning degeneration (2026): https://arxiv.org/abs/2607.11317
+- BitCal-TTS (2026): https://arxiv.org/abs/2605.05561
+
 ## Where to read
 
 | Group | PDF source | Code reference |
@@ -47,4 +57,4 @@ Core Paper 1 literature groups:
 4. Cost-of-Pass
 5. GPTQ paper (primary method — in merged bundle)
 
-Stop after these five before collecting more. Run HPC experiments in parallel with reading.
+After these five, read the current quantized-reliability/failure-mode group before freezing novelty. Do not run a broad grid in parallel; only recovery Phase 0 and approved matched pilots may proceed.

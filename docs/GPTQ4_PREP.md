@@ -1,15 +1,17 @@
 # GPTQ-4 Preparation Gate
 
-**Do not run** `level_a_gptq4_seed0.json` until a GPTQ-4 model path exists and is verified.
+**Publication hold (2026-08-14):** do not run `level_a_gptq4_seed0.json` or any GPTQ4 full cell until recovery Phase 0 and the matched BF16/FP8 Phase 1 pass. The seed-0 command below is retained as a historical wiring example, not the current publication protocol.
+
+Current order: [publication-recovery plan](plans/2026-08-14-publication-recovery.md).
 
 ## Correct order
 
 ```text
-1. BF16 smoke test          (scripts/hpc/03_smoke_test.sh)
-2. BF16 MATH-500 seed 0     (scripts/hpc/04_run_level_a_bf16.sh)
-3. Prepare GPTQ-4 weights   (this document)
-4. Verify model path        (scripts/hpc/06_verify_gptq4_model.sh)
-5. GPTQ-4 MATH-500 seed 0   (level_a_gptq4_seed0.json)
+1. Recovery P0 instrumentation and clean-recreation gate
+2. Matched BF16/FP8 seed-42 reconstruction
+3. Prepare and pin GPTQ-4 weights (this document)
+4. Verify model path and run tiny instrumented smoke
+5. Add GPTQ-4 to MATH-500 seeds 42/43/44 pilot
 ```
 
 ---

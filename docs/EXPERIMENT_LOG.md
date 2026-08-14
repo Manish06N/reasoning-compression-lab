@@ -310,7 +310,31 @@ Results:      both 10/10 correct, 10/10 boxed, 0 token-cap hits, 0 repetition fl
 Token counts: Qwen 1,111-12,729 (mean 4,393.1); Llama 1,163-8,638 (mean 3,580.8)
 Archive:      outputs-hpc-qrm-official-fp8-validation-2026-08-13
 Conclusion:   FP8 checkpoints are healthy on the pinned official path; modern-stack failure is not caused by FP8 weights alone.
-Next:         scripts/hpc/submit_qrm_fp8_full.sh (strictly revalidates both pilots before sbatch)
+Next:         SATISFIED - guarded submitter launched full jobs 96100/96101 below
+```
+
+---
+
+## 2026-08-13 - Exact-stack FP8 full correctness run (COMPLETED; audited 2026-08-14)
+
+```text
+Date:         2026-08-13
+Level:        full correctness/output-health follow-up
+Models:       DeepSeek-R1-Distill-Qwen-7B-FP8 + DeepSeek-R1-Distill-Llama-8B-FP8
+Task:         MATH-500, n=500
+Seed(s):      42
+Env:          qrm-official; vLLM 0.7.0; transformers 4.47.1; Lighteval 0.8.0
+Commit:       4796614 (pushed to origin/main before submit)
+Jobs:         96100 Qwen on ragpu008; 96101 Llama on ragpu004
+Started:      2026-08-13 15:56:04 IST
+Completed:    both jobs exit 0; Qwen 22m12s, Llama 40m28s
+Results:      Qwen 472/500 = 94.4%; Llama 445/500 = 89.0%
+Intervals:    Qwen Wilson95 92.03-96.10%; Llama Wilson95 85.95-91.45%
+Archive:      outputs-hpc-qrm-official-fp8-full-2026-08-13
+Interpretation: compatible with existing FP8 model-card results; replication/control only
+Runtime:      A100 used weight-only Marlin fallback; no native FP8/W8A8 claim
+Audit:        6 likely near-cap traces; phrase loops underdetected; finish_reason/token IDs absent
+Next gate:    publication-recovery Phase 0; keep b03/b04 and broad grid blocked
 ```
 
 ---

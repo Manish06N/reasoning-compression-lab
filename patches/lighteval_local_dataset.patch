@@ -1,0 +1,43 @@
+diff --git a/src/lighteval/utils/utils.py b/src/lighteval/utils/utils.py
+index 2c0ea487..f13bb282 100644
+--- a/src/lighteval/utils/utils.py
++++ b/src/lighteval/utils/utils.py
+@@ -225,15 +225,29 @@ def download_dataset_worker(
+     Worker function to download a dataset from the HuggingFace Hub.
+     Used for parallel dataset loading.
+     """
+-    dataset = load_dataset(
+-        path=dataset_path,
+-        name=dataset_config_name,
+-        data_dir=None,
+-        cache_dir=None,
+-        download_mode=None,
+-        trust_remote_code=trust_dataset,
+-        revision=revision,
+-    )
++    import os
++    if os.path.isdir(dataset_path):
++        from datasets import load_from_disk, DatasetDict, Dataset
++        loaded = load_from_disk(dataset_path)
++        if isinstance(loaded, Dataset):
++            dataset = DatasetDict({
++                "test": loaded,
++                "train": loaded,
++                "validation": loaded,
++                "default": loaded
++            })
++        else:
++            dataset = loaded
++    else:
++        dataset = load_dataset(
++            path=dataset_path,
++            name=dataset_config_name,
++            data_dir=None,
++            cache_dir=None,
++            download_mode=None,
++            trust_remote_code=trust_dataset,
++            revision=revision,
++        )
+ 
+     if dataset_filter is not None:
+         dataset = dataset.filter(dataset_filter)

@@ -1,13 +1,17 @@
 # Runbook - MacBook <-> HPC
 
-## Current project state (2026-08-13)
+## Current project state (2026-08-14)
 
-- GitHub/HPC include the FP8 KV-cache fix (`542f622`); MacBook should pull latest `origin/main`; `.qrm_official_env_ready` should remain untracked on HPC.
+- Canonical scientific verdict: **Needs revision** — [PUBLICATION_READINESS.md](PUBLICATION_READINESS.md).
+- Canonical next actions: [plans/2026-08-14-publication-recovery.md](plans/2026-08-14-publication-recovery.md). No b03/b04 or broad-grid launch before recovery Phase 0 passes.
+
+- GitHub/HPC baseline is `4796614`; current audit/plan/docs are uncommitted on HPC and must be preserved for sync; `.qrm_official_env_ready` should remain untracked.
 - Modern-stack b02 jobs **96086/96087** were canceled after unhealthy generated output; retain `outputs-hpc-2a100-main-2026-08-13` as evidence.
 - First b02 attempt jobs **96084/96085** failed before raw rows with the vLLM FP8 checkpoint plus FP8 KV-cache incompatibility; commit `542f622` fixes FP8 configs to `kv_cache_dtype: auto`.
 - Official QRM parity job **87302** completed 10/10 correct with 0 truncation under `qrm-official`; this confirmed prompt/protocol and isolated a `qreason` stack behavior gap.
 - Exact-stack FP8 validation jobs **96093/96094** both passed 10/10 correct, 10/10 boxed, with no cap hits or repetition flags.
-- Next gate: `bash scripts/hpc/submit_qrm_fp8_full.sh`; do not submit b03/b04 before full-result review.
+- Completed full correctness jobs: **96100** Qwen 472/500 (94.4%) and **96101** Llama 445/500 (89.0%), n=500/seed42, archive `outputs-hpc-qrm-official-fp8-full-2026-08-13`.
+- Interpretation: replication/control only; no same-stack BF16, multi-seed, calibration, or controlled performance evidence.
 - Calibration claims still require valid confidence rows; b02 uses `--skip-calibration`.
 
 
@@ -133,7 +137,7 @@ Plot on MacBook from `results/*.csv` → `paper_figures/`.
 
 ## Gate rules
 
-- Do not submit b03/b04 until b02 jobs 96086/96087 finish and summaries are reviewed.
+- Do not submit b03/b04 or a broad grid; completed 96100/96101 were reviewed and triggered recovery Phase 0.
 - Do not cite Brier/AURC/ECE until rows have valid confidence from logprobs or maj@5.
 - Do not use June/July diagnostic archives as QRM reproduction claims; use them as deployment-stack evidence only.
-- No 14B or Paper 2 expansion before the 7B/8B MATH-500 b02 signal is understood.
+- No 14B, Paper 2, or breadth expansion before the matched three-seed contribution gate.

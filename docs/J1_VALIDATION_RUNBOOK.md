@@ -1,6 +1,8 @@
 # J1 validation runbook — prove the pipeline before expanding
 
-**Status (2026-08-13):** unhealthy modern-stack b02 stopped; exact-official-stack FP8 n=10 gate **passed** for both models.
+**Status (2026-08-14):** jobs **96100/96101 completed** at 94.4% Qwen and 89.0% Llama; publication verdict is **Needs revision**.
+
+**Current authority:** [PUBLICATION_READINESS.md](PUBLICATION_READINESS.md) and [plans/2026-08-14-publication-recovery.md](plans/2026-08-14-publication-recovery.md). The historical procedures below remain useful, but any instruction to launch b03/b04 or treat seed 0 as publishable is superseded. The next permitted GPU work is a tiny recovery-Phase-0 smoke after reproducibility and instrumentation repairs.
 
 **Stopped b02:** Jobs 96086/96087 were canceled. Qwen's first 10 rows were 2/10 correct with 8/10 truncations and repetition loops. A V0-only probe (96091/96092) was also unhealthy.
 
@@ -10,13 +12,15 @@ First b02 attempt jobs **96084/96085** failed before raw rows with the vLLM FP8 
 
 **FP8 health gate:** jobs 96093/96094 ran the Qwen/Llama FP8 checkpoints through the exact job-87302 path. Both completed 10/10 correct and boxed with no token-cap hits or repetition flags. Use `bash scripts/hpc/submit_qrm_fp8_full.sh`; it reruns this strict gate before submission.
 
+**Full run:** 96100 (Qwen, `ragpu008`) and 96101 (Llama, `ragpu004`) completed from commit `4796614`. Qwen scored 472/500 (94.4%); Llama scored 445/500 (89.0%). Archive: `outputs-hpc-qrm-official-fp8-full-2026-08-13`. Both reproduce existing FP8 references; neither is a matched quantization comparison.
+
 **Path C (canceled):** Partial archive `outputs-hpc-diag-pathc-2026-07-05` - protocol OK, Qwen 10%/90% trunc and Llama 15%/75% trunc at n=20 on our vLLM 0.8.5 stack.
 
 **Experiments A-D:** [notes.md sections 31-33](../notes.md) . [QRM_STACK_PARITY_AUDIT.md](QRM_STACK_PARITY_AUDIT.md)
 
-**Quant grid rule:** a gated full official-stack FP8 correctness run is allowed. Do **not** submit b03/b04 until it finishes and is reviewed. Deployment telemetry still requires a separately validated main-harness path.
+**Quant grid rule:** do **not** submit b03/b04 or the broad b01–b09 grid. First complete recovery Phase 0, then four matched BF16/FP8 seed-42 cells, then review before the 24-cell three-seed pilot. Deployment telemetry requires a separately validated controlled path.
 
-**GitHub:** GitHub/HPC include the FP8 KV-cache fix (`542f622`); MacBook should pull latest `origin/main`; leave `.qrm_official_env_ready` untracked.
+**Repository:** baseline `4796614` is pushed; the 2026-08-14 audit/plan/docs are uncommitted on HPC and must be preserved for sync; leave `.qrm_official_env_ready` untracked.
 
 Use this on HPC (login + captcha required - agent cannot SSH for you).
 
@@ -242,7 +246,7 @@ python scripts/rescore_archive.py --archive "$ROOT"
 
 ## Phase 6 — Valid calibration (before Brier/AURC claims)
 
-**Hard gate before calibration claims:** rows must carry a valid `confidence_source` from logprobs or maj@5. b02 can be used now for pass@1, truncation, latency/VRAM, and cost because the launcher scores with `--skip-calibration`.
+**Hard gate before calibration or systems claims:** rows must carry a valid `confidence_source` from logprobs or maj@5. `--skip-calibration` permits diagnostic pass@1/trace scoring only; latency, VRAM, energy, and cost require the controlled telemetry path in recovery Phase 0.
 
 Until then:
 
@@ -260,14 +264,14 @@ python scripts/compute_calibration.py --input runs/raw/<multisample>.jsonl
 
 ---
 
-## Phase 7 — Three-seed pilot (after Phase 3–5 pass)
+## Phase 7 — Three-seed discriminating pilot (after recovery P0 and matched P1 pass)
 
-Recommended shape (includes GPTQ-3 at failure boundary):
+Current approved shape:
 
-- Qwen-7B × **{BF16, GPTQ-4, GPTQ-3}** × **{MATH-500, GPQA-Diamond}** × 3 seeds
+- Qwen-7B + Llama-8B × **{BF16, FP8, AWQ-4, GPTQ-4}** × **MATH-500** × seeds **42, 43, 44** = 24 cells
 - Use `scripts/j1/aggregate_seeds.py`
 
-Do **not** launch full 300-cell grid until pilot shows a reliability signal.
+Do **not** add GPQA, GSM8K, GPTQ-3, more models, or a full grid until the pilot passes the contribution-selection gate. Headline MATH-500 cells require seeds 42–46.
 
 ---
 
@@ -289,10 +293,13 @@ Never copy GPQA/AIME bands onto MATH-500.
 
 | Stage | Label |
 |-------|--------|
-| Now | **J1 engineering MVP complete; scientific validation pending** |
+| Now | **Needs revision; valid FP8 replication, publication recovery Phase 0 pending** |
+| After recovery P0 | **Clean reproducibility and observability gate passed** |
+| After matched P1 | **Matched BF16/FP8 seed-42 reconstruction complete** |
 | After Phase 3 pass | **Reproduction gate passed (BF16)** |
 | After Phase 4–5 | **Extraction gate passed; GPTQ repro validated** |
-| After Phase 6–7 | **Pilot signal; calibration endpoints valid** |
+| After three-seed pilot | **Contribution selected; confirmatory plan approved** |
+| After five-seed confirmation | **Candidate manuscript evidence complete** |
 
 ---
 

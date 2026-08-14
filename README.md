@@ -9,28 +9,31 @@ Deployment-science evaluation harness for compressed reasoning LLMs.
 
 **Roadmap:** PhD plan V8.2 (1 Jul 2026) — see [docs/plans/2026-07-01-v82-reengineering.md](docs/plans/2026-07-01-v82-reengineering.md) and [papers/j1/protocol.yaml](papers/j1/protocol.yaml).
 
-## Current status (2026-08-13)
+> **Publication decision (2026-08-14): Needs revision.** The completed FP8 runs are valid replication/control evidence, not a standalone publishable result. Read the [publication-readiness audit](docs/PUBLICATION_READINESS.md) and follow the [publication-recovery plan](docs/plans/2026-08-14-publication-recovery.md). No broad b03/b04 or b01–b09 launch is allowed before recovery Phase 0 passes.
 
-The modern-stack b02 FP8 run was stopped after unhealthy output. Both FP8 checkpoints then passed an n=10 health gate on the exact successful `qrm-official` stack.
+## Current status (2026-08-14)
+
+The modern-stack b02 FP8 run was stopped after unhealthy output. Both checkpoints then passed the exact-stack pilot, and full jobs 96100/96101 completed successfully. Independent review shows that these runs reproduce known FP8 accuracy but do not isolate quantization or support the planned calibration/cost claims.
 
 | Item | Status |
 |------|--------|
-| **Git sync** | GitHub and HPC include the FP8 KV-cache fix (`542f622`); MacBook should pull latest `origin/main`; `.qrm_official_env_ready` remains untracked on HPC |
+| **Repository state** | Baseline code is commit `4796614`; the 2026-08-14 audit/plan and earlier run-status doc edits are currently uncommitted on HPC; `.qrm_official_env_ready` remains untracked |
 | **Stopped modern b02** | Jobs **96086/96087** canceled; Qwen's first 10 rows were 2/10 correct with 8/10 truncations and obvious repetition |
 | **V0 probe** | Jobs **96091/96092** showed that `VLLM_USE_V1=0` alone did not fix malformed/looping output |
 | **b02 first attempt** | Jobs **96084/96085** failed before raw rows with `fp8_e5m2 kv-cache is not supported with fp8 checkpoints`; fixed in `542f622` by setting FP8 checkpoint KV cache to `auto` |
 | **Official QRM parity** | Job **87302** completed: Qwen-7B BF16, n=10 MATH-500, seed 42, **10/10 correct**, **0 truncation** |
 | **FP8 exact-stack gate** | Jobs **96093/96094** completed: Qwen and Llama each **10/10 correct**, 10/10 boxed, 0 token-cap hits, 0 repetition flags |
+| **Full exact-stack run** | **COMPLETED** — 96100 Qwen: 472/500 (**94.4%**); 96101 Llama: 445/500 (**89.0%**); MATH-500, seed 42 |
+| **Interpretation** | Both values are compatible with existing FP8 model-card results. They are replication evidence, not a matched BF16-vs-FP8 quantization comparison |
+| **Runtime qualification** | A100 used vLLM weight-only Marlin fallback for the FP8 checkpoints; do not describe the result as native FP8/W8A8 compute |
+| **Trace audit** | Six likely near-cap endings and phrase-level degeneration were found; saved output lacks `finish_reason`, so instrumentation must be repaired before causal trace claims |
 | **Path C / our stack** | Canceled at n=20 after Qwen **10% pass@1 / 90% trunc** and Llama **15% pass@1 / 75% trunc** |
 | **b01 July archive** | Deployment-stack BF16 evidence: Llama 500/500 **19.6% pass@1 / 58% trunc**; Qwen 410/500 about 94% trunc |
-| **Next gate** | `submit_qrm_fp8_full.sh` revalidates both pilots before submitting full MATH-500 correctness runs; b03/b04 remain blocked |
+| **Publication verdict** | **Needs revision** — suitable for an appendix/control table only |
+| **Next gate** | Recovery **Phase 0**: clean reproducibility, tracked QRM patches, finish/token/timing/telemetry schema, stronger pathology validation, tests, then tiny smoke runs |
 | **Calibration boundary** | b02 launcher scores with `--skip-calibration`; do not use b02 for Brier/AURC/ECE claims until valid confidence exists |
 
-```bash
-bash scripts/hpc/submit_qrm_fp8_full.sh
-```
-
-**Experiments A-D explained:** [notes.md sections 31-34](notes.md) . full audit: [docs/QRM_STACK_PARITY_AUDIT.md](docs/QRM_STACK_PARITY_AUDIT.md) . env debug log: [docs/QRM_OFFICIAL_HPC_TROUBLESHOOTING.md](docs/QRM_OFFICIAL_HPC_TROUBLESHOOTING.md)
+**Decision and execution:** [publication audit](docs/PUBLICATION_READINESS.md) · [recovery plan](docs/plans/2026-08-14-publication-recovery.md) · [notes.md sections 31-37](notes.md) · [stack audit](docs/QRM_STACK_PARITY_AUDIT.md) · [environment debug log](docs/QRM_OFFICIAL_HPC_TROUBLESHOOTING.md)
 
 ---
 
@@ -71,7 +74,9 @@ bash scripts/hpc/submit_qrm_official_test.sh   # uses qrm-official inside the jo
 
 **Live tracker:** [docs/PROGRESS.md](docs/PROGRESS.md) · **Full history:** [progress.md](progress.md) · **Ops log:** [CHANGELOG.md](CHANGELOG.md)
 
-### Pre-push / pre-rerun checklist (MacBook → GitHub → HPC)
+### Historical pre-rerun mechanics (do not submit a grid under the current gate)
+
+Use these commands only as references for sync/preflight mechanics. The authorized order is recovery Phase 0 → tiny smoke → matched P1.
 
 ```bash
 # MacBook (before git push)
@@ -85,9 +90,7 @@ python scripts/verify_decoding_params.py
 python scripts/hpc/07_preflight_publication.py
 # GPU smoke via Slurm — not on login node (no CUDA)
 
-# Fresh archive — see docs/J1_VALIDATION_RUNBOOK.md
-export QREASON_FRESH_RUN=1
-bash scripts/hpc/run_hpc_2a100_publication.sh b01_parallel_bf16_anchors
+# Broad b01 launch is blocked by the 2026-08-14 publication-recovery gate.
 
 # After b01 completes — sync again, then score (needs 286f5e4+ for baseline yaml)
 python scripts/score_run.py --input $QREASON_OUTPUT_ROOT/raw/level_a_qwen7b_bf16_math500_seed0.jsonl \
@@ -95,39 +98,21 @@ python scripts/score_run.py --input $QREASON_OUTPUT_ROOT/raw/level_a_qwen7b_bf16
 python scripts/compare_qrm_baseline.py --summary $QREASON_OUTPUT_ROOT/results/level_a_qwen7b_bf16_math500_seed0_summary.json
 ```
 
-Do **not** cite archive `outputs-hpc-2a100-main-2026-06-29` pass@1 in the paper — rerun with `repetition_penalty: 1.05` first.
+Do **not** cite archive `outputs-hpc-2a100-main-2026-06-29` as a quantization result. It remains diagnostic stack-failure evidence; new comparisons follow Protocol P1-2026-08.
 
-## Publication goal (journal)
+## Publication execution strategy
 
-> **HPC-only:** All publication experiments on **PARAM Rudra 2× A100** (`run_hpc_2a100_publication.sh`).  
-> Full plan: [HPC_2A100_PLAN.md](docs/HPC_2A100_PLAN.md)
+> **HPC-only for paper numbers; gated by evidence, not queue availability.** The historical b01–b09 scripts remain operational tools but are not the current scientific order.
 
-| Machine | Entry script | What runs there |
-|---------|--------------|-----------------|
-| **HPC 2× A100** | `scripts/hpc/run_hpc_2a100_publication.sh` | 7B/8B all quants, BF16 anchors, GSM8K, GPQA, 1.5B (b08–b09) |
-| **5080 (retired)** | — | Historical only — [archive](docs/archive/RTX5080_EXECUTION_PLAN.md) |
+| Stage | Authorized scope |
+|-------|------------------|
+| Recovery P0 | Track dependency patches; add finish/token/timing/telemetry fields; strengthen validators; test clean recreation |
+| Matched P1 | Qwen-7B + Llama-8B × {BF16, FP8} × MATH-500 × seed 42 |
+| Pilot P2 | Same models × {BF16, FP8, AWQ4, GPTQ4} × MATH-500 × seeds 42/43/44 |
+| Contribution P3 | Select quantization reliability–cost, controlled stack transfer, or negative-results artifact |
+| Confirmation | Extend approved headline cells to seeds 42–46; add breadth only after approval |
 
-**Protocol (both):** `repro_qrm.yaml`, batch_size=1, full n, seed 0.
-
-### HPC block grid (seed 0)
-
-| Block | GPUs | Est. time | Cells |
-|-------|------|-----------|-------|
-| b01 | 2× A100 | ~12–24 h | BF16 Qwen-7B + BF16 Llama-8B MATH-500 |
-| b02 | 2× A100 | ~12–24 h | FP8 Qwen-7B + FP8 Llama-8B MATH-500 |
-| b03 | 2× A100 | ~12–24 h | AWQ-4 Qwen-7B + AWQ-4 Llama-8B MATH-500 |
-| b04 | 2× A100 | ~12–24 h | GPTQ-4 Qwen-7B + GPTQ-4 Llama-8B MATH-500 |
-| b05 | 1× A100 | ~12–20 h | GPTQ-3 Qwen-7B MATH-500 |
-| b06 | 1× A100 | ~20–40 h | FP8 Qwen-7B GSM8K (n=1319) |
-| b07 | 1× A100 | ~8–20 h | GPQA-Diamond (after Hugging Face gate) |
-
-**Do not run on 5080:** any 7B/8B cell, GSM8K, or BF16 anchors — they OOM or take weeks at batch_size=1.
-
-## Publication sufficiency strategy
-
-The current HPC plan is sufficient for a first publishable core result set if b01-b09 complete cleanly and produce clear trends. It covers three model families/scales, five compression settings, and MATH-500/GSM8K/GPQA-Diamond.
-
-Do not expand the queue before seeing seed0 results. First finish b01-b09, score outputs, and build pass@1, trace length, latency, VRAM, cost-per-correct, and calibration/reliability tables. If robustness is needed, add seed1/seed2 only for the key Qwen-7B/Llama-8B MATH-500 cells: BF16, FP8, AWQ-4, and GPTQ-4.
+All compared cells must use one frozen Protocol P1-2026-08 stack and complete provenance. The old `repro_qrm.yaml` seed-0 block grid is historical engineering evidence. RTX 5080 remains outside J1 paper numbers.
 
 ## Push to GitHub
 
@@ -142,8 +127,7 @@ ssh manishn_iitp@paramrudra.iitp.ac.in -p 4422
 export QR=/scratch/$USER/reasoning-compression-lab
 cd $QR && git fetch origin && git reset --hard origin/main
 python scripts/verify_decoding_params.py
-bash scripts/hpc/submit_hpc_blocks.sh        # default: b01 only
-# bash scripts/hpc/submit_hpc_blocks.sh --fresh b01   # new archive + wipe cells
+# Do not call submit_hpc_blocks.sh until the recovery plan authorizes a cell.
 squeue -u $USER
 ```
 
@@ -182,21 +166,15 @@ outputs-hpc-*/    Publication archives (git-tracked when autopushed)
 
 ## Execution gates
 
-1. **Level A — reproduction:** Qwen-7B × {BF16, GPTQ-4} × MATH-500 × seed 0
-2. **Level B — pilot:** Qwen-7B × 5 configs × {MATH-500, GPQA-Diamond} × 5 seeds
-3. **Level C — main grid:** 3 models × 5 configs × 4 tasks × 5 seeds
-
-No full grid before reproduction works. No 14B before Qwen-7B pilot works.
+1. **Recovery P0:** clean reproducibility and observability.
+2. **Matched P1:** four BF16/FP8 seed-42 cells.
+3. **Pilot P2:** 24 MATH-500 cells across three seeds.
+4. **Contribution P3:** supervisor-approved primary RQs/endpoints.
+5. **Confirmation:** five-seed headline evidence and gated breadth.
 
 ## First experiment
 
-```
-Model:  DeepSeek-R1-Distill-Qwen-7B
-Task:   MATH-500
-Config: BF16
-Seed:   0
-Hardware: A100
-```
+The next work is Phase 0 code/instrumentation and clean-recreation testing. The next GPU action is a tiny instrumented smoke; the next scientific comparison is matched BF16/FP8 at seed 42.
 
 ## Reference repos
 

@@ -4,7 +4,9 @@
 **Cluster:** PARAM Rudra, IIT Patna (`paramrudra.iitp.ac.in`)  
 **Repo:** https://github.com/Manish06N/reasoning-compression-lab  
 **Support:** `rudrasupport@iitp.ac.in` · ticket portal: https://paramrudra.iitp.ac.in/support  
-**Last verified:** 2026-06-28 (cross-checked against repo scripts/configs and PARAM Rudra User Manual, IIT Patna, April 2025)
+**Operational base last verified:** 2026-06-28 · **publication-gate amendment:** 2026-08-14
+
+> **Read before running anything:** the completed FP8 jobs are replication/control evidence and the paper is **Needs revision**. The current authority is [PUBLICATION_READINESS.md](PUBLICATION_READINESS.md) plus [plans/2026-08-14-publication-recovery.md](plans/2026-08-14-publication-recovery.md). Do not follow old seed-0/b01–b09 expansion instructions; recovery Phase 0 must pass first.
 
 ---
 
@@ -16,9 +18,11 @@
 
 Most papers report a single accuracy number. This project treats deployment as a **systems problem**: a quantized model that is 2% less accurate but 4× faster and uses half the VRAM may be the better production choice — or it may be worse if calibration collapses and wrong answers are over-confident.
 
-### Paper title
+### Provisional paper title
 
-**Beyond Accuracy: Reliability, Calibration, Seed Variance, and Cost-per-Correct of Quantized Reasoning LLMs**
+**Beyond Pass@1: Reliability–Cost Frontiers of Quantized Reasoning Models under Controlled Serving-Stack Shift**
+
+The final contribution/title is selected after the three-seed pilot; the old broad “Beyond Accuracy” wording is motivation, not a completed novelty claim.
 
 ### What we compare
 
@@ -85,7 +89,7 @@ QRM (COLM 2025)                    Your Paper 1 (this repo)
 
 ### 1.2 Why is our pass@1 much lower than QRM (~7% vs ~94%)? Is something wrong?
 
-**Short answer (updated 2026-08-13):** The July BF16 `qreason` runs failed the QRM gate because the modern vLLM 0.8.5 stack loops/truncates. Path C confirmed the prompt and decoding were correct but still produced Qwen 10% pass@1 / 90% truncation and Llama 15% / 75% truncation on n=20. Experiment A then ran the official QRM stack (job **87302**) on the same 10 Qwen problems and got **10/10 correct with 0 truncation**. So the issue is a software-stack behavior gap, not the math scorer or prompt. The active next step is b02 FP8 (jobs **96086/96087**) to test whether FP8 changes that deployment-stack behavior.
+**Short answer (updated 2026-08-14):** The July BF16 `qreason` path and August modern-stack FP8 path looped/truncated, while the pinned QRM stack generated healthy answers. Full exact-stack jobs **96100/96101 completed** at **94.4% Qwen** and **89.0% Llama**, reproducing existing FP8 references. This validates the checkpoints and pinned path, but it does not isolate quantization or a single stack cause because no matched BF16 full run or one-factor stack ladder exists.
 
 **Key finding:** Raw JSONL proves prompt/decoding/seed are **correct**. Failures are **degeneration loops** (`yeah yeah`, `the the the`) burning 32k before a final boxed answer. When generation stops cleanly, accuracy is much higher (Qwen 2/2, Llama 3/5 on n=20). **Conclusion:** protocol parity achieved; **vLLM 0.8.5 stack** behaves differently from QRM official Lighteval/vLLM 0.7.0 path.
 
@@ -118,7 +122,7 @@ Rescoring that archive cannot fix truncated raw text.
 |--------|-------------------|
 | **Truncation at 32k** | R1-style traces are very long. If our vLLM run fills 32k before `\boxed{}`, pass@1 collapses even when the “recipe” matches QRM on paper. |
 | **Different inference stack** | QRM’s public code uses their **lighteval** pipeline; we use **vLLM 0.8.5** + our harness. Same hyperparameters ≠ identical token streams. |
-| **Seeds** | QRM Table 1 averages **seeds 42–44**; b01 uses **seed 0** first. That shifts pass@1 a few points, **not** 7% → 94%. |
+| **Seeds** | QRM Table 1 averages seeds 42–44; old b01 used seed 0. New pilot cells use 42–44 and headline cells 42–46. |
 | **Chat template / tokenizer** | DeepSeek-R1 distill models are sensitive to formatting; small differences change trace length. |
 | **~7 min/question ≈ 32k tokens** | Current Qwen logs (~420 s, ~78 tok/s out) suggest we are still **hitting the cap** — same failure mode as June, even with bugs fixed. |
 
@@ -127,17 +131,17 @@ Rescoring that archive cannot fix truncated raw text.
 | Statement | True? |
 |-----------|-------|
 | “Our June 7% reproduces QRM” | **No** — invalid run + massive truncation |
-| “Our pipeline is permanently broken” | **Not proven** — June had config bugs; July rerun still in progress |
-| “We can never publish” | **No** — you can publish **pass@1 + truncation_rate** under a fixed budget; that is deployment science |
-| “We must match 93.9% for Paper 1” | **No** for the **main** contribution — only for the **Level A hard gate** before opening b02 |
+| “Our pipeline is permanently broken” | **No** — the pinned QRM path completed healthy full runs; the modern path still needs controlled diagnosis |
+| “The two FP8 numbers are publishable now” | **No** — they are replication/control rows without matched BF16, seeds, calibration, or systems telemetry |
+| “We must match 93.9% for Paper 1” | Matching the reference validates replication; publication still requires a distinct matched contribution |
 
-**Decision rule (updated after Path C audit):**
+**Current decision rule:**
 
-1. Let Path C d01/d02 finish (`report_pathc_diagnostic.sh`).
-2. Run **d03 parity pilot** with serving-stack fixes (`submit_pathc_parity_pilot.sh`).
-3. Run **official QRM `inference.py`** on same 10 problems (`setup_official_qrm_repo.sh`).
-4. If QRM ~90% and we ~10% on same IDs → **stack gap confirmed** — document honestly in Paper 1; lead with truncation + cost-per-correct.
-5. If 64k Qwen (87118) jumps vs 32k → budget was binding; still document 32k deployment story.
+1. Complete recovery Phase 0: clean pinned patches, complete output schema, validators, telemetry, and tests.
+2. Run four matched BF16/FP8 seed-42 cells.
+3. Review before the 24-cell seeds-42/43/44 pilot.
+4. Select a quantization, controlled-stack, or negative-results contribution.
+5. Add five-seed confirmation and breadth only after approval.
 
 See [QRM_STACK_PARITY_AUDIT.md](QRM_STACK_PARITY_AUDIT.md), [CHANGELOG.md](../CHANGELOG.md), [qrm_literature_targets.yaml](../configs/baselines/qrm_literature_targets.yaml).
 
@@ -167,7 +171,7 @@ See [QRM_STACK_PARITY_AUDIT.md](QRM_STACK_PARITY_AUDIT.md), [CHANGELOG.md](../CH
               outputs-.../results/{cell_id}_summary.json  <- paper numbers
 ```
 
-### Execution gates (strict order)
+### Execution gates (strict order; amended 2026-08-14)
 
 Do **not** jump to the full grid until early gates pass:
 
@@ -177,9 +181,10 @@ Do **not** jump to the full grid until early gates pass:
 | **2** | Model weights | Qwen-7B downloaded to `$QR/models/` |
 | **2b** | Dataset | MATH-500 loads from Hugging Face |
 | **3** | Smoke test | vLLM loads model, writes ≥1 JSONL line |
-| **4** | Level A BF16 | 10-question debug, then full MATH-500 scored |
-| **5** | Level A GPTQ-4 | Same after GPTQ weights verified |
-| **6+** | Full grid | All blocks b01–b07 (+ 1.5B cells on HPC) |
+| **4** | Recovery P0 | Clean recreation, schema/validator/telemetry tests |
+| **5** | Instrumented smoke | Complete valid rows for both model families |
+| **6** | Matched P1 | BF16/FP8 × two models × seed 42 |
+| **7** | Pilot P2 | 24 cells only after P1 review |
 
 ---
 
@@ -187,7 +192,9 @@ Do **not** jump to the full grid until early gates pass:
 
 **All compute is on PARAM Rudra.** There is no personal GPU in this workflow.
 
-### Publication grid (seed 0)
+### Historical seed-0 block map — do not submit as the current plan
+
+The table below explains old block names and archives. The live experiment order is the recovery plan above.
 
 | Block | GPUs | What runs | Est. time |
 |-------|------|-----------|-----------|
@@ -199,9 +206,9 @@ Do **not** jump to the full grid until early gates pass:
 | **b06** | 1× A100 | Qwen-7B FP8 × GSM8K (1319 Q) | ~20–40 h |
 | **b07** | 1× A100 | Qwen-7B FP8 × GPQA-Diamond | ~8–20 h (after HF gate) |
 
-### Qwen-1.5B cells (also on HPC)
+### Qwen-1.5B cells (deferred)
 
-These are small but still part of the paper grid. Run each as a **single-GPU job** (~≤24 h each):
+These historical configs remain wired but are outside the current pilot. Do not run them until the contribution gate approves a scale extension.
 
 | Cell config | Model × quant |
 |-------------|---------------|
@@ -243,7 +250,7 @@ Long reasoning traces mean **each cell can take many hours**. That is expected.
 | GPU partition | `--partition=gpu` |
 | GPU request | `--gres=gpu:1` or `--gres=gpu:2` |
 
-### Total compute (seed 0, HPC-only)
+### Historical total-compute estimate (seed 0; not the current plan)
 
 | Metric | Estimate |
 |--------|----------|

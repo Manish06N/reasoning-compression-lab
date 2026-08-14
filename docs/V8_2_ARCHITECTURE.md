@@ -4,6 +4,8 @@ PhD Roadmap V8.2 (1 July 2026) — complete codebase layout.
 
 **Full overview:** [CODEBASE_OVERVIEW.md](CODEBASE_OVERVIEW.md) — thesis alignment, pipeline diagrams, paper status, and script reference.
 
+**2026-08-14 science amendment:** architecture presence does not mean publication validation. Recovery Phase 0 must verify clean dependency recreation, output finish/token/timing fields, pathology validation, and controlled telemetry before new cells. See [PUBLICATION_READINESS.md](PUBLICATION_READINESS.md) and [the recovery plan](plans/2026-08-14-publication-recovery.md).
+
 ## Python packages (`src/`)
 
 | V8.2 module | Path | Status |

@@ -5,9 +5,11 @@
 *Reliable and Cost-Efficient Deployment of Reasoning LLMs under Compression, Evaluation, and Multilingual Constraints*
 
 **Prepared for:** Manish Nandish  
-**Version:** 5 + V6 execution validation + V7 job-first control layer + stack-transfer extension  
+**Version:** 5 + V6 execution validation + V7 job-first control layer + stack-transfer extension + 2026-08-14 publication-recovery amendment
 **Repo:** [reasoning-compression-lab](https://github.com/Manish06N/reasoning-compression-lab)  
 **Live execution log:** [progress.md](../progress.md) (what actually ran on HPC — read alongside this doc)
+
+> **Controlling amendment (2026-08-14):** Paper 1 is **Needs revision**. Completed FP8 jobs 96100/96101 are valid replication/control evidence, not a publishable core. [PUBLICATION_READINESS.md](PUBLICATION_READINESS.md) controls scientific interpretation and [plans/2026-08-14-publication-recovery.md](plans/2026-08-14-publication-recovery.md) controls execution. Any older instruction to expand the seed-0 b01–b09 grid is superseded.
 
 ---
 
@@ -20,7 +22,7 @@
 5. **Running on cluster** → [§10 Execution plan](#10-90-day-execution-plan) + [progress.md](../progress.md)
 6. **After vLLM grid — GGUF/edge** → [Stack-transfer extension](#stack-transfer-extension-gguf-kv-cache-backends)
 
-**Control rule (V7):** Do not rewrite this roadmap again. Next intellectual document = **Paper 1 Design Doc v1 with reproduction numbers**.
+**Control rule:** preserve the thesis spine, but update factual gates when evidence changes. The next work is recovery Phase 0 and the matched pilot—not another broad roadmap or topic search.
 
 ---
 
@@ -184,43 +186,42 @@ Dual-track: **journals for the degree**, **artifacts + workshops for visibility*
 
 ## 7. Paper 1 design
 
-**Working title:** *Beyond Accuracy: Calibration and Deployment Cost of Quantized Reasoning Models*
+**Provisional title:** *Beyond Pass@1: Reliability–Cost Frontiers of Quantized Reasoning Models under Controlled Serving-Stack Shift*
 
-**Core gap:** Quantization-accuracy studied; gap is **after accuracy** — calibration, selective risk, cost-per-correct, seed variance, latency, VRAM.
+**Core gap under validation:** quantized-reasoning accuracy, calibration, and cost have all received substantial study. The candidate contribution is their reasoning-specific interaction with termination/degeneration and controlled serving-stack shift, supported by matched trace-level evidence.
 
 ### Research questions
 
 | RQ | Question |
 |----|----------|
-| RQ1 | Does calibration degrade where accuracy looks lossless? |
-| RQ2 | What is the cost-per-correct Pareto frontier? |
-| RQ3 | Is seed variance large enough to make single-run conclusions unsafe? |
-| RQ4 (opt) | Does trace behavior change under compression? |
-| RQ5 (opt) | Do edge/llama.cpp conclusions match datacenter/vLLM? |
+| RQ1 | Under a matched stack, do quantized formats change correctness, termination, or degeneration relative to BF16? |
+| RQ2 | Do calibrated selective-risk and cost-per-correct rankings differ from pass@1 rankings? |
+| RQ3 | Are those rankings stable across seeds 42–46? |
+| RQ4 | Are serving-stack effects larger than quantization effects when factors are isolated? |
 
-### Minimum publishable grid (J1)
+### Staged evidence plan (J1)
 
-| Dimension | Minimum |
-|-----------|---------|
-| Models | Qwen-1.5B, Qwen-7B, Llama-8B (R1-Distill) |
-| Quant | BF16, FP8, AWQ-4, GPTQ-4, GPTQ-3 |
-| Tasks | MATH-500, GPQA-Diamond, LiveCodeBench subset, GSM8K |
-| Seeds | **5** |
-| Hardware | A100 + vLLM (minimum); edge/GGUF → ambitious |
+| Stage | Scope |
+|-------|-------|
+| Matched reconstruction | Qwen-7B + Llama-8B × {BF16, FP8} × MATH-500 × seed 42 |
+| Discriminating pilot | Same models × {BF16, FP8, AWQ4, GPTQ4} × MATH-500 × seeds 42–44 |
+| Contribution gate | Select quantization reliability–cost, controlled stack transfer, or negative-results artifact |
+| Headline confirmation | Selected MATH-500 cells extended to seeds 42–46 |
+| Gated breadth | GPQA-Diamond/GSM8K only after contribution approval |
 
-**Repo execution:** HPC blocks b01–b09 (seed 0) — see [progress.md](../progress.md).
+Qwen-1.5B, GPTQ3, LiveCodeBench, GGUF/KV-cache, and larger models are extensions only. Historical HPC blocks b01–b09/seed 0 are engineering evidence and must not be mixed into the new protocol.
 
 ### Metrics
 
-pass@1, maj@5, Brier, ECE, AURC, latency, peak VRAM, cost-per-correct, seed variance, bootstrap 95% CIs; trace metrics exploratory.
+pass@1, predeclared maj@5 subset, Brier, ECE, AURC, finish/cap/loop/parse rates, latency distribution, throughput, peak VRAM, cost-per-correct, seed variance, and paired/bootstrap 95% CIs. Energy is reported only when measured, never as zero by default.
 
 ### Statistics
 
-5 seeds; cluster bootstrap on problems; paired McNemar vs BF16; Holm correction; 200-trace extraction audit (&lt;2% error).
+Three pilot seeds and five headline seeds; paired bootstrap on problems; paired McNemar vs BF16; seed-level variability; Holm correction; at least 200 stratified traces plus every flagged pathology.
 
 ### Paper 1 headline (V7)
 
-> Deployment decisions are **unsafe** if based only on one-run accuracy; calibration, selective risk, seed variance, and cost-per-correct change the conclusion.
+> Candidate hypothesis: matched reliability, calibrated selective risk, and cost evidence can change deployment choices that appear equivalent under pass@1. This remains a hypothesis until the contribution gate passes.
 
 Short repo summary: [PAPER1_DESIGN.md](PAPER1_DESIGN.md).
 
@@ -266,17 +267,15 @@ See [Appendix G — Supervisor script](#appendix-g-supervisor-meeting-script).
 
 | Week | Focus | Gate |
 |------|-------|------|
-| 1 | Repo/env; supervisor emails | Selftest; emails sent |
-| 2 | validate_tasks; download qwen7b | MATH-500 validates |
-| 3 | Quantize GPTQ-W4; smoke | Generation works |
-| 4 | Reproduce BF16/GPTQ MATH-500 | ±2 pts or explain gap |
-| 5 | Pilot 3 configs × 3 seeds | End-to-end pilot |
-| 6 | Profiling; cost table | cost-per-correct computed |
-| 7 | 200-trace extraction audit | &lt;2% error |
-| 8 | Figures; pilot summary | Supervisor packet |
-| 9–10 | Saturation scan; expand grid if approved | No scoop blocker |
-| 11–12 | Draft outline | Paper 1 design locked |
-| 13 | 90-day review | Full J1 execution |
+| 1–2 | Recovery P0: pin/track dependencies; extend schema and validators | Clean recreation + tests |
+| 3 | Controlled telemetry and tiny instrumented smoke | Complete valid smoke rows |
+| 4 | Four matched BF16/FP8 seed-42 cells | P1 audit |
+| 5–6 | 24-cell, three-seed MATH-500 pilot | Contribution-selection report |
+| 7 | Literature refresh + supervisor contribution gate | Track/RQs approved |
+| 8–10 | Five-seed headline confirmation | Complete primary cells |
+| 10–11 | Gated breadth and maj@5/calibration subset | Endpoints valid |
+| 12 | Frozen analysis + 200-trace audit | Reproducible figures/tables |
+| 13 | Draft and artifact review | Candidate manuscript |
 
 **V7 artifact-first variant:** Monthly public ship (repo → blog → HF pilot → dashboard → arXiv → journal).
 
@@ -321,17 +320,18 @@ See [Appendix G — Supervisor script](#appendix-g-supervisor-meeting-script).
 | Scope creep | Minimum J1; edge/energy → J3 |
 | Journal delay | Q1 target + Q2 fallback |
 
-**Saturation rule:** Proceed if no paper claims 3+ of: multi-seed protocol, calibration/selective risk under compression, cost-per-correct economics, deployment measurement, released traces. If 3+ claimed → pivot within 2 weeks (KV-cache, stack transfer, Indic pull-forward). **Do not restart topic from zero.**
+**Saturation decision (2026-08-14):** current work now occupies several of the former novelty axes, so the broad “3+” rule has triggered. Do not abandon the thesis spine; narrow Paper 1 through the contribution gate. Preferred differentiators are trace-level termination/degeneration under matched quantization and controlled serving-stack shift. If the pilot shows no defensible effect, release a replication/negative-results artifact and re-scope with the supervisor.
 
 ---
 
 ## 14. Immediate next actions
 
-1. Send supervisor publication-rule questions (written).
-2. Run preflight, smoke, reproduction cells.
-3. If reproduction passes → pilot (3 configs × 3 seeds).
-4. Prepare supervisor packet with real numbers.
-5. **Stop asking for new topics** unless supervisor vetoes or saturation fails twice.
+1. Preserve and sync the 2026-08-14 audit/plan documentation.
+2. Complete recovery Phase 0 without broad GPU use.
+3. Run only the four matched BF16/FP8 seed-42 cells after P0.
+4. Review them before authorizing the 24-cell pilot.
+5. Use the pilot and current literature to select one contribution with the supervisor.
+6. Expand to five seeds and breadth only after approval.
 
 **Stop-planning rule:** Next document = **Paper 1 Design Doc v1 with reproduction numbers**, not another roadmap version.
 
@@ -500,14 +500,14 @@ python scripts/build_repro_bundle.py --archive outputs-hpc-2a100-main-YYYY-MM-DD
 
 | Bucket | Risk to P1 | Differentiate by |
 |--------|--------------|------------------|
-| Quantization of reasoning (8+) | High if accuracy-only | Calibration, selective risk, seed variance, cost-per-correct |
-| Calibration of reasoning (13+) | Medium | Compression × calibration × **deployment** |
+| Quantization of reasoning (8+) | High if accuracy-only | Matched termination/degeneration and controlled stack shift |
+| Calibration of reasoning (13+) | High after ACL 2025 quantized-calibration work | Reasoning-specific confidence + selective deployment only if pilot differentiates |
 | Selective prediction (10+) | Medium for P2 | AURC as eval layer |
 | Speculative decoding (12+) | High for pure method | Failure analysis fallback |
 | Multilingual token-cost (3+) | Low–medium | Paper 3 |
 | Energy/cost serving (14+) | Medium if energy-only | Energy as deployment metric |
 
-**Novelty rule:** Proceed if no paper covers **3+** of: multi-seed protocol, calibration/selective risk under compression, cost economics, stack sensitivity, released traces.
+**Novelty amendment:** the former “3+” threshold is met by the current landscape. The project is now in contribution-selection mode; [PUBLICATION_READINESS.md](PUBLICATION_READINESS.md) records the current sources and claims boundary.
 
 ## V6 — Exact Paper 1 experiment specification
 
@@ -521,10 +521,11 @@ See [§7 Paper 1 design](#7-paper-1-design). Freeze models/tasks/configs at supe
 
 | Block | Purpose |
 |-------|---------|
-| Reproduction | Must pass before pilot |
-| Pilot | No full grid until pilot OK |
-| J1 minimum | 3×5×4×5 |
-| J1 ambitious | +edge/GGUF only if no J1 delay |
+| Recovery P0 | Clean reproducibility and observability before GPU expansion |
+| Matched P1 | 2 models × 2 formats × 1 seed |
+| Pilot P2 | 2 models × 4 formats × 3 seeds = 24 cells |
+| Headline confirmation | Extend selected MATH cells to 5 seeds |
+| Breadth | Only after contribution gate |
 
 If pilot cost/cell &gt;50% over estimate → shrink grid. **Do not cut seeds first.**
 
@@ -576,11 +577,11 @@ V6 = evidence base. **V7 = controlling priority layer** — same topic, reweight
 | Decision | Status |
 |----------|--------|
 | Spine | Frozen |
-| Paper 1 | Minimum beyond-accuracy grid |
+| Paper 1 | Needs revision; matched reliability/stack contribution gate |
 | Paper 2 | Industry-heavy acceleration |
 | Paper 3 | Indic economics |
 | Job strategy | Artifact-first |
-| Next | Preflight + reproduction numbers |
+| Next | Recovery Phase 0, then four matched BF16/FP8 cells |
 
 **Do not change:** spine (unless supervisor vetoes), no RLVR/agents as spine, no Paper 4 before P1 submit, no custom framework before repro cell.
 
@@ -588,7 +589,7 @@ V6 = evidence base. **V7 = controlling priority layer** — same topic, reweight
 
 # Stack-transfer extension (GGUF, KV-cache, backends)
 
-**When:** After current **vLLM grid (b01–b09)** is scored. Do not add in parallel mid-run.
+**When:** Only if the three-seed contribution gate selects controlled stack transfer or after the Track A core is complete. Do not execute the historical broad vLLM grid first by default.
 
 | Layer | Current (minimum) | Ambitious |
 |-------|-------------------|-----------|

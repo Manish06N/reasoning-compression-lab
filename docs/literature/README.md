@@ -11,6 +11,8 @@ Canonical merged PDF bundles that underpin the PhD papers, plus text extracts fo
 
 **Paper 1 reading guide:** [PAPER1_READING_MAP.md](PAPER1_READING_MAP.md)
 
+> **Coverage warning (2026-08-14):** the merged corpus is a historical local snapshot, not a complete current novelty search. The publication audit found newer 2025–2026 work on quantized calibration, reliability scaling, cost-per-correct, token inflation, and degeneration that must be included before claims are frozen. See [../PUBLICATION_READINESS.md](../PUBLICATION_READINESS.md).
+
 ## PDF vs Markdown — which to use?
 
 | Use case | Use |

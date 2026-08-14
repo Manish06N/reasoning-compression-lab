@@ -2,6 +2,8 @@
 
 GPQA is required for Level B/C runs on `configs/tasks/gpqa_diamond.json` but is **gated** on Hugging Face.
 
+**Scientific gate (2026-08-14):** obtaining access is allowed, but do not launch GPQA publication cells until the MATH-500 three-seed pilot selects a contribution. Seed-0 commands below are historical wiring examples.
+
 ## Steps
 
 1. Log in at https://huggingface.co
@@ -23,4 +25,4 @@ After access is granted, run:
 python scripts/run_inference.py --cell-config configs/cells/level_c_qwen7b_fp8_gpqa_seed0.json
 ```
 
-Until access is approved, skip GPQA cells and use MATH-500 + GSM8K only.
+Until access and the contribution gate are approved, skip GPQA cells. MATH-500 is the only current pilot task; GSM8K is also deferred until breadth is authorized.

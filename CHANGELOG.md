@@ -1,5 +1,40 @@
 # Changelog
 
+## 2026-08-14 - Audit completed FP8 results and block premature publication expansion
+
+An independent publication-readiness audit reviewed all project Markdown, the exact job/configuration path, all 1,000 result rows, result integrity, reproducibility, and current literature. Canonical decision: **Needs revision**. The completed jobs are credible FP8 replication/control evidence, not a standalone publishable result.
+
+| Job | Model | Final result | Audited interpretation |
+|-----|-------|--------------|------------------------|
+| **96100** | Qwen-7B FP8 | 472/500, **94.4%**, 22m12s | Compatible with existing 93.62% FP8 model-card value |
+| **96101** | Llama-8B FP8 | 445/500, **89.0%**, 40m28s | Compatible with existing 90.24% FP8 model-card value |
+
+Both jobs completed with exit code 0. Dataset coverage and prompt/gold alignment were exact. However, there was no same-stack BF16 control, only seed 42 and MATH-500, no valid confidence/calibration fields, and no controlled latency/VRAM/energy/cost telemetry. A100 executed the FP8 checkpoints through vLLM's weight-only Marlin fallback, so these runs are not evidence of native FP8/W8A8 compute.
+
+Row-level review identified six likely near-cap endings and phrase-level degeneration missed by the saved validation summary. The output schema lacks `finish_reason` and output token IDs, and the full validator's default quality thresholds are deliberately permissive. The external QRM checkout also contains required uncommitted patches not fully recreated by tracked setup.
+
+Added:
+
+- `docs/PUBLICATION_READINESS.md` — exact audited settings/results, supported and prohibited claims, reproducibility blockers, novelty assessment, and publication decision.
+- `docs/plans/2026-08-14-publication-recovery.md` — phased recovery from clean instrumentation through matched BF16/FP8, a 24-cell three-seed pilot, contribution selection, five-seed confirmation, frozen analysis, and manuscript/artifact gates.
+
+Operational decision: **do not submit b03/b04 or the broad b01–b09 grid.** The next allowed GPU action is a tiny Phase 0 smoke after reproducibility, output schema, pathology validation, telemetry, and tests are repaired.
+
+## 2026-08-13 - Pass strict FP8 gates and launch full exact-stack correctness runs
+
+Commit **`4796614`** (`Gate QRM FP8 runs on validated output`) was tested and pushed to `origin/main`. It adds `validate_official_results.py`, a gated `submit_qrm_fp8_full.sh`, model-qualified result-copy names, Telegram discovery for those names, and synchronized run documentation. All 116 collected pytest tests, shell syntax, Python compilation, and both real strict n=10 output gates passed. `ruff` and `shellcheck` were unavailable in the active environment.
+
+The guarded submitter re-tokenized and revalidated both pilots before calling `sbatch`, then submitted:
+
+| Job | Model | Node | Configuration | State at 16:00:56 IST |
+|-----|-------|------|---------------|------------------------|
+| **96100** | Qwen-7B FP8 | `ragpu008` | MATH-500 n=500, seed 42, exact `qrm-official` stack | RUNNING; at least 27/500 processed |
+| **96101** | Llama-8B FP8 | `ragpu004` | MATH-500 n=500, seed 42, exact `qrm-official` stack | RUNNING; at least 45/500 processed |
+
+Archive: `outputs-hpc-qrm-official-fp8-full-2026-08-13`. Both jobs passed the A-Z preflight, had more than 81 GB free VRAM on their allocated GPU, loaded both FP8 shards, and entered generation. This crosses the previous initialization and first-generation failure points.
+
+Operational caveat: the official Lighteval path writes its result JSON array only after the entire batch completes. Until then, `Processed prompts` in `logs/qrm_official_96100.err` and `logs/qrm_official_96101.err` is live progress, not a durable checkpoint. The runner will write per-model result aliases and validation reports after completion.
+
 ## 2026-08-13 - Stop unhealthy b02 output and validate FP8 on the known-good QRM stack
 
 Jobs **96086/96087** were canceled before further GPU time was spent. The Qwen FP8 checkpoint had reached 10 durable rows, but canonical scoring found only **2/10 correct**, with **8/10 length truncations** and **8/10 parse failures**. Raw tails contained sustained repetition (`yeah`, `which0`, `The`) and unrelated Chinese fragments. Llama had not reached its first 10-row checkpoint.

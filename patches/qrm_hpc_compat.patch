@@ -1,0 +1,62 @@
+diff --git a/inference.py b/inference.py
+index 7440d80..e0aa379 100644
+--- a/inference.py
++++ b/inference.py
+@@ -41,6 +41,8 @@ def parser_gen():
+                         help='Maximum number of tokens to generate per output sequence.')
+     parser.add_argument('--max_model_length', type=int, default=32768,
+                         help='Maximum model input length.')
++    parser.add_argument('--gpu_memory_utilization', type=float, default=0.9,
++                        help='GPU memory utilization.')
+     args = parser.parse_args()
+ 
+     # force float16 for gptqmodel inference
+@@ -125,7 +127,7 @@ def main(args):
+         dtype=args.dtype,
+         max_model_length=args.max_model_length,
+         tensor_parallel_size=args.tensor_parallel_size,
+-        gpu_memory_utilization=0.9,
++        gpu_memory_utilization=args.gpu_memory_utilization,
+         enforce_eager=True,
+         enable_prefix_caching=False,
+         enable_chunked_prefill=False,
+diff --git a/lighteval_custom/tasks/reasoning.py b/lighteval_custom/tasks/reasoning.py
+index 87e3271..11ccf4a 100644
+--- a/lighteval_custom/tasks/reasoning.py
++++ b/lighteval_custom/tasks/reasoning.py
+@@ -69,7 +69,7 @@ def prompt_fn(line, task_name: str = None):
+     """Assumes the model is either prompted to emit \\boxed{answer} or does so automatically"""
+     return Doc(
+         task_name=task_name,
+-        query=f"{line["problem"]}\n\nPlease reason step by step, and put your final answer within \\boxed{{}}.",
++        query=f'{line["problem"]}\n\nPlease reason step by step, and put your final answer within \\boxed{{}}.',
+         choices=[line["solution"]],
+         gold_index=0,
+     )
+@@ -78,7 +78,7 @@ def prompt_fn(line, task_name: str = None):
+ def aime24_prompt_fn(line, task_name: str = None):
+     return Doc(
+         task_name=task_name,
+-        query=f"{line["Problem"]}\n\nPlease reason step by step, and put your final answer within \\boxed{{}}.",
++        query=f'{line["Problem"]}\n\nPlease reason step by step, and put your final answer within \\boxed{{}}.',
+         choices=[line["Answer"]],
+         gold_index=0,
+     )
+@@ -87,7 +87,7 @@ def aime24_prompt_fn(line, task_name: str = None):
+ def aime25_prompt_fn(line, task_name: str = None):
+     return Doc(
+         task_name=task_name,
+-        query=f"{line["problem"]}\n\nPlease reason step by step, and put your final answer within \\boxed{{}}.",
++        query=f'{line["problem"]}\n\nPlease reason step by step, and put your final answer within \\boxed{{}}.',
+         choices=[line["answer"]],
+         gold_index=0,
+     )
+@@ -96,7 +96,7 @@ def aime25_prompt_fn(line, task_name: str = None):
+ def gsm8k_prompt_fn(line, task_name: str = None):
+     return Doc(
+         task_name=task_name,
+-        query=f"{line["question"]}\n\nPlease reason step by step, and put your final answer within \\boxed{{}}.",
++        query=f'{line["question"]}\n\nPlease reason step by step, and put your final answer within \\boxed{{}}.',
+         choices=[line["answer"]],
+         gold_index=0,
+     )

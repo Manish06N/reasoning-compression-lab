@@ -1,6 +1,6 @@
 # Hardware policy — J1 / J2 / J3
 
-**Frozen:** 2026-07-01
+**Frozen machine roles:** 2026-07-01 · **measurement amendment:** 2026-08-14
 
 One page so docs do not contradict each other.
 
@@ -23,6 +23,15 @@ One page so docs do not contradict each other.
 - 5080 may be used for **local smoke/debug** only (pipeline proof, not cited).
 
 Reason: 7B BF16 and 8B BF16 do not fit 16 GB for full MATH-500 at paper decoding settings.
+
+### A100 FP8 and systems-measurement boundary
+
+- A100 does not provide native FP8 tensor-core execution. The audited FP8 checkpoints ran through vLLM's weight-only Marlin fallback; report the checkpoint format and runtime kernel separately.
+- Do not infer speed, throughput, energy, or cost from Slurm elapsed time. Jobs 96100/96101 ran on different nodes and Llama logged 900+ KV-cache recomputations.
+- Controlled systems runs require warm-up, per-request latency, scheduler/preemption logs, peak VRAM, and explicit power/energy availability.
+- Zero or missing Slurm energy accounting means “unavailable,” not zero Joules.
+
+See [PUBLICATION_READINESS.md](PUBLICATION_READINESS.md) and [the recovery plan](plans/2026-08-14-publication-recovery.md).
 
 ---
 

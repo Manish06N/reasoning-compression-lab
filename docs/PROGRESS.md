@@ -1,28 +1,33 @@
 # Progress — Paper 1 Experiments
 
-**Last updated:** 2026-08-13 (bad b02 stopped; exact official-stack FP8 validation passed)
+**Last updated:** 2026-08-14 (full FP8 result audited; publication recovery required)
 **Repo:** https://github.com/Manish06N/reasoning-compression-lab  
-**Canonical log:** [progress.md](../progress.md) . **Audit:** [QRM_STACK_PARITY_AUDIT.md](QRM_STACK_PARITY_AUDIT.md) . **Ops:** [CHANGELOG.md](../CHANGELOG.md)
+**Canonical log:** [progress.md](../progress.md) · **publication decision:** [PUBLICATION_READINESS.md](PUBLICATION_READINESS.md) · **execution:** [plans/2026-08-14-publication-recovery.md](plans/2026-08-14-publication-recovery.md) · **ops:** [CHANGELOG.md](../CHANGELOG.md)
 
 ---
 
-## Summary (2026-08-13)
+## Summary (2026-08-14)
 
 | Area | Status |
 |------|--------|
-| **Latest gate** | n=10 FP8 validation on the exact successful `qrm-official` stack: **PASSED** |
+| **Publication verdict** | **Needs revision** — current result is appendix/control evidence only |
+| **Latest gate** | Full exact-stack FP8 replication completed and audited; matched quantization comparison absent |
 | **Validation jobs** | **96093** Qwen FP8: 10/10 correct, 0 cap hits; **96094** Llama FP8: 10/10 correct, 0 cap hits |
 | **Validation archive** | `outputs-hpc-qrm-official-fp8-validation-2026-08-13` |
+| **Completed full jobs** | **96100** Qwen: 472/500 (**94.4%**); **96101** Llama: 445/500 (**89.0%**); both seed 42 |
+| **Full archive** | `outputs-hpc-qrm-official-fp8-full-2026-08-13` |
+| **Interpretation** | Compatible with public FP8 references; no same-stack BF16, multi-seed, calibration, or controlled systems evidence |
+| **Trace/provenance** | Six likely near-cap traces; phrase loops underdetected; output lacks `finish_reason`/token IDs; external QRM requires uncommitted patches |
 | **Stopped b02** | Jobs **96086/96087** canceled after Qwen's first 10 rows showed 2/10 correct, 8/10 truncation, and repetition loops |
 | **b02 first attempt** | Jobs **96084/96085** failed before raw rows with `fp8_e5m2 kv-cache is not supported with fp8 checkpoints`; fixed in `542f622` by setting FP8 checkpoint KV cache to `auto` |
 | **V0 probe** | Jobs **96091/96092** showed that `VLLM_USE_V1=0` alone is insufficient: malformed answers and a 32768-token repetition loop remained |
 | **qreason stack** | vLLM **0.8.5** + transformers **5.12.1**; both V1 and V0 probes failed output-quality checks |
 | **Official QRM parity** | Job **87302** completed under `qrm-official`: **10/10 correct**, **0 truncation** on Qwen-7B BF16 n=10 |
 | **Path C archive** | `outputs-hpc-diag-pathc-2026-07-05` (~20 rows; kept for side-by-side stack-gap evidence) |
-| **Git sync** | GitHub/HPC include the FP8 KV-cache fix (`542f622`); MacBook should pull latest `origin/main`; keep `.qrm_official_env_ready` untracked |
-| **Calibration** | b02 auto-scoring uses `--skip-calibration`; valid for pass@1/truncation/cost, not Brier/AURC/ECE |
+| **Repository state** | Baseline `4796614` is pushed; current audit/plan/docs are uncommitted on HPC; keep `.qrm_official_env_ready` untracked |
+| **Calibration/systems** | `--skip-calibration` supports diagnostic correctness/trace scoring only; no Brier/AURC/ECE or controlled cost/performance claim |
 
-**Strategic label:** *The modern-stack b02 run is stopped. Jobs 96093/96094 prove both FP8 checkpoints generate healthy answers on the known-good official stack. A full run may now be submitted only through the strict pilot gate.* Exact settings and failure reasons are recorded in [the canonical progress log](../progress.md#2026-08-13-run-diagnosis-what-worked-what-did-not-and-why).
+**Strategic label:** *The FP8 checkpoints are healthy and their completed exact-stack results reproduce known accuracy, but the package is not publication-ready. Broad experiments are blocked until recovery Phase 0 repairs reproducibility and observability.* Exact settings and claims boundaries are in [PUBLICATION_READINESS.md](PUBLICATION_READINESS.md).
 
 ## Experiments A-D (diagnostic matrix)
 
@@ -33,15 +38,11 @@
 | **C** | Does `repetition_penalty` explain failure? | Our harness, with vs without | **Answered** - both fail |
 | **D** | Is 32k budget too tight? | Qwen 64k max_tokens | **Canceled** - not needed after A |
 
-Plain English: [notes.md sections 31-34](../notes.md)
+Plain English: [notes.md sections 31-36](../notes.md)
 
 ## Next gated action
 
-```bash
-bash scripts/hpc/submit_qrm_fp8_full.sh
-```
-
-The submitter revalidates both n=10 outputs before calling `sbatch`. Do not submit b03/b04 until the full FP8 correctness results are reviewed. The official path does not provide all main-harness deployment telemetry.
+Complete recovery Phase 0 from the [current plan](plans/2026-08-14-publication-recovery.md): tracked dependency patches, clean recreation, complete finish/token/timing/provenance fields, pathology validation, telemetry, and tests. Then run tiny smoke cells. Do not submit b03/b04 or a broad grid.
 
 ---
 

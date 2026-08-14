@@ -8,6 +8,8 @@ Quick navigation for `reasoning-compression-lab`. For the full high-level overvi
 
 | I want to… | Open |
 |------------|------|
+| See whether the result is publishable | [PUBLICATION_READINESS.md](PUBLICATION_READINESS.md) |
+| Execute the current scientific plan | [plans/2026-08-14-publication-recovery.md](plans/2026-08-14-publication-recovery.md) |
 | Understand the whole codebase | [CODEBASE_OVERVIEW.md](CODEBASE_OVERVIEW.md) |
 | Run on HPC | [BEGINNER_HPC_GUIDE.md](BEGINNER_HPC_GUIDE.md) |
 | See current status | [PROGRESS.md](PROGRESS.md) |
@@ -57,11 +59,12 @@ reasoning-compression-lab/
 │   ├── j2/                 # Method pilot manifest
 │   ├── j3/                 # Indic preflight, local transfer
 │   └── hpc/                # PARAM Rudra orchestration
-│       └── qrm_parity/     # Stack parity verify, side-by-side, QRM repo setup
+│       ├── submit_qrm_fp8_full.sh  # Strict pilot gate, then two n=500 FP8 jobs
+│       └── qrm_parity/     # Official runner, output validator, parity/setup tools
 ├── external/
 │   └── Quantized-Reasoning-Models/   # Authors' repo clone (Experiment A only; qrm-official env)
 ├── slurm/                  # SLURM job files
-├── tests/                  # 31 unit tests (2026-07-01)
+├── tests/                  # 116 collected tests (2026-08-13), including QRM output gate
 ├── dashboards/             # HTML dashboard output
 └── docs/                   # All documentation
 ```
@@ -94,8 +97,8 @@ Never develop experiments inside external repos.
 ## Test suite
 
 ```bash
-python -m pytest tests/ -q          # expect 31 passed
+python -m pytest tests/ -q          # 116 tests collected as of 2026-08-13
 python scripts/verify_decoding_params.py   # VERIFY OK
 ```
 
-Test files: `test_config_and_tasks`, `test_math_extractor`, `test_sampling_params`, `test_gpu_stats`, `test_external_repos_integration`, `test_v82_*`.
+QRM gate coverage: `tests/test_validate_official_results.py`. Other key files include `test_config_and_tasks`, `test_math_extractor`, `test_sampling_params`, `test_gpu_stats`, `test_external_repos_integration`, and `test_v82_*`.

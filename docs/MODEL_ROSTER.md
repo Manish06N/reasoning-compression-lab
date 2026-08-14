@@ -4,7 +4,9 @@ Single source of truth for Hugging Face IDs, local paths, env vars, and machine 
 
 **Scope policy (what to add / not add):** [MODEL_SCOPE_DECISION.md](MODEL_SCOPE_DECISION.md)
 
-**Stack:** vLLM 0.8.5, `enforce_eager=true`, chat template enabled.
+**Stack boundary (2026-08-14):** historical main harness uses vLLM 0.8.5; QRM replication uses vLLM 0.7.0. Neither version may be silently mixed in a comparison. Protocol P1-2026-08 must freeze one controlled stack after recovery Phase 0.
+
+**Publication plan:** [plans/2026-08-14-publication-recovery.md](plans/2026-08-14-publication-recovery.md)
 
 ## Machine roles
 
@@ -13,12 +15,23 @@ Single source of truth for Hugging Face IDs, local paths, env vars, and machine 
 | **RTX 5080 (16 GB)** | **Short jobs only** — Qwen-1.5B × 4 quants × MATH-500 (~≤24 h/cell) |
 | **HPC 2× A100 (80 GB)** | **Main grid** — all 7B/8B quants, BF16 anchors, GSM8K, GPQA (≤48 h SLURM blocks) |
 
-**Decoding (paper runs):**
+**Decoding profiles (historical; recovery plan controls new paper runs):**
 
 | Config | Use | max_tokens | batch |
 |--------|-----|------------|-------|
 | `configs/decoding/repro_qrm.yaml` | **5080 + HPC publication** | 32768 | 1 |
 | `configs/decoding/pilot_5080.yaml` | Optional 5080 debug pilot | 8192 | 4/2/1 |
+
+The old seed-0 cell names are not evidence that seed 0 is the publication protocol. New pilot aggregates use seeds 42/43/44; headline MATH-500 cells use 42–46.
+
+### Audited FP8 artifact pins
+
+| Model | Artifact revision | A100 execution qualification |
+|-------|-------------------|------------------------------|
+| Qwen-7B FP8 | `ceb2fcd178d477cd21b92ffb43164c74165a212c` | weight-only Marlin fallback |
+| Llama-8B FP8 | `5d548d9169c53b7bb7ef0b3bc261509d5da6e3dd` | weight-only Marlin fallback |
+
+Record exact revisions for BF16/AWQ4/GPTQ4 before matched execution.
 
 ---
 

@@ -1,12 +1,12 @@
 # Codebase Overview — reasoning-compression-lab
 
-**Version:** 1.0 · **Date:** 1 July 2026  
+**Version:** 1.1 · **Architecture date:** 1 July 2026 · **science status:** 14 August 2026
 **Roadmap alignment:** PhD Roadmap V8.2 (Evidence-Based Execution Plan)  
 **Repository:** https://github.com/Manish06N/reasoning-compression-lab
 
 This document is the canonical high-level map of the entire codebase: what it does, how pieces connect, what is implemented today, and how the three-paper thesis plan maps onto directories and scripts. For day-to-day HPC operations, start with [BEGINNER_HPC_GUIDE.md](BEGINNER_HPC_GUIDE.md). For live execution status, see [PROGRESS.md](PROGRESS.md).
 
-**J1 status (2026-08-13):** official QRM parity completed; b02 FP8 deployment block is running/pending in `outputs-hpc-2a100-main-2026-08-13`. See [J1_VALIDATION_RUNBOOK.md](J1_VALIDATION_RUNBOOK.md).
+**J1 status (2026-08-14):** exact-stack FP8 jobs 96100/96101 completed at 94.4% Qwen and 89.0% Llama. The [publication audit](PUBLICATION_READINESS.md) rates the package **Needs revision**: it is valid replication evidence without a matched quantization comparison. Follow [the recovery plan](plans/2026-08-14-publication-recovery.md), not the historical broad-grid order.
 
 ---
 
@@ -113,8 +113,9 @@ Cells roll up into **execution levels** and **HPC blocks**:
 | Level | Scope | Purpose |
 |-------|-------|---------|
 | **Level A** | Qwen-7B × {BF16, GPTQ-4} × MATH-500 × seeds 0,42–44 | Reproduction gate vs QRM literature |
-| **Level B** | Qwen-7B × 5 quants × {MATH-500, GPQA, GSM8K} × seed 0 | Pilot signal before full grid |
-| **Level C** | 3 models × 5 quants × 4 tasks × 5 seeds | Main publication grid |
+| **Historical Level B** | Qwen-7B × 5 quants × {MATH-500, GPQA, GSM8K} × seed 0 | Wired but superseded |
+| **Current pilot P2** | Qwen-7B + Llama-8B × 4 formats × MATH-500 × seeds 42–44 | Contribution-selection evidence |
+| **Confirmatory** | Selected headline MATH cells × seeds 42–46; gated breadth | Only after supervisor-approved contribution |
 
 | HPC block | GPUs | Cells | Est. wall time |
 |-----------|------|-------|----------------|
@@ -357,7 +358,7 @@ Implemented in `src/evaluation/calibration/`:
 | Reliability diagram bins | `reliability.py` | For plotting |
 | AURC / AUROC | via `src/metrics/calibration.py` | Selective prediction |
 
-**Calibration confidence (fail-closed):** `score_run.py` does **not** treat parse success as publication confidence. Use `--skip-calibration` for pass@1/truncation/cost scoring; use `--require-calibration` before Brier/AURC/ECE analysis. b02 may run because it is explicitly a pass@1/truncation/cost block. Valid calibration claims still require maj@5 or logprob-backed rows with a valid `confidence_source`. See [KNOWN_ISSUES.md](KNOWN_ISSUES.md) section 4.
+**Calibration confidence (fail-closed):** `score_run.py` does **not** treat parse success as publication confidence. `--skip-calibration` permits diagnostic correctness/trace scoring only; it does not validate latency, VRAM, energy, or cost. Use `--require-calibration` before Brier/AURC/ECE analysis. Valid calibration claims require maj@5 or logprob-backed rows with a valid `confidence_source`. See [KNOWN_ISSUES.md](KNOWN_ISSUES.md) section 4.
 
 **QRM baseline bands (fixed `286f5e4`):** MATH-500 gates are ~88–98%, not 45–65% (AIME-scale error). Comparator prints provenance banner at score time.
 
@@ -446,32 +447,32 @@ flowchart TD
 | **Novelty** | No competing paper claims same joint study | Manual — template in roadmap Appendix C |
 | **Scale** | 7B/8B story stable before 14B/32B | Config policy in `papers/j1/protocol.yaml` |
 
-**Current gate (2026-08-13):** wait for b02 jobs 96086/96087 to finish, then review pass@1, truncation, latency/VRAM, and cost-per-correct before submitting b03/b04. June/July diagnostic archives remain useful for stack-gap context, not for QRM reproduction claims.
+**Current gate (2026-08-14):** exact-stack jobs 96100/96101 completed and were audited. They reproduce FP8 accuracy but lack a matched BF16 control, multi-seed evidence, termination fields, calibration, controlled systems telemetry, and clean dependency recreation. Recovery Phase 0 now precedes all new grid work.
 
 ---
 
 ## 7. Paper-by-paper implementation status
 
-### 7.1 Paper 1 (J1) — **engineering MVP complete; validation pending**
+### 7.1 Paper 1 (J1) — **architecture present; publication recovery pending**
 
 | Component | Status |
 |-----------|--------|
 | Protocol YAML | ✅ `papers/j1/protocol.yaml` + `amendments.yaml` |
-| Minimum publishable grid | ✅ 15 **core validation** cells (seed 0) — `papers/j1/publication_matrix.yaml` |
+| Historical core matrix | ✅ 15 seed-0 cells wired; **not sufficient for publication** |
 | Full Level C (300 cells) | ❌ Aspirational — not generated yet |
 | Inference + scoring pipeline | ✅ Production on vLLM |
 | Fail-closed calibration | ✅ `src/evaluation/calibration/confidence.py` |
 | Statistics (McNemar, bootstrap, Holm) | ✅ |
-| HPC block grid b01–b09 | ✅ Wired (seed 0) |
+| HPC block grid b01–b09 | ✅ Wired historically; broad launch blocked |
 | Reproduction seeds 42–44 | ✅ Cell configs exist |
 | Manual audit tooling | ✅ |
-| **Fresh HPC publication runs** | Modern b02 **96086/96087 canceled** for unhealthy output; do not treat that archive as complete |
+| **Audited HPC evidence** | 96100 Qwen 94.4% and 96101 Llama 89.0% complete; replication/control only; modern b02 canceled |
 | **QRM stack parity** | BF16 job **87302** and FP8 pilots **96093/96094** passed - see [QRM_STACK_PARITY_AUDIT.md](QRM_STACK_PARITY_AUDIT.md), notes sections 31-35 |
 | QRM baseline yaml | ✅ Fixed task-specific bands (`286f5e4`, amd-002) |
 | Valid calibration numbers | ⏳ Requires logprobs patch or maj@5 after repro |
 | LiveCodeBench integration | ❌ Not yet wired |
 
-**Primary endpoints (pre-registered):** pass@1, Brier, AURC, cost-of-pass ratio.
+**Planned primary endpoints:** pass@1 plus matched reliability/calibration/cost endpoints after Protocol P1-2026-08 and confidence/telemetry validation. Final primary comparisons are frozen before confirmatory aggregation.
 
 ### 7.2 Paper 2 (J2) — **scaffolded, method gate pending**
 

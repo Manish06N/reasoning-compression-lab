@@ -2,11 +2,13 @@
 
 **SLURM limit:** 48 hours max per job  
 **Rule:** Paper 1/J1 publication numbers run on PARAM Rudra HPC. RTX 5080 outputs are historical or J3 local-transfer only.
-**Protocol:** `repro_qrm.yaml`, batch_size=1, full datasets, seed 0 for the main HPC grid; b02 currently scores with `--skip-calibration`.
+**Protocol:** historical b01–b09 used `repro_qrm.yaml`/seed 0. That grid is **not authorized for publication expansion** after the 2026-08-14 audit. Current protocol and seeds are defined in [the recovery plan](plans/2026-08-14-publication-recovery.md).
 
 GitHub: [reasoning-compression-lab](https://github.com/Manish06N/reasoning-compression-lab)
 
-**Current status (2026-08-13):** modern-stack b02 jobs **96086/96087** were canceled for unhealthy output. Exact-stack FP8 pilots **96093/96094** passed 10/10 for both models. The next allowed action is `scripts/hpc/submit_qrm_fp8_full.sh`; do not submit b03/b04 before reviewing the full correctness results. Calibration and deployment telemetry remain separate gates.
+**Current status (2026-08-14):** modern-stack b02 jobs **96086/96087** were canceled for unhealthy output. Exact-stack full jobs **96100/96101 completed** at 94.4% Qwen and 89.0% Llama. The [publication audit](PUBLICATION_READINESS.md) classifies them as replication/control evidence. Do not submit b03/b04 or the broad block grid; recovery Phase 0 is next.
+
+> The block tables below are retained as historical resource planning. They are not the current scientific execution order.
 
 First b02 attempt jobs **96084/96085** failed before raw rows with the vLLM FP8 checkpoint plus FP8 KV-cache incompatibility; commit `542f622` fixes FP8 configs to `kv_cache_dtype: auto`.
 
@@ -47,21 +49,20 @@ bash scripts/local/start_5080_main.sh
 
 ## HPC blocks (each <= 47 h)
 
-Current monitor commands:
+Historical monitor commands (completed jobs; logs remain useful):
 
 ```bash
 export QR=/scratch/$USER/reasoning-compression-lab
 cd $QR
 squeue -u $USER
-tail -f logs/slurm/b02_parallel_fp8_level_b_qwen7b_fp8_math500_seed0_96086.out
+tail -f logs/qrm_official_96100.err
+tail -f logs/qrm_official_96101.err
 ```
 
-Submit later blocks only after b02 review:
+Do not submit later blocks through this historical path:
 
 ```bash
-# after b02 finishes and summaries are reviewed
-bash scripts/hpc/submit_hpc_blocks.sh b03
-bash scripts/hpc/submit_hpc_blocks.sh b04
+# BLOCKED: b03/b04 require recovery P0, matched P1, and an approved pilot plan
 ```
 
 
@@ -125,13 +126,17 @@ sbatch slurm/hpc_2a100_b07_gpqa.slurm
 
 ## Publication sufficiency and expansion rule
 
-The b01-b09 seed0 grid is the current first publishable core result set. It covers:
+The b01–b09 seed-0 grid is a historical wiring/resource map, **not** the current publishable core. Do not submit it as a wave.
 
-- Qwen-1.5B, Qwen-7B, and Llama-8B.
-- BF16, FP8, AWQ-4, GPTQ-4, and GPTQ-3.
-- MATH-500, GSM8K, and GPQA-Diamond.
+Current order:
 
-Do not add broad new experiments before b01-b09 are scored. If the paper needs robustness, add a small multi-seed subset rather than repeating the full grid: seed1/seed2 for Qwen-7B and Llama-8B on MATH-500 with BF16, FP8, AWQ-4, and GPTQ-4.
+1. Recovery Phase 0 and tiny smoke.
+2. Four matched BF16/FP8 seed-42 cells.
+3. Review, then 24 MATH-500 pilot cells across seeds 42–44.
+4. Contribution gate.
+5. Extend selected headline cells to seeds 42–46 and authorize breadth only if justified.
+
+See [plans/2026-08-14-publication-recovery.md](plans/2026-08-14-publication-recovery.md).
 
 ---
 
@@ -162,8 +167,7 @@ bash scripts/hpc/02_download_model.sh   # Qwen-7B + quants
 # Llama-8B BF16 if missing:
 # huggingface-cli download deepseek-ai/DeepSeek-R1-Distill-Llama-8B ...
 
-# b02 is already submitted on 2026-08-13; monitor first
-squeue -u $USER
+# Current order: recovery Phase 0, tiny smoke, then matched P1 only
 ```
 
 ---

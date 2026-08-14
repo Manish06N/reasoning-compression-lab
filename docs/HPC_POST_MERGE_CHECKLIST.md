@@ -1,6 +1,8 @@
 # HPC post-merge checklist (manual steps)
 
-Run these on PARAM Rudra **after** syncing the deep re-audit P0–P2 pass to `main`.
+> **Historical checklist — superseded 2026-08-14.** Do not execute the old b01 seed-0 flow for new paper results. The current order is [plans/2026-08-14-publication-recovery.md](plans/2026-08-14-publication-recovery.md): reproducibility/observability Phase 0, tiny smoke, matched BF16/FP8, then a reviewed three-seed pilot.
+
+The commands below are retained for incident provenance and may contain useful mechanics only.
 
 ## 0. Cancel stale b01 job (if still queued)
 

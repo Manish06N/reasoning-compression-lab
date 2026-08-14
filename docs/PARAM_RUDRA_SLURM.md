@@ -1,6 +1,6 @@
 # PARAM Rudra SLURM — GPU quota and `--exclusive` trap
 
-Last updated: 2026-08-13
+Last updated: 2026-08-14
 
 ## User GPU quota
 
@@ -9,7 +9,7 @@ Last updated: 2026-08-13
 | `MaxTRESPerUser` (gpu QOS) | **`gres/gpu=2`** |
 | ragpu node layout | **2× A100 80GB** per node (`Gres=gpu:2`) |
 
-You can run **two parallel 1-GPU inference jobs** (e.g. b02 Qwen FP8 + Llama FP8 split cells). Current b02 jobs **96086/96087** use this non-exclusive `--gres=gpu:1` pattern.
+You can run **two parallel 1-GPU inference jobs**. Completed exact-stack jobs **96100/96101** validated this non-exclusive `--gres=gpu:1` pattern on `ragpu008` and `ragpu004`. The next scientific jobs remain blocked by recovery Phase 0; queue capacity is not authorization to submit.
 
 ## The `--exclusive` trap (do not repeat)
 
@@ -19,8 +19,8 @@ Each inference cell loads **one model on one GPU** (`--gres=gpu:1`). That is cor
 
 | Job | Flags | Counted toward your 2-GPU quota |
 |-----|-------|----------------------------------|
-| Qwen (running) | `gres/gpu:1`, shared (`OverSubscribe=OK`) | **1** |
-| Llama (pending) | `gres/gpu:1`, **`--exclusive`** (`OverSubscribe=NO`) | **2** |
+| Qwen example | `gres/gpu:1`, shared (`OverSubscribe=OK`) | **1** |
+| Llama bad example | `gres/gpu:1`, **`--exclusive`** (`OverSubscribe=NO`) | **2** |
 | **Total** | | **3 → `QOSMaxGRESPerUser`** |
 
 Symptom: second cell stays `PENDING (QOSMaxGRESPerUser)` while only one job is running.
