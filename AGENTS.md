@@ -147,18 +147,14 @@ Use this section when working in:
 
 ### Current Sync State
 
-- GitHub/HPC baseline code is `4796614`. The 2026-08-14 publication audit, recovery plan, and synchronized Markdown updates are currently uncommitted on HPC and must be preserved for the next MacBook/GitHub sync.
-- Relevant pushed code-fix commit on GitHub/HPC:
-
-```text
-4796614 Gate QRM FP8 runs on validated output
-```
-
+- GitHub/HPC baseline code is `88f6d7c` (`feat(publication-recovery): complete publication audit, TODO roadmap, chained campaign pipelines, and experimental parameters audit`).
 - Expected HPC status:
   - Branch `main` is up to date with `origin/main`.
   - `.qrm_official_env_ready` may be untracked and must stay out of Git.
 - Future sessions should read project memory before major actions:
   - `/scratch/manishn_iitp/reasoning-compression-lab/AGENTS.md`
+  - `/scratch/manishn_iitp/reasoning-compression-lab/TODO_LIST.md`
+  - `/scratch/manishn_iitp/reasoning-compression-lab/docs/EXPERIMENTAL_PARAMETERS_AND_OUTPUT_AUDIT.md`
   - `/scratch/manishn_iitp/reasoning-compression-lab/docs/PUBLICATION_READINESS.md`
   - `/scratch/manishn_iitp/reasoning-compression-lab/docs/plans/2026-08-14-publication-recovery.md`
   - `/scratch/manishn_iitp/reasoning-compression-lab/CHANGELOG.md`
@@ -188,21 +184,16 @@ git log --oneline -3
 
 ### Current Experiment Gate (2026-08-14)
 
-- **Stopped:** modern-stack b02 jobs **96086/96087** were canceled after Qwen's first 10 rows showed 2/10 correct, 8/10 truncation, and repetition loops. Preserve `outputs-hpc-2a100-main-2026-08-13` as diagnostic evidence.
-- **V0 probe:** jobs **96091/96092** showed `VLLM_USE_V1=0` alone is insufficient; malformed output and a 32768-token repetition loop remained.
-- **b02 retry reason:** jobs **96084/96085** failed before raw rows because vLLM 0.8.5 rejects `fp8_e5m2` KV cache with FP8 checkpoints; commit `542f622` sets FP8 checkpoint configs to `kv_cache_dtype: auto`.
-- **Validated fix path:** jobs **96093/96094** used the exact `qrm-official` job-87302 stack with FP8 model paths. Both completed 10/10 correct, 10/10 boxed, with zero token-cap hits and zero repetition flags.
-- **Completed full correctness jobs:** **96100** Qwen FP8 on `ragpu008` completed 472/500 (**94.4%**); **96101** Llama FP8 on `ragpu004` completed 445/500 (**89.0%**). Both used MATH-500 n=500, seed 42, archive `outputs-hpc-qrm-official-fp8-full-2026-08-13`.
+- **Phase 0 Smoke Tests:** **PASSED 100%** (Jobs **96231** Qwen BF16 3/3, **96232** Llama BF16 3/3; zero cap hits, zero loops; archive `outputs-hpc-phase0-smoke-2026-08-14`).
+- **Active 2-Channel Chained Campaign:** Submitted and active in SLURM (Jobs **96237–96249**):
+  - Channel 1 (Qwen): Job 96237 (BF16 s42) $\rightarrow$ Job 96238 (FP8) $\rightarrow$ Job 96239 (AWQ-4) $\rightarrow$ Job 96240 (GPTQ-4).
+  - Channel 2 (Llama): Job 96246 (BF16 s42) $\rightarrow$ Job 96247 (FP8) $\rightarrow$ Job 96248 (AWQ-4) $\rightarrow$ Job 96249 (GPTQ-4).
+  - Daemons active: `campaign_daemon` (queue slot feeder in tmux) + `hpc_progress` (Telegram milestone updates).
+  - Archive: `outputs-hpc-campaign-2026-08-14`.
+- **Completed full correctness jobs (Control/Appendix baseline):** **96100** Qwen FP8 on `ragpu008` completed 472/500 (**94.4%**); **96101** Llama FP8 on `ragpu004` completed 445/500 (**89.0%**).
 - **Official QRM parity:** job **87302** completed under `qrm-official` with **10/10 correct** and **0 truncation** on Qwen-7B BF16 n=10, seed 42.
-- **Path C:** canceled at n=20 after Qwen **10%/90% trunc** and Llama **15%/75% trunc**; partial archive `outputs-hpc-diag-pathc-2026-07-05` remains comparison evidence.
-- **Interpretation:** the FP8 checkpoints are healthy and the full values reproduce their public model-card results within uncertainty. This is replication/control evidence, not a BF16-vs-FP8 effect.
-- **A100 qualification:** vLLM logged weight-only Marlin fallback because A100 has no native FP8 compute. Never claim native FP8/W8A8 speed or energy from these jobs.
-- **Trace audit:** six likely near-cap traces and phrase-level degeneration were found; `finish_reason` and token IDs were not saved. The full validator's permissive thresholds make `passed: true` an integrity signal, not a publication gate.
-- **Publication verdict:** **Needs revision.** The result may be used in an appendix/control table only.
-- **Next:** execute recovery Phase 0—tracked QRM patches, clean recreation, finish/token/timing/telemetry schema, stronger validation, and tests. Do **not** submit b03/b04 or another broad grid before Phase 0 passes.
-- **Calibration boundary:** b02 is scored with `--skip-calibration`; do not cite Brier/AURC/ECE from it.
-- **Authority:** `docs/PUBLICATION_READINESS.md` and `docs/plans/2026-08-14-publication-recovery.md` supersede older “running/next grid” instructions.
-- **Git:** baseline `4796614` is on GitHub/HPC; preserve current uncommitted docs for sync; leave `.qrm_official_env_ready` untracked.
+- **Publication authority:** `docs/PUBLICATION_READINESS.md`, `TODO_LIST.md`, and `docs/EXPERIMENTAL_PARAMETERS_AND_OUTPUT_AUDIT.md`.
+- **Git:** baseline `88f6d7c` is live on GitHub `origin/main`.
 
 ### Important Jobs From 2026-06-26 and 2026-06-27
 

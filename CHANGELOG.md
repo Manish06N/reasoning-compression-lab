@@ -1,5 +1,25 @@
 # Changelog
 
+## 2026-08-14 (Afternoon) - Phase 0 smoke passed (100%) and 2-channel chained publication campaign launched
+
+Executed Phase 0 baseline smoke tests ($n=3$, seed 42) and verified complete correctness and zero pathologies across both model anchors:
+
+| Job | Model | Outcome | Details |
+|-----|-------|---------|---------|
+| **96231** | `DeepSeek-R1-Distill-Qwen-7B` (BF16) | **3/3 (100%) Correct**, 3/3 boxed, 0 cap hits, 0 loops | Completion tokens: 8,945, 1,676, 1,408 |
+| **96232** | `DeepSeek-R1-Distill-Llama-8B` (BF16) | **3/3 (100%) Correct**, 3/3 boxed, 0 cap hits, 0 loops | Completion tokens: 6,259, 1,271, 1,446 |
+
+Validation reports saved in `outputs-hpc-phase0-smoke-2026-08-14/validation/`.
+
+### Parallel Publication Pipeline Launched (Jobs 96237–96249)
+Submitted the 2-channel chained publication pipeline to SLURM (MATH-500, $n=500$, seed 42) with `--dependency=afterany` chaining:
+- **Channel 1 (GPU 1 - Qwen):** Job **96237** (BF16) $\rightarrow$ Job **96238** (FP8) $\rightarrow$ Job **96239** (AWQ-4) $\rightarrow$ Job **96240** (GPTQ-4).
+- **Channel 2 (GPU 2 - Llama):** Job **96246** (BF16) $\rightarrow$ Job **96247** (FP8) $\rightarrow$ Job **96248** (AWQ-4) $\rightarrow$ Job **96249** (GPTQ-4).
+- Concurrency: exactly 2 active GPUs (100% quota utilization, zero idle GPU waste).
+- Active Daemons: `campaign_daemon` managing submission queues; `hpc_progress` sending Telegram milestone updates.
+- Output Directory: `outputs-hpc-campaign-2026-08-14`.
+- Commit `88f6d7c` pushed to GitHub `origin/main`.
+
 ## 2026-08-14 - Audit completed FP8 results and block premature publication expansion
 
 An independent publication-readiness audit reviewed all project Markdown, the exact job/configuration path, all 1,000 result rows, result integrity, reproducibility, and current literature. Canonical decision: **Needs revision**. The completed jobs are credible FP8 replication/control evidence, not a standalone publishable result.
