@@ -96,6 +96,12 @@ echo "Output: $OUTPUT_ROOT"
 echo "max_samples=$MAX_SAMPLES seed=$SEED"
 
 QRM_GPU_MEMORY_UTILIZATION="${QRM_GPU_MEMORY_UTILIZATION:-0.75}"
+DTYPE_ARGS=()
+if [[ -n "${QRM_DTYPE:-}" ]]; then
+  DTYPE_ARGS=(--dtype "$QRM_DTYPE")
+elif [[ "$MODEL" == *"AWQ"* || "$MODEL" == *"awq"* ]]; then
+  DTYPE_ARGS=(--dtype "float16")
+fi
 
 python inference.py \
   --model "$MODEL" \
@@ -104,6 +110,7 @@ python inference.py \
   --seed "$SEED" \
   --output_dir "$OFFICIAL_RUN_DIR" \
   --gpu_memory_utilization "$QRM_GPU_MEMORY_UTILIZATION" \
+  "${DTYPE_ARGS[@]}" \
   --overwrite
 
 RESULT_JSON="$OFFICIAL_RUN_DIR/MATH-500.jsonl"

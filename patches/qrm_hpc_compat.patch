@@ -1,8 +1,8 @@
 diff --git a/inference.py b/inference.py
-index 7440d80..e0aa379 100644
+index 7440d80..4b35e5c 100644
 --- a/inference.py
 +++ b/inference.py
-@@ -41,6 +41,8 @@ def parser_gen():
+@@ -41,10 +41,12 @@ def parser_gen():
                          help='Maximum number of tokens to generate per output sequence.')
      parser.add_argument('--max_model_length', type=int, default=32768,
                          help='Maximum model input length.')
@@ -10,7 +10,13 @@ index 7440d80..e0aa379 100644
 +                        help='GPU memory utilization.')
      args = parser.parse_args()
  
-     # force float16 for gptqmodel inference
+-    # force float16 for gptqmodel inference
+-    if "gptqmodel" in args.model:
++    # force float16 for gptqmodel and awq inference
++    if "gptqmodel" in args.model or "awq" in args.model.lower() or "AWQ" in args.model:
+         args.dtype = "float16"
+ 
+     # output path
 @@ -125,7 +127,7 @@ def main(args):
          dtype=args.dtype,
          max_model_length=args.max_model_length,
