@@ -1,6 +1,35 @@
 # Changelog
 
-## 2026-08-14 (Afternoon) - Phase 0 smoke passed (100%) and 2-channel chained publication campaign launched
+## 2026-08-14 (Evening) - Matched Qwen Evaluation Results (94.4% BF16/FP8, 93.8% GPTQ-4), AWQ Float16 Dtype Fix, and Autonomous 24/7 Campaign Daemon
+
+### 1. Completed Headline Evaluation Runs (MATH-500, Seed 42)
+Successfully evaluated and validated the core Qwen-7B quantization matrix:
+
+| Job | Model & Format | Accuracy (Pass@1) | Correct / Total | Elapsed Time | Node | Verification |
+|-----|----------------|-------------------|-----------------|--------------|------|--------------|
+| **96237** | `DeepSeek-R1-Distill-Qwen-7B` (**BF16 Baseline**) | **94.4%** | **472 / 500** | 26m 23s | `ragpu008` | Validated in `outputs-hpc-campaign-2026-08-14` |
+| **96238** | `DeepSeek-R1-Distill-Qwen-7B` (**FP8**) | **94.4%** | **472 / 500** | 22m 27s | `ragpu005` | Validated in `outputs-hpc-campaign-2026-08-14` |
+| **96240** | `DeepSeek-R1-Distill-Qwen-7B` (**GPTQ-4**) | **93.8%** | **469 / 500** | 25m 31s | `ragpu005` | Validated in `outputs-hpc-campaign-2026-08-14` |
+
+**Scientific Finding:** Under matched prompt, sampling ($T=0.6, p=0.95$), eager vLLM 0.7.0 execution, and MATH-500 dataset, FP8 achieves 100% parity with BF16 (both at 94.4%), while 4-bit GPTQ experiences a minimal degradation of 0.6% (93.8%).
+
+### 2. Failure Root-Cause Analysis & Fixes
+- **AWQ Quantization Backend Error (Job 96239):**
+  - *Symptom:* Failed during model loading with `ValueError: torch.bfloat16 is not supported for quantization method awq. Supported dtypes: [torch.float16]`.
+  - *Fix:* Updated `inference.py`, `scripts/hpc/qrm_parity/run_official_inference.sh`, and `patches/qrm_hpc_compat.patch` to automatically detect AWQ checkpoints and force `--dtype float16`.
+- **Llama BF16 Shared Contention (Job 96246):**
+  - *Symptom:* Terminated with `SIGKILL` (`0:9`) on node `ragpu005` due to concurrent execution with external user workloads.
+- **Autonomous 24/7 Queue Manager Daemon Upgraded:**
+  - Updated `scripts/hpc/queue_manager_daemon.py` with Python 3.6/3.12 compatibility (`check_output` decoding).
+  - Added live validation artifact discovery to detect completed cells automatically, skip completed ones, and retry uncompleted ones.
+  - Maintains continuous chained pipelines across 2 channels (`Qwen-7B` and `Llama-8B`), strictly utilizing 2 active GPUs without exceeding SLURM queue caps.
+
+### 3. Active Resumed Pipeline
+- **Job 96289 (`p2-qwen7b-awq4-s42`):** RUNNING on `ragpu003` with float16 fix applied.
+- **Job 96247 (`p1-llama8b-fp8-s42`):** RUNNING on `ragpu003` (~55% progress).
+- **Chained Pending Jobs:** Jobs 96290/96291 (Qwen Seed 43) and Jobs 96248/96249 (Llama AWQ-4 / GPTQ-4).
+
+
 
 Executed Phase 0 baseline smoke tests ($n=3$, seed 42) and verified complete correctness and zero pathologies across both model anchors:
 

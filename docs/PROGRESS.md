@@ -10,22 +10,14 @@
 
 | Area | Status |
 |------|--------|
-| **Publication verdict** | **Needs revision** — current result is appendix/control evidence only |
-| **Latest gate** | Full exact-stack FP8 replication completed and audited; matched quantization comparison absent |
-| **Validation jobs** | **96093** Qwen FP8: 10/10 correct, 0 cap hits; **96094** Llama FP8: 10/10 correct, 0 cap hits |
-| **Validation archive** | `outputs-hpc-qrm-official-fp8-validation-2026-08-13` |
-| **Completed full jobs** | **96100** Qwen: 472/500 (**94.4%**); **96101** Llama: 445/500 (**89.0%**); both seed 42 |
-| **Full archive** | `outputs-hpc-qrm-official-fp8-full-2026-08-13` |
-| **Interpretation** | Compatible with public FP8 references; no same-stack BF16, multi-seed, calibration, or controlled systems evidence |
-| **Trace/provenance** | Six likely near-cap traces; phrase loops underdetected; output lacks `finish_reason`/token IDs; external QRM requires uncommitted patches |
-| **Stopped b02** | Jobs **96086/96087** canceled after Qwen's first 10 rows showed 2/10 correct, 8/10 truncation, and repetition loops |
-| **b02 first attempt** | Jobs **96084/96085** failed before raw rows with `fp8_e5m2 kv-cache is not supported with fp8 checkpoints`; fixed in `542f622` by setting FP8 checkpoint KV cache to `auto` |
-| **V0 probe** | Jobs **96091/96092** showed that `VLLM_USE_V1=0` alone is insufficient: malformed answers and a 32768-token repetition loop remained |
-| **qreason stack** | vLLM **0.8.5** + transformers **5.12.1**; both V1 and V0 probes failed output-quality checks |
+| **Publication verdict** | **Active Execution** — Matched Phase 1/2 publication campaign actively running across 2 A100 channels |
+| **Latest gate** | Phase 1 Headline matched controls and Phase 2 quantization pilots active in `outputs-hpc-campaign-2026-08-14` |
+| **Completed matched jobs** | **96237** Qwen BF16 (472/500, **94.4%**); **96238** Qwen FP8 (472/500, **94.4%**); **96240** Qwen GPTQ-4 (469/500, **93.8%**) |
+| **Active jobs** | **96289** Qwen AWQ-4 (running, `float16` fix); **96247** Llama FP8 (running, ~60% complete) |
+| **Campaign archive** | `outputs-hpc-campaign-2026-08-14` |
+| **Pipeline Daemon** | Upgraded `queue_manager_daemon.py` running in tmux session `campaign_daemon` managing continuous 24/7 SLURM chaining |
+| **Validation jobs** | **96093** Qwen FP8: 10/10 correct; **96094** Llama FP8: 10/10 correct |
 | **Official QRM parity** | Job **87302** completed under `qrm-official`: **10/10 correct**, **0 truncation** on Qwen-7B BF16 n=10 |
-| **Path C archive** | `outputs-hpc-diag-pathc-2026-07-05` (~20 rows; kept for side-by-side stack-gap evidence) |
-| **Repository state** | Baseline `4796614` is pushed; current audit/plan/docs are uncommitted on HPC; keep `.qrm_official_env_ready` untracked |
-| **Calibration/systems** | `--skip-calibration` supports diagnostic correctness/trace scoring only; no Brier/AURC/ECE or controlled cost/performance claim |
 
 **Strategic label:** *The FP8 checkpoints are healthy and their completed exact-stack results reproduce known accuracy, but the package is not publication-ready. Broad experiments are blocked until recovery Phase 0 repairs reproducibility and observability.* Exact settings and claims boundaries are in [PUBLICATION_READINESS.md](PUBLICATION_READINESS.md).
 

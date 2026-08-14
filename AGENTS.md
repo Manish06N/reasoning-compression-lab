@@ -184,16 +184,18 @@ git log --oneline -3
 
 ### Current Experiment Gate (2026-08-14)
 
-- **Phase 0 Smoke Tests:** **PASSED 100%** (Jobs **96231** Qwen BF16 3/3, **96232** Llama BF16 3/3; zero cap hits, zero loops; archive `outputs-hpc-phase0-smoke-2026-08-14`).
-- **Active 2-Channel Chained Campaign:** Submitted and active in SLURM (Jobs **96237–96249**):
-  - Channel 1 (Qwen): Job 96237 (BF16 s42) $\rightarrow$ Job 96238 (FP8) $\rightarrow$ Job 96239 (AWQ-4) $\rightarrow$ Job 96240 (GPTQ-4).
-  - Channel 2 (Llama): Job 96246 (BF16 s42) $\rightarrow$ Job 96247 (FP8) $\rightarrow$ Job 96248 (AWQ-4) $\rightarrow$ Job 96249 (GPTQ-4).
-  - Daemons active: `campaign_daemon` (queue slot feeder in tmux) + `hpc_progress` (Telegram milestone updates).
-  - Archive: `outputs-hpc-campaign-2026-08-14`.
-- **Completed full correctness jobs (Control/Appendix baseline):** **96100** Qwen FP8 on `ragpu008` completed 472/500 (**94.4%**); **96101** Llama FP8 on `ragpu004` completed 445/500 (**89.0%**).
-- **Official QRM parity:** job **87302** completed under `qrm-official` with **10/10 correct** and **0 truncation** on Qwen-7B BF16 n=10, seed 42.
+- **Completed Headline Matched Runs (MATH-500, Seed 42):**
+  - **96237** `DeepSeek-R1-Distill-Qwen-7B` (**BF16 Baseline**): **472/500 (94.4%)** [26m23s on `ragpu008`].
+  - **96238** `DeepSeek-R1-Distill-Qwen-7B` (**FP8**): **472/500 (94.4%)** [22m27s on `ragpu005`].
+  - **96240** `DeepSeek-R1-Distill-Qwen-7B` (**GPTQ-4**): **469/500 (93.8%)** [25m31s on `ragpu005`].
+- **Code & Pipeline Fixes Applied:**
+  - **AWQ float16 dtype fix:** Auto-sets `--dtype float16` for AWQ models in `inference.py`, `run_official_inference.sh`, and `patches/qrm_hpc_compat.patch` (resolves `ValueError: torch.bfloat16 is not supported for quantization method awq`).
+  - **Queue Manager Daemon:** Upgraded `scripts/hpc/queue_manager_daemon.py` with multi-version Python compatibility, auto-detection of completed validation JSON files, self-healing retry capability, and 2-channel continuous SLURM chaining.
+- **Active 2-Channel Chained Campaign (Jobs 96247, 96289, 96290, 96291, 96248, 96249):**
+  - Channel 1 (Qwen): Job 96289 (AWQ-4 s42) $\rightarrow$ Job 96290 (BF16 s43) $\rightarrow$ Job 96291 (FP8 s43).
+  - Channel 2 (Llama): Job 96247 (FP8 s42, ~55% done) $\rightarrow$ Job 96248 (AWQ-4 s42) $\rightarrow$ Job 96249 (GPTQ-4 s42).
+  - Output Archive: `outputs-hpc-campaign-2026-08-14`.
 - **Publication authority:** `docs/PUBLICATION_READINESS.md`, `TODO_LIST.md`, and `docs/EXPERIMENTAL_PARAMETERS_AND_OUTPUT_AUDIT.md`.
-- **Git:** baseline `88f6d7c` is live on GitHub `origin/main`.
 
 ### Important Jobs From 2026-06-26 and 2026-06-27
 

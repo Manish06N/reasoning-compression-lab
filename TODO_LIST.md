@@ -32,6 +32,11 @@
 | **96094** | Llama-8B | FP8 | MATH-500 ($n=10$) | 42 | `qrm-official` (vLLM 0.7.0) | **10/10 (100%)**, 0% trunc, 0 loops | Exact-stack pilot gate | ✅ COMPLETED |
 | **96100** | Qwen-7B | FP8 | MATH-500 ($n=500$) | 42 | `qrm-official` (vLLM 0.7.0) | **472/500 (94.4%)** [92.03–96.10%] | Appendix / Control Table | ✅ COMPLETED |
 | **96101** | Llama-8B | FP8 | MATH-500 ($n=500$) | 42 | `qrm-official` (vLLM 0.7.0) | **445/500 (89.0%)** [85.95–91.45%] | Appendix / Control Table | ✅ COMPLETED |
+| **96237** | Qwen-7B | BF16 | MATH-500 ($n=500$) | 42 | `qrm-official` (vLLM 0.7.0) | **472/500 (94.4%)** | Phase 1 Headline Matched Control | ✅ COMPLETED |
+| **96238** | Qwen-7B | FP8 | MATH-500 ($n=500$) | 42 | `qrm-official` (vLLM 0.7.0) | **472/500 (94.4%)** | Phase 1 Headline Matched Control | ✅ COMPLETED |
+| **96240** | Qwen-7B | GPTQ-4 | MATH-500 ($n=500$) | 42 | `qrm-official` (vLLM 0.7.0) | **469/500 (93.8%)** | Phase 2 4-bit Quantization Pilot | ✅ COMPLETED |
+| **96289** | Qwen-7B | AWQ-4 | MATH-500 ($n=500$) | 42 | `qrm-official` (vLLM 0.7.0) | *In Progress (float16)* | Phase 2 4-bit Quantization Pilot | 🔄 RUNNING |
+| **96247** | Llama-8B | FP8 | MATH-500 ($n=500$) | 42 | `qrm-official` (vLLM 0.7.0) | *In Progress* | Phase 1 Llama FP8 Control | 🔄 RUNNING |
 
 ---
 
