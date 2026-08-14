@@ -3,25 +3,49 @@
   {"name": "p1-qwen7b-fp8-s42", "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Qwen-7B-FP8", "seed": 42, "channel": "qwen"},
   {"name": "p2-qwen7b-awq4-s42", "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Qwen-7B-AWQ-4", "seed": 42, "channel": "qwen"},
   {"name": "p2-qwen7b-gptq4-s42", "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Qwen-7B-GPTQ-4", "seed": 42, "channel": "qwen"},
+
   {"name": "p2-qwen7b-bf16-s43", "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Qwen-7B", "seed": 43, "channel": "qwen"},
   {"name": "p2-qwen7b-fp8-s43", "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Qwen-7B-FP8", "seed": 43, "channel": "qwen"},
   {"name": "p2-qwen7b-awq4-s43", "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Qwen-7B-AWQ-4", "seed": 43, "channel": "qwen"},
   {"name": "p2-qwen7b-gptq4-s43", "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Qwen-7B-GPTQ-4", "seed": 43, "channel": "qwen"},
+
   {"name": "p2-qwen7b-bf16-s44", "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Qwen-7B", "seed": 44, "channel": "qwen"},
   {"name": "p2-qwen7b-fp8-s44", "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Qwen-7B-FP8", "seed": 44, "channel": "qwen"},
   {"name": "p2-qwen7b-awq4-s44", "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Qwen-7B-AWQ-4", "seed": 44, "channel": "qwen"},
   {"name": "p2-qwen7b-gptq4-s44", "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Qwen-7B-GPTQ-4", "seed": 44, "channel": "qwen"},
 
+  {"name": "p4-qwen7b-bf16-s45", "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Qwen-7B", "seed": 45, "channel": "qwen"},
+  {"name": "p4-qwen7b-fp8-s45", "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Qwen-7B-FP8", "seed": 45, "channel": "qwen"},
+  {"name": "p4-qwen7b-awq4-s45", "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Qwen-7B-AWQ-4", "seed": 45, "channel": "qwen"},
+  {"name": "p4-qwen7b-gptq4-s45", "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Qwen-7B-GPTQ-4", "seed": 45, "channel": "qwen"},
+
+  {"name": "p4-qwen7b-bf16-s46", "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Qwen-7B", "seed": 46, "channel": "qwen"},
+  {"name": "p4-qwen7b-fp8-s46", "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Qwen-7B-FP8", "seed": 46, "channel": "qwen"},
+  {"name": "p4-qwen7b-awq4-s46", "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Qwen-7B-AWQ-4", "seed": 46, "channel": "qwen"},
+  {"name": "p4-qwen7b-gptq4-s46", "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Qwen-7B-GPTQ-4", "seed": 46, "channel": "qwen"},
+
   {"name": "p1-llama8b-bf16-s42", "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Llama-8B", "seed": 42, "channel": "llama"},
   {"name": "p1-llama8b-fp8-s42", "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Llama-8B-FP8", "seed": 42, "channel": "llama"},
   {"name": "p2-llama8b-awq4-s42", "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Llama-8B-AWQ-4", "seed": 42, "channel": "llama"},
   {"name": "p2-llama8b-gptq4-s42", "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Llama-8B-GPTQ-4", "seed": 42, "channel": "llama"},
+
   {"name": "p2-llama8b-bf16-s43", "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Llama-8B", "seed": 43, "channel": "llama"},
   {"name": "p2-llama8b-fp8-s43", "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Llama-8B-FP8", "seed": 43, "channel": "llama"},
   {"name": "p2-llama8b-awq4-s43", "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Llama-8B-AWQ-4", "seed": 43, "channel": "llama"},
   {"name": "p2-llama8b-gptq4-s43", "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Llama-8B-GPTQ-4", "seed": 43, "channel": "llama"},
+
   {"name": "p2-llama8b-bf16-s44", "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Llama-8B", "seed": 44, "channel": "llama"},
   {"name": "p2-llama8b-fp8-s44", "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Llama-8B-FP8", "seed": 44, "channel": "llama"},
   {"name": "p2-llama8b-awq4-s44", "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Llama-8B-AWQ-4", "seed": 44, "channel": "llama"},
-  {"name": "p2-llama8b-gptq4-s44", "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Llama-8B-GPTQ-4", "seed": 44, "channel": "llama"}
+  {"name": "p2-llama8b-gptq4-s44", "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Llama-8B-GPTQ-4", "seed": 44, "channel": "llama"},
+
+  {"name": "p4-llama8b-bf16-s45", "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Llama-8B", "seed": 45, "channel": "llama"},
+  {"name": "p4-llama8b-fp8-s45", "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Llama-8B-FP8", "seed": 45, "channel": "llama"},
+  {"name": "p4-llama8b-awq4-s45", "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Llama-8B-AWQ-4", "seed": 45, "channel": "llama"},
+  {"name": "p4-llama8b-gptq4-s45", "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Llama-8B-GPTQ-4", "seed": 45, "channel": "llama"},
+
+  {"name": "p4-llama8b-bf16-s46", "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Llama-8B", "seed": 46, "channel": "llama"},
+  {"name": "p4-llama8b-fp8-s46", "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Llama-8B-FP8", "seed": 46, "channel": "llama"},
+  {"name": "p4-llama8b-awq4-s46", "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Llama-8B-AWQ-4", "seed": 46, "channel": "llama"},
+  {"name": "p4-llama8b-gptq4-s46", "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Llama-8B-GPTQ-4", "seed": 46, "channel": "llama"}
 ]
