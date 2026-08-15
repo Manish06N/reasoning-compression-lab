@@ -295,28 +295,28 @@ class CampaignTracker:
                 )
                 send_telegram(msg)
 
-        # 2-Channel Autonomous Dispatching (1 GPU Qwen + 1 GPU Llama)
+        # 2-Channel Autonomous Dispatching with Work-Stealing / Load-Balancing
+        # (If Qwen finishes all cells first, GPU 1 automatically helps run remaining Llama cells)
         for channel_name, channel_cells in [("qwen", self.qwen_cells), ("llama", self.llama_cells)]:
-            # Filter active jobs matching this channel
-            channel_active_jobs = [j for j in active_jobs if any(c["name"] == j["name"] for c in channel_cells)]
+            channel_active_jobs = [j for j in active_jobs if any(c["name"] == j["name"] for c in self.all_cells)]
+            
+            # Find active jobs currently assigned to this channel
+            chan_jobs = [j for j in active_jobs if any(c["name"] == j["name"] for c in channel_cells)]
             last_job_id = None
-            if channel_active_jobs:
-                sorted_jobs = sorted(channel_active_jobs, key=lambda x: int(x["id"]))
+            if chan_jobs:
+                sorted_jobs = sorted(chan_jobs, key=lambda x: int(x["id"]))
                 last_job_id = sorted_jobs[-1]["id"]
 
-            channel_job_count = len(channel_active_jobs)
+            channel_job_count = len(chan_jobs)
 
+            # Primary queue: submit cells designated for this channel
             for cell in channel_cells:
                 cname = cell["name"]
                 done, acc, score = is_cell_completed(cell, self.validation_dir, self.max_samples, self.task_name)
-                if done:
+                if done or cname in active_names:
                     continue
 
-                if cname in active_names:
-                    continue
-
-                # Maintain at most 2 queued per channel (avoids QOS limit, guarantees 1 GPU per model)
-                if channel_job_count >= 2:
+                if channel_job_count >= 2 or total_active_queued >= 4:
                     break
 
                 job_id = submit_cell(
@@ -331,6 +331,32 @@ class CampaignTracker:
                     channel_job_count += 1
                     total_active_queued += 1
                     active_names[cname] = {"id": job_id, "name": cname, "state": "PENDING", "node": "-", "elapsed": "0:00"}
+
+            # Work-Stealing: If this channel has 0 active jobs (all primary cells done),
+            # steal remaining unassigned cells from the other model to keep both GPUs 100% busy!
+            if channel_job_count == 0 and total_active_queued < 4:
+                other_cells = self.llama_cells if channel_name == "qwen" else self.qwen_cells
+                for cell in other_cells:
+                    cname = cell["name"]
+                    done, acc, score = is_cell_completed(cell, self.validation_dir, self.max_samples, self.task_name)
+                    if done or cname in active_names:
+                        continue
+
+                    if total_active_queued >= 4 or channel_job_count >= 2:
+                        break
+
+                    print(f"[queue_manager] ⚡ WORK-STEALING: Channel {channel_name.upper()} taking over {cname} on idle GPU!")
+                    job_id = submit_cell(
+                        cell,
+                        output_root=self.output_root,
+                        task_name=self.task_name,
+                        max_samples=self.max_samples,
+                        prev_job_id=None  # Can run immediately since this GPU is completely free
+                    )
+                    if job_id:
+                        channel_job_count += 1
+                        total_active_queued += 1
+                        active_names[cname] = {"id": job_id, "name": cname, "state": "ACTIVE", "node": "-", "elapsed": "0:00"}
 
         # Hourly status ping
         now = time.time()
