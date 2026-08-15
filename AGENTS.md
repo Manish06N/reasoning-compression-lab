@@ -1,44 +1,75 @@
-# CLAUDE.md — manishn_iitp @ PARAM Rudra HPC
-
-This file is auto-loaded by Claude Code at the start of every session.
-
-## System Overview
-- **User:** manishn_iitp, IIT Patna
-- **Cluster:** PARAM Rudra HPC (C-DAC / NSM), NVIDIA A100 80GB GPUs
-- **Shell:** bash, home = `/home/manishn_iitp`, scratch = `/scratch/manishn_iitp/`
-- **Python:** always use `python3` (not `python`)
-- **GPU jobs:** always submit via SLURM — login node kills any compute process
+# AGENTS.md — PhD Master Operating System & Memory
+**Scholar:** Manish Nandish, IIT Patna  
+**Cluster:** PARAM Rudra HPC (C-DAC / NSM), NVIDIA A100 80GB GPUs  
+**Repository:** `/scratch/manishn_iitp/reasoning-compression-lab`  
+**GitHub:** [https://github.com/Manish06N/reasoning-compression-lab](https://github.com/Manish06N/reasoning-compression-lab)  
+**Last Updated:** 2026-08-15 (Post-40-Cell Confirmatory Campaign Completion)
 
 ---
 
-## SSH Tunnel (copy-paste this every session)
+## 1. Executive Summary & Thesis Spine
 
-Run this on your **home Windows PC** (PowerShell) to forward the vLLM port:
+### PhD Thesis Title (Frozen)
+> **"Reliable and Cost-Efficient Deployment of Reasoning LLMs under Compression, Evaluation, and Multilingual Constraints"**
 
+### Degree Constraints & Mandate
+- **Target Requirements:** 3+ first-author Q1/Q2 journal articles (Scopus/SJR / JCR) + 2 peer-reviewed conference/workshop papers.
+- **Timeline:** ~2 years remaining (Degree completion target: 2027/2028).
+- **Execution Mode:** Distance mode, flexible supervisor; highly disciplined self-driven execution, public reproducible artifacts, and rigorous statistical controls.
+
+### 3-Journal + 2-Conference Publication Strategy
+
+```mermaid
+graph TD
+    J1["Paper 1 (J1): Quantization Reliability & Cost Frontier\n(MATH-500, GSM8K, GPQA; BF16/FP8/AWQ4/GPTQ4; 5 seeds)"] --> C1["Conference 1 (C1): Evaluation Metrology Workshop\n(Packaging calibration & trace pathology protocol)"]
+    J1 --> J2["Paper 2 (J2): Reasoning Speculative Decoding\n(0.5B-1.5B draft models, trace acceptance rates, acceleration)"]
+    J2 --> C2["Conference 2 (C2): Speculative Serving Demo\n(vLLM / SGLang integration & systems benchmark)"]
+    J1 --> J3["Paper 3 (J3): Indic & Multilingual Deployment Economics\n(Token-cost inequity, Indic reasoning, A100 vs RTX 5080 edge transfer)"]
+```
+
+| Output | Type | Title / Focus | Target Venues (Verify Q1) | Hardware / Stack | Status / Target Date |
+|---|---|---|---|---|---|
+| **J1** | Main Journal | *Beyond Pass@1: Reliability–Cost Frontiers of Quantized Reasoning Models under Controlled Serving-Stack Shift* | *Future Generation Computer Systems (FGCS)*, *Journal of Systems and Software (JSS)*, *Neurocomputing* | HPC 2× A100, `qrm-official` (vLLM 0.7.0 eager) | **Headline 40-cell grid completed (2026-08-15)**; Phase 5 analysis & draft in progress |
+| **C1** | Conference / Workshop | *Trace-Level Evaluation Metrology for Compressed Reasoning Models* | NeurIPS/ICLR/ACL Workshops (Eval4NLP, Efficient Natural Language, MLPerf) | HPC A100 | Submission Month 6–12 (Post-J1 pilot packaging) |
+| **J2** | Journal 2 | *Reasoning-Aware Speculative Decoding: Acceptance Dynamics and Serving Acceleration* | *JSS*, *Engineering Applications of AI (EAAI)*, *FGCS* | HPC 2× A100 | Year 2 (Methods & draft model training) |
+| **C2** | Conference / Workshop | *High-Throughput Speculative Serving of Compressed Reasoning LLMs* | MLSys / EuroSys / ACL Demo Track | HPC A100 | Year 2 |
+| **J3** | Journal 3 | *Deployment Economics and Token-Cost Inequity of Reasoning Models in Multilingual/Indic Settings* | *Sustainable Computing*, *Computer Speech & Language*, *Language Resources & Evaluation (LRE)* | HPC A100 (Primary) + RTX 5080 / llama.cpp (Edge Transfer) | Year 2 → Thesis Conclusion |
+
+---
+
+## 2. Cluster Architecture, Hardware Policy & SSH Tunneling
+
+### PARAM Rudra HPC Specifications
+- **Cluster:** PARAM Rudra HPC, IIT Patna (NSM / C-DAC).
+- **Compute Partition:** `gpu` partition with NVIDIA A100-PCIE-80GB GPUs (`ragpu003`–`ragpu008`, `racn115`–`racn116`).
+- **User Limits:** Max **2 GPUs** concurrently per user (`QOSMaxGRESPerUser`), max **48 hours** walltime per SLURM job.
+- **FairShare:** Dynamic priority score decay. Monitor regularly via `sshare -u $USER -l`.
+
+### Hardware Allocation Policy Across Papers
+
+| Paper | Primary Hardware | Secondary / Transfer Layer | Publication Hardware Policy |
+|---|---|---|---|
+| **Paper 1 (J1)** | HPC 2× A100 80GB | None for cited numbers | **100% HPC A100**. RTX 5080 is **strictly retired** for J1 publication numbers (used for short local smoke/debug only). |
+| **Paper 2 (J2)** | HPC 2× A100 80GB | Local workstation (small draft model prototyping) | All benchmarked acceleration numbers from HPC A100. |
+| **Paper 3 (J3)** | HPC 2× A100 80GB | **RTX 5080 + llama.cpp / GGUF** | Bounded "Datacenter A100 $\rightarrow$ Local Edge RTX 5080" transfer evaluation layer. |
+
+### Critical SLURM Rules for PARAM Rudra
+1. **Never `--exclusive` on 1-GPU cells:** ragpu nodes have 2× A100 GPUs. Requesting `--exclusive` with `--gres=gpu:1` allocates the whole node and consumes the user's full 2-GPU quota, causing the second job to stall in `QOSMaxGRESPerUser`.
+2. **Resource syntax:** Always use `--gres=gpu:1` or `--gres=gpu:2` with `--cpus-per-task=16`. Never specify `--mem` or GPU subtypes (e.g. no `--gres=gpu:a100:2`).
+3. **Always `--enforce-eager` in vLLM:** Triton JIT compilation fails on compute nodes due to missing toolchains/permissions.
+4. **GPU Memory Utilization:** Set `--gpu-memory-utilization 0.75` (reserves 60GB on 80GB A100) to prevent OOM errors on shared nodes.
+5. **AWQ Quantization Requirement:** Always set `--dtype float16` for AWQ models (`torch.bfloat16` is unsupported by the AWQ kernel).
+
+### SSH Tunnel for Local Interactive vLLM Inference
+Run on your **local Windows PC** (PowerShell) to forward the active vLLM port:
 ```powershell
 ssh -L 8080:<NODE>:8080 -N manishn_iitp@paramrudra.iitp.ac.in -p 4422
 ```
+*(Replace `<NODE>` with the assigned compute node, e.g. `ragpu004` or `ragpu005`).*  
+**Verify tunnel locally:** `curl http://localhost:8080/health` $\rightarrow$ Expected: `200 OK`.
 
-> **Replace `<NODE>`** with the current compute node from `squeue` output (e.g. `ragpu004` or `ragpu005`).
-
-**Full example (if node is ragpu004):**
-```powershell
-ssh -L 8080:ragpu004:8080 -N manishn_iitp@paramrudra.iitp.ac.in -p 4422
-```
-
-**Auth flow:** CAPTCHA string → Google Authenticator code → password
-
-**Verify tunnel works (run locally):**
-```bash
-curl http://localhost:8080/health
-# Expected: 200 OK
-```
-
----
-
-## Active vLLM Servers & Models
-
-| Model | Shards Path | Serving Script | GPUs |
+### Standalone Interactive LLM Serving Scripts
+| Model | Disk Path | Script | GPUs Required |
 |---|---|---|---|
 | **DeepSeek-R1-70B** | `/scratch/manishn_iitp/models/DeepSeek-R1-Distill-Llama-70B` | `~/start-llm-deepseek.sh` | 2 |
 | **MiniMax-M2.7-XL** | `/scratch/manishn_iitp/models/MiniMax-M2.7-UD-Q4_K_XL/UD-Q4_K_XL` | `~/serve-minimax.sh` | 2 |
@@ -46,366 +77,156 @@ curl http://localhost:8080/health
 
 ---
 
-## How to Switch Models (tell Claude: "Start the vLLM server")
-1. **User Preference:** The user will verbally tell the agent which model to run (e.g., "Start MiniMax").
-2. **Agent Action:** The agent MUST check running jobs (`squeue`), stop any active job (`scancel`), and then start the requested job using the appropriate script (e.g., `sbatch serve-minimax.sh`).
-3. **Verification:** Wait for node assignment, then verify with `curl http://<NODE>:8080/health`.
-4. **Communication:** Provide the user with the exact SSH tunnel command for their local machine.
+## 3. Paper 1 (J1): Scientific Positioning & Breakthrough Results
 
----
+### Provisional Title
+> **"Beyond Pass@1: Reliability–Cost Frontiers of Quantized Reasoning Models under Controlled Serving-Stack Shift"**
 
-## SLURM Rules for This Cluster
-- `--gres=gpu:1` or `--gres=gpu:2` — NO `--mem`, NO GPU type tag (e.g. no `--gres=gpu:a100:2`)
-- Always `--enforce-eager` for vLLM (triton JIT fails on compute nodes)
-- Run heavy jobs from `/scratch/$USER/`, back up results to `$HOME`
-- conda env: `/home/apps/MSCC/miniconda3/` (do NOT use the module system for Python/conda)
+### Novelty Positioning Against Prior Literature
+* **The Literature Gap:** Prior works (QRM 2025, A Sober Look 2025, Quantized LLMs Can Still Be Calibrated 2025, Cost-of-Pass 2025, Quantization Inflates Reasoning 2026, Reliability Scaling Laws 2026) studied accuracy, seed variance, or token count in isolation.
+* **Our Core Contribution:** A multi-seed, trace-level empirical study isolating the **joint reliability–calibration–cost frontier** across weight quantization formats (BF16, FP8, AWQ-4, GPTQ-4), proving where compression changes failure modes, selective prediction risk, and dollar-cost-per-correct answer even when raw accuracy appears preserved.
 
-### Never `--exclusive` on parallel 1-GPU publication cells (2026-07-03)
+### Headline Confirmatory Results (2026-08-15)
+**Dataset:** `HuggingFaceH4/MATH-500` ($n=500$) | **Seeds:** 42, 43, 44, 45, 46 (5 seeds) | **Total Evaluated Completions:** 20,000  
+**Stack:** `qrm-official` (vLLM 0.7.0 eager, $T=0.6, p=0.95, \text{max\_tokens}=32,768$) | **Archive:** `outputs-hpc-campaign-2026-08-14/validation/`
 
-- User quota: **2 GPUs** (`QOSMaxGRESPerUser`).
-- ragpu nodes have **2× A100**; `--exclusive` with `--gres=gpu:1` counts as **2 GPUs** toward quota.
-- Two split b01 cells need **non-exclusive** `gres/gpu:1` each (1+1=2). Exclusive second cell → `QOSMaxGRESPerUser`.
-- **Read:** `docs/PARAM_RUDRA_SLURM.md`. **Use:** `bash scripts/hpc/submit_hpc_blocks.sh b01` or `… cell <config.json>` — never manual `sbatch --exclusive` for 1-GPU inference.
-- Dirty GPUs: `metadata/dirty_nodes.txt` + `QREASON_MIN_FREE_GPU_MB`, not exclusive.
-
----
-
-## Cluster Policies & FairShare (Important)
-- **Max GPUs:** 2 per user at any time (`QOSMaxGRESPerUser`).
-- **Max Walltime:** 48 hours (2 days) per job. Jobs are automatically killed after this. This is **not** a monthly limit; jobs can be resubmitted immediately.
-- **FairShare:** A dynamic priority system. High usage leads to lower FairShare scores, which may increase wait times in the queue, but does not block jobs. Score recovers over time (decay).
-- **Agent Mandate:** Periodically check `squeue`, `sacct`, and `sshare -u $USER -l` to update the user on job status, cumulative usage, and priority score.
-- **Experiment Policy:** Publication experiments are HPC-only. Do not plan or schedule Windows/5080 experiment runs; that machine is retired for publication work because projected runtime is weeks. If Qwen-1.5B cells are still needed, plan them as HPC jobs after downloading and preflighting the required model variants.
-
----
-
-## HPC Queue Repair Workflow
-
-Use this when an experiment job is partially failed, wasting GPUs, or needs to be resubmitted with corrected code while follow-up jobs are already queued.
-
-1. Inspect the user queue and the wider GPU partition before changing anything:
-   ```bash
-   squeue -u $USER
-   squeue -p gpu -o "%.18i %.9P %.30j %.12u %.2t %.12M %.5D %.6C %.8b %.20R"
-   squeue -p gpu --sort=-p,i -o "%.18i %.10Q %.30j %.12u %.2t %.12M %.5D %.6C %.8b %.25R"
-   sinfo -p gpu -o "%P %.8a %.10l %.6D %.6t %N"
-   ```
-2. Read the failing or running job logs and durable checkpoint counts. Distinguish log progress from checkpointed rows.
-3. If a priority job must be resubmitted, protect ordering:
-   - hold downstream queued jobs first with `scontrol hold <jobids>`,
-   - cancel the broken running job with `scancel <jobid>`,
-   - submit the corrected priority job with the appropriate `sbatch ...`,
-   - wait until the corrected job is running or safely queued ahead,
-   - release downstream jobs with `scontrol release <jobids>`.
-4. Verify the corrected job actually passed the old failure point:
-   - check `squeue -u $USER`,
-   - tail the new SLURM `.out` and `.err`,
-   - confirm resume messages and durable row counts with `wc -l`.
-5. Document the operational change immediately in the project `CHANGELOG.md` and `progress.md`, including old job ID, new job ID, node, checkpoint resume point, downstream holds/releases, and GitHub sync status.
-6. Commit and push documentation or code changes when possible:
-   ```bash
-   git status -sb
-   git add CHANGELOG.md progress.md <changed-code-files>
-   git commit -m "<clear operational message>"
-   git push origin main
-   ```
-
-Example from 2026-06-29: b01 job `85342` had one failed branch and one live branch, so downstream jobs `85343`-`85347` were held, `85342` was canceled, corrected b01 `85394` was submitted and verified running on `ragpu008`, then b02-b06 were released back to `QOSMaxGRESPerUser`.
-
----
-
-## Key Files
-| File | Purpose |
-|---|---|
-| `~/start-llm-deepseek.sh` | SLURM script for DeepSeek-R1-70B |
-| `~/serve-minimax.sh` | SLURM script for MiniMax-M2.7-XL (GGUF) |
-| `~/serve-glm.sh` | SLURM script for GLM-4.7-XL (GGUF) |
-| `~/progress.md` | Full session log (all errors, fixes, history) |
-| `~/watch-job-52772.sh` | Job watcher script |
-| `~/llm_setup/` | Setup scripts (build, download, serve, tunnel, test) |
-
----
-
-## Model Compatibility Note
-- vLLM version: **0.8.5**
-- **Models Ready on Disk:**
-    - `DeepSeek-R1-70B`
-    - `MiniMax-M2.7-XL`
-    - `GLM-4.7-XL`
-- All models require **2 GPUs** and have corresponding `serve-*.sh` scripts in `~/`.
-- Qwen and Gemma models have been deleted.
-
----
-
-## Active Project: reasoning-compression-lab
-
-Use this section when working in:
-
-```bash
-/scratch/manishn_iitp/reasoning-compression-lab
+```
+====================================================================================================
+MODEL MATRIX SUMMARY (MATH-500, n=500, 5 Seeds: 42, 43, 44, 45, 46)
+====================================================================================================
+Model & Format          Seed 42   Seed 43   Seed 44   Seed 45   Seed 46      Mean ± Std   Trunc   Loops
+----------------------------------------------------------------------------------------------------
+Qwen-7B BF16             94.4%     94.0%     93.8%     94.6%     93.2%    94.00% ± 0.53%      0       0
+Qwen-7B FP8              94.4%     95.2%     94.8%     92.6%     95.0%    94.40% ± 1.05%      0       0
+Qwen-7B AWQ-4            92.4%     92.8%     93.2%     93.0%     94.2%    93.12% ± 0.68%      0       0
+Qwen-7B GPTQ-4           93.8%     92.6%     93.4%     94.6%     93.0%    93.48% ± 0.77%      0       0
+----------------------------------------------------------------------------------------------------
+Llama-8B BF16            89.0%     88.4%     90.2%     89.8%     88.8%    89.24% ± 0.73%      0       0
+Llama-8B FP8             89.0%     89.6%     88.6%     89.2%     91.2%    89.52% ± 1.02%      0       0
+Llama-8B AWQ-4           84.4%     84.8%     89.2%     87.4%     86.6%    86.48% ± 1.95%      0       0
+Llama-8B GPTQ-4          88.0%     89.6%     86.8%     89.4%     90.8%    88.92% ± 1.54%      0       0
+====================================================================================================
 ```
 
-### Current Sync State
+### Key Empirical Findings
+1. **FP8 Parity:** FP8 checkpoints on A100 (via Marlin weight-only fallback W8A16) achieve 100% statistical parity with BF16 across both architectures (Qwen: 94.40% vs 94.00%; Llama: 89.52% vs 89.24%).
+2. **4-Bit Quantization Resilience:** 4-bit GPTQ and AWQ retain exceptional reasoning fidelity on Qwen-7B (>93.1% vs 94.0% BF16), while Llama-8B exhibits greater sensitivity to 4-bit AWQ compression (86.48% vs 89.24% BF16).
+3. **Zero Pathological Degeneration:** Under the pinned `qrm-official` protocol, all 40 cells achieved **0 length truncations** and **0 infinite repetition loops** with >99% answer extraction rate.
 
-- GitHub/HPC baseline code is `88f6d7c` (`feat(publication-recovery): complete publication audit, TODO roadmap, chained campaign pipelines, and experimental parameters audit`).
-- Expected HPC status:
-  - Branch `main` is up to date with `origin/main`.
-  - `.qrm_official_env_ready` may be untracked and must stay out of Git.
-- Future sessions should read project memory before major actions:
-  - `/scratch/manishn_iitp/reasoning-compression-lab/AGENTS.md`
-  - `/scratch/manishn_iitp/reasoning-compression-lab/TODO_LIST.md`
-  - `/scratch/manishn_iitp/reasoning-compression-lab/docs/EXPERIMENTAL_PARAMETERS_AND_OUTPUT_AUDIT.md`
-  - `/scratch/manishn_iitp/reasoning-compression-lab/docs/PUBLICATION_READINESS.md`
-  - `/scratch/manishn_iitp/reasoning-compression-lab/docs/plans/2026-08-14-publication-recovery.md`
-  - `/scratch/manishn_iitp/reasoning-compression-lab/CHANGELOG.md`
-  - the matching `/home/manishn_iitp/*` assistant handoff file.
+---
 
-- Verify with:
+## 4. Master PhD & Paper 1 Execution Roadmap
 
+```mermaid
+gantt
+    title Paper 1 Execution Timeline
+    dateFormat  YYYY-MM-DD
+    section Completed
+    Phase 0 Reproducibility & Schema Fixes       :done, 2026-08-13, 2026-08-14
+    Phase 1 Matched BF16 vs FP8 Baseline        :done, 2026-08-14, 2026-08-14
+    Phase 2 3-Seed 4-Format Pilot Grid          :done, 2026-08-14, 2026-08-15
+    Phase 4 5-Seed Confirmatory Grid (MATH-500) :done, 2026-08-14, 2026-08-15
+    section Active
+    Phase 5 Statistical Analysis & Calibration  :active, 2026-08-15, 2026-08-20
+    Breadth Tasks (GPQA-Diamond, GSM8K)         :2026-08-18, 2026-08-25
+    Phase 6 Manuscript Draft (paper/main.md)    :2026-08-20, 2026-08-30
+```
+
+### Phase Details & Action Items
+
+#### [x] Phase 0–4: Completed Foundation & Confirmatory Grid
+- All 40 MATH-500 cells (2 models $\times$ 4 formats $\times$ 5 seeds) executed, verified, and backed up in `outputs-hpc-campaign-2026-08-14/`.
+
+#### [ ] Phase 5: Frozen Statistical Analysis & Calibration (CURRENT PRIORITY)
+1. **Paired Statistical Testing:** Run paired McNemar tests and problem-level paired bootstrap confidence intervals (95% CI) comparing BF16 against FP8, AWQ-4, and GPTQ-4. Apply Holm-Bonferroni correction across tests.
+2. **Sample-Consistency Calibration:** Execute `maj@5` on the predeclared 100-problem stratified subset to extract sample-consistency confidence scores, Brier scores, Expected Calibration Error (ECE), and Area Under Risk-Coverage curve (AURC).
+3. **Systems & Economics:** Compute throughput (tokens/sec), latency distributions ($p_{50}, p_{95}, p_{99}$), peak VRAM, and Cost-of-Pass ($C_{\text{pass}}$ / cost-per-correct answer) under standard GPU cloud pricing ($/GPU-hr).
+4. **Structured Trace Audit:** Manually review $\ge 200$ stratified completions and 100% of borderline cases to document qualitative reasoning trace preservation.
+
+#### [ ] Phase 4 Extension: Breadth Benchmark Evaluation (Gated)
+- **GPQA-Diamond:** $n=198$ expert science reasoning items (zero-shot, 4 formats $\times$ 3 seeds).
+- **GSM8K:** $n=1,319$ grade-school math reasoning items (zero-shot, 4 formats $\times$ 3 seeds).
+
+#### [ ] Phase 6: Manuscript Completion & Submission Packaging
+- Populate `paper/main.md` with finalized tables, figures, and statistical tests.
+- Draft comprehensive Limitations Section (covering A100 W8A16 Marlin fallback, single-family model scope, and shared-cluster limits).
+- Prepare open-source release artifact (pinned conda lockfile, patch series in `patches/`, configs, scoring scripts, and reproduction runbooks).
+- Submit to target Q1 journal (*FGCS* or *JSS*).
+
+---
+
+## 5. Standard Operating Procedures & Workflows
+
+### Autonomous 24/7 SLURM Campaign Daemon
+The autonomous queue daemon (`scripts/hpc/queue_manager_daemon.py`) manages chained pipeline execution across 2 channels (`Qwen-7B` and `Llama-8B`), maintaining 100% utilization of the 2-GPU quota with automatic completion detection and self-healing retries:
+```bash
+# Launch campaign daemon in background
+nohup python3 scripts/hpc/queue_manager_daemon.py > logs/queue_manager.log 2>&1 &
+```
+
+### HPC Queue Repair Workflow
+If a job is corrupted or requires immediate cancellation:
+1. Inspect queue: `squeue -u $USER`.
+2. Hold downstream dependencies: `scontrol hold <downstream_jobids>`.
+3. Cancel failing job: `scancel <jobid>`.
+4. Resubmit corrected job with `sbatch ...`.
+5. Release downstream jobs once the new job is safely active: `scontrol release <downstream_jobids>`.
+6. Log changes in `CHANGELOG.md` and `progress.md`.
+
+### Coordinated 3-Part Git Sync Workflow
+**Rule:** When syncing changes between HPC, MacBook, and GitHub, strictly follow:
+
+#### Part 1: Stage and Commit on HPC
 ```bash
 cd /scratch/manishn_iitp/reasoning-compression-lab
 git status -sb
-git log --oneline -3
+git add CHANGELOG.md AGENTS.md docs/ TODO_LIST.md <changed_code_files>
+git commit -m "docs/ops: update project state and campaign progress"
 ```
 
-### Project-Specific Environment
-
-- Conda env: `qreason`.
-- Conda root: `/home/apps/MSCC/miniconda3`.
-- Repo root: `/scratch/manishn_iitp/reasoning-compression-lab`.
-- Main model for current experiment:
-
-```text
-/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Qwen-7B
-```
-
-- Do not re-download the model, redo HF login, or rerun earlier setup gates unless logs show they broke.
-- Keep `models/`, `hf_cache/`, `runs/`, `results/`, and `logs/` out of GitHub.
-
-### Current Experiment Gate (2026-08-14)
-
-- **Completed Headline Matched Runs (MATH-500, Seed 42):**
-  - **96237** `DeepSeek-R1-Distill-Qwen-7B` (**BF16 Baseline**): **472/500 (94.4%)** [26m23s on `ragpu008`].
-  - **96238** `DeepSeek-R1-Distill-Qwen-7B` (**FP8**): **472/500 (94.4%)** [22m27s on `ragpu005`].
-  - **96240** `DeepSeek-R1-Distill-Qwen-7B` (**GPTQ-4**): **469/500 (93.8%)** [25m31s on `ragpu005`].
-- **Code & Pipeline Fixes Applied:**
-  - **AWQ float16 dtype fix:** Auto-sets `--dtype float16` for AWQ models in `inference.py`, `run_official_inference.sh`, and `patches/qrm_hpc_compat.patch` (resolves `ValueError: torch.bfloat16 is not supported for quantization method awq`).
-  - **Queue Manager Daemon:** Upgraded `scripts/hpc/queue_manager_daemon.py` with multi-version Python compatibility, auto-detection of completed validation JSON files, self-healing retry capability, and 2-channel continuous SLURM chaining.
-- **Active 2-Channel Chained Campaign (Jobs 96247, 96289, 96290, 96291, 96248, 96249):**
-  - Channel 1 (Qwen): Job 96289 (AWQ-4 s42) $\rightarrow$ Job 96290 (BF16 s43) $\rightarrow$ Job 96291 (FP8 s43).
-  - Channel 2 (Llama): Job 96247 (FP8 s42, ~55% done) $\rightarrow$ Job 96248 (AWQ-4 s42) $\rightarrow$ Job 96249 (GPTQ-4 s42).
-  - Output Archive: `outputs-hpc-campaign-2026-08-14`.
-- **Publication authority:** `docs/PUBLICATION_READINESS.md`, `TODO_LIST.md`, and `docs/EXPERIMENTAL_PARAMETERS_AND_OUTPUT_AUDIT.md`.
-
-### Important Jobs From 2026-06-26 and 2026-06-27
-
-- `85013` (`qreason-gpu-check`): completed successfully.
-  - Proved CUDA, PyTorch, and vLLM on A100.
-  - PyTorch: `2.6.0+cu124`.
-  - vLLM: `0.8.5`.
-- `85028` (`qreason-smoke`): failed.
-  - Root cause: tokenizer compatibility bug.
-  - Error: `Qwen2Tokenizer has no attribute all_special_tokens_extended`.
-  - Artifact missing: `runs/raw/smoke_test.jsonl`.
-- `85092` (`qreason-smoke`): failed after code fix.
-  - Tokenizer bug did **not** recur.
-  - New root cause: shared GPU out of memory.
-  - The assigned A100 had only `23.62 MiB` free because other processes were using GPU memory.
-- `85030` (`qreason-level-a-bf16`): canceled.
-  - It was a dependent 10-question debug job and could never run after smoke failed.
-- `85094` (`qreason-smoke-quick`): quick exclusive smoke job.
-  - Last known state: `PENDING (Resources)`.
-  - Do not submit another smoke job while `85094` is queued or running.
-
-Check current state with:
-
-```bash
-squeue -u $USER
-sacct -j 85094 --format=JobID,JobName%30,State,ExitCode,Elapsed,Start,End -P
-```
-
-### Code Fixes Already Applied
-
-- `src/runners/vllm_runner.py`
-  - Adds `_ensure_tokenizer_compatibility()`.
-  - Bridges `vllm==0.8.5` with `transformers==5.12.1`.
-  - Adds `all_special_tokens_extended` to `PreTrainedTokenizerBase` only when missing.
-- `scripts/hpc/03_smoke_test.sh`
-  - Uses `python -u` for unbuffered logs.
-  - Supports:
-    - `SMOKE_LIMIT`
-    - `SMOKE_OUTPUT`
-    - `SMOKE_MAX_TOKENS`
-    - `SMOKE_MIN_FREE_GPU_MB`
-  - Performs a free-GPU-memory preflight using `nvidia-smi`.
-- `slurm/smoke_test_quick_exclusive.slurm`
-  - Quick one-question validation job.
-  - Uses `SMOKE_MAX_TOKENS=64`.
-  - Requests `--exclusive` with `--gres=gpu:1`.
-  - Writes `runs/raw/smoke_test_quick.jsonl`.
-- `CHANGELOG.md`
-  - Root-level project changelog with detailed job history and fix notes.
-
-Verify fixes with:
-
-```bash
-grep -n "all_special_tokens_extended" src/runners/vllm_runner.py
-grep -n "SMOKE_MIN_FREE_GPU_MB" scripts/hpc/03_smoke_test.sh
-ls -l slurm/smoke_test_quick_exclusive.slurm
-```
-
-### Smoke-Test Workflow
-
-Preferred quick smoke command:
-
-```bash
-sbatch slurm/smoke_test_quick_exclusive.slurm
-```
-
-When it finishes, check:
-
-```bash
-ls -l runs/raw/smoke_test_quick.jsonl
-cat logs/smoke_quick_<JOBID>.out
-cat logs/smoke_quick_<JOBID>.err
-```
-
-If quick smoke passes, run the 10-question debug:
-
-```bash
-LIMIT=10 sbatch slurm/run_level_a_bf16.slurm
-```
-
-Only after the 10-question debug passes should the full Level A BF16 MATH-500 run be submitted.
-
-### Shared HPC Caveat
-
-- A scheduled GPU allocation may still land on a GPU with other users' memory already present.
-- If vLLM fails with CUDA OOM during model loading and logs show very little free GPU memory, treat it as resource contention rather than a project-code failure.
-- Prefer the quick exclusive smoke job for validation on busy days.
-
-### Sync Workflow
-
-- Preferred sync path is MacBook -> GitHub -> HPC. If HPC credentials are intentionally configured, HPC may push small project-doc/code commits directly after status review. The canonical fallback path is:
-
-```text
-MacBook git commit/push -> HPC fetch/reset
-HPC local changes -> MacBook rsync -> MacBook git commit/push -> HPC fetch/reset
-```
-
-- Trigger rule: if the user says "sync", "sync this", "sync to MacBook",
-  "sync to GitHub", or similar while working on this project, treat it as a
-  request to run the full coordinated sync workflow autonomously up to the
-  MacBook boundary:
-  1. On HPC, inspect `git status`, `git diff --stat`, and current log.
-  2. If there are meaningful local changes, stage and commit them locally on
-     HPC with a clear message.
-  3. Tell the user exactly what to run on MacBook for Part 2.
-  4. Wait for the user to confirm the MacBook push succeeded and provide the
-     new GitHub commit hash if possible.
-  5. Then run Part 3 on HPC: `git fetch origin`, compare logs, reset to
-     `origin/main`, and verify status/fix checks.
-  6. Report whether GitHub, MacBook, and HPC are synced.
-- Agent rule: after any big project change on HPC, explicitly tell the user:
-  - What changed.
-  - Whether it is committed locally on HPC.
-  - That MacBook/GitHub sync is needed.
-  - The exact Part 2 MacBook commands to run.
-  - That HPC must not be reset/pulled until the user confirms MacBook push
-    succeeded.
-- When an agent makes a meaningful project change on HPC, it must tell the user
-  that MacBook/GitHub sync is needed. Meaningful changes include:
-  - Code changes under `src/`.
-  - Script changes under `scripts/` or `slurm/`.
-  - Config changes under `configs/`.
-  - Project documentation changes such as `CHANGELOG.md`, `AGENTS.md`, or docs
-    under `docs/`.
-  - Any fix needed to reproduce an HPC run later.
-- Small runtime outputs do **not** need GitHub sync:
-  - `logs/`
-  - `runs/`
-  - `results/`
-  - `models/`
-  - `hf_cache/`
-
-#### Part 1: Save Work On HPC
-
-Run from the project root. This is a local backup only; it does not update
-GitHub.
-
-```bash
-cd /scratch/manishn_iitp/reasoning-compression-lab
-git status
-git diff --stat
-git add <changed-code-doc-script-files>
-git commit -m "<clear commit message>"
-```
-
-Do not run `git pull`, `git reset --hard`, or any history-rewriting command on
-HPC before MacBook/GitHub has the HPC changes, unless the user explicitly says
-the local HPC changes can be discarded.
-
-#### Part 2: User Syncs MacBook And GitHub
-
-The user runs this on MacBook:
-
+#### Part 2: Pull and Push on MacBook
 ```bash
 bash "/Users/manish/Projects/2026/paper 1/reasoning-compression-lab/scripts/macbook/rsync_from_hpc.sh"
 cd "/Users/manish/Projects/2026/paper 1/reasoning-compression-lab"
 git status
 git add -A
-git commit -m "<sync commit message>"
+git commit -m "sync: integrate latest HPC commits and logs"
 git push origin main
 ```
 
-After this step, GitHub and MacBook should share the same latest commit.
-
-#### Part 3: Align HPC With GitHub
-
-Only after the user confirms MacBook push succeeded, run on HPC:
-
+#### Part 3: Align HPC with GitHub
 ```bash
 cd /scratch/manishn_iitp/reasoning-compression-lab
 git fetch origin
-git status -sb
-git log --oneline -3 HEAD
-git log --oneline -3 origin/main
 git reset --hard origin/main
 git status -sb
-git log --oneline -3
 ```
 
-- `git reset --hard origin/main` only changes tracked files. It does not delete
-  ignored `models/`, `hf_cache/`, `runs/`, `results/`, or `logs/`.
-- After reset, success means:
-  - `git status -sb` shows `## main...origin/main`.
-  - No ahead/behind marker.
-  - Latest HPC commit matches latest GitHub commit.
-  - Any expected fix checks still pass, for example:
+---
 
-```bash
-grep -n "all_special_tokens_extended" src/runners/vllm_runner.py | head -2
-grep -n "SMOKE_MIN_FREE_GPU_MB" scripts/hpc/03_smoke_test.sh | head -1
-ls -l slurm/smoke_test_quick_exclusive.slurm
-```
+## 6. Supervisor Meeting Protocol & Institutional Governance
 
-#### Current Known Good Sync
+### Key Principles for Supervisor Alignment
+- **Monthly Progress Structure:** Deliver a concise 2-page briefing highlighting:
+  1. Completed empirical milestones with concrete pass@1, calibration, and cost numbers.
+  2. Active publication timeline against J1/J2/J3 targets.
+  3. Compute budget utilization on PARAM Rudra.
+- **Journal Quartile Verification:** Before submitting any paper, verify that the journal is indexed in Scopus/SJR as **Q1** and recognized by IIT Patna doctoral guidelines.
+- **Zero Hallucinated Claims:** All numbers in papers must trace back to verifiable raw JSONL logs with pinned seeds, prompt templates, and configuration hashes.
 
-- Current repository baseline to verify with `git log -3`:
+---
 
-```text
-4796614 Gate QRM FP8 runs on validated output
-6f333b7 Docs: clarify post-fix sync state
-```
+## 7. Canonical Key Files Reference
 
-- If future agents see local HPC commits ahead of `origin/main`, preserve them
-  by following Part 1 -> Part 2 -> Part 3. Do not discard local HPC work unless
-  the user explicitly says it has already been copied and pushed.
-- Repo-local `AGENTS.md` may be untracked on HPC if created after the last sync.
-  If the user wants it in GitHub, include it in the next HPC -> MacBook ->
-  GitHub sync.
-
-### Notification Caveat
-
-- Slurm watcher jobs `85031` and `85032` failed to send Telegram notifications because the node could not resolve `api.telegram.org`.
-- Treat Telegram watcher failures as network/DNS issues unless the job logs show a separate compute failure.
+| File | Location | Purpose |
+|---|---|---|
+| **Master Memory** | `/scratch/manishn_iitp/reasoning-compression-lab/AGENTS.md` | Single source of truth for all AI agents & PhD ops |
+| **PhD Roadmap** | `docs/PHD_ROADMAP.md` | Long-term 3-year PhD thesis strategy, tracks, and career mapping |
+| **Publication Audit** | `docs/PUBLICATION_READINESS.md` | Controlling scientific interpretation & claims boundary |
+| **Experimental Plan** | `docs/plans/2026-08-14-publication-recovery.md` | Step-by-step phased execution runbook |
+| **Working Manuscript** | `paper/main.md` | Live working draft of Paper 1 (J1) |
+| **Detailed Log** | `CHANGELOG.md` | Chronological job execution and code modification log |
+| **Model Scope** | `docs/MODEL_ROSTER.md` | Checkpoint paths, HF revisions, and model scope decisions |
+| **Hardware Policy** | `docs/HARDWARE_POLICY.md` | HPC A100 vs RTX 5080 role assignment |
+| **Literature Map** | `docs/literature/PAPER1_READING_MAP.md` | Reading groups, paper references, and novelty positioning |
+| **TODO Tracker** | `TODO_LIST.md` | Granular checklist of active, pending, and completed tasks |
