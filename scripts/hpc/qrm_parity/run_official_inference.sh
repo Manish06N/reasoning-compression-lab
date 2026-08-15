@@ -103,9 +103,11 @@ elif [[ "$MODEL" == *"AWQ"* || "$MODEL" == *"awq"* ]]; then
   DTYPE_ARGS=(--dtype "float16")
 fi
 
+DATASET="${QRM_DATASET:-MATH-500}"
+
 python inference.py \
   --model "$MODEL" \
-  --dataset MATH-500 \
+  --dataset "$DATASET" \
   --max_samples "$MAX_SAMPLES" \
   --seed "$SEED" \
   --output_dir "$OFFICIAL_RUN_DIR" \
@@ -113,10 +115,11 @@ python inference.py \
   "${DTYPE_ARGS[@]}" \
   --overwrite
 
-RESULT_JSON="$OFFICIAL_RUN_DIR/MATH-500.jsonl"
+RESULT_JSON="$OFFICIAL_RUN_DIR/${DATASET}.jsonl"
+DATASET_CLEAN="$(echo "$DATASET" | tr '[:upper:]' '[:lower:]' | tr -d '-')"
 if [[ -f "$RESULT_JSON" ]]; then
-  RESULT_COPY="$OUTPUT_ROOT/qrm_official_${MODEL_NAME}_math500_n${MAX_SAMPLES}_seed${SEED}.json"
-  VALIDATION_REPORT="$OUTPUT_ROOT/validation/${MODEL_NAME}_math500_n${MAX_SAMPLES}_seed${SEED}.json"
+  RESULT_COPY="$OUTPUT_ROOT/qrm_official_${MODEL_NAME}_${DATASET_CLEAN}_n${MAX_SAMPLES}_seed${SEED}.json"
+  VALIDATION_REPORT="$OUTPUT_ROOT/validation/${MODEL_NAME}_${DATASET_CLEAN}_n${MAX_SAMPLES}_seed${SEED}.json"
   mkdir -p "$(dirname "$VALIDATION_REPORT")"
   python3 "$QR/scripts/hpc/qrm_parity/validate_official_results.py" \
     --result "$RESULT_JSON" \

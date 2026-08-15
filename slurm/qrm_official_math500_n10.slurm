@@ -14,6 +14,7 @@ cd "$QR"
 mkdir -p logs
 
 export QR
+export QRM_DATASET="${QRM_DATASET:-MATH-500}"
 export QRM_MAX_SAMPLES="${QRM_MAX_SAMPLES:-10}"
 export QRM_SEED="${QRM_SEED:-42}"
 export QRM_MODEL_PATH="${QRM_MODEL_PATH:-$QR/models/DeepSeek-R1-Distill-Qwen-7B}"
