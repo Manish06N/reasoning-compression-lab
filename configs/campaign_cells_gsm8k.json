@@ -1,0 +1,35 @@
+{
+  "task": "GSM8K",
+  "max_samples": 1319,
+  "output_root": "/scratch/manishn_iitp/reasoning-compression-lab/outputs-hpc-breadth-gsm8k-2026-08-15",
+  "channels": {
+    "qwen": [
+      {"name": "gsm-qwen-bf16-s42", "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Qwen-7B", "seed": 42, "format": "BF16"},
+      {"name": "gsm-qwen-fp8-s42",  "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Qwen-7B-FP8", "seed": 42, "format": "FP8"},
+      {"name": "gsm-qwen-awq4-s42", "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Qwen-7B-AWQ-4", "seed": 42, "format": "AWQ-4"},
+      {"name": "gsm-qwen-gptq4-s42","model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Qwen-7B-GPTQ-4", "seed": 42, "format": "GPTQ-4"},
+      {"name": "gsm-qwen-bf16-s43", "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Qwen-7B", "seed": 43, "format": "BF16"},
+      {"name": "gsm-qwen-fp8-s43",  "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Qwen-7B-FP8", "seed": 43, "format": "FP8"},
+      {"name": "gsm-qwen-awq4-s43", "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Qwen-7B-AWQ-4", "seed": 43, "format": "AWQ-4"},
+      {"name": "gsm-qwen-gptq4-s43","model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Qwen-7B-GPTQ-4", "seed": 43, "format": "GPTQ-4"},
+      {"name": "gsm-qwen-bf16-s44", "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Qwen-7B", "seed": 44, "format": "BF16"},
+      {"name": "gsm-qwen-fp8-s44",  "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Qwen-7B-FP8", "seed": 44, "format": "FP8"},
+      {"name": "gsm-qwen-awq4-s44", "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Qwen-7B-AWQ-4", "seed": 44, "format": "AWQ-4"},
+      {"name": "gsm-qwen-gptq4-s44","model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Qwen-7B-GPTQ-4", "seed": 44, "format": "GPTQ-4"}
+    ],
+    "llama": [
+      {"name": "gsm-llama-bf16-s42", "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Llama-8B", "seed": 42, "format": "BF16"},
+      {"name": "gsm-llama-fp8-s42",  "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Llama-8B-FP8", "seed": 42, "format": "FP8"},
+      {"name": "gsm-llama-awq4-s42", "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Llama-8B-AWQ-4", "seed": 42, "format": "AWQ-4"},
+      {"name": "gsm-llama-gptq4-s42","model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Llama-8B-GPTQ-4", "seed": 42, "format": "GPTQ-4"},
+      {"name": "gsm-llama-bf16-s43", "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Llama-8B", "seed": 43, "format": "BF16"},
+      {"name": "gsm-llama-fp8-s43",  "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Llama-8B-FP8", "seed": 43, "format": "FP8"},
+      {"name": "gsm-llama-awq4-s43", "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Llama-8B-AWQ-4", "seed": 43, "format": "AWQ-4"},
+      {"name": "gsm-llama-gptq4-s43","model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Llama-8B-GPTQ-4", "seed": 43, "format": "GPTQ-4"},
+      {"name": "gsm-llama-bf16-s44", "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Llama-8B", "seed": 44, "format": "BF16"},
+      {"name": "gsm-llama-fp8-s44",  "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Llama-8B-FP8", "seed": 44, "format": "FP8"},
+      {"name": "gsm-llama-awq4-s44", "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Llama-8B-AWQ-4", "seed": 44, "format": "AWQ-4"},
+      {"name": "gsm-llama-gptq4-s44","model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Llama-8B-GPTQ-4", "seed": 44, "format": "GPTQ-4"}
+    ]
+  }
+}

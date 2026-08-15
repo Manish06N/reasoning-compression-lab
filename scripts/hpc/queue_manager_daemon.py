@@ -1,25 +1,27 @@
 #!/usr/bin/env python3
 """
-Queue Manager Daemon with Real-Time Telegram Notifications for
-Reasoning Compression Lab Publication Campaign (24/7 Multi-Seed Evaluation).
+Autonomous 24/7 Queue Manager Daemon with Real-Time Telegram Notifications.
+Manages 2-Channel execution (1 GPU Qwen + 1 GPU Llama) on PARAM Rudra HPC.
 
 Features:
-- 24/7 Continuous Execution across 2 A100 GPUs (1 Qwen channel + 1 Llama channel).
+- Maintains exactly 1 running job per model family concurrently (2 GPUs total).
+- Chained dependencies with max 2 jobs queued per channel (avoids QOS submit limits).
+- Dynamic configuration for any task (MATH-500, GSM8K, GPQA-Diamond).
 - Real-time Telegram Notifications:
     * Job Submissions & Queue Chaining
-    * Job Started (with allocated node)
+    * Job Started (with assigned compute node)
     * Milestone Progress Updates (every ~20% or 100 prompts)
     * Job Completion with Pass@1 Accuracy & validation report details
-    * Job Failure alerts with error cause
     * Hourly Campaign Status Summary Dashboard
-- Self-healing retry for failed/missing cells.
-- Fully compatible with Python 3.6+ and Python 3.12+.
+- Self-healing retry for failed or preempted cells.
 """
 
+import argparse
 import json
 import os
 import re
 import subprocess
+import sys
 import time
 import urllib.error
 import urllib.parse
@@ -27,23 +29,17 @@ import urllib.request
 from pathlib import Path
 
 QR = Path(os.environ.get("QR", f"/scratch/{os.environ.get('USER', 'manishn_iitp')}/reasoning-compression-lab"))
-CELLS_FILE = QR / "configs" / "campaign_cells.json"
-OUTPUT_ROOT = QR / "outputs-hpc-campaign-2026-08-14"
-OUTPUT_ROOT.mkdir(parents=True, exist_ok=True)
-SLURM_SCRIPT = QR / "slurm" / "qrm_official_math500_n10.slurm"
-STATE_FILE = OUTPUT_ROOT / "campaign_state.json"
-VALIDATION_DIR = OUTPUT_ROOT / "validation"
-VALIDATION_DIR.mkdir(parents=True, exist_ok=True)
 LOGS_DIR = QR / "logs"
+LOGS_DIR.mkdir(parents=True, exist_ok=True)
+SLURM_SCRIPT = QR / "slurm" / "qrm_official_math500_n10.slurm"
 
-# Telegram credentials loader
+
 def get_telegram_credentials():
     token = os.environ.get("TG_TOKEN")
     chat_id = os.environ.get("TG_CHAT_ID")
     if token and chat_id:
         return token, chat_id
 
-    # Fallback to watch-job script in home directory
     watch_script = Path(os.path.expanduser("~/watch-job-52772.sh"))
     if watch_script.exists():
         content = watch_script.read_text()
@@ -116,14 +112,17 @@ def get_active_slurm_jobs():
         return []
 
 
-def is_cell_completed(cell):
+def is_cell_completed(cell, validation_dir, max_samples, task_name):
     """Checks if a cell produced a valid output report."""
     model_name = os.path.basename(cell["model"])
     seed = cell["seed"]
-    max_samples = 500
-    report_file = VALIDATION_DIR / f"{model_name}_math500_n{max_samples}_seed{seed}.json"
+    clean_task = task_name.lower().replace("-", "")
+    report_file = validation_dir / f"{model_name}_{clean_task}_n{max_samples}_seed{seed}.json"
     if not report_file.exists():
-        return False, None, None
+        # Also check fallback naming
+        report_file = validation_dir / f"{model_name}_math500_n{max_samples}_seed{seed}.json"
+        if not report_file.exists():
+            return False, None, None
 
     try:
         data = json.loads(report_file.read_text())
@@ -137,14 +136,13 @@ def is_cell_completed(cell):
     return False, None, None
 
 
-def get_job_progress(job_id):
+def get_job_progress(job_id, max_samples):
     """Parses live prompt progress from SLURM error log."""
     err_file = LOGS_DIR / f"qrm_official_{job_id}.err"
     if not err_file.exists():
         return None, None, None
 
     try:
-        # Read last 4KB to get the latest progress line
         with open(err_file, "rb") as f:
             f.seek(0, os.SEEK_END)
             size = f.tell()
@@ -153,7 +151,9 @@ def get_job_progress(job_id):
 
         for line in reversed(lines):
             if "Processed prompts:" in line:
-                m = re.search(r"Processed prompts:\s*(\d+)%.*?(\d+)/500.*?output:\s*([\d\.]+\s*toks/s)", line)
+                m = re.search(r"Processed prompts:\s*(\d+)%.*?(\d+)/" + str(max_samples) + r".*?output:\s*([\d\.]+\s*toks/s)", line)
+                if not m:
+                    m = re.search(r"Processed prompts:\s*(\d+)%.*?(\d+)/\d+.*?output:\s*([\d\.]+\s*toks/s)", line)
                 if m:
                     pct = int(m.group(1))
                     count = int(m.group(2))
@@ -164,7 +164,7 @@ def get_job_progress(job_id):
     return None, None, None
 
 
-def submit_cell(cell, prev_job_id=None):
+def submit_cell(cell, output_root, task_name, max_samples, prev_job_id=None):
     """Submits a single cell to SLURM with optional dependency."""
     cmd = [
         "sbatch",
@@ -176,9 +176,10 @@ def submit_cell(cell, prev_job_id=None):
     cmd.append(str(SLURM_SCRIPT))
 
     env = os.environ.copy()
+    env["QRM_DATASET"] = str(task_name)
     env["QRM_MODEL_PATH"] = cell["model"]
-    env["QRM_OUTPUT_ROOT"] = str(OUTPUT_ROOT)
-    env["QRM_MAX_SAMPLES"] = "500"
+    env["QRM_OUTPUT_ROOT"] = str(output_root)
+    env["QRM_MAX_SAMPLES"] = str(max_samples)
     env["QRM_SEED"] = str(cell["seed"])
 
     if "AWQ" in cell["model"] or "awq" in cell["model"].lower():
@@ -193,14 +194,13 @@ def submit_cell(cell, prev_job_id=None):
         job_id = out.strip()
         print(f"[queue_manager] ==> SUBMITTED {cell['name']} (Seed {cell['seed']}) -> SLURM Job {job_id}" + (f" [dep: {prev_job_id}]" if prev_job_id else " [ACTIVE]"))
         
-        # Send Telegram notification for submission
         dep_str = f" (Chained after Job {prev_job_id})" if prev_job_id else " (Active Immediately)"
         msg = (
             f"🚀 <b>SLURM Job Submitted</b>\n"
             f"• <b>Job Name:</b> <code>{cell['name']}</code>\n"
             f"• <b>Job ID:</b> <code>{job_id}</code>{dep_str}\n"
             f"• <b>Model:</b> <code>{os.path.basename(cell['model'])}</code>\n"
-            f"• <b>Dataset:</b> MATH-500 | <b>Seed:</b> {cell['seed']}"
+            f"• <b>Task:</b> {task_name} ($n={max_samples}$) | <b>Seed:</b> {cell['seed']}"
         )
         send_telegram(msg)
         return job_id
@@ -210,76 +210,80 @@ def submit_cell(cell, prev_job_id=None):
 
 
 class CampaignTracker:
-    def __init__(self):
+    def __init__(self, config_path):
+        self.config_path = Path(config_path)
+        self.config = json.loads(self.config_path.read_text())
+        self.task_name = self.config.get("task", "GSM8K")
+        self.max_samples = self.config.get("max_samples", 1319)
+        self.output_root = Path(self.config.get("output_root", QR / "outputs-hpc-breadth-gsm8k-2026-08-15"))
+        self.validation_dir = self.output_root / "validation"
+        self.output_root.mkdir(parents=True, exist_ok=True)
+        self.validation_dir.mkdir(parents=True, exist_ok=True)
+
+        self.qwen_cells = self.config["channels"]["qwen"]
+        self.llama_cells = self.config["channels"]["llama"]
+        self.all_cells = self.qwen_cells + self.llama_cells
+
         self.known_completed = set()
-        self.known_running = {}  # job_id -> node
-        self.last_progress_pct = {}  # job_id -> pct
+        self.known_running = {}
+        self.last_progress_pct = {}
         self.last_summary_time = 0
 
-    def load_initial_completed(self, cells):
-        for cell in cells:
-            done, acc, score = is_cell_completed(cell)
+        self.load_initial_completed()
+
+    def load_initial_completed(self):
+        for cell in self.all_cells:
+            done, acc, score = is_cell_completed(cell, self.validation_dir, self.max_samples, self.task_name)
             if done:
                 self.known_completed.add(cell["name"])
 
     def step(self):
-        if not CELLS_FILE.exists():
-            return
-
-        cells = json.loads(CELLS_FILE.read_text())
-        if not self.known_completed:
-            self.load_initial_completed(cells)
-
         active_jobs = get_active_slurm_jobs()
         total_active_queued = len(active_jobs)
         active_names = {j["name"]: j for j in active_jobs}
 
-        qwen_cells = [c for c in cells if c["channel"] == "qwen"]
-        llama_cells = [c for c in cells if c["channel"] == "llama"]
-
         print("\n" + "=" * 70)
-        print(f"[queue_manager] [{time.strftime('%Y-%m-%d %H:%M:%S')}] 24/7 Campaign Heartbeat")
-        print(f"[queue_manager] Active/Queued Jobs in SLURM: {total_active_queued}")
+        print(f"[queue_manager] [{time.strftime('%Y-%m-%d %H:%M:%S')}] 24/7 Breadth Campaign Heartbeat ({self.task_name})")
+        print(f"[queue_manager] Active/Queued Jobs in SLURM: {total_active_queued} | Completed: {len(self.known_completed)}/{len(self.all_cells)}")
 
-        # Check job status transitions & progress
+        # Check job transitions
         for j in active_jobs:
             jid = j["id"]
             jname = j["name"]
             jstate = j["state"]
             jnode = j["node"]
 
-            # Check if job started running
+            # Job started
             if jstate == "RUNNING" and jid not in self.known_running:
                 self.known_running[jid] = jnode
                 msg = (
                     f"▶️ <b>Job Started Running</b>\n"
                     f"• <b>Job Name:</b> <code>{jname}</code> (Job <code>{jid}</code>)\n"
                     f"• <b>Node:</b> <code>{jnode}</code>\n"
-                    f"• <b>Time:</b> {time.strftime('%H:%M:%S IST')}"
+                    f"• <b>Task:</b> {self.task_name} | <b>Time:</b> {time.strftime('%H:%M:%S IST')}"
                 )
                 send_telegram(msg)
 
-            # Check prompt progress
+            # Prompt progress
             if jstate == "RUNNING":
-                pct, count, speed = get_job_progress(jid)
+                pct, count, speed = get_job_progress(jid, self.max_samples)
                 if pct is not None:
                     last_pct = self.last_progress_pct.get(jid, 0)
-                    # Notify every ~20% milestone or on first progress
                     if pct >= last_pct + 20 or (last_pct == 0 and pct >= 10):
                         self.last_progress_pct[jid] = pct
                         msg = (
                             f"⏳ <b>Milestone Progress ({pct}%)</b>\n"
                             f"• <b>Job:</b> <code>{jname}</code> (<code>{jid}</code>)\n"
-                            f"• <b>Progress:</b> {count} / 500 prompts ({pct}%)\n"
+                            f"• <b>Progress:</b> {count} / {self.max_samples} prompts ({pct}%)\n"
                             f"• <b>Gen Speed:</b> <code>{speed}</code>\n"
                             f"• <b>Node:</b> <code>{jnode}</code> | <b>Elapsed:</b> {j['elapsed']}"
                         )
                         send_telegram(msg)
 
-        # Check for newly completed cells
-        for cell in cells:
+        # Check newly completed cells
+        for cell in self.all_cells:
             cname = cell["name"]
-            done, acc, score = is_cell_completed(cell)
+            done, acc, score = is_cell_completed(cell, self.validation_dir, self.max_samples, self.task_name)
             if done and cname not in self.known_completed:
                 self.known_completed.add(cname)
                 msg = (
@@ -287,66 +291,86 @@ class CampaignTracker:
                     f"• <b>Cell:</b> <code>{cname}</code>\n"
                     f"• <b>Model:</b> <code>{os.path.basename(cell['model'])}</code>\n"
                     f"• <b>Accuracy (Pass@1):</b> <b>{acc}</b> ({score})\n"
-                    f"• <b>Seed:</b> {cell['seed']} | <b>Dataset:</b> MATH-500 ($n=500$)"
+                    f"• <b>Seed:</b> {cell['seed']} | <b>Task:</b> {self.task_name} ($n={self.max_samples}$)"
                 )
                 send_telegram(msg)
 
-        # Queue Management across both channels
-        for channel_name, channel_cells in [("Qwen-7B", qwen_cells), ("Llama-8B", llama_cells)]:
+        # 2-Channel Autonomous Dispatching (1 GPU Qwen + 1 GPU Llama)
+        for channel_name, channel_cells in [("qwen", self.qwen_cells), ("llama", self.llama_cells)]:
+            # Filter active jobs matching this channel
             channel_active_jobs = [j for j in active_jobs if any(c["name"] == j["name"] for c in channel_cells)]
-            last_job_id_in_channel = None
+            last_job_id = None
             if channel_active_jobs:
                 sorted_jobs = sorted(channel_active_jobs, key=lambda x: int(x["id"]))
-                last_job_id_in_channel = sorted_jobs[-1]["id"]
+                last_job_id = sorted_jobs[-1]["id"]
 
             channel_job_count = len(channel_active_jobs)
 
             for cell in channel_cells:
                 cname = cell["name"]
-                done, acc, score = is_cell_completed(cell)
+                done, acc, score = is_cell_completed(cell, self.validation_dir, self.max_samples, self.task_name)
                 if done:
                     continue
 
                 if cname in active_names:
                     continue
 
-                # Max 3 queued per channel, max 6 queued total
-                if channel_job_count >= 3 or total_active_queued >= 6:
+                # Maintain at most 2 queued per channel (avoids QOS limit, guarantees 1 GPU per model)
+                if channel_job_count >= 2:
                     break
 
-                job_id = submit_cell(cell, prev_job_id=last_job_id_in_channel)
+                job_id = submit_cell(
+                    cell,
+                    output_root=self.output_root,
+                    task_name=self.task_name,
+                    max_samples=self.max_samples,
+                    prev_job_id=last_job_id
+                )
                 if job_id:
-                    last_job_id_in_channel = job_id
+                    last_job_id = job_id
                     channel_job_count += 1
                     total_active_queued += 1
                     active_names[cname] = {"id": job_id, "name": cname, "state": "PENDING", "node": "-", "elapsed": "0:00"}
 
-        # Periodic hourly summary ping
+        # Hourly status ping
         now = time.time()
         if now - self.last_summary_time > 3600:
             self.last_summary_time = now
             completed_count = len(self.known_completed)
-            total_cells = len(cells)
+            total_cells = len(self.all_cells)
             msg = (
-                f"📊 <b>24/7 Campaign Hourly Status</b>\n"
-                f"• <b>Completed Cells:</b> {completed_count} / {total_cells} ({completed_count / total_cells:.1%})\n"
+                f"📊 <b>24/7 Breadth Campaign Hourly Status</b>\n"
+                f"• <b>Task:</b> {self.task_name} ($n={self.max_samples}$)\n"
+                f"• <b>Completed:</b> {completed_count} / {total_cells} ({completed_count / max(1, total_cells):.1%})\n"
                 f"• <b>Active SLURM Jobs:</b> {total_active_queued}\n"
-                f"• <b>Channel 1 (Qwen):</b> {len([j for j in active_jobs if 'qwen' in j['name'].lower()])} queued/active\n"
-                f"• <b>Channel 2 (Llama):</b> {len([j for j in active_jobs if 'llama' in j['name'].lower()])} queued/active"
+                f"• <b>Channel 1 (Qwen):</b> {len([j for j in active_jobs if 'qwen' in j['name'].lower()])} active/queued\n"
+                f"• <b>Channel 2 (Llama):</b> {len([j for j in active_jobs if 'llama' in j['name'].lower()])} active/queued"
             )
             send_telegram(msg)
 
 
 def main():
-    print("[queue_manager] Starting Upgraded 24/7 Publication Queue Manager with Telegram Alerts...")
-    send_telegram("🔔 <b>24/7 Publication Queue Manager Daemon Active</b>\nAutonomous execution across 2 A100 channels initialized.")
-    tracker = CampaignTracker()
+    parser = argparse.ArgumentParser(description="Autonomous 24/7 HPC Queue Manager Daemon")
+    parser.add_argument("--config", type=str, default="configs/campaign_cells_gsm8k.json", help="Path to campaign cell config JSON")
+    args = parser.parse_args()
+
+    config_path = QR / args.config if not os.path.isabs(args.config) else Path(args.config)
+    print(f"[queue_manager] Starting 24/7 Queue Manager Daemon using config: {config_path}")
+    
+    tracker = CampaignTracker(config_path)
+    send_telegram(
+        f"🔔 <b>24/7 Breadth Queue Manager Daemon Active</b>\n"
+        f"• <b>Task:</b> {tracker.task_name} ($n={tracker.max_samples}$)\n"
+        f"• <b>Allocations:</b> 2 Channels (1 GPU Qwen + 1 GPU Llama)\n"
+        f"• <b>Total Cells:</b> {len(tracker.all_cells)} across 4 formats &amp; 3 seeds."
+    )
+
     while True:
         try:
             tracker.step()
         except Exception as e:
-            print(f"[queue_manager] Daemon loop error: {e}")
-        time.sleep(45)  # Poll every 45 seconds
+            print(f"[queue_manager] Error in daemon step: {e}")
+        time.sleep(45)
 
 
 if __name__ == "__main__":
