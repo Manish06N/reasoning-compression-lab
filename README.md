@@ -14,7 +14,9 @@
 This repository contains the official codebase, execution pipelines, statistical analysis tools, and open-source reproducibility artifacts for evaluating post-training quantization (BF16, FP8, AWQ-4, GPTQ-4) on long-form reasoning models (`DeepSeek-R1-Distill-Qwen-7B` and `DeepSeek-R1-Distill-Llama-8B`).
 
 ### Headline Confirmatory Accuracy Matrix (MATH-500, $n=500$, Seeds 42–46, 20,000 Completions)
-All 40 experimental cells under **Protocol P1-2026-08** (`vLLM 0.7.0` eager execution, $T=0.6, p=0.95, \text{max\_tokens}=32,768$) achieved **0 length truncations** and **0 infinite repetition loops**:
+Canonical preprint: [`paper/main.tex`](paper/main.tex) → [`paper/main.pdf`](paper/main.pdf) (12 pages). Scoreboard: [`results/README.md`](results/README.md). **88 cells / 56,408 completions** (MATH-500 40 + GSM8K 24 + GPQA-Diamond 24).
+
+All 40 MATH-500 cells under the pinned `qrm-official` stack (`vLLM 0.7.0` eager, $T=0.6, p=0.95, \text{max\_tokens}=32,768$) show **0 heuristic truncations** and **0 identical-word loops** (token-cap and consecutive-word detectors; official QRM rows do not store `finish_reason`):
 
 | Model & Format | Seed 42 | Seed 43 | Seed 44 | Seed 45 | Seed 46 | Mean ± Std | 95% Wilson CI | Truncations | Repetition Loops |
 |---|---|---|---|---|---|---|---|---|---|
@@ -27,18 +29,18 @@ All 40 experimental cells under **Protocol P1-2026-08** (`vLLM 0.7.0` eager exec
 | **Llama-8B AWQ-4** | 84.4% | 84.8% | 89.2% | 87.4% | 86.6% | **86.48% ± 1.96%** | [85.1%, 87.8%] | 0 | 0 |
 | **Llama-8B GPTQ-4** | 88.0% | 89.6% | 86.8% | 89.4% | 90.8% | **88.92% ± 1.55%** | [87.6%, 90.1%] | 0 | 0 |
 
-### Breadth Benchmark Results (GSM8K, $n=1,319$, Seeds 42–44)
-* **Qwen-7B:** BF16: 91.26% ± 0.23% | FP8: 91.33% ± 0.13% | AWQ-4: 91.05% ± 0.93% | GPTQ-4: 91.13% ± 0.22%
-* **Llama-8B:** BF16: 88.68% ± 0.38% | FP8: 88.80% ± 0.50% | AWQ-4: 87.11% ± 0.19% | GPTQ-4: 88.96% ± 0.58%
+### Breadth Benchmark Results (sample std over seeds)
+* **GSM8K** ($n=1{,}319$, 3 seeds): Qwen BF16 $91.26\% \pm 0.29\%$; FP8 $91.33\% \pm 0.16\%$; AWQ-4 $91.05\% \pm 1.14\%$; GPTQ-4 $91.13\% \pm 0.27\%$. Llama BF16 $88.68\% \pm 0.46\%$; FP8 $88.80\% \pm 0.62\%$; AWQ-4 $87.11\% \pm 0.23\%$; GPTQ-4 $88.96\% \pm 0.70\%$.
+* **GPQA-Diamond** ($n=198$, 3 seeds): Qwen BF16 $50.34\% \pm 2.96\%$; FP8 $49.49\% \pm 1.52\%$; AWQ-4 $44.78\% \pm 3.04\%$; GPTQ-4 $47.98\% \pm 1.75\%$. Llama BF16 $46.13\% \pm 1.91\%$; FP8 $47.81\% \pm 0.29\%$; AWQ-4 $46.97\% \pm 2.02\%$; GPTQ-4 $44.95\% \pm 4.32\%$.
 
 ---
 
 ## 2. Key Scientific Findings
 
-1. **FP8 Statistical Parity:** On NVIDIA A100 GPUs (via Marlin W8A16 fallback), FP8 achieves complete statistical parity with full-precision BF16 baselines across both architectures (exact paired McNemar tests show no significant discordance under Holm-Bonferroni correction, $p > 0.05$).
-2. **Architecture Quantization Resilience:** Qwen-7B demonstrates superior robustness to 4-bit compression (>93.1% accuracy preserved), whereas Llama-8B exhibits higher sensitivity to 4-bit AWQ compression (86.48% vs 89.24% BF16).
-3. **Zero Pathological Degenerations:** Pinned eager execution with a 32,768-token budget eliminated the catastrophic context-cap truncations and repetition loops previously reported in uncalibrated serving configurations.
-4. **Token Inflation & Cost-of-Pass ($C_{\text{pass}}$):** 4-bit quantization introduces a $+3.9\%$ to $+6.5\%$ token inflation penalty, shifting the Pareto frontier such that **FP8 consistently delivers the optimal dollar-cost-per-correct answer**.
+1. **FP8 vs BF16 (maj@5 McNemar):** On A100 Marlin W8A16 (not native W8A8), paired McNemar tests on *maj@5* find no significant discordance after Holm–Bonferroni ($p > 0.29$). That is not a test of pass@1 means. Llama AWQ-4 still drops $2.76$ pp on mean pass@1.
+2. **Architecture sensitivity:** Qwen-7B 4-bit stays above $93.1\%$ on MATH-500; Llama-8B AWQ-4 is the weak cell ($86.48\%$ vs $89.24\%$ BF16).
+3. **Pathology heuristics:** Token-cap and identical-word detectors flag 0/0 across all 88 cells. Phrase-level loops and `finish_reason=length` are not in the saved schema.
+4. **Token inflation & modeled $C_{\text{pass}}$:** Full-grid MATH-500 4-bit inflation is $+1.7\%$ to $+6.8\%$ vs BF16; the 200-item audit subset is $+10\%$ to $+30\%$. Cost-of-Pass is modeled at $\$1.50$/A100-h and $65$ tok/s (not measured wall-clock). Under that model, FP8 is lowest $C_{\mathrm{pass}}$.
 
 ---
 
@@ -51,7 +53,7 @@ reasoning-compression-lab/
 │   ├── literature/        # Reading maps and base paper summaries
 │   ├── supervisor/        # Monthly PhD briefing reports
 │   └── PHD_ROADMAP.md     # 3-year PhD thesis strategy
-├── paper/                 # Live working manuscript (paper/main.md)
+├── paper/                 # Canonical LaTeX (`main.tex` → `main.pdf`); markdown mirror `main.md`
 ├── paper_figures/         # Vector PDF and PNG publication plots (Figures 1–4)
 ├── results/               # Statistical analysis, calibration, and trace audit JSON reports
 ├── scripts/

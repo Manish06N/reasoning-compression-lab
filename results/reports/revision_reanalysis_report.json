@@ -1,0 +1,2858 @@
+{
+  "meta": {
+    "loop_threshold": 20,
+    "token_cap": 32768,
+    "near_cap_threshold": 32500,
+    "n_boot": 10000,
+    "equiv_margin_pp": 1.0,
+    "extracted_answers_available": false,
+    "schema_note": "Released JSON has extractive_match, completion_tokens, repetition_flag; no answer strings or finish_reason."
+  },
+  "math500": {
+    "benchmark": "math500",
+    "n_items": 500,
+    "seeds": [
+      42,
+      43,
+      44,
+      45,
+      46
+    ],
+    "summary_statistics": {
+      "Qwen-7B_BF16": {
+        "seed_accs": {
+          "42": 94.39999999999999,
+          "43": 94.0,
+          "44": 93.8,
+          "45": 94.6,
+          "46": 93.2
+        },
+        "mean_acc": 94.0,
+        "std_acc": 0.5477225575051622,
+        "pooled_correct": 2350,
+        "wilson_ci_95": [
+          92.99983090311017,
+          94.86515720345298
+        ],
+        "clustered_acc_ci95": [
+          92.24,
+          95.64000000000006
+        ],
+        "mean_tokens": 4011.3608,
+        "loops": 0,
+        "token_limit_hits": 0,
+        "near_cap": 14,
+        "near_cap_unboxed": 14,
+        "max_completion_tokens": 32731,
+        "max_consecutive_word_run": 19,
+        "flagged_rows": []
+      },
+      "Qwen-7B_FP8": {
+        "seed_accs": {
+          "42": 94.39999999999999,
+          "43": 95.19999999999999,
+          "44": 94.8,
+          "45": 92.60000000000001,
+          "46": 95.0
+        },
+        "mean_acc": 94.4,
+        "std_acc": 1.0488088481701454,
+        "pooled_correct": 2360,
+        "wilson_ci_95": [
+          93.42872281831372,
+          95.2350379074
+        ],
+        "clustered_acc_ci95": [
+          92.76000000000003,
+          95.96000000000001
+        ],
+        "mean_tokens": 4007.6744,
+        "loops": 0,
+        "token_limit_hits": 0,
+        "near_cap": 15,
+        "near_cap_unboxed": 12,
+        "max_completion_tokens": 32728,
+        "max_consecutive_word_run": 19,
+        "flagged_rows": []
+      },
+      "Qwen-7B_AWQ-4": {
+        "seed_accs": {
+          "42": 92.4,
+          "43": 92.80000000000001,
+          "44": 93.2,
+          "45": 93.0,
+          "46": 94.19999999999999
+        },
+        "mean_acc": 93.12,
+        "std_acc": 0.6723094525588571,
+        "pooled_correct": 2328,
+        "wilson_ci_95": [
+          92.06021322767099,
+          94.04747511676089
+        ],
+        "clustered_acc_ci95": [
+          91.36000000000006,
+          94.84000000000005
+        ],
+        "mean_tokens": 4265.3196,
+        "loops": 1,
+        "token_limit_hits": 0,
+        "near_cap": 25,
+        "near_cap_unboxed": 23,
+        "max_completion_tokens": 32733,
+        "max_consecutive_word_run": 20,
+        "flagged_rows": [
+          {
+            "seed": 43,
+            "row": 150,
+            "completion_tokens": 4023,
+            "max_consecutive_word_run": 20,
+            "boxed": true,
+            "extractive_match": 1.0
+          }
+        ]
+      },
+      "Qwen-7B_GPTQ-4": {
+        "seed_accs": {
+          "42": 93.8,
+          "43": 92.60000000000001,
+          "44": 93.4,
+          "45": 94.6,
+          "46": 93.0
+        },
+        "mean_acc": 93.47999999999999,
+        "std_acc": 0.7694153624668488,
+        "pooled_correct": 2337,
+        "wilson_ci_95": [
+          92.44399065622463,
+          94.38259304544275
+        ],
+        "clustered_acc_ci95": [
+          91.68,
+          95.16100000000004
+        ],
+        "mean_tokens": 4287.230799999999,
+        "loops": 0,
+        "token_limit_hits": 0,
+        "near_cap": 24,
+        "near_cap_unboxed": 19,
+        "max_completion_tokens": 32729,
+        "max_consecutive_word_run": 16,
+        "flagged_rows": []
+      },
+      "Llama-8B_BF16": {
+        "seed_accs": {
+          "42": 89.0,
+          "43": 88.4,
+          "44": 90.2,
+          "45": 89.8,
+          "46": 88.8
+        },
+        "mean_acc": 89.24,
+        "std_acc": 0.7402702209328691,
+        "pooled_correct": 2231,
+        "wilson_ci_95": [
+          87.96455105344518,
+          90.39504288522613
+        ],
+        "clustered_acc_ci95": [
+          87.16000000000005,
+          91.24000000000005
+        ],
+        "mean_tokens": 4656.5912,
+        "loops": 3,
+        "token_limit_hits": 0,
+        "near_cap": 19,
+        "near_cap_unboxed": 14,
+        "max_completion_tokens": 32731,
+        "max_consecutive_word_run": 10528,
+        "flagged_rows": [
+          {
+            "seed": 42,
+            "row": 492,
+            "completion_tokens": 32685,
+            "max_consecutive_word_run": 10528,
+            "boxed": false,
+            "extractive_match": 0.0
+          },
+          {
+            "seed": 43,
+            "row": 150,
+            "completion_tokens": 5357,
+            "max_consecutive_word_run": 20,
+            "boxed": true,
+            "extractive_match": 0.0
+          },
+          {
+            "seed": 44,
+            "row": 150,
+            "completion_tokens": 8356,
+            "max_consecutive_word_run": 20,
+            "boxed": true,
+            "extractive_match": 1.0
+          }
+        ]
+      },
+      "Llama-8B_FP8": {
+        "seed_accs": {
+          "42": 89.0,
+          "43": 89.60000000000001,
+          "44": 88.6,
+          "45": 89.2,
+          "46": 91.2
+        },
+        "mean_acc": 89.52000000000001,
+        "std_acc": 1.0059821071967459,
+        "pooled_correct": 2238,
+        "wilson_ci_95": [
+          88.25810115219682,
+          90.6606336198799
+        ],
+        "clustered_acc_ci95": [
+          87.4,
+          91.56000000000006
+        ],
+        "mean_tokens": 4550.7908,
+        "loops": 3,
+        "token_limit_hits": 0,
+        "near_cap": 10,
+        "near_cap_unboxed": 8,
+        "max_completion_tokens": 32725,
+        "max_consecutive_word_run": 10522,
+        "flagged_rows": [
+          {
+            "seed": 42,
+            "row": 150,
+            "completion_tokens": 6206,
+            "max_consecutive_word_run": 20,
+            "boxed": true,
+            "extractive_match": 1.0
+          },
+          {
+            "seed": 42,
+            "row": 443,
+            "completion_tokens": 32725,
+            "max_consecutive_word_run": 10522,
+            "boxed": false,
+            "extractive_match": 0.0
+          },
+          {
+            "seed": 44,
+            "row": 150,
+            "completion_tokens": 6640,
+            "max_consecutive_word_run": 20,
+            "boxed": true,
+            "extractive_match": 1.0
+          }
+        ]
+      },
+      "Llama-8B_AWQ-4": {
+        "seed_accs": {
+          "42": 84.39999999999999,
+          "43": 84.8,
+          "44": 89.2,
+          "45": 87.4,
+          "46": 86.6
+        },
+        "mean_acc": 86.47999999999999,
+        "std_acc": 1.9626512680555395,
+        "pooled_correct": 2162,
+        "wilson_ci_95": [
+          85.08352245512822,
+          87.76454041140414
+        ],
+        "clustered_acc_ci95": [
+          84.24000000000005,
+          88.6800000000001
+        ],
+        "mean_tokens": 4736.4572,
+        "loops": 3,
+        "token_limit_hits": 0,
+        "near_cap": 12,
+        "near_cap_unboxed": 11,
+        "max_completion_tokens": 32737,
+        "max_consecutive_word_run": 7101,
+        "flagged_rows": [
+          {
+            "seed": 45,
+            "row": 42,
+            "completion_tokens": 8769,
+            "max_consecutive_word_run": 20,
+            "boxed": true,
+            "extractive_match": 1.0
+          },
+          {
+            "seed": 45,
+            "row": 112,
+            "completion_tokens": 32475,
+            "max_consecutive_word_run": 7101,
+            "boxed": false,
+            "extractive_match": 0.0
+          },
+          {
+            "seed": 46,
+            "row": 224,
+            "completion_tokens": 32698,
+            "max_consecutive_word_run": 6201,
+            "boxed": false,
+            "extractive_match": 0.0
+          }
+        ]
+      },
+      "Llama-8B_GPTQ-4": {
+        "seed_accs": {
+          "42": 88.0,
+          "43": 89.60000000000001,
+          "44": 86.8,
+          "45": 89.4,
+          "46": 90.8
+        },
+        "mean_acc": 88.92,
+        "std_acc": 1.546609194334498,
+        "pooled_correct": 2223,
+        "wilson_ci_95": [
+          87.62937907112573,
+          90.09119677222513
+        ],
+        "clustered_acc_ci95": [
+          86.88000000000005,
+          90.9200000000001
+        ],
+        "mean_tokens": 4840.5028,
+        "loops": 2,
+        "token_limit_hits": 0,
+        "near_cap": 21,
+        "near_cap_unboxed": 19,
+        "max_completion_tokens": 32731,
+        "max_consecutive_word_run": 4308,
+        "flagged_rows": [
+          {
+            "seed": 44,
+            "row": 222,
+            "completion_tokens": 11133,
+            "max_consecutive_word_run": 3865,
+            "boxed": true,
+            "extractive_match": 1.0
+          },
+          {
+            "seed": 45,
+            "row": 222,
+            "completion_tokens": 14772,
+            "max_consecutive_word_run": 4308,
+            "boxed": true,
+            "extractive_match": 1.0
+          }
+        ]
+      }
+    },
+    "pass1_contrasts": [
+      {
+        "contrast": "Qwen-7B BF16 vs FP8",
+        "model": "Qwen-7B",
+        "format": "FP8",
+        "delta": 0.003999999999999999,
+        "delta_pp": 0.3999999999999999,
+        "ci95_lo_pp": -0.4799999999999994,
+        "ci95_hi_pp": 1.2800000000000005,
+        "ci90_lo_pp": -0.31999999999999995,
+        "ci90_hi_pp": 1.1200000000000006,
+        "p_value": 0.3828,
+        "excludes_zero": false,
+        "tost_equiv_1pp": true,
+        "n11": 467,
+        "n10": 5,
+        "n01": 8,
+        "n00": 20,
+        "mcnemar_p": 0.5810546875,
+        "holm_alpha_pass1": 0.016666666666666666,
+        "holm_significant_pass1": false,
+        "holm_alpha_mcnemar": 0.01,
+        "holm_significant_mcnemar": false
+      },
+      {
+        "contrast": "Qwen-7B BF16 vs AWQ-4",
+        "model": "Qwen-7B",
+        "format": "AWQ-4",
+        "delta": -0.0088,
+        "delta_pp": -0.88,
+        "ci95_lo_pp": -1.8800000000000001,
+        "ci95_hi_pp": 0.07999999999999992,
+        "ci90_lo_pp": -1.680000000000001,
+        "ci90_hi_pp": -0.08000000000000004,
+        "p_value": 0.069,
+        "excludes_zero": false,
+        "tost_equiv_1pp": true,
+        "n11": 463,
+        "n10": 9,
+        "n01": 9,
+        "n00": 19,
+        "mcnemar_p": 1.0,
+        "holm_alpha_pass1": 0.01,
+        "holm_significant_pass1": false,
+        "holm_alpha_mcnemar": 0.016666666666666666,
+        "holm_significant_mcnemar": false
+      },
+      {
+        "contrast": "Qwen-7B BF16 vs GPTQ-4",
+        "model": "Qwen-7B",
+        "format": "GPTQ-4",
+        "delta": -0.005199999999999999,
+        "delta_pp": -0.5199999999999999,
+        "ci95_lo_pp": -1.4000000000000008,
+        "ci95_hi_pp": 0.36,
+        "ci90_lo_pp": -1.28,
+        "ci90_hi_pp": 0.2000000000000001,
+        "p_value": 0.2454,
+        "excludes_zero": false,
+        "tost_equiv_1pp": true,
+        "n11": 466,
+        "n10": 6,
+        "n01": 4,
+        "n00": 24,
+        "mcnemar_p": 0.75390625,
+        "holm_alpha_pass1": 0.0125,
+        "holm_significant_pass1": false,
+        "holm_alpha_mcnemar": 0.0125,
+        "holm_significant_mcnemar": false
+      },
+      {
+        "contrast": "Llama-8B BF16 vs FP8",
+        "model": "Llama-8B",
+        "format": "FP8",
+        "delta": 0.0027999999999999995,
+        "delta_pp": 0.27999999999999997,
+        "ci95_lo_pp": -0.9200000000000002,
+        "ci95_hi_pp": 1.48,
+        "ci90_lo_pp": -0.7199999999999996,
+        "ci90_hi_pp": 1.28,
+        "p_value": 0.6474,
+        "excludes_zero": false,
+        "tost_equiv_1pp": true,
+        "n11": 445,
+        "n10": 11,
+        "n01": 10,
+        "n00": 34,
+        "mcnemar_p": 1.0,
+        "holm_alpha_pass1": 0.05,
+        "holm_significant_pass1": false,
+        "holm_alpha_mcnemar": 0.025,
+        "holm_significant_mcnemar": false
+      },
+      {
+        "contrast": "Llama-8B BF16 vs AWQ-4",
+        "model": "Llama-8B",
+        "format": "AWQ-4",
+        "delta": -0.027600000000000003,
+        "delta_pp": -2.7600000000000002,
+        "ci95_lo_pp": -4.159999999999997,
+        "ci95_hi_pp": -1.4399999999999995,
+        "ci90_lo_pp": -3.9199999999999973,
+        "ci90_hi_pp": -1.6399999999999997,
+        "p_value": 0.0,
+        "excludes_zero": true,
+        "tost_equiv_1pp": true,
+        "n11": 436,
+        "n10": 20,
+        "n01": 13,
+        "n00": 31,
+        "mcnemar_p": 0.296206368599087,
+        "holm_alpha_pass1": 0.008333333333333333,
+        "holm_significant_pass1": true,
+        "holm_alpha_mcnemar": 0.008333333333333333,
+        "holm_significant_mcnemar": false
+      },
+      {
+        "contrast": "Llama-8B BF16 vs GPTQ-4",
+        "model": "Llama-8B",
+        "format": "GPTQ-4",
+        "delta": -0.0032,
+        "delta_pp": -0.32,
+        "ci95_lo_pp": -1.5600000000000007,
+        "ci95_hi_pp": 0.9599999999999997,
+        "ci90_lo_pp": -1.3600000000000005,
+        "ci90_hi_pp": 0.7200000000000002,
+        "p_value": 0.6188,
+        "excludes_zero": false,
+        "tost_equiv_1pp": true,
+        "n11": 444,
+        "n10": 12,
+        "n01": 12,
+        "n00": 32,
+        "mcnemar_p": 1.0,
+        "holm_alpha_pass1": 0.025,
+        "holm_significant_pass1": false,
+        "holm_alpha_mcnemar": 0.05,
+        "holm_significant_mcnemar": false
+      }
+    ],
+    "token_analysis": {
+      "Qwen-7B_FP8": {
+        "ratio_of_means_pct": -0.09189898849288891,
+        "mean_of_per_item_ratios_pct": 3.95323178751803,
+        "mean_paired_delta_tokens": -3.686400000000003,
+        "median_paired_delta_tokens": -0.5,
+        "delta_ci95": [
+          -142.02095000000008,
+          134.20270000000005
+        ],
+        "iqr_delta": [
+          -289.39999999999986,
+          368.1999999999998
+        ],
+        "p90_delta": 996.4600000000006,
+        "p95_delta": 1959.9600000000012,
+        "strata": {
+          "both_correct": {
+            "n": 2297,
+            "mean": 50.71397474967349,
+            "median": 17.0,
+            "p90": 1506.000000000001,
+            "p95": 2441.399999999997
+          },
+          "bf16_only": {
+            "n": 53,
+            "mean": 5444.301886792453,
+            "median": 3820.0,
+            "p90": 18205.999999999993,
+            "p95": 26387.399999999998
+          },
+          "quant_only": {
+            "n": 63,
+            "mean": -6940.126984126984,
+            "median": -4351.0,
+            "p90": 2233.3999999999974,
+            "p95": 5585.999999999996
+          },
+          "both_wrong": {
+            "n": 87,
+            "mean": 264.0689655172414,
+            "median": -23.0,
+            "p90": 12379.400000000001,
+            "p95": 15883.1
+          }
+        },
+        "old_200_even_seed42": {
+          "mean_of_ratios_pct": 11.409588375318357,
+          "ratio_of_means_pct": -3.4265025303338636
+        }
+      },
+      "Qwen-7B_AWQ-4": {
+        "ratio_of_means_pct": 6.3309887258209185,
+        "mean_of_per_item_ratios_pct": 7.010033943478455,
+        "mean_paired_delta_tokens": 253.95880000000002,
+        "median_paired_delta_tokens": 50.200000000000045,
+        "delta_ci95": [
+          116.27762000000006,
+          397.69107999999966
+        ],
+        "iqr_delta": [
+          -252.25,
+          455.94999999999993
+        ],
+        "p90_delta": 1499.1400000000006,
+        "p95_delta": 2935.2900000000022,
+        "strata": {
+          "both_correct": {
+            "n": 2272,
+            "mean": 166.10519366197184,
+            "median": 36.5,
+            "p90": 1694.4000000000005,
+            "p95": 3087.5999999999985
+          },
+          "bf16_only": {
+            "n": 78,
+            "mean": 6914.51282051282,
+            "median": 3901.5,
+            "p90": 22435.899999999998,
+            "p95": 27491.850000000006
+          },
+          "quant_only": {
+            "n": 56,
+            "mean": -6533.392857142857,
+            "median": -3096.5,
+            "p90": 2593.5,
+            "p95": 3162.25
+          },
+          "both_wrong": {
+            "n": 94,
+            "mean": 894.0851063829788,
+            "median": 213.5,
+            "p90": 10942.400000000001,
+            "p95": 15107.849999999986
+          }
+        },
+        "old_200_even_seed42": {
+          "mean_of_ratios_pct": 19.812559523619623,
+          "ratio_of_means_pct": 9.318275194314785
+        }
+      },
+      "Qwen-7B_GPTQ-4": {
+        "ratio_of_means_pct": 6.877217327346874,
+        "mean_of_per_item_ratios_pct": 7.416120478703414,
+        "mean_paired_delta_tokens": 275.87,
+        "median_paired_delta_tokens": 4.400000000000091,
+        "delta_ci95": [
+          121.32507999999996,
+          431.34554999999966
+        ],
+        "iqr_delta": [
+          -228.94999999999993,
+          432.20000000000005
+        ],
+        "p90_delta": 1557.200000000001,
+        "p95_delta": 3381.240000000003,
+        "strata": {
+          "both_correct": {
+            "n": 2284,
+            "mean": 136.36646234676007,
+            "median": -12.0,
+            "p90": 1507.699999999998,
+            "p95": 2791.9999999999964
+          },
+          "bf16_only": {
+            "n": 66,
+            "mean": 6891.772727272727,
+            "median": 3407.5,
+            "p90": 26215.5,
+            "p95": 27591.25
+          },
+          "quant_only": {
+            "n": 53,
+            "mean": -4910.0,
+            "median": -4586.0,
+            "p90": 7787.799999999994,
+            "p95": 11467.999999999996
+          },
+          "both_wrong": {
+            "n": 97,
+            "mean": 1892.6494845360826,
+            "median": 1062.0,
+            "p90": 11881.4,
+            "p95": 14662.800000000008
+          }
+        },
+        "old_200_even_seed42": {
+          "mean_of_ratios_pct": 21.137132681072824,
+          "ratio_of_means_pct": 9.528890957965185
+        }
+      },
+      "Llama-8B_FP8": {
+        "ratio_of_means_pct": -2.272056864257277,
+        "mean_of_per_item_ratios_pct": 3.2290287615371227,
+        "mean_paired_delta_tokens": -105.8004,
+        "median_paired_delta_tokens": -29.200000000000045,
+        "delta_ci95": [
+          -283.83551000000006,
+          64.94140999999998
+        ],
+        "iqr_delta": [
+          -498.34999999999997,
+          399.35
+        ],
+        "p90_delta": 1306.72,
+        "p95_delta": 2699.530000000001,
+        "strata": {
+          "both_correct": {
+            "n": 2121,
+            "mean": 37.77133427628477,
+            "median": 5.0,
+            "p90": 1966.0,
+            "p95": 3532.0
+          },
+          "bf16_only": {
+            "n": 110,
+            "mean": 2629.2545454545457,
+            "median": 556.5,
+            "p90": 13028.499999999998,
+            "p95": 16806.699999999997
+          },
+          "quant_only": {
+            "n": 117,
+            "mean": -4159.290598290599,
+            "median": -1179.0,
+            "p90": 3677.000000000005,
+            "p95": 4985.8
+          },
+          "both_wrong": {
+            "n": 152,
+            "mean": -968.3881578947369,
+            "median": 0.0,
+            "p90": 6821.900000000001,
+            "p95": 10132.34999999999
+          }
+        },
+        "old_200_even_seed42": {
+          "mean_of_ratios_pct": 10.205490581272292,
+          "ratio_of_means_pct": -6.481245973809258
+        }
+      },
+      "Llama-8B_AWQ-4": {
+        "ratio_of_means_pct": 1.7151172729098496,
+        "mean_of_per_item_ratios_pct": 7.251767003195098,
+        "mean_paired_delta_tokens": 79.86599999999999,
+        "median_paired_delta_tokens": 10.700000000000045,
+        "delta_ci95": [
+          -108.99969999999996,
+          268.18764000000033
+        ],
+        "iqr_delta": [
+          -423.79999999999995,
+          618.05
+        ],
+        "p90_delta": 1909.1400000000003,
+        "p95_delta": 3494.5700000000006,
+        "strata": {
+          "both_correct": {
+            "n": 2052,
+            "mean": 91.39961013645224,
+            "median": 25.5,
+            "p90": 2151.100000000001,
+            "p95": 4115.150000000001
+          },
+          "bf16_only": {
+            "n": 179,
+            "mean": 3090.0335195530724,
+            "median": 1088.0,
+            "p90": 12598.599999999997,
+            "p95": 17272.699999999993
+          },
+          "quant_only": {
+            "n": 110,
+            "mean": -4477.272727272727,
+            "median": -2227.5,
+            "p90": 3252.4999999999964,
+            "p95": 6741.849999999998
+          },
+          "both_wrong": {
+            "n": 159,
+            "mean": -305.0503144654088,
+            "median": -480.0,
+            "p90": 7733.79999999999,
+            "p95": 13187.299999999992
+          }
+        },
+        "old_200_even_seed42": {
+          "mean_of_ratios_pct": 29.76661795462283,
+          "ratio_of_means_pct": 11.077224418386301
+        }
+      },
+      "Llama-8B_GPTQ-4": {
+        "ratio_of_means_pct": 3.9494899187199506,
+        "mean_of_per_item_ratios_pct": 8.0320472853203,
+        "mean_paired_delta_tokens": 183.91160000000002,
+        "median_paired_delta_tokens": 38.200000000000045,
+        "delta_ci95": [
+          12.021290000000032,
+          359.29617000000025
+        ],
+        "iqr_delta": [
+          -422.85000000000014,
+          559.8
+        ],
+        "p90_delta": 2205.120000000001,
+        "p95_delta": 4073.0,
+        "strata": {
+          "both_correct": {
+            "n": 2097,
+            "mean": 65.79589890319504,
+            "median": 0.0,
+            "p90": 2060.4,
+            "p95": 3772.8
+          },
+          "bf16_only": {
+            "n": 134,
+            "mean": 5914.895522388059,
+            "median": 3274.5,
+            "p90": 20369.300000000007,
+            "p95": 24027.599999999995
+          },
+          "quant_only": {
+            "n": 126,
+            "mean": -4327.3650793650795,
+            "median": -1931.0,
+            "p90": 4415.5,
+            "p95": 7088.75
+          },
+          "both_wrong": {
+            "n": 143,
+            "mean": 520.6783216783217,
+            "median": 437.0,
+            "p90": 9787.999999999998,
+            "p95": 14062.600000000008
+          }
+        },
+        "old_200_even_seed42": {
+          "mean_of_ratios_pct": 28.446619697255837,
+          "ratio_of_means_pct": 9.611631561056665
+        }
+      }
+    },
+    "deployment_economics": {
+      "Qwen-7B_BF16": {
+        "mean_tokens": 4011.3608,
+        "time_per_q_sec": 61.71324307692308,
+        "cost_per_q_dollars": 0.025713851282051284,
+        "c_pass_dollars": 0.02735516093835243,
+        "note": "token-implied Cpass at shared 65 tok/s; not measured wall-clock"
+      },
+      "Qwen-7B_FP8": {
+        "mean_tokens": 4007.6744,
+        "time_per_q_sec": 61.65652923076923,
+        "cost_per_q_dollars": 0.025690220512820515,
+        "c_pass_dollars": 0.027214216644936985,
+        "note": "token-implied Cpass at shared 65 tok/s; not measured wall-clock"
+      },
+      "Qwen-7B_AWQ-4": {
+        "mean_tokens": 4265.3196,
+        "time_per_q_sec": 65.62030153846153,
+        "cost_per_q_dollars": 0.027341792307692306,
+        "c_pass_dollars": 0.029361890364789846,
+        "note": "token-implied Cpass at shared 65 tok/s; not measured wall-clock"
+      },
+      "Qwen-7B_GPTQ-4": {
+        "mean_tokens": 4287.230799999999,
+        "time_per_q_sec": 65.95739692307691,
+        "cost_per_q_dollars": 0.027482248717948715,
+        "c_pass_dollars": 0.029399067948169363,
+        "note": "token-implied Cpass at shared 65 tok/s; not measured wall-clock"
+      },
+      "Llama-8B_BF16": {
+        "mean_tokens": 4656.5912,
+        "time_per_q_sec": 71.63986461538461,
+        "cost_per_q_dollars": 0.02984994358974359,
+        "c_pass_dollars": 0.033449062740636026,
+        "note": "token-implied Cpass at shared 65 tok/s; not measured wall-clock"
+      },
+      "Llama-8B_FP8": {
+        "mean_tokens": 4550.7908,
+        "time_per_q_sec": 70.01216615384615,
+        "cost_per_q_dollars": 0.029171735897435897,
+        "c_pass_dollars": 0.03258683634655484,
+        "note": "token-implied Cpass at shared 65 tok/s; not measured wall-clock"
+      },
+      "Llama-8B_AWQ-4": {
+        "mean_tokens": 4736.4572,
+        "time_per_q_sec": 72.8685723076923,
+        "cost_per_q_dollars": 0.03036190512820513,
+        "c_pass_dollars": 0.035108585948433316,
+        "note": "token-implied Cpass at shared 65 tok/s; not measured wall-clock"
+      },
+      "Llama-8B_GPTQ-4": {
+        "mean_tokens": 4840.5028,
+        "time_per_q_sec": 74.46927384615385,
+        "cost_per_q_dollars": 0.031028864102564106,
+        "c_pass_dollars": 0.034895258774813434,
+        "note": "token-implied Cpass at shared 65 tok/s; not measured wall-clock"
+      }
+    },
+    "selective_oracle": {
+      "Qwen-7B_BF16": {
+        "gold_hit_counts": {
+          "0": 11,
+          "1": 6,
+          "2": 11,
+          "3": 7,
+          "4": 24,
+          "5": 441
+        },
+        "all_correct_unanimous": 441,
+        "all_wrong": 11,
+        "oracle_gate": {
+          "1/5": {
+            "coverage": 100.0,
+            "selective_accuracy": 97.8,
+            "note": "oracle gold-hit gate; not answer-string agreement"
+          },
+          "2/5": {
+            "coverage": 100.0,
+            "selective_accuracy": 96.6,
+            "note": "oracle gold-hit gate; not answer-string agreement"
+          },
+          "3/5": {
+            "coverage": 100.0,
+            "selective_accuracy": 94.4,
+            "note": "oracle gold-hit gate; not answer-string agreement"
+          },
+          "4/5": {
+            "coverage": 96.4,
+            "selective_accuracy": 96.47302904564316,
+            "note": "oracle gold-hit gate; not answer-string agreement"
+          },
+          "5/5": {
+            "coverage": 90.4,
+            "selective_accuracy": 97.56637168141593,
+            "note": "oracle gold-hit gate; not answer-string agreement"
+          }
+        },
+        "k3_coverage_tautological": true
+      },
+      "Qwen-7B_FP8": {
+        "gold_hit_counts": {
+          "0": 8,
+          "1": 6,
+          "2": 11,
+          "3": 12,
+          "4": 19,
+          "5": 444
+        },
+        "all_correct_unanimous": 444,
+        "all_wrong": 8,
+        "oracle_gate": {
+          "1/5": {
+            "coverage": 100.0,
+            "selective_accuracy": 98.4,
+            "note": "oracle gold-hit gate; not answer-string agreement"
+          },
+          "2/5": {
+            "coverage": 100.0,
+            "selective_accuracy": 97.2,
+            "note": "oracle gold-hit gate; not answer-string agreement"
+          },
+          "3/5": {
+            "coverage": 100.0,
+            "selective_accuracy": 95.0,
+            "note": "oracle gold-hit gate; not answer-string agreement"
+          },
+          "4/5": {
+            "coverage": 95.4,
+            "selective_accuracy": 97.06498951781971,
+            "note": "oracle gold-hit gate; not answer-string agreement"
+          },
+          "5/5": {
+            "coverage": 90.4,
+            "selective_accuracy": 98.23008849557522,
+            "note": "oracle gold-hit gate; not answer-string agreement"
+          }
+        },
+        "k3_coverage_tautological": true
+      },
+      "Qwen-7B_AWQ-4": {
+        "gold_hit_counts": {
+          "0": 10,
+          "1": 9,
+          "2": 9,
+          "3": 18,
+          "4": 23,
+          "5": 431
+        },
+        "all_correct_unanimous": 431,
+        "all_wrong": 10,
+        "oracle_gate": {
+          "1/5": {
+            "coverage": 100.0,
+            "selective_accuracy": 98.0,
+            "note": "oracle gold-hit gate; not answer-string agreement"
+          },
+          "2/5": {
+            "coverage": 100.0,
+            "selective_accuracy": 96.2,
+            "note": "oracle gold-hit gate; not answer-string agreement"
+          },
+          "3/5": {
+            "coverage": 100.0,
+            "selective_accuracy": 94.4,
+            "note": "oracle gold-hit gate; not answer-string agreement"
+          },
+          "4/5": {
+            "coverage": 94.6,
+            "selective_accuracy": 95.9830866807611,
+            "note": "oracle gold-hit gate; not answer-string agreement"
+          },
+          "5/5": {
+            "coverage": 88.2,
+            "selective_accuracy": 97.73242630385488,
+            "note": "oracle gold-hit gate; not answer-string agreement"
+          }
+        },
+        "k3_coverage_tautological": true
+      },
+      "Qwen-7B_GPTQ-4": {
+        "gold_hit_counts": {
+          "0": 10,
+          "1": 9,
+          "2": 11,
+          "3": 8,
+          "4": 28,
+          "5": 434
+        },
+        "all_correct_unanimous": 434,
+        "all_wrong": 10,
+        "oracle_gate": {
+          "1/5": {
+            "coverage": 100.0,
+            "selective_accuracy": 98.0,
+            "note": "oracle gold-hit gate; not answer-string agreement"
+          },
+          "2/5": {
+            "coverage": 100.0,
+            "selective_accuracy": 96.2,
+            "note": "oracle gold-hit gate; not answer-string agreement"
+          },
+          "3/5": {
+            "coverage": 100.0,
+            "selective_accuracy": 94.0,
+            "note": "oracle gold-hit gate; not answer-string agreement"
+          },
+          "4/5": {
+            "coverage": 96.2,
+            "selective_accuracy": 96.04989604989605,
+            "note": "oracle gold-hit gate; not answer-string agreement"
+          },
+          "5/5": {
+            "coverage": 88.8,
+            "selective_accuracy": 97.74774774774775,
+            "note": "oracle gold-hit gate; not answer-string agreement"
+          }
+        },
+        "k3_coverage_tautological": true
+      },
+      "Llama-8B_BF16": {
+        "gold_hit_counts": {
+          "0": 13,
+          "1": 15,
+          "2": 16,
+          "3": 20,
+          "4": 56,
+          "5": 380
+        },
+        "all_correct_unanimous": 380,
+        "all_wrong": 13,
+        "oracle_gate": {
+          "1/5": {
+            "coverage": 100.0,
+            "selective_accuracy": 97.4,
+            "note": "oracle gold-hit gate; not answer-string agreement"
+          },
+          "2/5": {
+            "coverage": 100.0,
+            "selective_accuracy": 94.4,
+            "note": "oracle gold-hit gate; not answer-string agreement"
+          },
+          "3/5": {
+            "coverage": 100.0,
+            "selective_accuracy": 91.2,
+            "note": "oracle gold-hit gate; not answer-string agreement"
+          },
+          "4/5": {
+            "coverage": 92.8,
+            "selective_accuracy": 93.96551724137932,
+            "note": "oracle gold-hit gate; not answer-string agreement"
+          },
+          "5/5": {
+            "coverage": 78.6,
+            "selective_accuracy": 96.69211195928753,
+            "note": "oracle gold-hit gate; not answer-string agreement"
+          }
+        },
+        "k3_coverage_tautological": true
+      },
+      "Llama-8B_FP8": {
+        "gold_hit_counts": {
+          "0": 18,
+          "1": 11,
+          "2": 16,
+          "3": 16,
+          "4": 48,
+          "5": 391
+        },
+        "all_correct_unanimous": 391,
+        "all_wrong": 18,
+        "oracle_gate": {
+          "1/5": {
+            "coverage": 100.0,
+            "selective_accuracy": 96.4,
+            "note": "oracle gold-hit gate; not answer-string agreement"
+          },
+          "2/5": {
+            "coverage": 100.0,
+            "selective_accuracy": 94.2,
+            "note": "oracle gold-hit gate; not answer-string agreement"
+          },
+          "3/5": {
+            "coverage": 100.0,
+            "selective_accuracy": 91.0,
+            "note": "oracle gold-hit gate; not answer-string agreement"
+          },
+          "4/5": {
+            "coverage": 93.6,
+            "selective_accuracy": 93.80341880341881,
+            "note": "oracle gold-hit gate; not answer-string agreement"
+          },
+          "5/5": {
+            "coverage": 81.8,
+            "selective_accuracy": 95.59902200488997,
+            "note": "oracle gold-hit gate; not answer-string agreement"
+          }
+        },
+        "k3_coverage_tautological": true
+      },
+      "Llama-8B_AWQ-4": {
+        "gold_hit_counts": {
+          "0": 15,
+          "1": 23,
+          "2": 13,
+          "3": 34,
+          "4": 64,
+          "5": 351
+        },
+        "all_correct_unanimous": 351,
+        "all_wrong": 15,
+        "oracle_gate": {
+          "1/5": {
+            "coverage": 100.0,
+            "selective_accuracy": 97.0,
+            "note": "oracle gold-hit gate; not answer-string agreement"
+          },
+          "2/5": {
+            "coverage": 100.0,
+            "selective_accuracy": 92.4,
+            "note": "oracle gold-hit gate; not answer-string agreement"
+          },
+          "3/5": {
+            "coverage": 100.0,
+            "selective_accuracy": 89.8,
+            "note": "oracle gold-hit gate; not answer-string agreement"
+          },
+          "4/5": {
+            "coverage": 90.6,
+            "selective_accuracy": 91.61147902869757,
+            "note": "oracle gold-hit gate; not answer-string agreement"
+          },
+          "5/5": {
+            "coverage": 73.2,
+            "selective_accuracy": 95.90163934426229,
+            "note": "oracle gold-hit gate; not answer-string agreement"
+          }
+        },
+        "k3_coverage_tautological": true
+      },
+      "Llama-8B_GPTQ-4": {
+        "gold_hit_counts": {
+          "0": 14,
+          "1": 12,
+          "2": 18,
+          "3": 25,
+          "4": 55,
+          "5": 376
+        },
+        "all_correct_unanimous": 376,
+        "all_wrong": 14,
+        "oracle_gate": {
+          "1/5": {
+            "coverage": 100.0,
+            "selective_accuracy": 97.2,
+            "note": "oracle gold-hit gate; not answer-string agreement"
+          },
+          "2/5": {
+            "coverage": 100.0,
+            "selective_accuracy": 94.8,
+            "note": "oracle gold-hit gate; not answer-string agreement"
+          },
+          "3/5": {
+            "coverage": 100.0,
+            "selective_accuracy": 91.2,
+            "note": "oracle gold-hit gate; not answer-string agreement"
+          },
+          "4/5": {
+            "coverage": 91.4,
+            "selective_accuracy": 94.31072210065645,
+            "note": "oracle gold-hit gate; not answer-string agreement"
+          },
+          "5/5": {
+            "coverage": 78.0,
+            "selective_accuracy": 96.41025641025641,
+            "note": "oracle gold-hit gate; not answer-string agreement"
+          }
+        },
+        "k3_coverage_tautological": true
+      }
+    },
+    "loop_rows": [
+      {
+        "seed": 43,
+        "row": 150,
+        "completion_tokens": 4023,
+        "max_consecutive_word_run": 20,
+        "boxed": true,
+        "extractive_match": 1.0,
+        "model": "Qwen-7B",
+        "format": "AWQ-4"
+      },
+      {
+        "seed": 42,
+        "row": 492,
+        "completion_tokens": 32685,
+        "max_consecutive_word_run": 10528,
+        "boxed": false,
+        "extractive_match": 0.0,
+        "model": "Llama-8B",
+        "format": "BF16"
+      },
+      {
+        "seed": 43,
+        "row": 150,
+        "completion_tokens": 5357,
+        "max_consecutive_word_run": 20,
+        "boxed": true,
+        "extractive_match": 0.0,
+        "model": "Llama-8B",
+        "format": "BF16"
+      },
+      {
+        "seed": 44,
+        "row": 150,
+        "completion_tokens": 8356,
+        "max_consecutive_word_run": 20,
+        "boxed": true,
+        "extractive_match": 1.0,
+        "model": "Llama-8B",
+        "format": "BF16"
+      },
+      {
+        "seed": 42,
+        "row": 150,
+        "completion_tokens": 6206,
+        "max_consecutive_word_run": 20,
+        "boxed": true,
+        "extractive_match": 1.0,
+        "model": "Llama-8B",
+        "format": "FP8"
+      },
+      {
+        "seed": 42,
+        "row": 443,
+        "completion_tokens": 32725,
+        "max_consecutive_word_run": 10522,
+        "boxed": false,
+        "extractive_match": 0.0,
+        "model": "Llama-8B",
+        "format": "FP8"
+      },
+      {
+        "seed": 44,
+        "row": 150,
+        "completion_tokens": 6640,
+        "max_consecutive_word_run": 20,
+        "boxed": true,
+        "extractive_match": 1.0,
+        "model": "Llama-8B",
+        "format": "FP8"
+      },
+      {
+        "seed": 45,
+        "row": 42,
+        "completion_tokens": 8769,
+        "max_consecutive_word_run": 20,
+        "boxed": true,
+        "extractive_match": 1.0,
+        "model": "Llama-8B",
+        "format": "AWQ-4"
+      },
+      {
+        "seed": 45,
+        "row": 112,
+        "completion_tokens": 32475,
+        "max_consecutive_word_run": 7101,
+        "boxed": false,
+        "extractive_match": 0.0,
+        "model": "Llama-8B",
+        "format": "AWQ-4"
+      },
+      {
+        "seed": 46,
+        "row": 224,
+        "completion_tokens": 32698,
+        "max_consecutive_word_run": 6201,
+        "boxed": false,
+        "extractive_match": 0.0,
+        "model": "Llama-8B",
+        "format": "AWQ-4"
+      },
+      {
+        "seed": 44,
+        "row": 222,
+        "completion_tokens": 11133,
+        "max_consecutive_word_run": 3865,
+        "boxed": true,
+        "extractive_match": 1.0,
+        "model": "Llama-8B",
+        "format": "GPTQ-4"
+      },
+      {
+        "seed": 45,
+        "row": 222,
+        "completion_tokens": 14772,
+        "max_consecutive_word_run": 4308,
+        "boxed": true,
+        "extractive_match": 1.0,
+        "model": "Llama-8B",
+        "format": "GPTQ-4"
+      }
+    ],
+    "total_loops": 12,
+    "total_near_cap": 140,
+    "total_token_limit_hits": 0
+  },
+  "gsm8k": {
+    "benchmark": "gsm8k",
+    "n_items": 1319,
+    "seeds": [
+      42,
+      43,
+      44
+    ],
+    "summary_statistics": {
+      "Qwen-7B_BF16": {
+        "seed_accs": {
+          "42": 91.0538286580743,
+          "43": 91.58453373768006,
+          "44": 91.12964366944655
+        },
+        "mean_acc": 91.25600202173364,
+        "std_acc": 0.28703100054588354,
+        "pooled_correct": 3611,
+        "wilson_ci_95": [
+          90.33536885041745,
+          92.09661016073248
+        ],
+        "clustered_acc_ci95": [
+          89.84078847611828,
+          92.57012888551932
+        ],
+        "mean_tokens": 1695.8989133181703,
+        "loops": 0,
+        "token_limit_hits": 0,
+        "near_cap": 9,
+        "near_cap_unboxed": 9,
+        "max_completion_tokens": 32708,
+        "max_consecutive_word_run": 9,
+        "flagged_rows": []
+      },
+      "Qwen-7B_FP8": {
+        "seed_accs": {
+          "42": 91.28127369219105,
+          "43": 91.50871872630782,
+          "44": 91.20545868081881
+        },
+        "mean_acc": 91.33181703310589,
+        "std_acc": 0.15782153142275873,
+        "pooled_correct": 3614,
+        "wilson_ci_95": [
+          90.41456170206877,
+          92.16890027204194
+        ],
+        "clustered_acc_ci95": [
+          89.94187515794792,
+          92.62067222643421
+        ],
+        "mean_tokens": 1697.3598685873137,
+        "loops": 0,
+        "token_limit_hits": 0,
+        "near_cap": 9,
+        "near_cap_unboxed": 8,
+        "max_completion_tokens": 32719,
+        "max_consecutive_word_run": 8,
+        "flagged_rows": []
+      },
+      "Qwen-7B_AWQ-4": {
+        "seed_accs": {
+          "42": 91.0538286580743,
+          "43": 89.91660348749052,
+          "44": 92.19105382865807
+        },
+        "mean_acc": 91.0538286580743,
+        "std_acc": 1.1372251705837755,
+        "pooled_correct": 3603,
+        "wilson_ci_95": [
+          90.12428396349577,
+          91.9037404797588
+        ],
+        "clustered_acc_ci95": [
+          89.66388678291636,
+          92.36795552185998
+        ],
+        "mean_tokens": 1685.7955521859994,
+        "loops": 0,
+        "token_limit_hits": 0,
+        "near_cap": 6,
+        "near_cap_unboxed": 6,
+        "max_completion_tokens": 32711,
+        "max_consecutive_word_run": 14,
+        "flagged_rows": []
+      },
+      "Qwen-7B_GPTQ-4": {
+        "seed_accs": {
+          "42": 90.9021986353298,
+          "43": 91.43290371493555,
+          "44": 91.0538286580743
+        },
+        "mean_acc": 91.12964366944654,
+        "std_acc": 0.2733549109525344,
+        "pooled_correct": 3606,
+        "wilson_ci_95": [
+          90.20342459251313,
+          91.97608281370218
+        ],
+        "clustered_acc_ci95": [
+          89.7397017942886,
+          92.4191306545363
+        ],
+        "mean_tokens": 1705.949456659085,
+        "loops": 0,
+        "token_limit_hits": 0,
+        "near_cap": 12,
+        "near_cap_unboxed": 11,
+        "max_completion_tokens": 32707,
+        "max_consecutive_word_run": 12,
+        "flagged_rows": []
+      },
+      "Llama-8B_BF16": {
+        "seed_accs": {
+          "42": 88.17285822592874,
+          "43": 88.77937831690674,
+          "44": 89.08263836239576
+        },
+        "mean_acc": 88.67829163507707,
+        "std_acc": 0.4632373712363745,
+        "pooled_correct": 3509,
+        "wilson_ci_95": [
+          87.6532894069726,
+          89.62826886351131
+        ],
+        "clustered_acc_ci95": [
+          87.13671973717467,
+          90.14404852160726
+        ],
+        "mean_tokens": 1769.6156178923427,
+        "loops": 0,
+        "token_limit_hits": 0,
+        "near_cap": 2,
+        "near_cap_unboxed": 2,
+        "max_completion_tokens": 32711,
+        "max_consecutive_word_run": 11,
+        "flagged_rows": []
+      },
+      "Llama-8B_FP8": {
+        "seed_accs": {
+          "42": 89.08263836239576,
+          "43": 89.23426838514025,
+          "44": 88.09704321455648
+        },
+        "mean_acc": 88.80464998736416,
+        "std_acc": 0.6174774689345786,
+        "pooled_correct": 3514,
+        "wilson_ci_95": [
+          87.7843401938473,
+          89.74968968157121
+        ],
+        "clustered_acc_ci95": [
+          87.28834975991914,
+          90.24513520343692
+        ],
+        "mean_tokens": 1723.72100075815,
+        "loops": 0,
+        "token_limit_hits": 0,
+        "near_cap": 2,
+        "near_cap_unboxed": 1,
+        "max_completion_tokens": 32693,
+        "max_consecutive_word_run": 16,
+        "flagged_rows": []
+      },
+      "Llama-8B_AWQ-4": {
+        "seed_accs": {
+          "42": 87.33889310083397,
+          "43": 86.88400303260046,
+          "44": 87.11144806671722
+        },
+        "mean_acc": 87.11144806671722,
+        "std_acc": 0.2274450341167551,
+        "pooled_correct": 3447,
+        "wilson_ci_95": [
+          86.0313308155079,
+          88.11957955378685
+        ],
+        "clustered_acc_ci95": [
+          85.54460449835736,
+          88.67829163507704
+        ],
+        "mean_tokens": 1753.3118524134445,
+        "loops": 1,
+        "token_limit_hits": 0,
+        "near_cap": 8,
+        "near_cap_unboxed": 7,
+        "max_completion_tokens": 32719,
+        "max_consecutive_word_run": 10674,
+        "flagged_rows": [
+          {
+            "seed": 44,
+            "row": 623,
+            "completion_tokens": 32719,
+            "max_consecutive_word_run": 10674,
+            "boxed": false,
+            "extractive_match": 0.0
+          }
+        ]
+      },
+      "Llama-8B_GPTQ-4": {
+        "seed_accs": {
+          "42": 88.47611827141773,
+          "43": 88.62774829416225,
+          "44": 89.76497346474602
+        },
+        "mean_acc": 88.95628001010867,
+        "std_acc": 0.7044407310976203,
+        "pooled_correct": 3520,
+        "wilson_ci_95": [
+          87.94165336979187,
+          89.89534243154819
+        ],
+        "clustered_acc_ci95": [
+          87.48989133181695,
+          90.3721253474855
+        ],
+        "mean_tokens": 1841.4829416224413,
+        "loops": 0,
+        "token_limit_hits": 0,
+        "near_cap": 9,
+        "near_cap_unboxed": 8,
+        "max_completion_tokens": 32710,
+        "max_consecutive_word_run": 11,
+        "flagged_rows": []
+      }
+    },
+    "pass1_contrasts": [
+      {
+        "contrast": "Qwen-7B BF16 vs FP8",
+        "model": "Qwen-7B",
+        "format": "FP8",
+        "delta": 0.0007581501137225167,
+        "delta_pp": 0.07581501137225168,
+        "ci95_lo_pp": -0.5812484205205964,
+        "ci95_hi_pp": 0.7328784432650997,
+        "ci90_lo_pp": -0.4548900682335104,
+        "ci90_hi_pp": 0.6317917614354306,
+        "p_value": 0.827,
+        "excludes_zero": false,
+        "tost_equiv_1pp": true,
+        "holm_alpha_pass1": 0.05,
+        "holm_significant_pass1": false
+      },
+      {
+        "contrast": "Qwen-7B BF16 vs AWQ-4",
+        "model": "Qwen-7B",
+        "format": "AWQ-4",
+        "delta": -0.0020217336365933795,
+        "delta_pp": -0.20217336365933794,
+        "ci95_lo_pp": -0.9097801364670205,
+        "ci95_hi_pp": 0.48016173869092754,
+        "ci90_lo_pp": -0.7834217841799347,
+        "ci90_hi_pp": 0.3790750568612586,
+        "p_value": 0.5788,
+        "excludes_zero": false,
+        "tost_equiv_1pp": true,
+        "holm_alpha_pass1": 0.0125,
+        "holm_significant_pass1": false
+      },
+      {
+        "contrast": "Qwen-7B BF16 vs GPTQ-4",
+        "model": "Qwen-7B",
+        "format": "GPTQ-4",
+        "delta": -0.0012635835228708623,
+        "delta_pp": -0.12635835228708622,
+        "ci95_lo_pp": -0.8592367955521863,
+        "ci95_hi_pp": 0.6317917614354304,
+        "ci90_lo_pp": -0.758150113722517,
+        "ci90_hi_pp": 0.5054334091483446,
+        "p_value": 0.7294,
+        "excludes_zero": false,
+        "tost_equiv_1pp": true,
+        "holm_alpha_pass1": 0.016666666666666666,
+        "holm_significant_pass1": false
+      },
+      {
+        "contrast": "Llama-8B BF16 vs FP8",
+        "model": "Llama-8B",
+        "format": "FP8",
+        "delta": 0.0012635835228708618,
+        "delta_pp": 0.1263583522870862,
+        "ci95_lo_pp": -0.6570634318928481,
+        "ci95_hi_pp": 0.935051806924438,
+        "ci90_lo_pp": -0.530705079605762,
+        "ci90_hi_pp": 0.8086934546373513,
+        "p_value": 0.7612,
+        "excludes_zero": false,
+        "tost_equiv_1pp": true,
+        "holm_alpha_pass1": 0.025,
+        "holm_significant_pass1": false
+      },
+      {
+        "contrast": "Llama-8B BF16 vs AWQ-4",
+        "model": "Llama-8B",
+        "format": "AWQ-4",
+        "delta": -0.015668435683598686,
+        "delta_pp": -1.5668435683598685,
+        "ci95_lo_pp": -2.5524387161991418,
+        "ci95_hi_pp": -0.5812484205205961,
+        "ci90_lo_pp": -2.3755370229972215,
+        "ci90_hi_pp": -0.7328784432650991,
+        "p_value": 0.0018,
+        "excludes_zero": true,
+        "tost_equiv_1pp": true,
+        "holm_alpha_pass1": 0.008333333333333333,
+        "holm_significant_pass1": true
+      },
+      {
+        "contrast": "Llama-8B BF16 vs GPTQ-4",
+        "model": "Llama-8B",
+        "format": "GPTQ-4",
+        "delta": 0.0027798837503158957,
+        "delta_pp": 0.2779883750315896,
+        "ci95_lo_pp": -0.5307050796057621,
+        "ci95_hi_pp": 1.0873136214303685,
+        "ci90_lo_pp": -0.4043467273186759,
+        "ci90_hi_pp": 0.9603234773818551,
+        "p_value": 0.5106,
+        "excludes_zero": false,
+        "tost_equiv_1pp": true,
+        "holm_alpha_pass1": 0.01,
+        "holm_significant_pass1": false
+      }
+    ],
+    "token_analysis": {
+      "Qwen-7B_FP8": {
+        "ratio_of_means_pct": 0.0861463650734251,
+        "mean_of_per_item_ratios_pct": 5.688050061447658,
+        "mean_paired_delta_tokens": 1.4609552691432934,
+        "median_paired_delta_tokens": -7.666666666666515,
+        "delta_ci95": [
+          -66.63360500379093,
+          70.04075056861267
+        ],
+        "iqr_delta": [
+          -237.16666666666663,
+          217.16666666666663
+        ],
+        "p90_delta": 589.4000000000004,
+        "p95_delta": 992.7333333333322,
+        "strata": {
+          "both_correct": {
+            "n": 3528,
+            "mean": -6.933673469387755,
+            "median": 0.0,
+            "p90": 730.2000000000007,
+            "p95": 1173.0
+          },
+          "bf16_only": {
+            "n": 83,
+            "mean": 2549.421686746988,
+            "median": 857.0,
+            "p90": 7919.799999999993,
+            "p95": 26477.900000000092
+          },
+          "quant_only": {
+            "n": 86,
+            "mean": -1784.139534883721,
+            "median": -242.5,
+            "p90": 2295.5,
+            "p95": 2988.5
+          },
+          "both_wrong": {
+            "n": 260,
+            "mean": -107.39615384615385,
+            "median": -10.5,
+            "p90": 2150.4999999999995,
+            "p95": 3015.9000000000024
+          }
+        }
+      },
+      "Qwen-7B_AWQ-4": {
+        "ratio_of_means_pct": -0.5957525565248978,
+        "mean_of_per_item_ratios_pct": 5.677934650422056,
+        "mean_paired_delta_tokens": -10.10336113217084,
+        "median_paired_delta_tokens": -47.666666666666515,
+        "delta_ci95": [
+          -76.46846727318686,
+          55.818018701036074
+        ],
+        "iqr_delta": [
+          -282.5,
+          217.83333333333326
+        ],
+        "p90_delta": 644.2000000000005,
+        "p95_delta": 1348.5,
+        "strata": {
+          "both_correct": {
+            "n": 3506,
+            "mean": -13.312892184826012,
+            "median": -33.5,
+            "p90": 807.5,
+            "p95": 1375.0
+          },
+          "bf16_only": {
+            "n": 105,
+            "mean": 1245.1619047619047,
+            "median": 330.0,
+            "p90": 6220.599999999995,
+            "p95": 7256.399999999999
+          },
+          "quant_only": {
+            "n": 97,
+            "mean": -1871.041237113402,
+            "median": -425.0,
+            "p90": 3091.000000000001,
+            "p95": 4307.600000000001
+          },
+          "both_wrong": {
+            "n": 249,
+            "mean": 230.70281124497993,
+            "median": 36.0,
+            "p90": 2900.999999999998,
+            "p95": 4000.999999999999
+          }
+        }
+      },
+      "Qwen-7B_GPTQ-4": {
+        "ratio_of_means_pct": 0.592638114334898,
+        "mean_of_per_item_ratios_pct": 6.4119109885059755,
+        "mean_paired_delta_tokens": 10.050543340914833,
+        "median_paired_delta_tokens": -40.33333333333337,
+        "delta_ci95": [
+          -64.82365428354818,
+          84.67043214556496
+        ],
+        "iqr_delta": [
+          -277.6666666666667,
+          200.33333333333337
+        ],
+        "p90_delta": 634.5999999999998,
+        "p95_delta": 1147.6999999999978,
+        "strata": {
+          "both_correct": {
+            "n": 3507,
+            "mean": -37.13116623895067,
+            "median": -32.0,
+            "p90": 751.0,
+            "p95": 1312.5999999999985
+          },
+          "bf16_only": {
+            "n": 104,
+            "mean": 3303.596153846154,
+            "median": 788.0,
+            "p90": 8449.1,
+            "p95": 29526.449999999993
+          },
+          "quant_only": {
+            "n": 99,
+            "mean": -1737.6363636363637,
+            "median": -173.0,
+            "p90": 2451.6,
+            "p95": 2777.4999999999977
+          },
+          "both_wrong": {
+            "n": 247,
+            "mean": -6.3117408906882595,
+            "median": 2.0,
+            "p90": 2549.0,
+            "p95": 3902.4999999999995
+          }
+        }
+      },
+      "Llama-8B_FP8": {
+        "ratio_of_means_pct": -2.5934794353168256,
+        "mean_of_per_item_ratios_pct": 5.903744507604225,
+        "mean_paired_delta_tokens": -45.89461713419258,
+        "median_paired_delta_tokens": -12.0,
+        "delta_ci95": [
+          -104.67673110942631,
+          11.689543846348181
+        ],
+        "iqr_delta": [
+          -292.33333333333326,
+          253.33333333333337
+        ],
+        "p90_delta": 722.4000000000001,
+        "p95_delta": 1266.0666666666664,
+        "strata": {
+          "both_correct": {
+            "n": 3382,
+            "mean": -51.58190419869899,
+            "median": -35.5,
+            "p90": 873.6000000000004,
+            "p95": 1474.3999999999978
+          },
+          "bf16_only": {
+            "n": 127,
+            "mean": 680.0787401574803,
+            "median": 147.0,
+            "p90": 4245.600000000001,
+            "p95": 5955.800000000002
+          },
+          "quant_only": {
+            "n": 132,
+            "mean": -1326.310606060606,
+            "median": -384.0,
+            "p90": 2803.5,
+            "p95": 3284.3
+          },
+          "both_wrong": {
+            "n": 316,
+            "mean": 258.0632911392405,
+            "median": 100.5,
+            "p90": 3118.0,
+            "p95": 5292.5
+          }
+        }
+      },
+      "Llama-8B_AWQ-4": {
+        "ratio_of_means_pct": -0.9213167715097614,
+        "mean_of_per_item_ratios_pct": 6.516095471031247,
+        "mean_paired_delta_tokens": -16.303765478898153,
+        "median_paired_delta_tokens": -62.66666666666663,
+        "delta_ci95": [
+          -84.7746967399545,
+          52.11226307808955
+        ],
+        "iqr_delta": [
+          -351.6666666666666,
+          233.50000000000006
+        ],
+        "p90_delta": 813.7333333333332,
+        "p95_delta": 1604.6999999999953,
+        "strata": {
+          "both_correct": {
+            "n": 3294,
+            "mean": -71.29356405585914,
+            "median": -59.0,
+            "p90": 911.6999999999998,
+            "p95": 1538.1499999999992
+          },
+          "bf16_only": {
+            "n": 215,
+            "mean": 1326.413953488372,
+            "median": 351.0,
+            "p90": 5006.999999999999,
+            "p95": 6925.2000000000035
+          },
+          "quant_only": {
+            "n": 153,
+            "mean": -608.4705882352941,
+            "median": -175.0,
+            "p90": 2834.0,
+            "p95": 4214.800000000001
+          },
+          "both_wrong": {
+            "n": 295,
+            "mean": -73.74915254237288,
+            "median": -59.0,
+            "p90": 3150.000000000001,
+            "p95": 5612.100000000003
+          }
+        }
+      },
+      "Llama-8B_GPTQ-4": {
+        "ratio_of_means_pct": 4.06118272259004,
+        "mean_of_per_item_ratios_pct": 10.808260929640646,
+        "mean_paired_delta_tokens": 71.86732373009856,
+        "median_paired_delta_tokens": -5.0,
+        "delta_ci95": [
+          0.5266237048269374,
+          145.85993808440696
+        ],
+        "iqr_delta": [
+          -286.0,
+          281.8333333333333
+        ],
+        "p90_delta": 983.4666666666669,
+        "p95_delta": 1769.1333333333328,
+        "strata": {
+          "both_correct": {
+            "n": 3373,
+            "mean": 20.503112955825674,
+            "median": -14.0,
+            "p90": 986.6000000000004,
+            "p95": 1846.4
+          },
+          "bf16_only": {
+            "n": 136,
+            "mean": 1729.1764705882354,
+            "median": 466.0,
+            "p90": 5658.5,
+            "p95": 7061.25
+          },
+          "quant_only": {
+            "n": 147,
+            "mean": -896.4081632653061,
+            "median": -252.0,
+            "p90": 2940.200000000001,
+            "p95": 4839.3999999999905
+          },
+          "both_wrong": {
+            "n": 301,
+            "mean": 371.51495016611295,
+            "median": -1.0,
+            "p90": 4440.0,
+            "p95": 5918.0
+          }
+        }
+      }
+    },
+    "deployment_economics": {
+      "Qwen-7B_BF16": {
+        "mean_tokens": 1695.8989133181703,
+        "time_per_q_sec": 26.090752512587237,
+        "cost_per_q_dollars": 0.010871146880244683,
+        "c_pass_dollars": 0.011912802050713987,
+        "note": "token-implied Cpass at shared 65 tok/s; not measured wall-clock"
+      },
+      "Qwen-7B_FP8": {
+        "mean_tokens": 1697.3598685873137,
+        "time_per_q_sec": 26.113228747497136,
+        "cost_per_q_dollars": 0.010880511978123807,
+        "c_pass_dollars": 0.01191316709945653,
+        "note": "token-implied Cpass at shared 65 tok/s; not measured wall-clock"
+      },
+      "Qwen-7B_AWQ-4": {
+        "mean_tokens": 1685.7955521859994,
+        "time_per_q_sec": 25.935316187476914,
+        "cost_per_q_dollars": 0.010806381744782049,
+        "c_pass_dollars": 0.011868124497391776,
+        "note": "token-implied Cpass at shared 65 tok/s; not measured wall-clock"
+      },
+      "Qwen-7B_GPTQ-4": {
+        "mean_tokens": 1705.949456659085,
+        "time_per_q_sec": 26.245376256293614,
+        "cost_per_q_dollars": 0.01093557344012234,
+        "c_pass_dollars": 0.012000017776640073,
+        "note": "token-implied Cpass at shared 65 tok/s; not measured wall-clock"
+      },
+      "Llama-8B_BF16": {
+        "mean_tokens": 1769.6156178923427,
+        "time_per_q_sec": 27.224855659882195,
+        "cost_per_q_dollars": 0.011343689858284248,
+        "c_pass_dollars": 0.012791958041958042,
+        "note": "token-implied Cpass at shared 65 tok/s; not measured wall-clock"
+      },
+      "Llama-8B_FP8": {
+        "mean_tokens": 1723.72100075815,
+        "time_per_q_sec": 26.51878462704846,
+        "cost_per_q_dollars": 0.011049493594603527,
+        "c_pass_dollars": 0.012442471870758724,
+        "note": "token-implied Cpass at shared 65 tok/s; not measured wall-clock"
+      },
+      "Llama-8B_AWQ-4": {
+        "mean_tokens": 1753.3118524134445,
+        "time_per_q_sec": 26.97402849866838,
+        "cost_per_q_dollars": 0.011239178541111824,
+        "c_pass_dollars": 0.012902068316559179,
+        "note": "token-implied Cpass at shared 65 tok/s; not measured wall-clock"
+      },
+      "Llama-8B_GPTQ-4": {
+        "mean_tokens": 1841.4829416224413,
+        "time_per_q_sec": 28.330506794191404,
+        "cost_per_q_dollars": 0.011804377830913086,
+        "c_pass_dollars": 0.013269864510489513,
+        "note": "token-implied Cpass at shared 65 tok/s; not measured wall-clock"
+      }
+    },
+    "selective_oracle": {},
+    "loop_rows": [
+      {
+        "seed": 44,
+        "row": 623,
+        "completion_tokens": 32719,
+        "max_consecutive_word_run": 10674,
+        "boxed": false,
+        "extractive_match": 0.0,
+        "model": "Llama-8B",
+        "format": "AWQ-4"
+      }
+    ],
+    "total_loops": 1,
+    "total_near_cap": 57,
+    "total_token_limit_hits": 0
+  },
+  "gpqa_diamond": {
+    "benchmark": "gpqa",
+    "n_items": 198,
+    "seeds": [
+      42,
+      43,
+      44
+    ],
+    "summary_statistics": {
+      "Qwen-7B_BF16": {
+        "seed_accs": {
+          "42": 51.515151515151516,
+          "43": 46.96969696969697,
+          "44": 52.52525252525253
+        },
+        "mean_acc": 50.33670033670034,
+        "std_acc": 2.959325897516324,
+        "pooled_correct": 299,
+        "wilson_ci_95": [
+          46.32665143426348,
+          54.34242227097778
+        ],
+        "clustered_acc_ci95": [
+          44.78114478114479,
+          55.8922558922559
+        ],
+        "mean_tokens": 8529.395622895623,
+        "loops": 4,
+        "token_limit_hits": 0,
+        "near_cap": 5,
+        "near_cap_unboxed": 5,
+        "max_completion_tokens": 32647,
+        "max_consecutive_word_run": 8113,
+        "flagged_rows": [
+          {
+            "seed": 42,
+            "row": 75,
+            "completion_tokens": 31135,
+            "max_consecutive_word_run": 7856,
+            "boxed": true,
+            "extractive_match": 0.0
+          },
+          {
+            "seed": 42,
+            "row": 154,
+            "completion_tokens": 32562,
+            "max_consecutive_word_run": 6046,
+            "boxed": false,
+            "extractive_match": 1.0
+          },
+          {
+            "seed": 43,
+            "row": 18,
+            "completion_tokens": 32603,
+            "max_consecutive_word_run": 8113,
+            "boxed": false,
+            "extractive_match": 0.0
+          },
+          {
+            "seed": 44,
+            "row": 153,
+            "completion_tokens": 32510,
+            "max_consecutive_word_run": 7270,
+            "boxed": false,
+            "extractive_match": 0.0
+          }
+        ]
+      },
+      "Qwen-7B_FP8": {
+        "seed_accs": {
+          "42": 49.494949494949495,
+          "43": 51.010101010101,
+          "44": 47.97979797979798
+        },
+        "mean_acc": 49.49494949494949,
+        "std_acc": 1.515151515151512,
+        "pooled_correct": 294,
+        "wilson_ci_95": [
+          45.49042217010807,
+          53.50596727203006
+        ],
+        "clustered_acc_ci95": [
+          43.93939393939392,
+          55.05050505050506
+        ],
+        "mean_tokens": 8046.6144781144785,
+        "loops": 0,
+        "token_limit_hits": 0,
+        "near_cap": 0,
+        "near_cap_unboxed": 0,
+        "max_completion_tokens": 21651,
+        "max_consecutive_word_run": 16,
+        "flagged_rows": []
+      },
+      "Qwen-7B_AWQ-4": {
+        "seed_accs": {
+          "42": 44.44444444444444,
+          "43": 41.91919191919192,
+          "44": 47.97979797979798
+        },
+        "mean_acc": 44.78114478114478,
+        "std_acc": 3.044299885526116,
+        "pooled_correct": 266,
+        "wilson_ci_95": [
+          40.828454416207684,
+          48.800903152552856
+        ],
+        "clustered_acc_ci95": [
+          39.057239057239066,
+          50.5050505050505
+        ],
+        "mean_tokens": 8493.683501683501,
+        "loops": 4,
+        "token_limit_hits": 0,
+        "near_cap": 1,
+        "near_cap_unboxed": 1,
+        "max_completion_tokens": 32569,
+        "max_consecutive_word_run": 9220,
+        "flagged_rows": [
+          {
+            "seed": 42,
+            "row": 49,
+            "completion_tokens": 25959,
+            "max_consecutive_word_run": 4023,
+            "boxed": true,
+            "extractive_match": 0.0
+          },
+          {
+            "seed": 43,
+            "row": 138,
+            "completion_tokens": 29977,
+            "max_consecutive_word_run": 191,
+            "boxed": false,
+            "extractive_match": 0.0
+          },
+          {
+            "seed": 44,
+            "row": 131,
+            "completion_tokens": 32569,
+            "max_consecutive_word_run": 9220,
+            "boxed": false,
+            "extractive_match": 0.0
+          },
+          {
+            "seed": 44,
+            "row": 155,
+            "completion_tokens": 32405,
+            "max_consecutive_word_run": 5444,
+            "boxed": false,
+            "extractive_match": 1.0
+          }
+        ]
+      },
+      "Qwen-7B_GPTQ-4": {
+        "seed_accs": {
+          "42": 46.96969696969697,
+          "43": 50.0,
+          "44": 46.96969696969697
+        },
+        "mean_acc": 47.97979797979798,
+        "std_acc": 1.7495462702715938,
+        "pooled_correct": 285,
+        "wilson_ci_95": [
+          43.988054955431124,
+          51.99750281312134
+        ],
+        "clustered_acc_ci95": [
+          42.25589225589226,
+          53.70370370370369
+        ],
+        "mean_tokens": 9128.329966329968,
+        "loops": 3,
+        "token_limit_hits": 0,
+        "near_cap": 4,
+        "near_cap_unboxed": 4,
+        "max_completion_tokens": 32647,
+        "max_consecutive_word_run": 9060,
+        "flagged_rows": [
+          {
+            "seed": 43,
+            "row": 111,
+            "completion_tokens": 32339,
+            "max_consecutive_word_run": 9060,
+            "boxed": false,
+            "extractive_match": 1.0
+          },
+          {
+            "seed": 44,
+            "row": 75,
+            "completion_tokens": 25637,
+            "max_consecutive_word_run": 7321,
+            "boxed": true,
+            "extractive_match": 1.0
+          },
+          {
+            "seed": 44,
+            "row": 138,
+            "completion_tokens": 32131,
+            "max_consecutive_word_run": 546,
+            "boxed": false,
+            "extractive_match": 1.0
+          }
+        ]
+      },
+      "Llama-8B_BF16": {
+        "seed_accs": {
+          "42": 43.93939393939394,
+          "43": 46.96969696969697,
+          "44": 47.474747474747474
+        },
+        "mean_acc": 46.12794612794613,
+        "std_acc": 1.9120903521213048,
+        "pooled_correct": 274,
+        "wilson_ci_95": [
+          42.15680925919762,
+          50.14884313052794
+        ],
+        "clustered_acc_ci95": [
+          40.74074074074075,
+          51.683501683501675
+        ],
+        "mean_tokens": 8662.382154882156,
+        "loops": 0,
+        "token_limit_hits": 0,
+        "near_cap": 0,
+        "near_cap_unboxed": 0,
+        "max_completion_tokens": 32130,
+        "max_consecutive_word_run": 12,
+        "flagged_rows": []
+      },
+      "Llama-8B_FP8": {
+        "seed_accs": {
+          "42": 47.474747474747474,
+          "43": 47.97979797979798,
+          "44": 47.97979797979798
+        },
+        "mean_acc": 47.811447811447806,
+        "std_acc": 0.2915910450452656,
+        "pooled_correct": 284,
+        "wilson_ci_95": [
+          43.82135134348913,
+          51.82966957244272
+        ],
+        "clustered_acc_ci95": [
+          42.424242424242415,
+          53.198653198653226
+        ],
+        "mean_tokens": 8718.084175084174,
+        "loops": 0,
+        "token_limit_hits": 0,
+        "near_cap": 0,
+        "near_cap_unboxed": 0,
+        "max_completion_tokens": 32130,
+        "max_consecutive_word_run": 10,
+        "flagged_rows": []
+      },
+      "Llama-8B_AWQ-4": {
+        "seed_accs": {
+          "42": 46.96969696969697,
+          "43": 44.94949494949495,
+          "44": 48.98989898989899
+        },
+        "mean_acc": 46.96969696969697,
+        "std_acc": 2.0202020202020208,
+        "pooled_correct": 279,
+        "wilson_ci_95": [
+          42.98851284083425,
+          50.98982381199446
+        ],
+        "clustered_acc_ci95": [
+          41.75084175084178,
+          52.188552188552165
+        ],
+        "mean_tokens": 8889.18686868687,
+        "loops": 0,
+        "token_limit_hits": 0,
+        "near_cap": 1,
+        "near_cap_unboxed": 1,
+        "max_completion_tokens": 32632,
+        "max_consecutive_word_run": 15,
+        "flagged_rows": []
+      },
+      "Llama-8B_GPTQ-4": {
+        "seed_accs": {
+          "42": 44.44444444444444,
+          "43": 40.909090909090914,
+          "44": 49.494949494949495
+        },
+        "mean_acc": 44.94949494949495,
+        "std_acc": 4.315153406726024,
+        "pooled_correct": 267,
+        "wilson_ci_95": [
+          40.994338637620444,
+          48.96955578376072
+        ],
+        "clustered_acc_ci95": [
+          39.73063973063973,
+          50.16835016835019
+        ],
+        "mean_tokens": 9247.816498316497,
+        "loops": 1,
+        "token_limit_hits": 0,
+        "near_cap": 1,
+        "near_cap_unboxed": 1,
+        "max_completion_tokens": 32580,
+        "max_consecutive_word_run": 8264,
+        "flagged_rows": [
+          {
+            "seed": 44,
+            "row": 154,
+            "completion_tokens": 32580,
+            "max_consecutive_word_run": 8264,
+            "boxed": false,
+            "extractive_match": 1.0
+          }
+        ]
+      }
+    },
+    "pass1_contrasts": [
+      {
+        "contrast": "Qwen-7B BF16 vs FP8",
+        "model": "Qwen-7B",
+        "format": "FP8",
+        "delta": -0.008417508417508414,
+        "delta_pp": -0.8417508417508414,
+        "ci95_lo_pp": -4.713804713804715,
+        "ci95_hi_pp": 3.030303030303031,
+        "ci90_lo_pp": -4.208754208754207,
+        "ci90_hi_pp": 2.525252525252525,
+        "p_value": 0.6902,
+        "excludes_zero": false,
+        "tost_equiv_1pp": true,
+        "holm_alpha_pass1": 0.025,
+        "holm_significant_pass1": false
+      },
+      {
+        "contrast": "Qwen-7B BF16 vs AWQ-4",
+        "model": "Qwen-7B",
+        "format": "AWQ-4",
+        "delta": -0.05555555555555555,
+        "delta_pp": -5.555555555555555,
+        "ci95_lo_pp": -9.595959595959595,
+        "ci95_hi_pp": -1.5151515151515145,
+        "ci90_lo_pp": -9.09090909090909,
+        "ci90_hi_pp": -2.188552188552187,
+        "p_value": 0.0068,
+        "excludes_zero": true,
+        "tost_equiv_1pp": true,
+        "holm_alpha_pass1": 0.008333333333333333,
+        "holm_significant_pass1": true
+      },
+      {
+        "contrast": "Qwen-7B BF16 vs GPTQ-4",
+        "model": "Qwen-7B",
+        "format": "GPTQ-4",
+        "delta": -0.023569023569023566,
+        "delta_pp": -2.3569023569023564,
+        "ci95_lo_pp": -6.5656565656565675,
+        "ci95_hi_pp": 1.851851851851852,
+        "ci90_lo_pp": -6.060606060606057,
+        "ci90_hi_pp": 1.178451178451179,
+        "p_value": 0.2878,
+        "excludes_zero": false,
+        "tost_equiv_1pp": true,
+        "holm_alpha_pass1": 0.01,
+        "holm_significant_pass1": false
+      },
+      {
+        "contrast": "Llama-8B BF16 vs FP8",
+        "model": "Llama-8B",
+        "format": "FP8",
+        "delta": 0.016835016835016835,
+        "delta_pp": 1.6835016835016834,
+        "ci95_lo_pp": -2.188552188552188,
+        "ci95_hi_pp": 5.3872053872053876,
+        "ci90_lo_pp": -1.5151515151515158,
+        "ci90_hi_pp": 4.882154882154881,
+        "p_value": 0.4032,
+        "excludes_zero": false,
+        "tost_equiv_1pp": true,
+        "holm_alpha_pass1": 0.0125,
+        "holm_significant_pass1": false
+      },
+      {
+        "contrast": "Llama-8B BF16 vs AWQ-4",
+        "model": "Llama-8B",
+        "format": "AWQ-4",
+        "delta": 0.008417508417508416,
+        "delta_pp": 0.8417508417508416,
+        "ci95_lo_pp": -3.5353535353535346,
+        "ci95_hi_pp": 5.050505050505051,
+        "ci90_lo_pp": -2.8619528619528602,
+        "ci90_hi_pp": 4.377104377104378,
+        "p_value": 0.7114,
+        "excludes_zero": false,
+        "tost_equiv_1pp": true,
+        "holm_alpha_pass1": 0.05,
+        "holm_significant_pass1": false
+      },
+      {
+        "contrast": "Llama-8B BF16 vs GPTQ-4",
+        "model": "Llama-8B",
+        "format": "GPTQ-4",
+        "delta": -0.011784511784511785,
+        "delta_pp": -1.1784511784511784,
+        "ci95_lo_pp": -5.387205387205389,
+        "ci95_hi_pp": 3.03030303030303,
+        "ci90_lo_pp": -4.713804713804714,
+        "ci90_hi_pp": 2.3569023569023564,
+        "p_value": 0.573,
+        "excludes_zero": false,
+        "tost_equiv_1pp": true,
+        "holm_alpha_pass1": 0.016666666666666666,
+        "holm_significant_pass1": false
+      }
+    ],
+    "token_analysis": {
+      "Qwen-7B_FP8": {
+        "ratio_of_means_pct": -5.660203443784528,
+        "mean_of_per_item_ratios_pct": -0.7910445389983423,
+        "mean_paired_delta_tokens": -482.7811447811448,
+        "median_paired_delta_tokens": -150.99999999999932,
+        "delta_ci95": [
+          -805.1611531986531,
+          -163.03417508417513
+        ],
+        "iqr_delta": [
+          -1102.75,
+          793.6666666666672
+        ],
+        "p90_delta": 1909.5666666666664,
+        "p95_delta": 2581.233333333334,
+        "strata": {
+          "both_correct": {
+            "n": 223,
+            "mean": 3.309417040358744,
+            "median": 45.0,
+            "p90": 3549.400000000005,
+            "p95": 4820.5
+          },
+          "bf16_only": {
+            "n": 76,
+            "mean": 156.18421052631578,
+            "median": -150.5,
+            "p90": 4131.5,
+            "p95": 7833.5
+          },
+          "quant_only": {
+            "n": 71,
+            "mean": -1963.9014084507041,
+            "median": -992.0,
+            "p90": 3384.0,
+            "p95": 4154.5
+          },
+          "both_wrong": {
+            "n": 224,
+            "mean": -714.03125,
+            "median": -237.0,
+            "p90": 2367.3999999999996,
+            "p95": 3403.649999999999
+          }
+        }
+      },
+      "Qwen-7B_AWQ-4": {
+        "ratio_of_means_pct": -0.41869462727534,
+        "mean_of_per_item_ratios_pct": 4.67187479351947,
+        "mean_paired_delta_tokens": -35.712121212121204,
+        "median_paired_delta_tokens": -215.66666666666674,
+        "delta_ci95": [
+          -420.18362794612784,
+          369.4808501683503
+        ],
+        "iqr_delta": [
+          -1152.75,
+          1020.1666666666669
+        ],
+        "p90_delta": 2666.9333333333343,
+        "p95_delta": 3873.033333333334,
+        "strata": {
+          "both_correct": {
+            "n": 201,
+            "mean": 97.23383084577114,
+            "median": 49.0,
+            "p90": 4049.0,
+            "p95": 5268.0
+          },
+          "bf16_only": {
+            "n": 98,
+            "mean": 1022.1938775510204,
+            "median": 593.5,
+            "p90": 5780.999999999999,
+            "p95": 7577.950000000001
+          },
+          "quant_only": {
+            "n": 65,
+            "mean": -2085.769230769231,
+            "median": -821.0,
+            "p90": 3163.6000000000004,
+            "p95": 3770.199999999999
+          },
+          "both_wrong": {
+            "n": 230,
+            "mean": -23.291304347826088,
+            "median": -175.5,
+            "p90": 3134.2,
+            "p95": 5078.450000000001
+          }
+        }
+      },
+      "Qwen-7B_GPTQ-4": {
+        "ratio_of_means_pct": 7.022002143113304,
+        "mean_of_per_item_ratios_pct": 8.924037890909165,
+        "mean_paired_delta_tokens": 598.9343434343434,
+        "median_paired_delta_tokens": 347.1666666666665,
+        "delta_ci95": [
+          251.968308080808,
+          964.1472643097643
+        ],
+        "iqr_delta": [
+          -493.91666666666663,
+          1620.833333333333
+        ],
+        "p90_delta": 3226.6000000000013,
+        "p95_delta": 5130.600000000005,
+        "strata": {
+          "both_correct": {
+            "n": 212,
+            "mean": 441.54716981132077,
+            "median": 60.5,
+            "p90": 4278.500000000001,
+            "p95": 5745.099999999998
+          },
+          "bf16_only": {
+            "n": 87,
+            "mean": 2146.103448275862,
+            "median": 783.0,
+            "p90": 10329.800000000001,
+            "p95": 13680.400000000007
+          },
+          "quant_only": {
+            "n": 73,
+            "mean": -289.0,
+            "median": 0.0,
+            "p90": 3927.0,
+            "p95": 6782.6
+          },
+          "both_wrong": {
+            "n": 222,
+            "mean": 434.8873873873874,
+            "median": 434.0,
+            "p90": 3809.3,
+            "p95": 5341.299999999999
+          }
+        }
+      },
+      "Llama-8B_FP8": {
+        "ratio_of_means_pct": 0.6430335120995334,
+        "mean_of_per_item_ratios_pct": 5.469142349148126,
+        "mean_paired_delta_tokens": 55.70202020202022,
+        "median_paired_delta_tokens": -109.99999999999955,
+        "delta_ci95": [
+          -207.4530723905722,
+          329.4441077441077
+        ],
+        "iqr_delta": [
+          -1116.0000000000002,
+          1120.4166666666667
+        ],
+        "p90_delta": 2122.733333333334,
+        "p95_delta": 3564.46666666667,
+        "strata": {
+          "both_correct": {
+            "n": 201,
+            "mean": 134.18407960199005,
+            "median": 102.0,
+            "p90": 3822.0,
+            "p95": 5459.0
+          },
+          "bf16_only": {
+            "n": 73,
+            "mean": 1409.4657534246576,
+            "median": 191.0,
+            "p90": 7449.599999999998,
+            "p95": 9786.600000000002
+          },
+          "quant_only": {
+            "n": 83,
+            "mean": -1201.2048192771085,
+            "median": -131.0,
+            "p90": 2190.6,
+            "p95": 4142.300000000004
+          },
+          "both_wrong": {
+            "n": 237,
+            "mean": 12.341772151898734,
+            "median": -201.0,
+            "p90": 2994.6000000000013,
+            "p95": 3660.9999999999986
+          }
+        }
+      },
+      "Llama-8B_AWQ-4": {
+        "ratio_of_means_pct": 2.6182718535095573,
+        "mean_of_per_item_ratios_pct": 5.979139545763035,
+        "mean_paired_delta_tokens": 226.80471380471383,
+        "median_paired_delta_tokens": -4.16666666666606,
+        "delta_ci95": [
+          -109.97053872053866,
+          569.7705387205388
+        ],
+        "iqr_delta": [
+          -1258.6666666666665,
+          1304.666666666667
+        ],
+        "p90_delta": 3207.333333333334,
+        "p95_delta": 3890.8500000000017,
+        "strata": {
+          "both_correct": {
+            "n": 187,
+            "mean": 637.0641711229947,
+            "median": 112.0,
+            "p90": 6068.000000000002,
+            "p95": 8110.499999999996
+          },
+          "bf16_only": {
+            "n": 87,
+            "mean": 1371.7011494252874,
+            "median": 422.0,
+            "p90": 6537.2,
+            "p95": 9836.400000000003
+          },
+          "quant_only": {
+            "n": 92,
+            "mean": -983.75,
+            "median": -675.0,
+            "p90": 3002.3000000000025,
+            "p95": 5985.350000000003
+          },
+          "both_wrong": {
+            "n": 228,
+            "mean": -58.078947368421055,
+            "median": -238.5,
+            "p90": 3661.3,
+            "p95": 4908.950000000001
+          }
+        }
+      },
+      "Llama-8B_GPTQ-4": {
+        "ratio_of_means_pct": 6.758352759862851,
+        "mean_of_per_item_ratios_pct": 10.952912783984846,
+        "mean_paired_delta_tokens": 585.4343434343435,
+        "median_paired_delta_tokens": 319.5,
+        "delta_ci95": [
+          283.27243265993246,
+          907.2794191919188
+        ],
+        "iqr_delta": [
+          -565.1666666666665,
+          1714.1666666666665
+        ],
+        "p90_delta": 2988.7666666666682,
+        "p95_delta": 3941.8833333333355,
+        "strata": {
+          "both_correct": {
+            "n": 183,
+            "mean": 684.0,
+            "median": 422.0,
+            "p90": 5558.2000000000035,
+            "p95": 7417.0
+          },
+          "bf16_only": {
+            "n": 91,
+            "mean": 1507.5384615384614,
+            "median": 1383.0,
+            "p90": 6267.0,
+            "p95": 7685.0
+          },
+          "quant_only": {
+            "n": 84,
+            "mean": 218.71428571428572,
+            "median": 92.0,
+            "p90": 4542.2,
+            "p95": 5246.25
+          },
+          "both_wrong": {
+            "n": 236,
+            "mean": 283.97457627118644,
+            "median": 249.0,
+            "p90": 3769.0,
+            "p95": 5082.25
+          }
+        }
+      }
+    },
+    "deployment_economics": {
+      "Qwen-7B_BF16": {
+        "mean_tokens": 8529.395622895623,
+        "time_per_q_sec": 131.22147112147113,
+        "cost_per_q_dollars": 0.05467561296727964,
+        "c_pass_dollars": 0.10861977960723782,
+        "note": "token-implied Cpass at shared 65 tok/s; not measured wall-clock"
+      },
+      "Qwen-7B_FP8": {
+        "mean_tokens": 8046.6144781144785,
+        "time_per_q_sec": 123.7940688940689,
+        "cost_per_q_dollars": 0.05158086203919538,
+        "c_pass_dollars": 0.10421439473225191,
+        "note": "token-implied Cpass at shared 65 tok/s; not measured wall-clock"
+      },
+      "Qwen-7B_AWQ-4": {
+        "mean_tokens": 8493.683501683501,
+        "time_per_q_sec": 130.67205387205385,
+        "cost_per_q_dollars": 0.054446689113355776,
+        "c_pass_dollars": 0.12158395989974936,
+        "note": "token-implied Cpass at shared 65 tok/s; not measured wall-clock"
+      },
+      "Qwen-7B_GPTQ-4": {
+        "mean_tokens": 9128.329966329968,
+        "time_per_q_sec": 140.43584563584565,
+        "cost_per_q_dollars": 0.05851493568160236,
+        "c_pass_dollars": 0.12195744489428703,
+        "note": "token-implied Cpass at shared 65 tok/s; not measured wall-clock"
+      },
+      "Llama-8B_BF16": {
+        "mean_tokens": 8662.382154882156,
+        "time_per_q_sec": 133.26741776741778,
+        "cost_per_q_dollars": 0.05552809073642408,
+        "c_pass_dollars": 0.12037841568407263,
+        "note": "token-implied Cpass at shared 65 tok/s; not measured wall-clock"
+      },
+      "Llama-8B_FP8": {
+        "mean_tokens": 8718.084175084174,
+        "time_per_q_sec": 134.1243719243719,
+        "cost_per_q_dollars": 0.055885154968488296,
+        "c_pass_dollars": 0.11688655651859878,
+        "note": "token-implied Cpass at shared 65 tok/s; not measured wall-clock"
+      },
+      "Llama-8B_AWQ-4": {
+        "mean_tokens": 8889.18686868687,
+        "time_per_q_sec": 136.75672105672106,
+        "cost_per_q_dollars": 0.05698196710696711,
+        "c_pass_dollars": 0.12131644609870418,
+        "note": "token-implied Cpass at shared 65 tok/s; not measured wall-clock"
+      },
+      "Llama-8B_GPTQ-4": {
+        "mean_tokens": 9247.816498316497,
+        "time_per_q_sec": 142.27409997409995,
+        "cost_per_q_dollars": 0.05928087498920832,
+        "c_pass_dollars": 0.13188329491981177,
+        "note": "token-implied Cpass at shared 65 tok/s; not measured wall-clock"
+      }
+    },
+    "selective_oracle": {},
+    "loop_rows": [
+      {
+        "seed": 42,
+        "row": 75,
+        "completion_tokens": 31135,
+        "max_consecutive_word_run": 7856,
+        "boxed": true,
+        "extractive_match": 0.0,
+        "model": "Qwen-7B",
+        "format": "BF16"
+      },
+      {
+        "seed": 42,
+        "row": 154,
+        "completion_tokens": 32562,
+        "max_consecutive_word_run": 6046,
+        "boxed": false,
+        "extractive_match": 1.0,
+        "model": "Qwen-7B",
+        "format": "BF16"
+      },
+      {
+        "seed": 43,
+        "row": 18,
+        "completion_tokens": 32603,
+        "max_consecutive_word_run": 8113,
+        "boxed": false,
+        "extractive_match": 0.0,
+        "model": "Qwen-7B",
+        "format": "BF16"
+      },
+      {
+        "seed": 44,
+        "row": 153,
+        "completion_tokens": 32510,
+        "max_consecutive_word_run": 7270,
+        "boxed": false,
+        "extractive_match": 0.0,
+        "model": "Qwen-7B",
+        "format": "BF16"
+      },
+      {
+        "seed": 42,
+        "row": 49,
+        "completion_tokens": 25959,
+        "max_consecutive_word_run": 4023,
+        "boxed": true,
+        "extractive_match": 0.0,
+        "model": "Qwen-7B",
+        "format": "AWQ-4"
+      },
+      {
+        "seed": 43,
+        "row": 138,
+        "completion_tokens": 29977,
+        "max_consecutive_word_run": 191,
+        "boxed": false,
+        "extractive_match": 0.0,
+        "model": "Qwen-7B",
+        "format": "AWQ-4"
+      },
+      {
+        "seed": 44,
+        "row": 131,
+        "completion_tokens": 32569,
+        "max_consecutive_word_run": 9220,
+        "boxed": false,
+        "extractive_match": 0.0,
+        "model": "Qwen-7B",
+        "format": "AWQ-4"
+      },
+      {
+        "seed": 44,
+        "row": 155,
+        "completion_tokens": 32405,
+        "max_consecutive_word_run": 5444,
+        "boxed": false,
+        "extractive_match": 1.0,
+        "model": "Qwen-7B",
+        "format": "AWQ-4"
+      },
+      {
+        "seed": 43,
+        "row": 111,
+        "completion_tokens": 32339,
+        "max_consecutive_word_run": 9060,
+        "boxed": false,
+        "extractive_match": 1.0,
+        "model": "Qwen-7B",
+        "format": "GPTQ-4"
+      },
+      {
+        "seed": 44,
+        "row": 75,
+        "completion_tokens": 25637,
+        "max_consecutive_word_run": 7321,
+        "boxed": true,
+        "extractive_match": 1.0,
+        "model": "Qwen-7B",
+        "format": "GPTQ-4"
+      },
+      {
+        "seed": 44,
+        "row": 138,
+        "completion_tokens": 32131,
+        "max_consecutive_word_run": 546,
+        "boxed": false,
+        "extractive_match": 1.0,
+        "model": "Qwen-7B",
+        "format": "GPTQ-4"
+      },
+      {
+        "seed": 44,
+        "row": 154,
+        "completion_tokens": 32580,
+        "max_consecutive_word_run": 8264,
+        "boxed": false,
+        "extractive_match": 1.0,
+        "model": "Llama-8B",
+        "format": "GPTQ-4"
+      }
+    ],
+    "total_loops": 12,
+    "total_near_cap": 12,
+    "total_token_limit_hits": 0
+  },
+  "grid_totals": {
+    "loops": 25,
+    "near_cap": 209,
+    "token_limit_hits": 0
+  }
+}

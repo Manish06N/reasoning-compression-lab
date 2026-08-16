@@ -1,6 +1,6 @@
 # Progress Log — Master Reference
 
-Canonical dated record for **Paper 1: Beyond Accuracy** (`reasoning-compression-lab`).
+Canonical dated record for **Paper 1: Beyond Pass@1** (`reasoning-compression-lab`).
 
 **Purpose:** Future sessions can resume without guessing what was built, where it runs, which gates passed, and what failed. Update this file after every material change on MacBook, Windows/WSL, or HPC.
 
@@ -9,19 +9,19 @@ Canonical dated record for **Paper 1: Beyond Accuracy** (`reasoning-compression-
 
 ---
 
-## Current Status Snapshot (2026-08-16: Phase 4/5 & GSM8K Completed; GPQA Active)
+## Current Status Snapshot (2026-08-16: 88/88 complete; arXiv package in `paper/`)
 
 | Area | Status |
 |------|--------|
-| **Publication verdict** | **On Track for Q1 Submission** — Complete 40-cell MATH-500 grid and 24-cell GSM8K grid validated with 0 truncations / 0 loops |
-| **Scientific authority** | [Publication Readiness Audit](docs/PUBLICATION_READINESS.md) · [Working Manuscript](paper/main.md) |
-| **Execution authority** | [2026-08-14 Publication-Recovery Plan](docs/plans/2026-08-14-publication-recovery.md) · [TODO List](TODO_LIST.md) |
+| **Publication verdict** | **ArXiv-ready preprint** pending author PDF review and MacBook commit/push. Not yet a journal submission. |
+| **Scientific authority** | Canonical manuscript [`paper/main.tex`](paper/main.tex) / [`paper/main.pdf`](paper/main.pdf). The [2026-08-14 audit](docs/PUBLICATION_READINESS.md) is historical; see the 2026-08-16 superseding banner. |
+| **Execution authority** | Grid complete. Do not launch new GPU jobs unless asked. Scoreboard: [`results/README.md`](results/README.md). |
 | **MATH-500 Confirmatory Grid** | **100% Complete** (40 cells, 20,000 completions, seeds 42–46). Qwen: BF16 94.00%, FP8 94.40%, AWQ4 93.12%, GPTQ4 93.48%; Llama: BF16 89.24%, FP8 89.52%, AWQ4 86.48%, GPTQ4 88.92% |
-| **Phase 5 Statistical Analysis** | **100% Complete** — Paired McNemar exact tests ($p > 0.05$ vs BF16), sample-consistency calibration (ECE $\le 0.034$), Brier score ($<0.022$), AURC ($\le 0.0054$), Cost-of-Pass ($C_{\text{pass}}$) Pareto frontier |
-| **GSM8K Breadth Grid** | **100% Complete** (24 cells, $n=1,319$, seeds 42–44). Qwen: BF16 91.26%, FP8 91.33%, AWQ4 91.05%, GPTQ4 91.13%; Llama: BF16 88.68%, FP8 88.80%, AWQ4 87.11%, GPTQ4 88.96% |
-| **GPQA-Diamond Breadth Grid** | **RUNNING** on HPC (24 cells, $n=198$, seeds 42–44) via autonomous daemon `gpqa_daemon` in tmux |
-| **Hardware Utilization** | Exactly 2 GPUs concurrently (1 Qwen on `ragpu005` + 1 Llama on `ragpu006`), 100% compliant with `QOSMaxGRESPerUser` |
-| **Backups** | Dual verified backups in local project `archive/` and persistent home directory `/home/manishn_iitp/archive/` (MATH-500 565MB, GSM8K 439MB) |
+| **Phase 5 Statistical Analysis** | **100% Complete** — maj@5 McNemar ($p > 0.29$ vs BF16 after Holm–Bonferroni), sample-consistency ECE/Brier/AURC, modeled $C_{\mathrm{pass}}$ at $\$1.50$/h and $65$ tok/s |
+| **GSM8K Breadth Grid** | **100% Complete** (24 cells, $n=1,319$, seeds 42–44) |
+| **GPQA-Diamond Breadth Grid** | **100% Complete** (24 cells, $n=198$, seeds 42–44). Qwen: BF16 50.34%, FP8 49.49%, AWQ-4 44.78%, GPTQ-4 47.98%; Llama: BF16 46.13%, FP8 47.81%, AWQ-4 46.97%, GPTQ-4 44.95% |
+| **Hardware Utilization** | Campaign finished. Do not submit extra GPU jobs unless asked. |
+| **Backups** | Dual verified backups in local project `archive/` and `/home/manishn_iitp/archive/`; 88 JSON files in `results/` |
 
 ### 2026-08-13 run diagnosis: what worked, what did not, and why
 

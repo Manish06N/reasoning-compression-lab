@@ -11,7 +11,9 @@ import os
 from collections import defaultdict
 
 def main():
-    validation_dir = "outputs-hpc-campaign-2026-08-14/validation"
+    validation_dir = "results/math500"
+    if not glob.glob(os.path.join(validation_dir, "*.json")):
+        validation_dir = "outputs-hpc-campaign-2026-08-14/validation"
     files = sorted(glob.glob(os.path.join(validation_dir, "*.json")))
     print(f"Loading {len(files)} validation files for trace audit...")
 
@@ -136,7 +138,7 @@ def main():
 ---
 
 ## 2. Qualitative Trace & Token Inflation Mechanism
-* **Step Deliberation Drift:** 4-bit quantized traces (AWQ-4 and GPTQ-4) frequently introduce additional intermediate algebraic restatements (e.g. repeated factorization checks) before concluding with the final boxed value.
+* **Note:** This script does not read generated trace text. Qualitative mechanism claims require the HPC JSONLs. Token numbers below are seed-42 even-index subset statistics and are **not** interchangeable with full-grid ratio-of-means; see ``revision_reanalysis.py``.
 * **Token Inflation vs BF16:**
   * `Qwen-7B FP8`: {audit_findings['mean_token_deltas_vs_bf16'].get('Qwen-7B_FP8', 'N/A')}
   * `Qwen-7B AWQ-4`: {audit_findings['mean_token_deltas_vs_bf16'].get('Qwen-7B_AWQ-4', 'N/A')}

@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
-"""
-Selective Prediction & Abstention Analysis (Risk-Coverage Tradeoffs).
-Evaluates operational serving thresholds (agreement thresholds k/5: 1/5, 2/5, 3/5, 4/5, 5/5)
-across BF16, FP8, AWQ-4, GPTQ-4.
-Computes:
-- Coverage Rate (% of questions answered)
-- Effective Selective Accuracy (% correct among answered)
-- Selective Risk (% error among answered)
+"""Oracle gold-hit selective-prediction diagnostic (NOT deployable).
+
+The compact validation JSON has no extracted answer strings. This script therefore
+gates on gold-correct seed counts, not on modal-answer agreement. For K=5, k=3
+coverage is identically 100% because max(c, 5-c) >= 3 always. Do not cite these
+numbers as an operational safety gate. Prefer scripts/analysis/revision_reanalysis.py.
 """
 
 import json

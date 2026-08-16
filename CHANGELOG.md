@@ -1,5 +1,30 @@
 # Changelog
 
+## 2026-08-16 (night) — P0 analysis correction + manuscript rewrite
+
+Addressed the six-review consensus without new GPU jobs:
+
+- Fixed pathology JSON-key mismatch (`token_limit_hits` / `repetition_rows`). Grid totals: **25 loops**, **0 exact cap hits**, **209 near-cap** (`>= 32500` tokens).
+- Primary stats are now problem-clustered bootstrap of pass@1 (Llama AWQ-4 MATH −2.76 pp, p<0.001; Qwen AWQ-4 GPQA −5.56 pp, p=0.007). maj@5 McNemar is secondary.
+- Replaced the 200-item even-index mean-of-ratios “stratified” analysis with full-grid paired token deltas stratified by correctness.
+- Dropped gold-hit “safety gate” / circular ECE from headlines. Compact JSON has no extracted answers.
+- Retitled to *Pinned Serving Stack*. Token-implied Cpass is no longer called Pareto-optimal.
+- Canonical report: `results/reports/revision_reanalysis_report.json`. Recompute with `python3 scripts/analysis/revision_reanalysis.py`.
+
+## 2026-08-16 (evening) — Manuscript verification pass
+
+Checked every table in `paper/main.tex` against `results/reports/*.json` and `results/README.md` (88 JSON files; 56,408 completions). Numbers match. Fixes from this pass:
+
+- Bibliography authors/titles: Lian et al. (arXiv:2606.25519), Alimaskina et al. (arXiv:2606.02011), Zollo/Wang/Zemel (arXiv:2604.19444). In-text cites no longer say Zhang/Zhao.
+- `\FloatBarrier` so figures no longer interleave with References (PDF is now 12 pages).
+- `paper/main.md` now has full Tables 7–8.
+- Stale overclaims and scrambled GPQA seed rows corrected in `README.md`, `TODO_LIST.md`, `AGENTS.md`, `progress.md`. `docs/PUBLICATION_READINESS.md` has a 2026-08-16 superseding banner (the 2026-08-14 audit is historical).
+- `setup_official_qrm_repo.sh` now applies `patches/qrm_hpc_compat.patch` and `patches/lighteval_local_dataset.patch`.
+
+## 2026-08-16 (evening) — ArXiv manuscript package
+
+Honest methods pass on `paper/main.tex`: sample-consistency ECE matches the analysis code; $C_{\mathrm{pass}}$ labeled as modeled at $1.50/h and 65 tok/s; truncation/loops labeled as heuristics; token inflation scoped (full-grid vs 200-item audit); McNemar scoped to maj@5. Related Work, Discussion, Tables 5–8, four figures, and corrected bibliography (Liu arXiv:2504.04823; Erol et al. Cost-of-Pass; DeepSeek-R1). Compiled `paper/main.pdf` (11 pages). Upload zip: `paper/arxiv_source.zip`. See `paper/ARTIFACT.md`.
+
 ## 2026-08-16 - Completed Phase 4 (40-Cell Headline Grid) & Phase 5 (Statistical Metrology & Trace Audit), Manuscript Updated
 
 ### 1. Headline Confirmatory Results (MATH-500, n=500, Seeds 42–46, 20,000 Completions)

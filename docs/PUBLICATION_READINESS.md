@@ -1,12 +1,22 @@
-# Publication Readiness Audit — 2026-08-14
+# Publication Readiness
 
-**Decision:** **Needs revision — do not submit the current two-result package as a paper.**
+**Superseding decision (2026-08-16):** The matched 88-cell grid is complete (**56,408** completions: MATH-500 40 + GSM8K 24 + GPQA-Diamond 24). Canonical manuscript: [`paper/main.tex`](../paper/main.tex) compiled to [`paper/main.pdf`](../paper/main.pdf) (12 pages). Scoreboard: [`results/README.md`](../results/README.md). ArXiv zip: [`paper/arxiv_source.zip`](../paper/arxiv_source.zip).
 
-**Current evidence label:** validated single-seed FP8 replication/control evidence.
+The 2026-08-14 audit below is **historical**. It correctly blocked publishing the two-job FP8-only package. It does **not** describe the current evidence. The recovery-plan GPU freeze (no b03/b04 / no broad grid) is **lifted** because Phases 0–6 and both breadth grids finished. Do not launch new GPU jobs unless the user asks.
 
-**Canonical execution plan:** [plans/2026-08-14-publication-recovery.md](plans/2026-08-14-publication-recovery.md)
+**Current label:** arXiv-ready preprint package, pending author PDF review and GitHub commit/push from the MacBook.
 
-This document is the controlling scientific interpretation for Paper 1. Older status notes remain useful as chronological evidence, but any statement that jobs 96100/96101 are running, that seed 0 alone is a publishable core, or that the current FP8 result establishes a quantization effect is superseded by this audit.
+---
+
+# Publication Readiness Audit — 2026-08-14 (historical)
+
+**Historical decision:** **Needs revision — do not submit the (then) two-result package as a paper.**
+
+**Then-current evidence label:** validated single-seed FP8 replication/control evidence.
+
+**Canonical execution plan (historical):** [plans/2026-08-14-publication-recovery.md](plans/2026-08-14-publication-recovery.md)
+
+This 2026-08-14 audit was the controlling scientific interpretation *until the matched 88-cell grid finished*. Keep it as chronological evidence. Any statement that jobs 96100/96101 are running, that seed 0 alone is a publishable core, or that the two-job FP8 result establishes a quantization effect remains superseded — first by this audit, and now by the 2026-08-16 banner at the top of this file.
 
 ---
 

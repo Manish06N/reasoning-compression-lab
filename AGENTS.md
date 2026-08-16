@@ -3,7 +3,7 @@
 **Cluster:** PARAM Rudra HPC (C-DAC / NSM), NVIDIA A100 80GB GPUs  
 **Repository:** `/scratch/manishn_iitp/reasoning-compression-lab`  
 **GitHub:** [https://github.com/Manish06N/reasoning-compression-lab](https://github.com/Manish06N/reasoning-compression-lab)  
-**Last Updated:** 2026-08-15 (Post-40-Cell Confirmatory Campaign Completion)
+**Last Updated:** 2026-08-16 (88-cell grids complete; arXiv manuscript package in `paper/`)
 
 ---
 
@@ -29,7 +29,7 @@ graph TD
 
 | Output | Type | Title / Focus | Target Venues (Verify Q1) | Hardware / Stack | Status / Target Date |
 |---|---|---|---|---|---|
-| **J1** | Main Journal | *Beyond Pass@1: Reliability–Cost Frontiers of Quantized Reasoning Models under Controlled Serving-Stack Shift* | *Future Generation Computer Systems (FGCS)*, *Journal of Systems and Software (JSS)*, *Neurocomputing* | HPC 2× A100, `qrm-official` (vLLM 0.7.0 eager) | **Headline 40-cell grid completed (2026-08-15)**; Phase 5 analysis & draft in progress |
+| **J1** | Main Journal | *Beyond Pass@1: Reliability–Cost Frontiers of Quantized Reasoning Models under Controlled Serving-Stack Shift* | *Future Generation Computer Systems (FGCS)*, *Journal of Systems and Software (JSS)*, *Neurocomputing* | HPC 2× A100, `qrm-official` (vLLM 0.7.0 eager) | **88/88 cells complete**; arXiv package in `paper/` (2026-08-16) |
 | **C1** | Conference / Workshop | *Trace-Level Evaluation Metrology for Compressed Reasoning Models* | NeurIPS/ICLR/ACL Workshops (Eval4NLP, Efficient Natural Language, MLPerf) | HPC A100 | Submission Month 6–12 (Post-J1 pilot packaging) |
 | **J2** | Journal 2 | *Reasoning-Aware Speculative Decoding: Acceptance Dynamics and Serving Acceleration* | *JSS*, *Engineering Applications of AI (EAAI)*, *FGCS* | HPC 2× A100 | Year 2 (Methods & draft model training) |
 | **C2** | Conference / Workshop | *High-Throughput Speculative Serving of Compressed Reasoning LLMs* | MLSys / EuroSys / ACL Demo Track | HPC A100 | Year 2 |
@@ -96,22 +96,22 @@ MODEL MATRIX SUMMARY (MATH-500, n=500, 5 Seeds: 42, 43, 44, 45, 46)
 ====================================================================================================
 Model & Format          Seed 42   Seed 43   Seed 44   Seed 45   Seed 46      Mean ± Std   Trunc   Loops
 ----------------------------------------------------------------------------------------------------
-Qwen-7B BF16             94.4%     94.0%     93.8%     94.6%     93.2%    94.00% ± 0.53%      0       0
+Qwen-7B BF16             94.4%     94.0%     93.8%     94.6%     93.2%    94.00% ± 0.55%      0       0
 Qwen-7B FP8              94.4%     95.2%     94.8%     92.6%     95.0%    94.40% ± 1.05%      0       0
-Qwen-7B AWQ-4            92.4%     92.8%     93.2%     93.0%     94.2%    93.12% ± 0.68%      0       0
+Qwen-7B AWQ-4            92.4%     92.8%     93.2%     93.0%     94.2%    93.12% ± 0.67%      0       0
 Qwen-7B GPTQ-4           93.8%     92.6%     93.4%     94.6%     93.0%    93.48% ± 0.77%      0       0
 ----------------------------------------------------------------------------------------------------
-Llama-8B BF16            89.0%     88.4%     90.2%     89.8%     88.8%    89.24% ± 0.73%      0       0
-Llama-8B FP8             89.0%     89.6%     88.6%     89.2%     91.2%    89.52% ± 1.02%      0       0
-Llama-8B AWQ-4           84.4%     84.8%     89.2%     87.4%     86.6%    86.48% ± 1.95%      0       0
-Llama-8B GPTQ-4          88.0%     89.6%     86.8%     89.4%     90.8%    88.92% ± 1.54%      0       0
+Llama-8B BF16            89.0%     88.4%     90.2%     89.8%     88.8%    89.24% ± 0.74%      0       0
+Llama-8B FP8             89.0%     89.6%     88.6%     89.2%     91.2%    89.52% ± 1.01%      0       0
+Llama-8B AWQ-4           84.4%     84.8%     89.2%     87.4%     86.6%    86.48% ± 1.96%      0       0
+Llama-8B GPTQ-4          88.0%     89.6%     86.8%     89.4%     90.8%    88.92% ± 1.55%      0       0
 ====================================================================================================
 ```
 
 ### Key Empirical Findings
-1. **FP8 Parity:** FP8 checkpoints on A100 (via Marlin weight-only fallback W8A16) achieve 100% statistical parity with BF16 across both architectures (Qwen: 94.40% vs 94.00%; Llama: 89.52% vs 89.24%).
-2. **4-Bit Quantization Resilience:** 4-bit GPTQ and AWQ retain exceptional reasoning fidelity on Qwen-7B (>93.1% vs 94.0% BF16), while Llama-8B exhibits greater sensitivity to 4-bit AWQ compression (86.48% vs 89.24% BF16).
-3. **Zero Pathological Degeneration:** Under the pinned `qrm-official` protocol, all 40 cells achieved **0 length truncations** and **0 infinite repetition loops** with >99% answer extraction rate.
+1. **FP8 vs BF16:** On A100 Marlin W8A16 (not native W8A8), maj@5 McNemar vs BF16 is non-significant after Holm–Bonferroni ($p > 0.29$). Llama AWQ-4 still drops $2.76$ pp on mean pass@1.
+2. **4-Bit Quantization Resilience:** Qwen-7B 4-bit stays above $93.1\%$ on MATH-500; Llama-8B AWQ-4 is the weak cell ($86.48\%$ vs $89.24\%$ BF16).
+3. **Pathology heuristics:** All 88 cells are 0/0 on the token-cap and identical-word detectors. Official QRM rows do not store `finish_reason`.
 
 ---
 
@@ -126,10 +126,9 @@ gantt
     Phase 1 Matched BF16 vs FP8 Baseline        :done, 2026-08-14, 2026-08-14
     Phase 2 3-Seed 4-Format Pilot Grid          :done, 2026-08-14, 2026-08-15
     Phase 4 5-Seed Confirmatory Grid (MATH-500) :done, 2026-08-14, 2026-08-15
-    section Active
-    Phase 5 Statistical Analysis & Calibration  :active, 2026-08-15, 2026-08-20
-    Breadth Tasks (GPQA-Diamond, GSM8K)         :2026-08-18, 2026-08-25
-    Phase 6 Manuscript Draft (paper/main.md)    :2026-08-20, 2026-08-30
+    Phase 5 Statistical Analysis & Calibration  :done, 2026-08-15, 2026-08-16
+    Breadth Tasks (GPQA-Diamond, GSM8K)         :done, 2026-08-15, 2026-08-16
+    Phase 6 ArXiv Manuscript Package            :done, 2026-08-16, 2026-08-16
 ```
 
 ### Phase Details & Action Items
@@ -138,20 +137,20 @@ gantt
 - All 40 MATH-500 cells (2 models $\times$ 4 formats $\times$ 5 seeds) executed, verified, and backed up in `outputs-hpc-campaign-2026-08-14/`.
 
 #### [x] Phase 5: Frozen Statistical Analysis & Calibration (COMPLETED)
-1. **Paired Statistical Testing:** Paired McNemar tests confirm exact statistical parity between BF16 and quantized formats under Holm-Bonferroni correction ($p > 0.05$).
-2. **Sample-Consistency Calibration:** `maj@5` evaluated; ECE $\le 0.034$ (Qwen) / $\le 0.072$ (Llama); Brier score $< 0.022$; AURC $\le 0.0054$.
-3. **Systems & Economics:** Cost-of-Pass ($C_{\text{pass}}$) Pareto frontier computed under $1.50/A100 GPU-hr baseline; FP8 establishes optimal dollar-cost-per-correct answer.
-4. **Structured Trace Audit:** 200-sample stratified audit documented in `results/trace_audit_report.json` with 0 degenerations.
+1. **Paired Statistical Testing:** Exact McNemar on maj@5 vs BF16 is non-significant after Holm–Bonferroni ($p > 0.29$). Not a test of pass@1 means.
+2. **Sample-Consistency Calibration:** `maj@5` evaluated; ECE $\le 0.034$ (Qwen) / $\le 0.072$ (Llama); Brier score $< 0.022$; AURC $\le 0.0054$. Confidence is gold-correct seed fraction, not logprobs.
+3. **Systems & Economics:** Modeled Cost-of-Pass ($C_{\text{pass}}$) at $\$1.50$/A100-h and $65$ tok/s; FP8 is lowest modeled cost. Latency columns are $\bar{T}/65$, not wall-clock.
+4. **Structured Trace Audit:** 200-sample stratified audit in `results/reports/trace_audit_report.json`. Full-grid 4-bit token inflation $+1.7\%$ to $+6.8\%$; subset $+10\%$ to $+30\%$.
 
 #### [x] Phase 4 Extension: Breadth Benchmark Evaluation (COMPLETED)
 - **GSM8K ($n=1,319$):** ✅ **100% COMPLETED** (24 cells, seeds 42–44). Qwen: BF16 91.26%, FP8 91.33%, AWQ-4 91.05%, GPTQ-4 91.13%; Llama: BF16 88.68%, FP8 88.80%, AWQ-4 87.11%, GPTQ-4 88.96%.
 - **GPQA-Diamond ($n=198$):** ✅ **100% COMPLETED** (24 cells, seeds 42–44). Qwen: BF16 50.34%, FP8 49.49%, AWQ-4 44.78%, GPTQ-4 47.98%; Llama: BF16 46.13%, FP8 47.81%, AWQ-4 46.97%, GPTQ-4 44.95%.
 
 #### [x] Phase 6: Manuscript Completion & Submission Packaging (COMPLETED)
-- Full manuscript in [`paper/main.md`](paper/main.md) and [`paper/main.tex`](paper/main.tex) with all 8 tables and formal formulas.
-- Camera-ready PDF compiled cleanly into [`paper/main.pdf`](paper/main.pdf) (7 pages).
-- Target venue: *Future Generation Computer Systems (FGCS)* / *Journal of Systems and Software (JSS)* (Q1).
-- All 88 validation JSON files across MATH-500, GSM8K, and GPQA backed up into `results/` and synced with GitHub.
+- Canonical LaTeX in [`paper/main.tex`](paper/main.tex); markdown mirror [`paper/main.md`](paper/main.md); compiled [`paper/main.pdf`](paper/main.pdf) (12 pages).
+- ArXiv source zip: [`paper/arxiv_source.zip`](paper/arxiv_source.zip). Artifact notes: [`paper/ARTIFACT.md`](paper/ARTIFACT.md).
+- First public target is arXiv; journal venue selection is later.
+- All 88 validation JSON files across MATH-500, GSM8K, and GPQA are in `results/` (GitHub `eda2b11` plus local manuscript files).
 
 ---
 

@@ -26,8 +26,8 @@ def parse_val_file(path):
             acc = sum(1 for r in records if r.get("is_correct", False)) / len(records)
     
     tokens = data.get("completion_tokens_mean", 0)
-    trunc = data.get("truncation_count", data.get("hit_token_limit_count", 0))
-    loops = data.get("repetition_flag_count", 0)
+    trunc = data.get("token_limit_hits", data.get("truncation_count", data.get("hit_token_limit_count", 0)))
+    loops = data.get("repetition_rows", data.get("repetition_flag_count", 0))
     return acc, tokens, trunc, loops
 
 def compute_grid(dir_path, seeds, models, formats):

@@ -106,7 +106,9 @@ def compute_aurc(confidences, errors):
     return aurc
 
 def main():
-    validation_dir = "outputs-hpc-campaign-2026-08-14/validation"
+    validation_dir = "results/math500"
+    if not glob.glob(os.path.join(validation_dir, "*.json")):
+        validation_dir = "outputs-hpc-campaign-2026-08-14/validation"
     files = sorted(glob.glob(os.path.join(validation_dir, "*.json")))
     print(f"Loaded {len(files)} validation files from {validation_dir}")
 
@@ -174,8 +176,14 @@ def main():
 
             # Token length
             mean_tokens = sum(cell_seeds[s]["completion_tokens_mean"] for s in seeds) / len(seeds)
-            trunc_count = sum(cell_seeds[s].get("truncation_count", cell_seeds[s].get("hit_token_limit_count", 0)) for s in seeds)
-            loop_count = sum(cell_seeds[s].get("repetition_flag_count", 0) for s in seeds)
+            trunc_count = sum(
+                cell_seeds[s].get("token_limit_hits", cell_seeds[s].get("truncation_count", cell_seeds[s].get("hit_token_limit_count", 0)))
+                for s in seeds
+            )
+            loop_count = sum(
+                cell_seeds[s].get("repetition_rows", cell_seeds[s].get("repetition_flag_count", 0))
+                for s in seeds
+            )
 
             key = f"{m}_{fmt}"
             summary_stats[key] = {
@@ -355,7 +363,7 @@ def main():
         "deployment_economics": economics_results
     }
 
-    out_path = "results/phase5_statistical_analysis_report.json"
+    out_path = "results/reports/phase5_statistical_analysis_report.json"
     os.makedirs(os.path.dirname(out_path), exist_ok=True)
     with open(out_path, "w") as fp:
         json.dump(report, fp, indent=2)

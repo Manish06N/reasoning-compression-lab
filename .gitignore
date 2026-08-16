@@ -21,8 +21,6 @@ runs/
 logs/
 outputs-win5080-*/
 outputs-hpc-*/
-paper_figures/*.png
-paper_figures/*.pdf
 
 # Literature PDFs over GitHub 100 MB limit (text .md extract is tracked instead)
 docs/literature/paper1/ALL_PAPERS_MERGED.pdf

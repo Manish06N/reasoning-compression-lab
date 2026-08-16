@@ -68,4 +68,4 @@ results/
 ## 3. Data Integrity & Verification
 - All results generated on PARAM Rudra HPC 2× A100 GPUs under `qrm-official` (vLLM 0.7.0 eager).
 - Decoding parameters: $T=0.6, p=0.95, \text{max\_tokens}=32,768$.
-- Pathological degeneration rate: **0 truncations, 0 repetition loops** across all cells.
+- Pathological degeneration rate: **0 truncations, 0 repetition loops** across all cells under the **heuristic** detectors (encoded length $\ge 32{,}768$; consecutive identical-word runs). Official QRM rows do not store vLLM `finish_reason`.
