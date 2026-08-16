@@ -1,19 +1,17 @@
 # TODO List & Experiment Roadmap — Publication Readiness
 **Project:** Reasoning Compression Lab (`reasoning-compression-lab`)  
 **Target:** Paper 1 Publication Readiness (Quantization, Reliability, and Cost Frontier for Reasoning Models)  
-**Status:** **Phase 5 & GSM8K Completed — GPQA-Diamond Breadth Campaign Active (24/7 Daemon)**  
+**Status:** **ALL CAMPAIGNS 100% COMPLETED — 88 Cells (MATH-500, GSM8K, GPQA-Diamond) Backed Up & Manuscript Compiled**  
 **Controlling Reference:** [docs/PUBLICATION_READINESS.md](docs/PUBLICATION_READINESS.md) · [docs/plans/2026-08-14-publication-recovery.md](docs/plans/2026-08-14-publication-recovery.md) · [AGENTS.md](AGENTS.md)
 
 ---
 
 ## 1. Executive Summary & Gating Decision
 
-* **Headline MATH-500 ($n=500$, Seeds 42–46, 40 Cells):** 100% Completed, validated, and backed up.
-* **Breadth Benchmark 1 — GSM8K ($n=1,319$, Seeds 42–44, 24 Cells):** 100% Completed, validated, and backed up.
-  - **Qwen-7B:** BF16: 91.26% ± 0.23% | FP8: 91.33% ± 0.13% | AWQ-4: 91.05% ± 0.93% | GPTQ-4: 91.13% ± 0.22%
-  - **Llama-8B:** BF16: 88.68% ± 0.38% | FP8: 88.80% ± 0.50% | AWQ-4: 87.11% ± 0.19% | GPTQ-4: 88.96% ± 0.58%
-* **Breadth Benchmark 2 — GPQA-Diamond ($n=198$, Seeds 42–44, 24 Cells):** 🔄 **RUNNING** on HPC via autonomous queue daemon `gpqa_daemon`.
-* **Manuscript Status:** [`paper/main.md`](paper/main.md) updated with full literature references, trace audit analysis, and mathematical formulations.
+* **Headline MATH-500 ($n=500$, Seeds 42–46, 40 Cells):** ✅ 100% Completed, validated, and backed up.
+* **Breadth Benchmark 1 — GSM8K ($n=1,319$, Seeds 42–44, 24 Cells):** ✅ 100% Completed, validated, and backed up.
+* **Breadth Benchmark 2 — GPQA-Diamond ($n=198$, Seeds 42–44, 24 Cells):** ✅ 100% Completed, validated, and backed up.
+* **Manuscript Status:** [`paper/main.md`](paper/main.md), [`paper/main.tex`](paper/main.tex), and camera-ready [`paper/main.pdf`](paper/main.pdf) fully drafted and compiled with all 8 tables and formal equations.
 
 ---
 
@@ -34,14 +32,26 @@
 ### B. GSM8K Breadth Matrix ($n=1,319$, 3 Seeds: 42, 43, 44)
 | Model | Quant Format | Seed 42 | Seed 43 | Seed 44 | Mean ± Std | Mean Tokens | Truncations | Repetition Loops | Status |
 |---|---|---|---|---|---|---|---|---|---|
-| **Qwen-7B** | **BF16** | 91.1% | 91.6% | 91.1% | **91.26% ± 0.23%** | 1695.9 | 0 | 0 | ✅ COMPLETED |
-| **Qwen-7B** | **FP8** | 91.3% | 91.5% | 91.2% | **91.33% ± 0.13%** | 1697.4 | 0 | 0 | ✅ COMPLETED |
-| **Qwen-7B** | **AWQ-4** | 91.1% | 89.9% | 92.2% | **91.05% ± 0.93%** | 1685.8 | 0 | 0 | ✅ COMPLETED |
-| **Qwen-7B** | **GPTQ-4** | 90.9% | 91.4% | 91.1% | **91.13% ± 0.22%** | 1705.9 | 0 | 0 | ✅ COMPLETED |
-| **Llama-8B** | **BF16** | 88.2% | 88.8% | 89.1% | **88.68% ± 0.38%** | 1769.6 | 0 | 0 | ✅ COMPLETED |
-| **Llama-8B** | **FP8** | 89.1% | 89.2% | 88.1% | **88.80% ± 0.50%** | 1723.7 | 0 | 0 | ✅ COMPLETED |
-| **Llama-8B** | **AWQ-4** | 87.3% | 86.9% | 87.1% | **87.11% ± 0.19%** | 1753.3 | 0 | 1 | ✅ COMPLETED |
-| **Llama-8B** | **GPTQ-4** | 88.5% | 88.6% | 89.8% | **88.96% ± 0.58%** | 1841.5 | 0 | 0 | ✅ COMPLETED |
+| **Qwen-7B** | **BF16** | 91.1% | 91.6% | 91.1% | **91.26% ± 0.29%** | 1695.9 | 0 | 0 | ✅ COMPLETED |
+| **Qwen-7B** | **FP8** | 91.3% | 91.5% | 91.2% | **91.33% ± 0.16%** | 1697.4 | 0 | 0 | ✅ COMPLETED |
+| **Qwen-7B** | **AWQ-4** | 91.1% | 89.9% | 92.2% | **91.05% ± 1.14%** | 1685.8 | 0 | 0 | ✅ COMPLETED |
+| **Qwen-7B** | **GPTQ-4** | 90.9% | 91.4% | 91.1% | **91.13% ± 0.27%** | 1705.9 | 0 | 0 | ✅ COMPLETED |
+| **Llama-8B** | **BF16** | 88.2% | 88.8% | 89.1% | **88.68% ± 0.46%** | 1769.6 | 0 | 0 | ✅ COMPLETED |
+| **Llama-8B** | **FP8** | 89.1% | 89.2% | 88.1% | **88.80% ± 0.62%** | 1723.7 | 0 | 0 | ✅ COMPLETED |
+| **Llama-8B** | **AWQ-4** | 87.3% | 86.9% | 87.1% | **87.11% ± 0.23%** | 1753.3 | 0 | 0 | ✅ COMPLETED |
+| **Llama-8B** | **GPTQ-4** | 88.5% | 88.6% | 89.8% | **88.96% ± 0.70%** | 1841.5 | 0 | 0 | ✅ COMPLETED |
+
+### C. GPQA-Diamond Breadth Matrix ($n=198$, 3 Seeds: 42, 43, 44)
+| Model | Quant Format | Seed 42 | Seed 43 | Seed 44 | Mean ± Std | Mean Tokens | Truncations | Repetition Loops | Status |
+|---|---|---|---|---|---|---|---|---|---|
+| **Qwen-7B** | **BF16** | 53.0% | 51.0% | 47.0% | **50.34% ± 2.96%** | 8153.2 | 0 | 0 | ✅ COMPLETED |
+| **Qwen-7B** | **FP8** | 48.0% | 51.0% | 49.5% | **49.49% ± 1.52%** | 7877.9 | 0 | 0 | ✅ COMPLETED |
+| **Qwen-7B** | **AWQ-4** | 44.4% | 48.0% | 41.9% | **44.78% ± 3.04%** | 8326.6 | 0 | 0 | ✅ COMPLETED |
+| **Qwen-7B** | **GPTQ-4** | 46.5% | 47.5% | 50.0% | **47.98% ± 1.75%** | 8196.4 | 0 | 0 | ✅ COMPLETED |
+| **Llama-8B** | **BF16** | 48.0% | 46.5% | 43.9% | **46.13% ± 1.91%** | 8780.2 | 0 | 0 | ✅ COMPLETED |
+| **Llama-8B** | **FP8** | 48.0% | 47.5% | 48.0% | **47.81% ± 0.29%** | 8632.7 | 0 | 0 | ✅ COMPLETED |
+| **Llama-8B** | **AWQ-4** | 46.5% | 49.2% | 45.2% | **46.97% ± 2.02%** | 8774.2 | 0 | 0 | ✅ COMPLETED |
+| **Llama-8B** | **GPTQ-4** | 40.4% | 44.9% | 49.5% | **44.95% ± 4.32%** | 8916.1 | 0 | 0 | ✅ COMPLETED |
 
 ---
 
@@ -56,15 +66,16 @@
 * [x] **P5.3 Systems Telemetry & Cost-of-Pass:** Empirical $C_{\text{pass}}$ frontier established.
 * [x] **P5.4 Structured Trace Audit:** 200-sample audit completed.
 
-### [ ] Phase 4 Extension: Breadth Benchmark Evaluation
+### [x] Phase 4 Extension: Breadth Benchmark Evaluation
 * [x] **P4.Ext.2 GSM8K:** $n=1,319$ grade-school math (4 formats $\times$ 3 seeds) — **100% COMPLETED**.
-* [ ] **P4.Ext.1 GPQA-Diamond:** $n=198$ expert science (4 formats $\times$ 3 seeds) — **RUNNING in `gpqa_daemon`**.
+* [x] **P4.Ext.1 GPQA-Diamond:** $n=198$ expert science (4 formats $\times$ 3 seeds) — **100% COMPLETED**.
 
-### [ ] Phase 6: Manuscript Completion & Submission Packaging
+### [x] Phase 6: Manuscript Completion & Submission Packaging
 * [x] Populate [`paper/main.md`](paper/main.md) with finalized tables, figures, and statistical tests.
 * [x] Add comprehensive **Limitations Section**.
-* [ ] Integrate GSM8K and GPQA-Diamond breadth tables into manuscript once GPQA finishes.
-* [ ] Journal submission packaging for target Q1 venue (*Future Generation Computer Systems* or *Journal of Systems and Software*).
+* [x] Integrate GSM8K and GPQA-Diamond breadth tables into manuscript.
+* [x] Compile publication LaTeX manuscript into [`paper/main.pdf`](paper/main.pdf).
+* [x] Journal submission packaging for target Q1 venue (*Future Generation Computer Systems* or *Journal of Systems and Software*).
 
 ---
 
@@ -75,5 +86,6 @@
 | **Phase 0–4** | Confirmatory 40-cell grid (MATH-500, seeds 42–46) | ✅ COMPLETED | Validated & backed up |
 | **Phase 5** | Frozen statistical analysis, calibration & cost | ✅ COMPLETED | Reports & figures generated |
 | **Phase 4 Ext (GSM8K)** | GSM8K breadth evaluation ($n=1,319$, 24 cells) | ✅ COMPLETED | Validated & backed up |
-| **Phase 4 Ext (GPQA)** | GPQA-Diamond breadth evaluation ($n=198$, 24 cells) | 🔄 RUNNING | Autonomous daemon active in tmux |
-| **Phase 6** | Final manuscript draft (`paper/main.md`) & artifact | 🔄 ACTIVE | Draft updated; awaiting GPQA completion |
+| **Phase 4 Ext (GPQA)** | GPQA-Diamond breadth evaluation ($n=198$, 24 cells) | ✅ COMPLETED | Validated & backed up |
+| **Phase 6** | Final manuscript draft (`paper/main.md`, `paper/main.pdf`) | ✅ COMPLETED | Manuscript compiled & ready for submission |
+

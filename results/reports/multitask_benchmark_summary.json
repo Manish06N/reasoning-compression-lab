@@ -260,11 +260,11 @@
     "Llama-8B_GPTQ-4": {
       "model": "Llama-8B",
       "format": "GPTQ-4",
-      "completed_seeds": 2,
+      "completed_seeds": 3,
       "total_seeds": 3,
-      "accuracy_mean": 42.67676767676768,
-      "accuracy_std": 2.4998724587403154,
-      "mean_tokens": 9329.06313131313,
+      "accuracy_mean": 44.949494949494955,
+      "accuracy_std": 4.315153406726024,
+      "mean_tokens": 9247.816498316497,
       "truncations": 0,
       "loops": 0
     }
