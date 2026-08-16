@@ -98,7 +98,7 @@ Cost-of-Pass in the paper is a **fixed-throughput token-cost proxy** ($\$1.50$/A
 
 Compact validation records still omit traces and `finish_reason`. Recovered extracted answers live in [`recovered/math500_modal_inputs.jsonl`](recovered/math500_modal_inputs.jsonl) (20,000 rows; SHA256 `23e9ead021111959cf047323572889c95be0496e9475d6870b06c8b2c9a6149b`). Canonical modal numbers: [`reports/modal_agreement_report.json`](reports/modal_agreement_report.json).
 
-Gold is used only after unique-mode clustering. Serve at $k/5$ iff a unique modal class has size $\ge k$. Mean five-sample token cost $T_5$ sums all five seeds before abstention.
+Gold is used only after unique-mode clustering. Serve at $k/5$ iff a unique modal class has size $\ge k$. Mean five-sample token-cost proxy $T_5$ sums all five seeds before abstention. Campaign clustering used LightEval 0.8.0; MacBook `--check` validates the compact artifact and does not re-extract from `generated_text`.
 
 | Cell | >=3/5 cov / risk | >=4/5 cov / risk | 5/5 cov / risk | Mean $T_5$ |
 |---|---|---|---|---|

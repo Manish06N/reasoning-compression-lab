@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-08-16 (late night) — Finalize observable modal-agreement paper integration
+
+Tighten wording on branch `paper-modal-agreement`: five-sample token-cost proxy (not dollars); no FP8 “parity”; LightEval **0.8.0** is the campaign evaluator and a throwaway MacBook LightEval 0.8.1 install is documented as unused; limitations list finish_reason, five-generation cost, and MATH-500-only five-seed coverage.
+
 ## 2026-08-16 (late night) — Integrate observable modal-agreement analysis
 
 Branch `paper-modal-agreement`. MacBook audit of HPC commit `631d843`:

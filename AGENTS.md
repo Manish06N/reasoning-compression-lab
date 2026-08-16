@@ -99,6 +99,7 @@ Older dated CHANGELOG / briefing notes that still say 0 truncations / 0 loops ar
 2. **FP8 vs BF16:** clustered 95% CIs include 0; MATH $\pm 1$ pp TOST is not passed. maj@5 McNemar is secondary.
 3. **4-bit:** architecture- and task-dependent (Llama AWQ-4 MATH/GSM8K; Qwen AWQ-4 GPQA).
 4. **Tokens:** Qwen 4-bit +6–7% on the full MATH-500 grid; extra length concentrated on format-induced failures.
+5. **Modal agreement (MATH-500, gold-free):** 5/5 selective error $\le 0.27\%$ in this sample; coverage $70.2$–$88.8\%$; Llama AWQ-4 5/5 coverage $-6.0$ pp vs BF16 (95% paired CI $[-9.4,-2.6]$). Campaign evaluator: LightEval 0.8.0. A throwaway MacBook LightEval 0.8.1 install is not canonical.
 
 ---
 

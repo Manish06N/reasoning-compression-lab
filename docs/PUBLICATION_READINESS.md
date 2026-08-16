@@ -1,6 +1,6 @@
 # Publication Readiness
 
-**Superseding decision (2026-08-16):** The matched 88-cell grid is complete (**56,408** completions: MATH-500 40 + GSM8K 24 + GPQA-Diamond 24). Canonical manuscript: [`paper/main.tex`](../paper/main.tex) compiled to [`paper/main.pdf`](../paper/main.pdf) (12 pages). Scoreboard: [`results/README.md`](../results/README.md). ArXiv zip: [`paper/arxiv_source.zip`](../paper/arxiv_source.zip).
+**Superseding decision (2026-08-16):** The matched 88-cell grid is complete (**56,408** completions: MATH-500 40 + GSM8K 24 + GPQA-Diamond 24). Canonical manuscript: [`paper/main.tex`](../paper/main.tex) compiled to [`paper/main.pdf`](../paper/main.pdf) (currently 14 pages; do not squeeze science to force a page count). Scoreboard: [`results/README.md`](../results/README.md). ArXiv zip: [`paper/arxiv_source.zip`](../paper/arxiv_source.zip).
 
 The 2026-08-14 audit below is **historical**. It correctly blocked publishing the two-job FP8-only package. It does **not** describe the current evidence. The recovery-plan GPU freeze (no b03/b04 / no broad grid) is **lifted** because Phases 0–6 and both breadth grids finished. Do not launch new GPU jobs unless the user asks.
 

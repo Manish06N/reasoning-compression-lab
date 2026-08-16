@@ -40,7 +40,7 @@ This paper **pins** one stack. It does not run a factorial vLLM 0.7.0 vs 0.8.5 e
 | Qwen AWQ-4 | Significant GPQA-Diamond pass@1 degradation vs BF16 |
 | Qwen 4-bit tokens | About $+6$–$7\%$ mean length vs BF16 on the full MATH-500 grid |
 | 200-item subset | Retracted as a result (even-index / seed-42 estimator artifact) |
-| Modal-answer selective prediction | Gold-free MATH-500 modal agreement in the manuscript; old gold-hit 98.23% gate remains retracted |
+| Modal-answer selective prediction | Gold-free MATH-500 modal agreement; 5/5 selective error $\le 0.27\%$ in this sample; Llama AWQ-4 5/5 coverage $-6.0$ pp vs BF16. Not a safety property. |
 | Gold-hit 98.23% “safety gate” | Removed; not an operational abstention rule |
 | Cost | Fixed-throughput token-cost proxy; not Pareto-optimal; not measured tok/s |
 | FP8 vs BF16 | 95% CIs include 0; **not** claimed as “FP8 matches BF16” or $\pm 1$ pp equivalent |

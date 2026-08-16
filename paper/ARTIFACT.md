@@ -35,7 +35,8 @@ Compile with `pdflatex` → `bibtex` → `pdflatex` → `pdflatex`. Figures are 
 - **Pass@1** is extractive match, averaged over seeds. Primary test: problem-clustered bootstrap of quantized − BF16. McNemar on maj@5 is secondary.
 - **Loops** read `repetition_rows` (threshold: 20 consecutive identical words). **Cap hits** read `token_limit_hits`. **Near-cap** counts `completion_tokens >= 32500`.
 - Compact per-cell JSON has **no** traces, token IDs, or `finish_reason`. Recovered MATH-500 answers are in `results/recovered/math500_modal_inputs.jsonl`. Do not report the old gold-hit 98.23% gate.
-- Modal agreement uses unique-mode clustering with gold scoring only after the serve/abstain decision. Five-sample token cost $T_5$ sums all five seeds before abstention.
+- Modal agreement uses unique-mode clustering with gold scoring only after the serve/abstain decision. Five-sample token-cost proxy $T_5$ sums all five seeds before abstention.
+- Campaign/extraction evaluator: **LightEval 0.8.0**. A throwaway MacBook LightEval 0.8.1 install was not used for paper numbers.
 - **Cost-of-Pass** assumes $\$1.50$ per A100-hour and $65$ tok/s, shared across formats. It is a token ranking, not measured wall-clock.
 - **Token inflation:** full-grid ratio of means over all seeds. The old 200-item mean-of-ratios subset is an estimator artifact and is not used in the paper.
 
@@ -48,7 +49,7 @@ python3 scripts/analysis/revision_reanalysis.py --check
 python3 scripts/analysis/modal_agreement_analysis.py --check
 ```
 
-Exits 0 only if the recomputed object matches `results/reports/revision_reanalysis_report.json`.
+`revision_reanalysis.py --check` must match `results/reports/revision_reanalysis_report.json`. On MacBook, `modal_agreement_analysis.py --check` validates the compact artifact SHA and report internals (LightEval 0.8.0 re-extraction is HPC-only).
 
 ## Stack
 

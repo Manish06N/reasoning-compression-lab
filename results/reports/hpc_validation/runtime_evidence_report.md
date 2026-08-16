@@ -45,3 +45,4 @@ Each runtime setting for the August campaign is classified below as:
 * **Hostname:** `login01`
 * **Python Executable (Conda):** Python 3.11.15 (`/home/manishn_iitp/.conda/envs/qreason/bin/python3`)
 * **Note:** The login node does not host active GPU devices (compute processes run strictly on assigned SLURM GPU compute nodes).
+* **Not canonical:** A later MacBook throwaway venv (`/tmp/modal-repro`) installed LightEval **0.8.1**. That environment was **not** used for campaign extraction or paper numbers. Canonical evaluator remains LightEval **0.8.0** from the `qrm-official` campaign preflight.

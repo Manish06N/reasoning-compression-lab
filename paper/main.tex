@@ -98,7 +98,7 @@ $\tau = 65$ tok/s (unmeasured) and $R=\$1.50$ per A100-hour. Because $\tau$ and 
 
 \paragraph{Observable modal agreement.}
 \label{sec:modal-def}
-Compact per-cell JSON stores \texttt{extractive\_match} but not extracted strings. After recovering the 20{,}000 MATH-500 answer strings, we form agreement \emph{without} gold. For item $i$ and five generated predictions, let $\sim$ be the campaign mathematical-equivalence relation (LightEval / math-verify; frozen in \texttt{docs/ANSWER\_NORMALIZATION.md}). Cluster the five predictions into connected components of $\sim$. Let $m_i$ be the size of the unique largest class when one exists; otherwise the item is a non-unique-mode tie. Observable agreement is $a_i=m_i/5$. Serve at threshold $k/5$ only when a unique modal class satisfies $m_i\ge k$. The pattern $(A,A,B,B,C)$ has $m_i=2$ and is not served at $\ge 3/5$; $(A,A,A,B,B)$ has unique mode $A$ with $m_i=3$ and is served at $\ge 3/5$. Gold is used only afterward to estimate selective accuracy and risk. All five samples are generated before the decision; $T_5$ is the sum of their completion tokens, including abstained queries. We report three discrete operating points, not a continuous risk--coverage curve. Gold-hit ECE (confidence $=c_i/5$, label $=\mathbb{I}(c_i\ge 3)$) remains a deterministic function of the gold-hit histogram and is omitted.
+Compact per-cell JSON stores \texttt{extractive\_match} but not extracted strings. After recovering the 20{,}000 MATH-500 answer strings, we form agreement \emph{without} gold. Campaign extraction and clustering used LightEval~0.8.0 with math-verify (frozen in \texttt{docs/ANSWER\_NORMALIZATION.md}). A later throwaway MacBook install of LightEval~0.8.1 was \emph{not} used for canonical numbers. For item $i$ and five generated predictions, let $\sim$ be that campaign mathematical-equivalence relation. Cluster the five predictions into connected components of $\sim$. Let $m_i$ be the size of the unique largest class when one exists; otherwise the item is a non-unique-mode tie. Observable agreement is $a_i=m_i/5$. Serve at threshold $k/5$ only when a unique modal class satisfies $m_i\ge k$. The pattern $(A,A,B,B,C)$ has $m_i=2$ and is not served at $\ge 3/5$; $(A,A,A,B,B)$ has unique mode $A$ with $m_i=3$ and is served at $\ge 3/5$. Gold is used only afterward to estimate selective accuracy and risk. All five samples are generated before the decision. The five-sample token-cost proxy $T_5$ is the sum of their completion tokens, including abstained queries. We report three discrete operating points, not a continuous risk--coverage curve. Gold-hit ECE (confidence $=c_i/5$, label $=\mathbb{I}(c_i\ge 3)$) remains a deterministic function of the gold-hit histogram and is omitted.
 
 \begin{table*}[t]
 \centering
@@ -260,15 +260,15 @@ Table~\ref{tab:difficulty}: Level~1 is easy for every format in this sample. Lla
 
 \subsection{Observable modal agreement on MATH-500}
 \label{sec:modal}
-Recovered answer strings make RQ3 measurable. Table~\ref{tab:modal} reports coverage and selective risk at three discrete thresholds. Higher observable agreement is associated with lower selective error: $\ge 4/5$ and $5/5$ retain very low risk on this benchmark, while $\ge 3/5$ covers more items at higher residual risk. Point estimates of $100\%$ selective accuracy among served items are finite-sample statements (they can arise from a few hundred served problems with no observed error) and do not imply zero true error.
+Recovered answer strings make RQ3 measurable as observable multi-sample agreement, selective prediction, and abstention---not as model safety or softmax calibration. Table~\ref{tab:modal} reports coverage and selective risk at three discrete thresholds. On MATH-500, higher observable answer agreement is associated with lower selective error. At 5/5 consensus, selective error is at most $0.27\%$ across the evaluated configurations, but coverage ranges from $70.2\%$ (Llama AWQ-4) to $88.8\%$ (Qwen FP8). Point estimates of $100\%$ selective accuracy among served items are finite-sample statements and do not imply zero true error or guaranteed correctness.
 
-Four-bit AWQ reduces \emph{strict-consensus coverage} in some configurations even when selective error among retained predictions stays low. Versus matched BF16, Qwen AWQ-4 $\ge 4/5$ coverage falls $2.2$\,pp ($95\%$ paired CI $[-4.0,-0.6]$). Llama AWQ-4 $\ge 4/5$ coverage falls $3.2$\,pp ($[-6.0,-0.6]$) and $5/5$ coverage falls $6.0$\,pp ($[-9.4,-2.6]$). The $\ge 3/5$ AWQ contrasts, and all FP8 and GPTQ-4 coverage contrasts, have paired intervals that include zero; we do not call those differences equivalent. Appendix Table~\ref{tab:modal-paired} lists the full threshold pattern.
+AWQ-4 reduces strict-consensus coverage in some configurations, most clearly for Llama-8B: $70.2\%$ versus $76.2\%$ for BF16, a paired difference of $-6.0$\,pp ($95\%$ CI $[-9.4,-2.6]$). Llama AWQ-4 $\ge 4/5$ coverage falls $3.2$\,pp ($[-6.0,-0.6]$). Qwen AWQ-4 $\ge 4/5$ coverage falls $2.2$\,pp ($[-4.0,-0.6]$). The $\ge 3/5$ AWQ contrasts, and all GPTQ-4 coverage contrasts, have paired intervals that include zero. No clear FP8--BF16 difference was detected in modal-agreement coverage or selective risk under these configurations. Appendix Table~\ref{tab:modal-paired} lists the full threshold pattern.
 
-Five-sample cost is paid before abstention. Mean $T_5$ is about $20{,}057$ / $20{,}038$ / $21{,}327$ / $21{,}436$ tokens for Qwen BF16/FP8/AWQ-4/GPTQ-4 and $23{,}283$ / $22{,}754$ / $23{,}682$ / $24{,}203$ for Llama. Qwen 4-bit retains its approximately $+6$--$7\%$ output-token penalty in this five-sample accounting because $T_5$ is the sum of the same five traces. Tokens per served query divide that total by the number served, so abstained items are not free. Figure~\ref{fig:modal} shows the three operating points.
+The five-sample token-cost proxy is paid before abstention. Mean $T_5$ is $20{,}057$ / $20{,}038$ / $21{,}327$ / $21{,}436$ tokens for Qwen BF16/FP8/AWQ-4/GPTQ-4 and $23{,}283$ / $22{,}754$ / $23{,}682$ / $24{,}203$ for Llama. Qwen 4-bit retains its approximately $+6$--$7\%$ output-token penalty in this accounting because $T_5$ is the sum of the same five traces. Tokens per served query divide that total by the number served, so abstained items are not free. This is not a measured monetary cost. Figure~\ref{fig:modal} shows the three operating points.
 
 \begin{table*}[t]
 \centering
-\caption{Observable modal-answer agreement on MATH-500 ($n=500$, seeds 42--46). Coverage is the fraction of items with a unique modal class of size $\ge k$. Risk is $1-$selective accuracy among served items. Mean $T_5$ is the five-sample output-token sum over all 500 items. Gold is used only to score served predictions.}
+\caption{Observable modal-answer agreement on MATH-500 ($n=500$, seeds 42--46). Coverage is the fraction of items with a unique modal class of size $\ge k$. Risk is $1-$selective accuracy among served items. Mean $T_5$ is the five-sample token-cost proxy over all 500 items (abstained queries still pay). Gold is used only to score served predictions.}
 \label{tab:modal}
 \small
 \resizebox{\textwidth}{!}{%
@@ -314,7 +314,7 @@ Llama-8B & GPTQ-4 & 93.8 & 2.77 & 86.4 & 0.46 & 75.4 & 0.27 & 24{,}203 \\
 \legend{Q-BF16, Q-FP8, Q-AWQ, Q-GPTQ, L-BF16, L-FP8, L-AWQ, L-GPTQ}
 \end{axis}
 \end{tikzpicture}
-\caption{Three discrete MATH-500 operating points ($\ge 3/5$, $\ge 4/5$, $5/5$), not a continuous risk--coverage curve. Filled markers: Qwen-7B. Hollow-style dashed markers: Llama-8B. Lower-right is high coverage and high residual risk; lower-left is strict consensus.}
+\caption{Three discrete MATH-500 operating points ($\ge 3/5$, $\ge 4/5$, $5/5$), not a continuous risk--coverage curve. Solid markers: Qwen-7B. Dashed markers: Llama-8B. Lower-right is high coverage and higher residual risk; lower-left is strict consensus.}
 \label{fig:modal}
 \end{figure}
 
@@ -425,7 +425,7 @@ Llama-8B & GPTQ-4 & 93.8 & 2.77 & 86.4 & 0.46 & 75.4 & 0.27 & 24{,}203 \\
 \section{Discussion}
 Under this pinned A100 W8A16 stack, FP8-checkpoint serving tracks BF16 pass@1 closely on the evaluated distillations, but we do not establish $\pm 1$\,pp equivalence on MATH-500. Four-bit behavior is not a single story: Qwen keeps MATH-500 and GSM8K near BF16 while losing 5.6\,pp on GPQA-Diamond under AWQ-4; Llama AWQ-4 is the MATH/GSM8K weak cell. Mean 4-bit lengthening on MATH-500 is modest and, when present, lives mostly on traces that also lose the answer. That is a sharper claim than ``4-bit inflates reasoning'' and a more honest one than ``nothing happens.''
 
-Pass@1 and repeated-sampling stability are related but distinct. Llama AWQ-4's degradation appears in both mean accuracy and 5/5 consensus coverage, whereas FP8 coverage and accuracy differences remain small and their paired intervals include zero---which does not prove equivalence. Observable multi-sample agreement therefore exposes a second quantization effect beyond pass@1: strict-consensus coverage can decline under 4-bit AWQ even when selective error among retained predictions remains low. The construction is not a general uncertainty estimator and is not a safety property; it is an abstention rule on MATH-500 that requires five generations before the decision.
+Pass@1 and stochastic output stability are related but distinct. Llama AWQ-4's degradation appears in both mean accuracy and 5/5 consensus coverage. Qwen 4-bit formats retain relatively strong MATH-500 pass@1 while spending more tokens. No clear FP8--BF16 difference was detected in modal-agreement coverage or selective risk under these configurations; paired intervals that include zero do not prove equivalence. Repeated sampling sharply reduces selective risk on MATH-500 but costs about five generations per attempted item. The construction is not a general uncertainty estimator and is not a safety property; it is an abstention rule on MATH-500 that requires five generations before the decision.
 
 We previously wrote that pinning vLLM~0.7.0 ``removed'' truncations and loops seen on vLLM~0.8.5. Those earlier runs also differed in harness, decoding flags (including a bug that dropped \texttt{repetition\_penalty}), and prompt profile. The final grid still contains 25 loops. We therefore do not attribute pathology rates causally to the engine version. A clean stack $\times$ format factorial remains future work, not a result in this paper.
 
@@ -434,11 +434,11 @@ FP8 is a reasonable \emph{accuracy} default on this A100 W8A16 path for these tw
 \section{Limitations}
 \begin{enumerate}
     \item \textbf{A100 W8A16 fallback.} FP8 numbers do not transfer to Hopper native W8A8.
-    \item \textbf{Unmeasured serving cost.} $C_{\mathrm{pass}}$ assumes equal $65$ tok/s. Weight-only 4-bit kernels typically raise decode throughput; the ranking can flip. Peak VRAM, energy, and GPU-hours are not logged per cell. At 32k traces the KV cache can dominate weight memory; weight-only PTQ does not shrink that term.
-    \item \textbf{Pathology metrology.} The loop detector is identical-word runs $\ge 20$. Phrase-level cycles and \texttt{finish\_reason=length} are unobserved. Near-cap is a proxy.
-    \item \textbf{Modal agreement is MATH-500-specific.} Five seeds exist only for MATH-500. The construction requires five generations per query, uses a task-specific mathematical equivalence evaluator, and can still serve a confidently wrong answer. Results do not establish general model-uncertainty calibration.
-    \item \textbf{Checkpoint provenance.} AWQ-4 is a community quantization of unknown calibration set. GPTQ-4/FP8 are RedHatAI artifacts (appendix).
-    \item \textbf{Two 7--8B distillations}, English math/science, one engine, one GPU generation, one prompt. GSM8K/GPQA use three seeds.
+    \item \textbf{Unmeasured serving cost.} $C_{\mathrm{pass}}$ and $T_5$ are token-cost proxies, not measured wall-clock, latency, peak VRAM, energy, or dollars. Weight-only 4-bit kernels typically raise decode throughput; a monetary ranking can flip.
+    \item \textbf{Pathology metrology.} The loop detector is identical-word runs $\ge 20$. Phrase-level cycles and \texttt{finish\_reason} were not saved in the original campaign. Near-cap is a proxy.
+    \item \textbf{Modal agreement.} Five generations are required per attempted MATH problem. Only MATH-500 has five seeds in this campaign. Mathematical answer equivalence is evaluator- and task-specific (campaign LightEval~0.8.0 / math-verify). High agreement can still be wrong. The signal is not general uncertainty calibration, not softmax calibration, and not a safety property.
+    \item \textbf{Checkpoint provenance.} AWQ-4 is a community quantization of unknown calibration set and quantizer revision. GPTQ-4/FP8 are RedHatAI artifacts (appendix).
+    \item \textbf{Scope.} Two 7--8B DeepSeek-R1 distillations, English math/science, one pinned serving stack, one prompt. GSM8K/GPQA use three seeds.
     \item \textbf{Source configs vs.\ launcher.} Files in \texttt{configs/models/} are not the QRM \texttt{inference.py} campaign. Effective KV-cache dtype is not stored per cell. Launcher flags such as \texttt{max\_model\_len=32768} are code/launcher-confirmed, not per-job runtime telemetry.
 \end{enumerate}
 
@@ -447,10 +447,11 @@ On a pinned vLLM~0.7.0 eager stack, FP8-checkpoint (W8A16) pass@1 stays close to
 
 \section*{Artifacts}
 Code, patches, validation JSON, and analysis reports:
-\url{https://github.com/Manish06N/reasoning-compression-lab}.
+\href{https://github.com/Manish06N/reasoning-compression-lab}{\texttt{Manish06N/reasoning-compression-lab}}.
 Per-cell records: \texttt{results/math500/}, \texttt{results/gsm8k/}, \texttt{results/gpqa/}.
 Canonical pass@1 tables: \texttt{revision\_reanalysis\_report.json}.
-Modal agreement: \texttt{modal\_agreement\_report.json} and compact recovered answers \texttt{math500\_modal\_inputs.jsonl}.
+Modal agreement: \texttt{modal\_agreement\_report.json}.
+Compact recovered answers: \texttt{math500\_modal\_inputs.jsonl}.
 JSON rows contain \texttt{extractive\_match}, \texttt{completion\_tokens}, \texttt{repetition\_flag}; they do \emph{not} contain traces, token IDs, or \texttt{finish\_reason}. See \texttt{paper/ARTIFACT.md}. GPQA is a gated benchmark; public records must not republish item text.
 
 \section*{Acknowledgment}
@@ -500,9 +501,9 @@ Pathology, clustered bootstrap, and token strata are produced by the canonical r
 
 \section{Modal-agreement details}
 \label{app:modal}
-The compact recovered artifact has 20{,}000 rows (SHA256 prefix \texttt{23e9ead021111959}; full digest is in the JSON sidecar). It stores extracted prediction representations, campaign \texttt{extractive\_match}, and completion tokens. It does not store chain-of-thought or problem text. Campaign extractive match was reproduced on 20{,}000/20{,}000 rows before clustering. Equivalence clustering reported 0 symmetry violations, 0 transitivity violations, and 116 non-unique-mode ties among 4{,}000 groups. Bootstrap uses $B=10{,}000$ problem resamples with seed $20260816$. Secondary ECE/Brier scores (confidence $=m_i/5$) are in the JSON report and are not treated as a primary calibration result.
+The compact recovered artifact has 20{,}000 rows (SHA256 prefix \texttt{23e9ead021111959}; full digest is in the JSON sidecar). It stores extracted prediction representations, campaign \texttt{extractive\_match}, and completion tokens. It does not store chain-of-thought or problem text. Campaign extraction used LightEval~0.8.0; a later MacBook LightEval~0.8.1 install was not used for these numbers. Campaign extractive match was reproduced on 20{,}000/20{,}000 rows before clustering. Equivalence clustering reported 0 symmetry violations, 0 transitivity violations, and 116 non-unique-mode ties among 4{,}000 groups. Bootstrap uses $B=10{,}000$ problem resamples with seed $20260816$. Secondary ECE/Brier scores (confidence $=m_i/5$) are in the JSON report and are not treated as a primary calibration result.
 
-$T_5$ is the sum of completion tokens over seeds 42--46. Mean / median / P90 $T_5$ are computed over all 500 items. Tokens per served query and tokens per correct served result use that same 500-item $T_5$ total in the numerator.
+$T_5$ is the five-sample token-cost proxy: the sum of completion tokens over seeds 42--46. Mean / median / P90 $T_5$ are computed over all 500 items. Tokens per served query and tokens per correct served result use that same 500-item $T_5$ total in the numerator, so abstained queries are not free.
 
 \begin{table*}[t]
 \centering
