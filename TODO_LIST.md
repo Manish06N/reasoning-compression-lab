@@ -1,7 +1,7 @@
 # TODO List & Experiment Roadmap — Publication Readiness
 **Project:** Reasoning Compression Lab (`reasoning-compression-lab`)  
 **Target:** Paper 1 Publication Readiness (Quantization, Reliability, and Cost Frontier for Reasoning Models)  
-**Status:** **88-cell campaign complete. P0 reanalysis on branch `paper-p0-reanalysis`. Do not cite 0/0 pathologies or the 98.23% safety gate.**  
+**Status:** **88-cell campaign complete. Modal agreement integrated on branch `paper-modal-agreement`. Do not cite 0/0 pathologies or the 98.23% safety gate.**  
 **Controlling Reference:** [docs/PUBLICATION_READINESS.md](docs/PUBLICATION_READINESS.md) · [docs/plans/2026-08-14-publication-recovery.md](docs/plans/2026-08-14-publication-recovery.md) · [AGENTS.md](AGENTS.md)
 
 ---
@@ -11,7 +11,7 @@
 * **Headline MATH-500 ($n=500$, Seeds 42–46, 40 Cells):** ✅ 100% Completed, validated, and backed up.
 * **Breadth Benchmark 1 — GSM8K ($n=1,319$, Seeds 42–44, 24 Cells):** ✅ 100% Completed, validated, and backed up.
 * **Breadth Benchmark 2 — GPQA-Diamond ($n=198$, Seeds 42–44, 24 Cells):** ✅ 100% Completed, validated, and backed up.
-* **Manuscript Status:** Canonical source [`paper/main.tex`](paper/main.tex) compiled to [`paper/main.pdf`](paper/main.pdf) (12 pages, 8 tables, 4 figures). Markdown mirror: [`paper/main.md`](paper/main.md). ArXiv zip: [`paper/arxiv_source.zip`](paper/arxiv_source.zip).
+* **Manuscript Status:** Canonical source [`paper/main.tex`](paper/main.tex) compiled to [`paper/main.pdf`](paper/main.pdf). Markdown mirror: [`paper/main.md`](paper/main.md). ArXiv zip: [`paper/arxiv_source.zip`](paper/arxiv_source.zip).
 
 ---
 

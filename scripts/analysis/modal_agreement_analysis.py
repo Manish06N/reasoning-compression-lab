@@ -17,17 +17,18 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 import json
 import math
-import os
-import re
 import sys
-from collections import Counter
-from dataclasses import asdict, dataclass
+from collections import defaultdict
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-import numpy as np
+try:
+    import numpy as np
+except ImportError:  # pragma: no cover - MacBook stdlib --check-artifact path
+    np = None  # type: ignore[assignment]
 
 # Ensure external QRM and LightEval are in path
 SCRIPT_DIR = Path(__file__).resolve().parent
@@ -60,6 +61,17 @@ FORMATS = ["BF16", "FP8", "AWQ-4", "GPTQ-4"]
 SEEDS = [42, 43, 44, 45, 46]
 NUM_PROBLEMS = 500
 THRESHOLDS = [3, 4, 5]
+EXPECTED_DERIVED_SHA256 = "23e9ead021111959cf047323572889c95be0496e9475d6870b06c8b2c9a6149b"
+CONFIG_NAMES = [
+    ("Qwen-7B", "BF16"),
+    ("Qwen-7B", "FP8"),
+    ("Qwen-7B", "AWQ-4"),
+    ("Qwen-7B", "GPTQ-4"),
+    ("Llama-8B", "BF16"),
+    ("Llama-8B", "FP8"),
+    ("Llama-8B", "AWQ-4"),
+    ("Llama-8B", "GPTQ-4"),
+]
 
 
 def get_run_dir_name(model: str, weight_format: str, seed: int) -> str:
@@ -395,19 +407,13 @@ def run_full_modal_analysis(
     print("=" * 80)
 
     # Problem-level bootstrap resampling across all 8 configurations
+    if np is None:
+        raise RuntimeError("numpy is required for the full modal analysis path")
+
     rng = np.random.default_rng(seed)
     boot_indices = rng.integers(0, NUM_PROBLEMS, size=(bootstrap_reps, NUM_PROBLEMS))
 
-    config_names = [
-        ("Qwen-7B", "BF16"),
-        ("Qwen-7B", "FP8"),
-        ("Qwen-7B", "AWQ-4"),
-        ("Qwen-7B", "GPTQ-4"),
-        ("Llama-8B", "BF16"),
-        ("Llama-8B", "FP8"),
-        ("Llama-8B", "AWQ-4"),
-        ("Llama-8B", "GPTQ-4"),
-    ]
+    config_names = CONFIG_NAMES
 
     report_matrix: Dict[str, Any] = {}
     csv_rows: List[Dict[str, Any]] = []
@@ -640,7 +646,7 @@ def generate_markdown_report(report: Dict[str, Any], output_md: Path) -> None:
     lines.append("")
     lines.append("---")
     lines.append("")
-    lines.append("## 2. Paired Differences Against BF16 Anchors ($\Delta = \\text{Quantized} - \\text{BF16}$)")
+    lines.append(r"## 2. Paired Differences Against BF16 Anchors ($\Delta = \text{Quantized} - \text{BF16}$)")
     lines.append("")
     lines.append("| Comparison | Threshold | $\\Delta$ Coverage (95% CI) | $\\Delta$ Selective Accuracy (95% CI) | $\\Delta$ Selective Risk (95% CI) |")
     lines.append("|---|---|---|---|---|")
@@ -712,6 +718,147 @@ def generate_validation_md(report: Dict[str, Any], output_val_md: Path) -> None:
     print(f"Validation report written to: {output_val_md}")
 
 
+def campaign_jsonl_available(campaign_root: Path) -> bool:
+    sample = campaign_root / get_run_dir_name(MODELS[0], FORMATS[0], SEEDS[0]) / "MATH-500.jsonl"
+    return sample.exists()
+
+
+def sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def check_derived_artifact(derived_path: Path, report_path: Path) -> None:
+    """Stdlib check of the committed compact artifact against the frozen JSON report.
+
+    This does *not* re-extract from campaign traces and does *not* re-cluster with a
+    second judge. Full LightEval clustering remains the HPC ``--check`` path.
+    """
+    if not derived_path.exists():
+        raise FileNotFoundError(f"Missing compact artifact: {derived_path}")
+    if not report_path.exists():
+        raise FileNotFoundError(f"Missing report JSON: {report_path}")
+
+    digest = sha256_file(derived_path)
+    if digest != EXPECTED_DERIVED_SHA256:
+        raise AssertionError(
+            f"Compact artifact SHA256 mismatch: got {digest}, expected {EXPECTED_DERIVED_SHA256}"
+        )
+
+    rows: List[Dict[str, Any]] = []
+    forbidden_keys = {
+        "generated_text",
+        "gold",
+        "gold_list",
+        "pred_list",
+        "question",
+        "problem",
+        "prompt",
+    }
+    seen_keys = set()
+    for line in derived_path.read_text(encoding="utf-8").splitlines():
+        if not line.strip():
+            continue
+        row = json.loads(line)
+        overlap = forbidden_keys.intersection(row)
+        if overlap:
+            raise AssertionError(f"Compact artifact contains forbidden keys: {sorted(overlap)}")
+        rows.append(row)
+        seen_keys.update(row.keys())
+
+    if len(rows) != 20_000:
+        raise AssertionError(f"Expected 20,000 rows, got {len(rows)}")
+
+    expected_keys = {
+        "benchmark",
+        "problem_index",
+        "model",
+        "format",
+        "seed",
+        "extracted_pred_repr",
+        "campaign_extractive_match",
+        "completion_tokens",
+    }
+    if seen_keys != expected_keys:
+        raise AssertionError(f"Unexpected compact keys: {sorted(seen_keys)}")
+
+    groups: Dict[Tuple[str, str, int], List[Dict[str, Any]]] = {}
+    pair_keys = set()
+    missing_pred = 0
+    for row in rows:
+        if row["benchmark"] != "MATH-500":
+            raise AssertionError(f"Unexpected benchmark: {row['benchmark']}")
+        key = (row["model"], row["format"], int(row["problem_index"]))
+        groups.setdefault(key, []).append(row)
+        pair = (row["model"], row["format"], int(row["problem_index"]), int(row["seed"]))
+        if pair in pair_keys:
+            raise AssertionError(f"Duplicate row: {pair}")
+        pair_keys.add(pair)
+        pred = row["extracted_pred_repr"]
+        if not isinstance(pred, list) or len(pred) == 0:
+            missing_pred += 1
+
+    if len(groups) != 4_000:
+        raise AssertionError(f"Expected 4,000 groups, got {len(groups)}")
+    if missing_pred != 0:
+        raise AssertionError(f"Missing extracted predictions: {missing_pred}")
+
+    t5_sums: Dict[Tuple[str, str], List[int]] = defaultdict(list)
+    for key, group in groups.items():
+        if len(group) != 5:
+            raise AssertionError(f"Group {key} has {len(group)} rows")
+        seeds_found = sorted(int(r["seed"]) for r in group)
+        if seeds_found != SEEDS:
+            raise AssertionError(f"Group {key} seeds {seeds_found}")
+        t5_sums[(key[0], key[1])].append(sum(int(r["completion_tokens"]) for r in group))
+
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+    diag = report["validation_diagnostics"]
+    assert diag["total_rows_evaluated"] == 20_000
+    assert diag["total_groups"] == 4_000
+    assert diag["mismatch_count"] == 0
+    assert diag["symmetry_violations"] == 0
+    assert diag["transitivity_violations"] == 0
+    assert diag["total_ties"] == 116
+    assert diag["empty_extraction_fallbacks"] == 0
+    assert report["metadata"]["gold_free_modal_selection"] is True
+
+    for model_family, fmt in CONFIG_NAMES:
+        cfg = report["configurations"][f"{model_family}_{fmt}"]
+        t5_arr = t5_sums[(model_family, fmt)]
+        if len(t5_arr) != NUM_PROBLEMS:
+            raise AssertionError(f"{model_family} {fmt}: expected 500 T5 sums")
+        mean_t5 = sum(t5_arr) / float(NUM_PROBLEMS)
+        total_t5 = float(sum(t5_arr))
+        if not math.isclose(mean_t5, cfg["token_economics"]["mean_t5_output_tokens"], rel_tol=0, abs_tol=1e-6):
+            raise AssertionError(f"{model_family} {fmt}: T5 mean drift")
+        if int(total_t5) != int(cfg["token_economics"]["total_5sample_tokens"]):
+            raise AssertionError(f"{model_family} {fmt}: T5 total drift")
+        for tau in THRESHOLDS:
+            th = cfg["thresholds"][f"tau_{tau}"]
+            served = th["served_count"]
+            correct = th["correct_served_count"]
+            if not math.isclose(th["coverage"], served / float(NUM_PROBLEMS), abs_tol=1e-12):
+                raise AssertionError(f"{model_family} {fmt} tau={tau}: coverage != served/500")
+            if served > 0:
+                acc = correct / float(served)
+                if not math.isclose(th["selective_accuracy"], acc, abs_tol=1e-12):
+                    raise AssertionError(f"{model_family} {fmt} tau={tau}: accuracy drift")
+                if not math.isclose(th["selective_risk"], 1.0 - acc, abs_tol=1e-12):
+                    raise AssertionError(f"{model_family} {fmt} tau={tau}: risk drift")
+                paid = total_t5 / float(served)
+                if not math.isclose(th["five_sample_token_cost_per_served"], paid, rel_tol=0, abs_tol=1e-6):
+                    raise AssertionError(
+                        f"{model_family} {fmt} tau={tau}: tokens/served must use all {NUM_PROBLEMS} T5 sums"
+                    )
+
+    print("OK: compact artifact SHA256, 20,000/4,000 structure, T5 accounting, and report internals match.")
+    print("Note: this path does not re-run LightEval extraction or answer clustering.")
+
+
 def main():
     parser = argparse.ArgumentParser(description="Modal-answer agreement reanalysis on MATH-500.")
     parser.add_argument("--campaign-root", type=Path, default=REPO_ROOT / "outputs-hpc-campaign-2026-08-14" / "inference")
@@ -724,7 +871,21 @@ def main():
     parser.add_argument("--bootstrap-reps", type=int, default=10000)
     parser.add_argument("--seed", type=int, default=20260816)
     parser.add_argument("--check", action="store_true", help="Verify recomputed results against existing report JSON.")
+    parser.add_argument(
+        "--check-artifact",
+        action="store_true",
+        help="Stdlib check of the committed compact JSONL + report internals (no campaign traces).",
+    )
     args = parser.parse_args()
+
+    if args.check_artifact or (args.check and not campaign_jsonl_available(args.campaign_root)):
+        if args.check and not args.check_artifact:
+            print(
+                "Campaign JSONLs are not present; running compact-artifact --check "
+                "(full LightEval re-extraction requires outputs-hpc-campaign-2026-08-14)."
+            )
+        check_derived_artifact(args.derived_output, args.report_json)
+        sys.exit(0)
 
     if args.check:
         if not args.report_json.exists():

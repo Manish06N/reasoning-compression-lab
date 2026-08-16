@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-08-16 (late night) — Integrate observable modal-agreement analysis
+
+Branch `paper-modal-agreement`. MacBook audit of HPC commit `631d843`:
+
+- Compact artifact SHA256 `23e9ead021111959cf047323572889c95be0496e9475d6870b06c8b2c9a6149b` (20,000 rows, ~3.8 MB; no CoT / problem text).
+- `revision_reanalysis.py --check` still passes; P0 56k JSON is unchanged vs `3076573`.
+- Gold is insulated until after unique-mode clustering. Ties = 116. Symmetry/transitivity violations = 0.
+- Full LightEval re-extraction `--check` still requires campaign JSONLs (HPC). MacBook `--check` validates the compact artifact, T5 accounting, and report internals.
+- Manuscript: new observable modal table (not the old gold-hit Table 8), discrete 3-point risk–coverage figure, paired AWQ coverage CIs, five-sample $T_5$ cost. No “FP8 parity,” “safety,” or “reliable uncertainty estimator” wording.
+- Placement: **main paper**, because the signal is now gold-free, agreement separates low-risk subsets, AWQ-4 reduces strict-consensus coverage with CIs excluding zero, and the 5× token cost is explicit.
+
 ## 2026-08-16 (late night) — Phase 1 repo hygiene (one version of the truth)
 
 Branch `paper-p0-reanalysis`. After the P0 manuscript checkpoint (`07b5f9d`):

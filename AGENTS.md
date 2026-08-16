@@ -84,7 +84,7 @@ ssh -L 8080:<NODE>:8080 -N manishn_iitp@paramrudra.iitp.ac.in -p 4422
 
 ### Novelty Positioning Against Prior Literature
 * **The Literature Gap:** Prior works (QRM 2025, A Sober Look 2025, Quantized LLMs Can Still Be Calibrated 2025, Cost-of-Pass 2025, Quantization Inflates Reasoning 2026) studied accuracy, seed variance, or token count in isolation.
-* **Our Core Contribution:** A multi-seed, stack-pinned 88-cell grid isolating weight format under vLLM 0.7.0 eager, with problem-clustered pass@1 tests, real pathology counts, and a token-implied cost proxy. Modal-answer selective prediction is **not yet available** from the compact JSON.
+* **Our Core Contribution:** A multi-seed, stack-pinned 88-cell grid isolating weight format under vLLM 0.7.0 eager, with problem-clustered pass@1 tests, real pathology counts, a token-implied cost proxy, and gold-free MATH-500 modal-answer agreement.
 
 ### Headline Confirmatory Results (2026-08-16 P0 reanalysis)
 **Dataset:** MATH-500 ($n=500$, seeds 42–46) + GSM8K + GPQA-Diamond | **Total completions:** 56,408
@@ -127,7 +127,7 @@ gantt
 1. **Primary test:** problem-clustered bootstrap of pass@1 vs BF16. Llama AWQ-4 MATH −2.76 pp; Qwen AWQ-4 GPQA −5.56 pp. maj@5 McNemar is secondary.
 2. **Pathology:** 25 loops, 0 exact cap hits, 209 near-cap. Not 0/0.
 3. **Cost:** token-implied $C_{\text{pass}}$ at $\$1.50$/A100-h and assumed $65$ tok/s. Not measured wall-clock; not Pareto-optimal.
-4. **Selective prediction:** modal-answer agreement **not yet available**. Gold-hit ECE / 98.23% gate retracted.
+4. **Selective prediction:** gold-free MATH-500 modal agreement in `results/reports/modal_agreement_report.json`. Gold-hit ECE / 98.23% gate retracted.
 5. **Tokens:** full-grid ratio of means; 200-item even-index subset retracted as a result.
 
 #### [x] Phase 4 Extension: Breadth Benchmark Evaluation (COMPLETED)

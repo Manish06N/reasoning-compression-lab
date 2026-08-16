@@ -1,6 +1,6 @@
 # Answer normalization policy (frozen before agreement analysis)
 
-**Status:** frozen 2026-08-16, *before* any modal-agreement or selective-prediction rerun.
+**Status:** frozen 2026-08-16, *before* any modal-agreement or selective-prediction rerun. HPC modal analysis (`scripts/analysis/modal_agreement_analysis.py`) used this policy; do not retune it after seeing risk–coverage curves.
 
 Compact `results/*.json` records store `extractive_match` but **not** extracted answer strings. If HPC JSONLs are recovered, agreement analysis must use this policy. Do not retune it after seeing risk–coverage curves.
 

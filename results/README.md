@@ -94,17 +94,32 @@ Cost-of-Pass in the paper is a **fixed-throughput token-cost proxy** ($\$1.50$/A
 
 ---
 
-## 4. What is not in these JSON files
+## 4. Modal agreement (recovered MATH-500 answers)
 
-Compact validation records have `extractive_match`, `completion_tokens`, and repetition flags. They do **not** contain extracted answer strings, token IDs, raw text, or vLLM `finish_reason`.
+Compact validation records still omit traces and `finish_reason`. Recovered extracted answers live in [`recovered/math500_modal_inputs.jsonl`](recovered/math500_modal_inputs.jsonl) (20,000 rows; SHA256 `23e9ead021111959cf047323572889c95be0496e9475d6870b06c8b2c9a6149b`). Canonical modal numbers: [`reports/modal_agreement_report.json`](reports/modal_agreement_report.json).
 
-Therefore:
+Gold is used only after unique-mode clustering. Serve at $k/5$ iff a unique modal class has size $\ge k$. Mean five-sample token cost $T_5$ sums all five seeds before abstention.
 
-* Modal-answer selective prediction is **not yet available**.
-* Guo-style ECE/Brier from model probabilities is not available.
-* Gold-hit $k/5$ histograms are oracle diagnostics, not a deployable abstention gate.
+| Cell | >=3/5 cov / risk | >=4/5 cov / risk | 5/5 cov / risk | Mean $T_5$ |
+|---|---|---|---|---|
+| Qwen BF16 | 96.0 / 1.67 | 93.4 / 0.43 | 88.4 / 0.23 | 20,057 |
+| Qwen FP8 | 96.6 / 1.66 | 92.6 / 0.00 | 88.8 / 0.00 | 20,038 |
+| Qwen AWQ-4 | 95.8 / 1.46 | 91.2 / 0.44 | 86.4 / 0.23 | 21,327 |
+| Qwen GPTQ-4 | 95.4 / 1.47 | 92.8 / 0.43 | 86.8 / 0.00 | 21,436 |
+| Llama BF16 | 94.0 / 2.98 | 87.8 / 0.68 | 76.2 / 0.26 | 23,283 |
+| Llama FP8 | 94.0 / 3.19 | 88.6 / 0.90 | 78.2 / 0.00 | 22,754 |
+| Llama AWQ-4 | 93.2 / 3.65 | 84.6 / 1.89 | 70.2 / 0.00 | 23,682 |
+| Llama GPTQ-4 | 93.8 / 2.77 | 86.4 / 0.46 | 75.4 / 0.27 | 24,203 |
 
-If HPC JSONLs still exist, export answers with `scripts/hpc/qrm_parity/check_campaign_jsonls.sh` using the frozen policy in [`docs/ANSWER_NORMALIZATION.md`](../docs/ANSWER_NORMALIZATION.md).
+Coverage/risk in percent. A 0.00 risk point estimate is not proof of zero true error. Llama AWQ-4 5/5 coverage vs BF16: **−6.0 pp** (95% paired CI $[-9.4,-2.6]$). Qwen AWQ-4 $\ge 4/5$: **−2.2 pp** ($[-4.0,-0.6]$). FP8 coverage CIs include 0; that is not equivalence.
+
+Gold-hit $k/5$ histograms remain oracle diagnostics, not a deployable abstention gate. Guo-style ECE from model probabilities is still unavailable.
+
+Reproduce:
+
+```bash
+python3 scripts/analysis/modal_agreement_analysis.py --check
+```
 
 ---
 
@@ -116,9 +131,12 @@ results/
 ├── gsm8k/        # 24 breadth records
 ├── gpqa/         # 24 breadth records
 ├── reports/
-│   ├── revision_reanalysis_report.json   # CANONICAL
+│   ├── revision_reanalysis_report.json   # CANONICAL pass@1 / pathology / tokens
+│   ├── modal_agreement_report.json       # gold-free MATH-500 modal agreement
 │   └── runtime_manifest.json             # effective 56k launch settings
+├── recovered/
+│   └── math500_modal_inputs.jsonl        # compact extracted answers (no CoT)
 └── README.md
 ```
 
-Other files under `reports/` are either derived stubs or historical. Cite only `revision_reanalysis_report.json`.
+Other files under `reports/` are either derived stubs or historical. Cite `revision_reanalysis_report.json` for pass@1/pathology/tokens and `modal_agreement_report.json` for observable agreement.

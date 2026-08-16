@@ -7,7 +7,7 @@ Evaluation harness and artifacts for **Paper 1**: quantized reasoning models und
 * **GitHub:** [https://github.com/Manish06N/reasoning-compression-lab](https://github.com/Manish06N/reasoning-compression-lab)
 * **Paper 1 (J1):** *Beyond Pass@1: Reliability and Token-Cost Effects of Quantized Reasoning Models under a Pinned Serving Stack*
 
-Canonical manuscript: [`paper/main.tex`](paper/main.tex) → [`paper/main.pdf`](paper/main.pdf). Scoreboard: [`results/README.md`](results/README.md). Canonical numbers: [`results/reports/revision_reanalysis_report.json`](results/reports/revision_reanalysis_report.json).
+Canonical manuscript: [`paper/main.tex`](paper/main.tex) → [`paper/main.pdf`](paper/main.pdf). Scoreboard: [`results/README.md`](results/README.md). Canonical numbers: [`results/reports/revision_reanalysis_report.json`](results/reports/revision_reanalysis_report.json). Modal agreement: [`results/reports/modal_agreement_report.json`](results/reports/modal_agreement_report.json).
 
 ---
 
@@ -44,7 +44,7 @@ Files under `configs/models/` are **not** the campaign launcher. They contain di
 2. **Pathology (full 56,408-row grid).** **25** identical-word loop flags (threshold = 20 consecutive identical words). **0** exact $32{,}768$ cap hits after re-encoding. **209** near-cap generations (`completion_tokens >= 32{,}500`). `finish_reason` is not in the compact JSON.
 3. **Pass@1 (problem-clustered bootstrap vs BF16).** Llama AWQ-4: **−2.76 pp** on MATH-500 (95% CI $[−4.16,−1.44]$, $p<0.001$) and **−1.57 pp** on GSM8K. Qwen AWQ-4: **−5.56 pp** on GPQA-Diamond (95% CI $[−9.60,−1.52]$, $p=0.007$). FP8–BF16 95% intervals include 0; MATH $\pm 1$ pp TOST is **not** passed. maj@5 McNemar is secondary and non-significant.
 4. **Token inflation (full MATH-500 grid, all 5 seeds, ratio of means).** Qwen AWQ-4 **+6.33%**, Qwen GPTQ-4 **+6.88%** (paired token CIs exclude 0). Extra length is concentrated on BF16-correct / quantized-wrong items. The old 200-item even-index mean-of-ratios subset is an estimator artifact and is **not** a result.
-5. **Selective prediction.** Modal-answer agreement is **not yet available**: compact validation JSON has extractive_match flags but no extracted answer strings. Gold-hit $k/5$ tables (including the old 98.23% “operational safety gate”) are **not** in the manuscript.
+5. **Selective prediction.** Gold-free modal-answer agreement is now available from recovered MATH-500 answer strings (`results/recovered/math500_modal_inputs.jsonl`). Strict 5/5 consensus has very low selective error but costs five generations; Llama AWQ-4 reduces 5/5 coverage by **6.0 pp** vs BF16 (95% paired CI $[-9.4,-2.6]$). Gold-hit $k/5$ tables (including the old 98.23% “operational safety gate”) are **not** in the manuscript.
 6. **Cost.** Cost-of-Pass is a **fixed-throughput token-cost proxy** at $\$1.50$/A100-h and an assumed $65$ tok/s, shared across formats. It is not measured wall-clock, and FP8 is not called Pareto-optimal.
 
 ### Breadth means (sample std over seeds)
@@ -67,13 +67,13 @@ paper/main.tex tables
 ```
 
 ```bash
-python3 scripts/analysis/revision_reanalysis.py          # rewrite canonical JSON
-python3 scripts/analysis/revision_reanalysis.py --check  # exit 1 on drift vs git
+python3 scripts/analysis/revision_reanalysis.py --check
+python3 scripts/analysis/modal_agreement_analysis.py --check   # artifact path on MacBook; full LightEval path on HPC
 ```
 
 Older scripts live in [`scripts/analysis/legacy/`](scripts/analysis/legacy/) and must not be used for paper numbers.
 
-Answer-string recovery (HPC JSONLs, if they still exist) is documented in [`docs/ANSWER_NORMALIZATION.md`](docs/ANSWER_NORMALIZATION.md) and [`scripts/hpc/qrm_parity/check_campaign_jsonls.sh`](scripts/hpc/qrm_parity/check_campaign_jsonls.sh). Do not invent a new judge before that recovery.
+Answer-string recovery used the frozen policy in [`docs/ANSWER_NORMALIZATION.md`](docs/ANSWER_NORMALIZATION.md). Compact recovered answers: [`results/recovered/math500_modal_inputs.jsonl`](results/recovered/math500_modal_inputs.jsonl) (SHA256 `23e9ead021111959cf047323572889c95be0496e9475d6870b06c8b2c9a6149b`).
 
 ---
 
