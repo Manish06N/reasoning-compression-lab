@@ -1,7 +1,7 @@
 # Experimental Results & Validation Archive
 **Repository:** reasoning-compression-lab  
 **Cluster:** PARAM Rudra HPC (NVIDIA A100 80GB GPUs)  
-**Last Synced:** 2026-08-16 18:09:11  
+**Last Synced:** 2026-08-16 18:40:42  
 
 This directory contains the verified, reproducible evaluation results across all quantization formats (BF16, FP8, AWQ-4, GPTQ-4), architectures (Qwen-7B, Llama-8B), and random seeds.
 
@@ -48,8 +48,8 @@ This directory contains the verified, reproducible evaluation results across all
 | Qwen-7B | AWQ-4 | 44.44% | 41.92% | 47.98% | **44.78% ± 3.04%** |
 | Qwen-7B | GPTQ-4 | 46.97% | 50.00% | 46.97% | **47.98% ± 1.75%** |
 | Llama-8B | BF16 | 43.94% | 46.97% | 47.47% | **46.13% ± 1.91%** |
-| Llama-8B | FP8 | 47.47% | 47.98% | — | **47.73% ± 0.36%** |
-| Llama-8B | AWQ-4 | 46.97% | 44.95% | — | **45.96% ± 1.43%** |
+| Llama-8B | FP8 | 47.47% | 47.98% | 47.98% | **47.81% ± 0.29%** |
+| Llama-8B | AWQ-4 | 46.97% | 44.95% | 48.99% | **46.97% ± 2.02%** |
 | Llama-8B | GPTQ-4 | 44.44% | 40.91% | — | **42.68% ± 2.50%** |
 
 ---
