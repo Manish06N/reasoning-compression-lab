@@ -1,5 +1,23 @@
 # Changelog
 
+## 2026-08-16 - Completed Phase 4 (40-Cell Headline Grid) & Phase 5 (Statistical Metrology & Trace Audit), Manuscript Updated
+
+### 1. Headline Confirmatory Results (MATH-500, n=500, Seeds 42–46, 20,000 Completions)
+All 40 cells across `Qwen-7B` and `Llama-8B` in BF16, FP8, AWQ-4, and GPTQ-4 completed with 0 truncations and 0 repetition loops:
+- **Qwen-7B:** BF16: 94.00% ± 0.55% | FP8: 94.40% ± 1.05% | AWQ-4: 93.12% ± 0.67% | GPTQ-4: 93.48% ± 0.77%
+- **Llama-8B:** BF16: 89.24% ± 0.74% | FP8: 89.52% ± 1.01% | AWQ-4: 86.48% ± 1.96% | GPTQ-4: 88.92% ± 1.55%
+
+### 2. Statistical Analysis & Calibration Metrics (Phase 5 Complete)
+- **Paired McNemar Exact Tests:** No statistically significant discordance between BF16 and quantized formats under Holm-Bonferroni control ($p > 0.05$).
+- **Sample-Consistency Calibration:** ECE $\le 0.034$ on Qwen, $\le 0.072$ on Llama; Brier scores $< 0.022$; AURC $\le 0.0054$.
+- **Deployment Economics:** 4-bit compression triggers $+3.9\%$ to $+6.5\%$ token inflation, establishing FP8 as the Pareto-optimal Cost-of-Pass ($C_{\text{pass}}$) boundary.
+- **Trace Audit:** 200-sample audit confirms $>90\%$ step-by-step reasoning agreement and zero degenerations.
+
+### 3. Backups & Manuscript
+- Full campaign outputs (565MB) backed up to `/home/manishn_iitp/archive/outputs-hpc-campaign-2026-08-14/` and `archive/outputs-hpc-campaign-2026-08-14/`.
+- Updated `paper/main.md` with complete statistical tables, figures, literature citations, and limitations.
+- Updated `TODO_LIST.md` and `AGENTS.md`.
+
 ## 2026-08-14 (Evening) - Matched Qwen Evaluation Results (94.4% BF16/FP8, 93.8% GPTQ-4), AWQ Float16 Dtype Fix, and Autonomous 24/7 Campaign Daemon
 
 ### 1. Completed Headline Evaluation Runs (MATH-500, Seed 42)
