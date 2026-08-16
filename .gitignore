@@ -4,10 +4,12 @@ __pycache__/
 *.pyc
 .venv/
 .env
+.qrm_official_env_ready
 
 # Experiments
 runs/
-results/
+# Structured evaluation summaries, validation records, and analysis reports are tracked
+!results/
 logs/
 outputs-win5080-*/
 outputs-hpc-*/

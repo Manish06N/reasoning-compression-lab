@@ -1,0 +1,4519 @@
+{
+  "accuracy": 0.926,
+  "boxed": 494,
+  "boxed_rate": 0.988,
+  "completion_tokens_max": 32729,
+  "completion_tokens_mean": 4508.418,
+  "completion_tokens_min": 584,
+  "correct": 463,
+  "details": [
+    {
+      "boxed": true,
+      "completion_tokens": 13196,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 1
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1695,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 2
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1304,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 3
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 5445,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 4
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1420,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 1,
+      "repetition_flag": false,
+      "row": 5
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1383,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 6
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1696,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 7
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2495,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 5,
+      "repetition_flag": false,
+      "row": 8
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2815,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 9
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 6436,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 10
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 4968,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 11
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2610,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 12
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 4194,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 4,
+      "repetition_flag": false,
+      "row": 13
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3440,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 14
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1425,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 15
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 934,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 1,
+      "repetition_flag": false,
+      "row": 16
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1316,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 17
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 9089,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 18
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 5799,
+      "extractive_match": 0.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 6,
+      "repetition_flag": false,
+      "row": 19
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3814,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 20
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1186,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 21
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 4286,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 22
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2658,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 4,
+      "repetition_flag": false,
+      "row": 23
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2328,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 24
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2555,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 25
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1622,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 26
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3375,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 27
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3034,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 28
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3160,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 4,
+      "repetition_flag": false,
+      "row": 29
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 4629,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 4,
+      "repetition_flag": false,
+      "row": 30
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3868,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 31
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2046,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 32
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 4764,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 7,
+      "repetition_flag": false,
+      "row": 33
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 7653,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 34
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2888,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 35
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 13923,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 36
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2096,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 37
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 4373,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 38
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1106,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 1,
+      "repetition_flag": false,
+      "row": 39
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3025,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 40
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 6447,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 41
+    },
+    {
+      "boxed": false,
+      "completion_tokens": 32729,
+      "extractive_match": 0.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 42
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 9612,
+      "extractive_match": 0.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 43
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 29860,
+      "extractive_match": 0.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 44
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 4787,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 45
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 7479,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 4,
+      "repetition_flag": false,
+      "row": 46
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3655,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 47
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 5141,
+      "extractive_match": 0.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 48
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3586,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 49
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 5232,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 4,
+      "repetition_flag": false,
+      "row": 50
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 10246,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 5,
+      "repetition_flag": false,
+      "row": 51
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 9377,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 52
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 6204,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 11,
+      "repetition_flag": false,
+      "row": 53
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 5355,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 54
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 4730,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 55
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1236,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 56
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1734,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 57
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2069,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 58
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2718,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 59
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2759,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 60
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2819,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 61
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1381,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 62
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 911,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 1,
+      "repetition_flag": false,
+      "row": 63
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1945,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 64
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2968,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 65
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1652,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 66
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3624,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 67
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3142,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 68
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2516,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 69
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2279,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 70
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 18840,
+      "extractive_match": 0.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 71
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2236,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 72
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 4339,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 73
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 21887,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 74
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2759,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 75
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 4389,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 76
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1269,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 1,
+      "repetition_flag": false,
+      "row": 77
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1660,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 78
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 7408,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 79
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3198,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 80
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 19342,
+      "extractive_match": 0.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 4,
+      "repetition_flag": false,
+      "row": 81
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2138,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 82
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3443,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 6,
+      "repetition_flag": false,
+      "row": 83
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 4116,
+      "extractive_match": 0.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 84
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 10895,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 5,
+      "repetition_flag": false,
+      "row": 85
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 10482,
+      "extractive_match": 0.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 86
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3028,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 87
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3450,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 88
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1374,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 89
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 20214,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 5,
+      "repetition_flag": false,
+      "row": 90
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1456,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 4,
+      "repetition_flag": false,
+      "row": 91
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 7276,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 92
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1619,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 93
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1529,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 94
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1236,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 1,
+      "repetition_flag": false,
+      "row": 95
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2005,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 96
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 17551,
+      "extractive_match": 0.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 97
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 6564,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 4,
+      "repetition_flag": false,
+      "row": 98
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 5052,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 99
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2196,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 100
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3508,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 101
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 910,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 102
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1636,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 103
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2364,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 104
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1431,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 105
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 5490,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 106
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1175,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 1,
+      "repetition_flag": false,
+      "row": 107
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1193,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 1,
+      "repetition_flag": false,
+      "row": 108
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3602,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 109
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 884,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 1,
+      "repetition_flag": false,
+      "row": 110
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1144,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 1,
+      "repetition_flag": false,
+      "row": 111
+    },
+    {
+      "boxed": false,
+      "completion_tokens": 32470,
+      "extractive_match": 0.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 12,
+      "repetition_flag": false,
+      "row": 112
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3358,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 113
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3228,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 114
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2958,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 115
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2897,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 4,
+      "repetition_flag": false,
+      "row": 116
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3914,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 4,
+      "repetition_flag": false,
+      "row": 117
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2724,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 118
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1658,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 119
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1996,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 120
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1241,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 121
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 7812,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 6,
+      "repetition_flag": false,
+      "row": 122
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 4920,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 123
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1349,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 124
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1392,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 125
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 5640,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 126
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 4379,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 127
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1537,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 128
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1417,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 129
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 8733,
+      "extractive_match": 0.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 130
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1010,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 131
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3262,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 4,
+      "repetition_flag": false,
+      "row": 132
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 15305,
+      "extractive_match": 0.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 133
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1158,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 134
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 969,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 135
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2297,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 136
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 938,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 137
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2807,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 4,
+      "repetition_flag": false,
+      "row": 138
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 5437,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 139
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1672,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 140
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2932,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 141
+    },
+    {
+      "boxed": false,
+      "completion_tokens": 32719,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 142
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2224,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 4,
+      "repetition_flag": false,
+      "row": 143
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2365,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 144
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1072,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 145
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1580,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 146
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1861,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 147
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1992,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 6,
+      "repetition_flag": false,
+      "row": 148
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1586,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 149
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 4074,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 9,
+      "repetition_flag": false,
+      "row": 150
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1561,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 151
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 8628,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 152
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 4620,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 4,
+      "repetition_flag": false,
+      "row": 153
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 910,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 154
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1903,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 4,
+      "repetition_flag": false,
+      "row": 155
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1767,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 156
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 6416,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 157
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 11768,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 158
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2351,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 159
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1066,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 160
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 4904,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 161
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2358,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 162
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 7527,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 163
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 8426,
+      "extractive_match": 0.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 164
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1627,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 165
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1847,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 166
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2908,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 167
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3660,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 4,
+      "repetition_flag": false,
+      "row": 168
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3668,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 4,
+      "repetition_flag": false,
+      "row": 169
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2860,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 1,
+      "repetition_flag": false,
+      "row": 170
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1442,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 171
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1881,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 172
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2264,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 4,
+      "repetition_flag": false,
+      "row": 173
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1603,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 174
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1978,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 175
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3905,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 4,
+      "repetition_flag": false,
+      "row": 176
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 9911,
+      "extractive_match": 0.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 177
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2337,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 178
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2848,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 179
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 19383,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 180
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1087,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 181
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1692,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 182
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1104,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 183
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1220,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 184
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1728,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 4,
+      "repetition_flag": false,
+      "row": 185
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1479,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 186
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3000,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 187
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1377,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 1,
+      "repetition_flag": false,
+      "row": 188
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 9114,
+      "extractive_match": 0.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 189
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1961,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 190
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2050,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 191
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3313,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 192
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1304,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 193
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1112,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 194
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2335,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 195
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 8454,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 5,
+      "repetition_flag": false,
+      "row": 196
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1459,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 197
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 4207,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 198
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2255,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 199
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 32638,
+      "extractive_match": 0.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 4,
+      "repetition_flag": false,
+      "row": 200
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1808,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 201
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2634,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 202
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 584,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 1,
+      "repetition_flag": false,
+      "row": 203
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 11815,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 8,
+      "repetition_flag": false,
+      "row": 204
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3742,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 205
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2343,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 206
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2286,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 207
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 5288,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 208
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2459,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 209
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3952,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 210
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2494,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 4,
+      "repetition_flag": false,
+      "row": 211
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2958,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 212
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1053,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 5,
+      "repetition_flag": false,
+      "row": 213
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1361,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 214
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 6907,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 4,
+      "repetition_flag": false,
+      "row": 215
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2779,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 216
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2490,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 217
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1726,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 218
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1225,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 219
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2025,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 220
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 930,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 221
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 5486,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 222
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1642,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 223
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 9248,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 5,
+      "repetition_flag": false,
+      "row": 224
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 14519,
+      "extractive_match": 0.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 225
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 6625,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 226
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3503,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 4,
+      "repetition_flag": false,
+      "row": 227
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2325,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 228
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2534,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 1,
+      "repetition_flag": false,
+      "row": 229
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2136,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 230
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3165,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 231
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1427,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 232
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2138,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 233
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 5888,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 234
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1213,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 235
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 7246,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 236
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1612,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 1,
+      "repetition_flag": false,
+      "row": 237
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1760,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 1,
+      "repetition_flag": false,
+      "row": 238
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 7999,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 4,
+      "repetition_flag": false,
+      "row": 239
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3211,
+      "extractive_match": 0.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 240
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3119,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 241
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1805,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 242
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 19501,
+      "extractive_match": 0.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 4,
+      "repetition_flag": false,
+      "row": 243
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1872,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 244
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1784,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 245
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3404,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 246
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3586,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 247
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2913,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 1,
+      "repetition_flag": false,
+      "row": 248
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 4914,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 249
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1751,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 250
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1945,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 251
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 16240,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 252
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 4600,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 253
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 10399,
+      "extractive_match": 0.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 6,
+      "repetition_flag": false,
+      "row": 254
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2099,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 255
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3326,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 1,
+      "repetition_flag": false,
+      "row": 256
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 9228,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 257
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1650,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 258
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2563,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 259
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2227,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 260
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1846,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 261
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 11977,
+      "extractive_match": 0.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 4,
+      "repetition_flag": false,
+      "row": 262
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3985,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 263
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2529,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 264
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2024,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 265
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 28604,
+      "extractive_match": 0.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 4,
+      "repetition_flag": false,
+      "row": 266
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2393,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 267
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1566,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 268
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2900,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 269
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 4908,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 270
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3499,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 271
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1591,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 272
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1857,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 4,
+      "repetition_flag": false,
+      "row": 273
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1514,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 274
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 6585,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 275
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1763,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 276
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 19660,
+      "extractive_match": 0.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 277
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 5006,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 278
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 726,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 279
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2552,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 280
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2406,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 281
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1938,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 1,
+      "repetition_flag": false,
+      "row": 282
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2226,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 283
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 4873,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 284
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1815,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 285
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2664,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 286
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 4730,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 287
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2701,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 288
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 9230,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 289
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1336,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 290
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2018,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 4,
+      "repetition_flag": false,
+      "row": 291
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 12740,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 292
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3666,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 293
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 7126,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 294
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2873,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 295
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 22079,
+      "extractive_match": 0.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 4,
+      "repetition_flag": false,
+      "row": 296
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2573,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 297
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1881,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 298
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 7463,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 6,
+      "repetition_flag": false,
+      "row": 299
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1749,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 300
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1011,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 301
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2945,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 302
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 7099,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 303
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2382,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 304
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 11698,
+      "extractive_match": 0.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 305
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1918,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 306
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1629,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 307
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 4023,
+      "extractive_match": 0.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 4,
+      "repetition_flag": false,
+      "row": 308
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1045,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 309
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 4183,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 310
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2097,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 311
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 7004,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 312
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1591,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 313
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2909,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 314
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2260,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 315
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1440,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 316
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 940,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 317
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 6601,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 318
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1647,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 319
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2177,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 320
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2351,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 321
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3480,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 322
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1995,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 323
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3677,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 324
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2124,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 325
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 7328,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 326
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 5856,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 327
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 6648,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 328
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3949,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 329
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1278,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 330
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 4617,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 331
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1479,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 332
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3126,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 333
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1839,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 334
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 734,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 1,
+      "repetition_flag": false,
+      "row": 335
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2110,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 336
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 9968,
+      "extractive_match": 0.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 337
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2842,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 1,
+      "repetition_flag": false,
+      "row": 338
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 6988,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 339
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1995,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 340
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3344,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 341
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 4188,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 342
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 12595,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 343
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1224,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 344
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2971,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 345
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2730,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 346
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2515,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 347
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2525,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 348
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1021,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 349
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2212,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 5,
+      "repetition_flag": false,
+      "row": 350
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 4237,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 351
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2857,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 352
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2078,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 353
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2410,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 354
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1769,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 355
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1407,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 356
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 24692,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 4,
+      "repetition_flag": false,
+      "row": 357
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2232,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 358
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 5340,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 359
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2716,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 8,
+      "repetition_flag": false,
+      "row": 360
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2500,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 4,
+      "repetition_flag": false,
+      "row": 361
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1802,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 362
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1999,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 363
+    },
+    {
+      "boxed": false,
+      "completion_tokens": 32674,
+      "extractive_match": 0.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 5,
+      "repetition_flag": false,
+      "row": 364
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1040,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 365
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1922,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 366
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2453,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 367
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1913,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 368
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1666,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 1,
+      "repetition_flag": false,
+      "row": 369
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3150,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 370
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2398,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 1,
+      "repetition_flag": false,
+      "row": 371
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1977,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 372
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1982,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 373
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3080,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 374
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1541,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 375
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2069,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 376
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 4198,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 377
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3676,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 378
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2137,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 379
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3515,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 380
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2372,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 6,
+      "repetition_flag": false,
+      "row": 381
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2034,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 382
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1260,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 383
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1975,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 384
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 7392,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 385
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2635,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 386
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3273,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 387
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 4460,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 388
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 7156,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 389
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 5476,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 390
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 6129,
+      "extractive_match": 0.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 391
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1005,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 392
+    },
+    {
+      "boxed": false,
+      "completion_tokens": 32696,
+      "extractive_match": 0.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 5,
+      "repetition_flag": false,
+      "row": 393
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2973,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 394
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 11095,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 4,
+      "repetition_flag": false,
+      "row": 395
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3991,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 396
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1899,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 397
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1645,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 398
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1161,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 399
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2597,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 400
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2537,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 4,
+      "repetition_flag": false,
+      "row": 401
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2155,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 4,
+      "repetition_flag": false,
+      "row": 402
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 8237,
+      "extractive_match": 0.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 403
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 14220,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 4,
+      "repetition_flag": false,
+      "row": 404
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 11617,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 405
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1496,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 406
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2291,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 1,
+      "repetition_flag": false,
+      "row": 407
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1835,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 408
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 5029,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 409
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 6188,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 410
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1637,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 411
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1607,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 412
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 8638,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 5,
+      "repetition_flag": false,
+      "row": 413
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3699,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 414
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1042,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 415
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2793,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 6,
+      "repetition_flag": false,
+      "row": 416
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 9415,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 5,
+      "repetition_flag": false,
+      "row": 417
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 17076,
+      "extractive_match": 0.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 5,
+      "repetition_flag": false,
+      "row": 418
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2253,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 419
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3955,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 4,
+      "repetition_flag": false,
+      "row": 420
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3071,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 5,
+      "repetition_flag": false,
+      "row": 421
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3470,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 422
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1649,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 423
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2263,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 4,
+      "repetition_flag": false,
+      "row": 424
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 4159,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 425
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1290,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 426
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 32600,
+      "extractive_match": 0.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 7,
+      "repetition_flag": false,
+      "row": 427
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 900,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 428
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1714,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 429
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1803,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 430
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2099,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 431
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3793,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 5,
+      "repetition_flag": false,
+      "row": 432
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1961,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 433
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 704,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 1,
+      "repetition_flag": false,
+      "row": 434
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2249,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 5,
+      "repetition_flag": false,
+      "row": 435
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2385,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 436
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3342,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 437
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2545,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 438
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2065,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 439
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3135,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 440
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2735,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 4,
+      "repetition_flag": false,
+      "row": 441
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1100,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 1,
+      "repetition_flag": false,
+      "row": 442
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 5257,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 443
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 4306,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 444
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2813,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 445
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2974,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 11,
+      "repetition_flag": false,
+      "row": 446
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2559,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 447
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 11648,
+      "extractive_match": 0.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 448
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2203,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 7,
+      "repetition_flag": false,
+      "row": 449
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 8769,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 450
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1762,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 451
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2830,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 452
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 31989,
+      "extractive_match": 0.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 6,
+      "repetition_flag": false,
+      "row": 453
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2198,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 454
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2066,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 455
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1873,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 456
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3401,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 457
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2590,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 458
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1507,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 459
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 5074,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 460
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1791,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 461
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1350,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 462
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 10774,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 6,
+      "repetition_flag": false,
+      "row": 463
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1341,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 464
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2708,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 4,
+      "repetition_flag": false,
+      "row": 465
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 4919,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 466
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1589,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 467
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2079,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 468
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2103,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 469
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3898,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 470
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1775,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 471
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 4063,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 472
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 4182,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 473
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 9272,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 5,
+      "repetition_flag": false,
+      "row": 474
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2468,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 475
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1077,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 476
+    },
+    {
+      "boxed": false,
+      "completion_tokens": 32694,
+      "extractive_match": 0.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 9,
+      "repetition_flag": false,
+      "row": 477
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 997,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 478
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 12681,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 479
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1877,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 480
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 780,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 1,
+      "repetition_flag": false,
+      "row": 481
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 4898,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 482
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2608,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 483
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2008,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 484
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 7794,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 7,
+      "repetition_flag": false,
+      "row": 485
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1109,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 486
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2080,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 487
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2823,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 5,
+      "repetition_flag": false,
+      "row": 488
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3426,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 489
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2136,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 490
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2865,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 491
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 4932,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 5,
+      "repetition_flag": false,
+      "row": 492
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 12315,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 493
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1936,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 494
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1606,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 495
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 1659,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 496
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3691,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 2,
+      "repetition_flag": false,
+      "row": 497
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 2551,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 5,
+      "repetition_flag": false,
+      "row": 498
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 3614,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 499
+    },
+    {
+      "boxed": true,
+      "completion_tokens": 6544,
+      "extractive_match": 1.0,
+      "hit_token_limit": false,
+      "max_consecutive_word_run": 3,
+      "repetition_flag": false,
+      "row": 500
+    }
+  ],
+  "errors": [],
+  "metric_rows": 500,
+  "model": "/scratch/manishn_iitp/reasoning-compression-lab/models/DeepSeek-R1-Distill-Qwen-7B-GPTQ-4",
+  "passed": true,
+  "repetition_rows": 0,
+  "result": "/scratch/manishn_iitp/reasoning-compression-lab/outputs-hpc-campaign-2026-08-14/inference/DeepSeek-R1-Distill-Qwen-7B-GPTQ-4-seed43/MATH-500.jsonl",
+  "rows": 500,
+  "token_limit_hits": 0
+}

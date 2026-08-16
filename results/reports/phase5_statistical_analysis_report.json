@@ -1,0 +1,356 @@
+{
+  "dataset": "HuggingFaceH4/MATH-500",
+  "sample_count_per_cell": 500,
+  "total_evaluated_completions": 20000,
+  "seeds": [
+    42,
+    43,
+    44,
+    45,
+    46
+  ],
+  "summary_statistics": {
+    "Qwen-7B_BF16": {
+      "model": "Qwen-7B",
+      "format": "BF16",
+      "seed_accs": {
+        "42": 94.39999999999999,
+        "43": 94.0,
+        "44": 93.8,
+        "45": 94.6,
+        "46": 93.2
+      },
+      "mean_acc": 93.99999999999999,
+      "std_acc": 0.5477225575051622,
+      "pooled_correct": 2350,
+      "wilson_ci_95": [
+        92.99983090311017,
+        94.86515720345298
+      ],
+      "mean_tokens": 4011.3608,
+      "truncations": 0,
+      "loops": 0
+    },
+    "Qwen-7B_FP8": {
+      "model": "Qwen-7B",
+      "format": "FP8",
+      "seed_accs": {
+        "42": 94.39999999999999,
+        "43": 95.19999999999999,
+        "44": 94.8,
+        "45": 92.60000000000001,
+        "46": 95.0
+      },
+      "mean_acc": 94.4,
+      "std_acc": 1.0488088481701454,
+      "pooled_correct": 2360,
+      "wilson_ci_95": [
+        93.42872281831372,
+        95.2350379074
+      ],
+      "mean_tokens": 4007.6744,
+      "truncations": 0,
+      "loops": 0
+    },
+    "Qwen-7B_AWQ-4": {
+      "model": "Qwen-7B",
+      "format": "AWQ-4",
+      "seed_accs": {
+        "42": 92.4,
+        "43": 92.80000000000001,
+        "44": 93.2,
+        "45": 93.0,
+        "46": 94.19999999999999
+      },
+      "mean_acc": 93.12,
+      "std_acc": 0.6723094525588571,
+      "pooled_correct": 2328,
+      "wilson_ci_95": [
+        92.06021322767099,
+        94.04747511676089
+      ],
+      "mean_tokens": 4265.3196,
+      "truncations": 0,
+      "loops": 0
+    },
+    "Qwen-7B_GPTQ-4": {
+      "model": "Qwen-7B",
+      "format": "GPTQ-4",
+      "seed_accs": {
+        "42": 93.8,
+        "43": 92.60000000000001,
+        "44": 93.4,
+        "45": 94.6,
+        "46": 93.0
+      },
+      "mean_acc": 93.47999999999999,
+      "std_acc": 0.7694153624668488,
+      "pooled_correct": 2337,
+      "wilson_ci_95": [
+        92.44399065622463,
+        94.38259304544275
+      ],
+      "mean_tokens": 4287.230799999999,
+      "truncations": 0,
+      "loops": 0
+    },
+    "Llama-8B_BF16": {
+      "model": "Llama-8B",
+      "format": "BF16",
+      "seed_accs": {
+        "42": 89.0,
+        "43": 88.4,
+        "44": 90.2,
+        "45": 89.8,
+        "46": 88.8
+      },
+      "mean_acc": 89.24000000000001,
+      "std_acc": 0.7402702209328691,
+      "pooled_correct": 2231,
+      "wilson_ci_95": [
+        87.96455105344518,
+        90.39504288522613
+      ],
+      "mean_tokens": 4656.591200000001,
+      "truncations": 0,
+      "loops": 0
+    },
+    "Llama-8B_FP8": {
+      "model": "Llama-8B",
+      "format": "FP8",
+      "seed_accs": {
+        "42": 89.0,
+        "43": 89.60000000000001,
+        "44": 88.6,
+        "45": 89.2,
+        "46": 91.2
+      },
+      "mean_acc": 89.52000000000001,
+      "std_acc": 1.0059821071967459,
+      "pooled_correct": 2238,
+      "wilson_ci_95": [
+        88.25810115219682,
+        90.6606336198799
+      ],
+      "mean_tokens": 4550.7908,
+      "truncations": 0,
+      "loops": 0
+    },
+    "Llama-8B_AWQ-4": {
+      "model": "Llama-8B",
+      "format": "AWQ-4",
+      "seed_accs": {
+        "42": 84.39999999999999,
+        "43": 84.8,
+        "44": 89.2,
+        "45": 87.4,
+        "46": 86.6
+      },
+      "mean_acc": 86.47999999999999,
+      "std_acc": 1.9626512680555397,
+      "pooled_correct": 2162,
+      "wilson_ci_95": [
+        85.08352245512822,
+        87.76454041140414
+      ],
+      "mean_tokens": 4736.4572,
+      "truncations": 0,
+      "loops": 0
+    },
+    "Llama-8B_GPTQ-4": {
+      "model": "Llama-8B",
+      "format": "GPTQ-4",
+      "seed_accs": {
+        "42": 88.0,
+        "43": 89.60000000000001,
+        "44": 86.8,
+        "45": 89.4,
+        "46": 90.8
+      },
+      "mean_acc": 88.92000000000002,
+      "std_acc": 1.546609194334498,
+      "pooled_correct": 2223,
+      "wilson_ci_95": [
+        87.62937907112573,
+        90.09119677222513
+      ],
+      "mean_tokens": 4840.5028,
+      "truncations": 0,
+      "loops": 0
+    }
+  },
+  "mcnemar_paired_contrasts": [
+    {
+      "contrast": "Llama-8B (BF16 vs AWQ-4)",
+      "model": "Llama-8B",
+      "format": "AWQ-4",
+      "n11": 436,
+      "n10": 20,
+      "n01": 13,
+      "n00": 31,
+      "p_value": 0.296206368599087,
+      "holm_alpha": 0.008333333333333333,
+      "is_significant": false
+    },
+    {
+      "contrast": "Qwen-7B (BF16 vs FP8)",
+      "model": "Qwen-7B",
+      "format": "FP8",
+      "n11": 467,
+      "n10": 5,
+      "n01": 8,
+      "n00": 20,
+      "p_value": 0.5810546875,
+      "holm_alpha": 0.01,
+      "is_significant": false
+    },
+    {
+      "contrast": "Qwen-7B (BF16 vs GPTQ-4)",
+      "model": "Qwen-7B",
+      "format": "GPTQ-4",
+      "n11": 466,
+      "n10": 6,
+      "n01": 4,
+      "n00": 24,
+      "p_value": 0.75390625,
+      "holm_alpha": 0.0125,
+      "is_significant": false
+    },
+    {
+      "contrast": "Qwen-7B (BF16 vs AWQ-4)",
+      "model": "Qwen-7B",
+      "format": "AWQ-4",
+      "n11": 463,
+      "n10": 9,
+      "n01": 9,
+      "n00": 19,
+      "p_value": 1.0,
+      "holm_alpha": 0.016666666666666666,
+      "is_significant": false
+    },
+    {
+      "contrast": "Llama-8B (BF16 vs FP8)",
+      "model": "Llama-8B",
+      "format": "FP8",
+      "n11": 445,
+      "n10": 11,
+      "n01": 10,
+      "n00": 34,
+      "p_value": 1.0,
+      "holm_alpha": 0.025,
+      "is_significant": false
+    },
+    {
+      "contrast": "Llama-8B (BF16 vs GPTQ-4)",
+      "model": "Llama-8B",
+      "format": "GPTQ-4",
+      "n11": 444,
+      "n10": 12,
+      "n01": 12,
+      "n00": 32,
+      "p_value": 1.0,
+      "holm_alpha": 0.05,
+      "is_significant": false
+    }
+  ],
+  "calibration_metrology": {
+    "Qwen-7B_BF16": {
+      "maj5_accuracy": 94.39999999999999,
+      "ece": 0.026399999999999986,
+      "brier_score": 0.008160000000000006,
+      "aurc": 0.0015980790415699385
+    },
+    "Qwen-7B_FP8": {
+      "maj5_accuracy": 95.0,
+      "ece": 0.028399999999999988,
+      "brier_score": 0.009360000000000007,
+      "aurc": 0.0012713361213295255
+    },
+    "Qwen-7B_AWQ-4": {
+      "maj5_accuracy": 94.39999999999999,
+      "ece": 0.034399999999999986,
+      "brier_score": 0.011200000000000009,
+      "aurc": 0.0015980790415699385
+    },
+    "Qwen-7B_GPTQ-4": {
+      "maj5_accuracy": 94.0,
+      "ece": 0.029999999999999978,
+      "brier_score": 0.009040000000000006,
+      "aurc": 0.0018370792284372298
+    },
+    "Llama-8B_BF16": {
+      "maj5_accuracy": 91.2,
+      "ece": 0.05720000000000007,
+      "brier_score": 0.017200000000000007,
+      "aurc": 0.003990795019059387
+    },
+    "Llama-8B_FP8": {
+      "maj5_accuracy": 91.0,
+      "ece": 0.04920000000000002,
+      "brier_score": 0.014960000000000011,
+      "aurc": 0.004177218714193028
+    },
+    "Llama-8B_AWQ-4": {
+      "maj5_accuracy": 89.8,
+      "ece": 0.0724000000000001,
+      "brier_score": 0.021999999999999974,
+      "aurc": 0.005388408947565192
+    },
+    "Llama-8B_GPTQ-4": {
+      "maj5_accuracy": 91.2,
+      "ece": 0.061200000000000074,
+      "brier_score": 0.019119999999999995,
+      "aurc": 0.003990795019059387
+    }
+  },
+  "deployment_economics": {
+    "Qwen-7B_BF16": {
+      "mean_tokens": 4011.3608,
+      "time_per_q_sec": 61.71324307692308,
+      "cost_per_q_dollars": 0.025713851282051284,
+      "c_pass_dollars": 0.027355160938352434
+    },
+    "Qwen-7B_FP8": {
+      "mean_tokens": 4007.6744,
+      "time_per_q_sec": 61.65652923076923,
+      "cost_per_q_dollars": 0.025690220512820515,
+      "c_pass_dollars": 0.027214216644936985
+    },
+    "Qwen-7B_AWQ-4": {
+      "mean_tokens": 4265.3196,
+      "time_per_q_sec": 65.62030153846153,
+      "cost_per_q_dollars": 0.027341792307692306,
+      "c_pass_dollars": 0.029361890364789846
+    },
+    "Qwen-7B_GPTQ-4": {
+      "mean_tokens": 4287.230799999999,
+      "time_per_q_sec": 65.95739692307691,
+      "cost_per_q_dollars": 0.027482248717948715,
+      "c_pass_dollars": 0.029399067948169363
+    },
+    "Llama-8B_BF16": {
+      "mean_tokens": 4656.591200000001,
+      "time_per_q_sec": 71.63986461538462,
+      "cost_per_q_dollars": 0.029849943589743595,
+      "c_pass_dollars": 0.033449062740636026
+    },
+    "Llama-8B_FP8": {
+      "mean_tokens": 4550.7908,
+      "time_per_q_sec": 70.01216615384615,
+      "cost_per_q_dollars": 0.029171735897435897,
+      "c_pass_dollars": 0.03258683634655484
+    },
+    "Llama-8B_AWQ-4": {
+      "mean_tokens": 4736.4572,
+      "time_per_q_sec": 72.8685723076923,
+      "cost_per_q_dollars": 0.03036190512820513,
+      "c_pass_dollars": 0.035108585948433316
+    },
+    "Llama-8B_GPTQ-4": {
+      "mean_tokens": 4840.5028,
+      "time_per_q_sec": 74.46927384615385,
+      "cost_per_q_dollars": 0.031028864102564106,
+      "c_pass_dollars": 0.03489525877481343
+    }
+  }
+}

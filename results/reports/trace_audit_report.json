@@ -1,0 +1,21 @@
+{
+  "sample_size": 200,
+  "qwen_agreement": {
+    "all_4_formats_correct": 180,
+    "all_4_formats_fail": 6,
+    "mixed_correctness": 14
+  },
+  "llama_agreement": {
+    "all_4_formats_correct": 157,
+    "all_4_formats_fail": 9,
+    "mixed_correctness": 34
+  },
+  "mean_token_deltas_vs_bf16": {
+    "Qwen-7B_FP8": "+11.41%",
+    "Qwen-7B_AWQ-4": "+19.81%",
+    "Qwen-7B_GPTQ-4": "+21.14%",
+    "Llama-8B_FP8": "+10.21%",
+    "Llama-8B_AWQ-4": "+29.77%",
+    "Llama-8B_GPTQ-4": "+28.45%"
+  }
+}
