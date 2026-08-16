@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 """
-Consolidated Multi-Task Benchmark Aggregator.
-Combines evaluation metrics across:
-1. MATH-500 (Competition Math, n=500, 5 seeds)
-2. GSM8K (Grade School Math, n=1,319, 3 seeds)
-3. GPQA-Diamond (Graduate Scientific Reasoning, n=198, 3 seeds)
-Outputs JSON and Markdown tables for manuscript inclusion.
+DEPRECATED.
+
+This script is not the manuscript pipeline. Pathology keys and
+summary tables must come from scripts/analysis/revision_reanalysis.py.
 """
 
 import json

@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Publication figures for the pinned-stack revision."""
+"""Optional matplotlib copies of the pinned-stack figures.
+
+The submitted PDF uses TikZ in paper/main.tex. These PNGs are not the manuscript
+and must not be cited as a Pareto frontier.
+"""
 
 import json
 import os

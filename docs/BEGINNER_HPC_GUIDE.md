@@ -1,5 +1,7 @@
 # Paper 1 — Beginner's Guide to `reasoning-compression-lab` on PARAM Rudra
 
+> **Superseding note (2026-08-16):** Current title/findings are in [`../README.md`](../README.md). Do not cite 0/0 pathologies or a Serving-Stack Shift result from older sections below.
+
 **Audience:** Someone new to the project who will run all experiments on **HPC only** (no personal GPU).  
 **Cluster:** PARAM Rudra, IIT Patna (`paramrudra.iitp.ac.in`)  
 **Repo:** https://github.com/Manish06N/reasoning-compression-lab  

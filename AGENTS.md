@@ -29,7 +29,7 @@ graph TD
 
 | Output | Type | Title / Focus | Target Venues (Verify Q1) | Hardware / Stack | Status / Target Date |
 |---|---|---|---|---|---|
-| **J1** | Main Journal | *Beyond Pass@1: Reliability–Cost Frontiers of Quantized Reasoning Models under Controlled Serving-Stack Shift* | *Future Generation Computer Systems (FGCS)*, *Journal of Systems and Software (JSS)*, *Neurocomputing* | HPC 2× A100, `qrm-official` (vLLM 0.7.0 eager) | **88/88 cells complete**; arXiv package in `paper/` (2026-08-16) |
+| **J1** | Main Journal | *Beyond Pass@1: Reliability and Token-Cost Effects of Quantized Reasoning Models under a Pinned Serving Stack* | *Future Generation Computer Systems (FGCS)*, *Journal of Systems and Software (JSS)*, *Neurocomputing* | HPC 2× A100, `qrm-official` (vLLM 0.7.0 eager) | **88/88 cells complete**; P0 reanalysis on `paper-p0-reanalysis`; arXiv package in `paper/` |
 | **C1** | Conference / Workshop | *Trace-Level Evaluation Metrology for Compressed Reasoning Models* | NeurIPS/ICLR/ACL Workshops (Eval4NLP, Efficient Natural Language, MLPerf) | HPC A100 | Submission Month 6–12 (Post-J1 pilot packaging) |
 | **J2** | Journal 2 | *Reasoning-Aware Speculative Decoding: Acceptance Dynamics and Serving Acceleration* | *JSS*, *Engineering Applications of AI (EAAI)*, *FGCS* | HPC 2× A100 | Year 2 (Methods & draft model training) |
 | **C2** | Conference / Workshop | *High-Throughput Speculative Serving of Compressed Reasoning LLMs* | MLSys / EuroSys / ACL Demo Track | HPC A100 | Year 2 |
@@ -80,38 +80,25 @@ ssh -L 8080:<NODE>:8080 -N manishn_iitp@paramrudra.iitp.ac.in -p 4422
 ## 3. Paper 1 (J1): Scientific Positioning & Breakthrough Results
 
 ### Provisional Title
-> **"Beyond Pass@1: Reliability–Cost Frontiers of Quantized Reasoning Models under Controlled Serving-Stack Shift"**
+> **"Beyond Pass@1: Reliability and Token-Cost Effects of Quantized Reasoning Models under a Pinned Serving Stack"**
 
 ### Novelty Positioning Against Prior Literature
-* **The Literature Gap:** Prior works (QRM 2025, A Sober Look 2025, Quantized LLMs Can Still Be Calibrated 2025, Cost-of-Pass 2025, Quantization Inflates Reasoning 2026, Reliability Scaling Laws 2026) studied accuracy, seed variance, or token count in isolation.
-* **Our Core Contribution:** A multi-seed, trace-level empirical study isolating the **joint reliability–calibration–cost frontier** across weight quantization formats (BF16, FP8, AWQ-4, GPTQ-4), proving where compression changes failure modes, selective prediction risk, and dollar-cost-per-correct answer even when raw accuracy appears preserved.
+* **The Literature Gap:** Prior works (QRM 2025, A Sober Look 2025, Quantized LLMs Can Still Be Calibrated 2025, Cost-of-Pass 2025, Quantization Inflates Reasoning 2026) studied accuracy, seed variance, or token count in isolation.
+* **Our Core Contribution:** A multi-seed, stack-pinned 88-cell grid isolating weight format under vLLM 0.7.0 eager, with problem-clustered pass@1 tests, real pathology counts, and a token-implied cost proxy. Modal-answer selective prediction is **not yet available** from the compact JSON.
 
-### Headline Confirmatory Results (2026-08-15)
-**Dataset:** `HuggingFaceH4/MATH-500` ($n=500$) | **Seeds:** 42, 43, 44, 45, 46 (5 seeds) | **Total Evaluated Completions:** 20,000  
-**Stack:** `qrm-official` (vLLM 0.7.0 eager, $T=0.6, p=0.95, \text{max\_tokens}=32,768$) | **Archive:** `outputs-hpc-campaign-2026-08-14/validation/`
+### Headline Confirmatory Results (2026-08-16 P0 reanalysis)
+**Dataset:** MATH-500 ($n=500$, seeds 42–46) + GSM8K + GPQA-Diamond | **Total completions:** 56,408
+**Stack:** `qrm-official` (vLLM 0.7.0 eager) | **Canonical JSON:** `results/reports/revision_reanalysis_report.json`
 
-```
-====================================================================================================
-MODEL MATRIX SUMMARY (MATH-500, n=500, 5 Seeds: 42, 43, 44, 45, 46)
-====================================================================================================
-Model & Format          Seed 42   Seed 43   Seed 44   Seed 45   Seed 46      Mean ± Std   Trunc   Loops
-----------------------------------------------------------------------------------------------------
-Qwen-7B BF16             94.4%     94.0%     93.8%     94.6%     93.2%    94.00% ± 0.55%      0       0
-Qwen-7B FP8              94.4%     95.2%     94.8%     92.6%     95.0%    94.40% ± 1.05%      0       0
-Qwen-7B AWQ-4            92.4%     92.8%     93.2%     93.0%     94.2%    93.12% ± 0.67%      0       0
-Qwen-7B GPTQ-4           93.8%     92.6%     93.4%     94.6%     93.0%    93.48% ± 0.77%      0       0
-----------------------------------------------------------------------------------------------------
-Llama-8B BF16            89.0%     88.4%     90.2%     89.8%     88.8%    89.24% ± 0.74%      0       0
-Llama-8B FP8             89.0%     89.6%     88.6%     89.2%     91.2%    89.52% ± 1.01%      0       0
-Llama-8B AWQ-4           84.4%     84.8%     89.2%     87.4%     86.6%    86.48% ± 1.96%      0       0
-Llama-8B GPTQ-4          88.0%     89.6%     86.8%     89.4%     90.8%    88.92% ± 1.55%      0       0
-====================================================================================================
-```
+Pathology over the full grid: **25 loops**, **0 exact cap hits**, **209 near-cap** (`completion_tokens >= 32500`). Llama AWQ-4 MATH −2.76 pp (clustered $p<0.001$); Qwen AWQ-4 GPQA −5.56 pp; Qwen 4-bit MATH token inflation +6.3–6.9%. Cost is a fixed-throughput token proxy. Do not cite 0/0 pathologies, 98.23% safety gate, Pareto-optimal FP8, or the 200-item mixed-correctness subset.
+
+Older dated CHANGELOG / briefing notes that still say 0 truncations / 0 loops are **historical** and superseded by the P0 reanalysis.
 
 ### Key Empirical Findings
-1. **FP8 vs BF16:** On A100 Marlin W8A16 (not native W8A8), maj@5 McNemar vs BF16 is non-significant after Holm–Bonferroni ($p > 0.29$). Llama AWQ-4 still drops $2.76$ pp on mean pass@1.
-2. **4-Bit Quantization Resilience:** Qwen-7B 4-bit stays above $93.1\%$ on MATH-500; Llama-8B AWQ-4 is the weak cell ($86.48\%$ vs $89.24\%$ BF16).
-3. **Pathology heuristics:** All 88 cells are 0/0 on the token-cap and identical-word detectors. Official QRM rows do not store `finish_reason`.
+1. **Pinned stack, not a Serving-Stack Shift experiment.**
+2. **FP8 vs BF16:** clustered 95% CIs include 0; MATH $\pm 1$ pp TOST is not passed. maj@5 McNemar is secondary.
+3. **4-bit:** architecture- and task-dependent (Llama AWQ-4 MATH/GSM8K; Qwen AWQ-4 GPQA).
+4. **Tokens:** Qwen 4-bit +6–7% on the full MATH-500 grid; extra length concentrated on format-induced failures.
 
 ---
 
@@ -136,11 +123,12 @@ gantt
 #### [x] Phase 0–4: Completed Foundation & Confirmatory Grid
 - All 40 MATH-500 cells (2 models $\times$ 4 formats $\times$ 5 seeds) executed, verified, and backed up in `outputs-hpc-campaign-2026-08-14/`.
 
-#### [x] Phase 5: Frozen Statistical Analysis & Calibration (COMPLETED)
-1. **Paired Statistical Testing:** Exact McNemar on maj@5 vs BF16 is non-significant after Holm–Bonferroni ($p > 0.29$). Not a test of pass@1 means.
-2. **Sample-Consistency Calibration:** `maj@5` evaluated; ECE $\le 0.034$ (Qwen) / $\le 0.072$ (Llama); Brier score $< 0.022$; AURC $\le 0.0054$. Confidence is gold-correct seed fraction, not logprobs.
-3. **Systems & Economics:** Modeled Cost-of-Pass ($C_{\text{pass}}$) at $\$1.50$/A100-h and $65$ tok/s; FP8 is lowest modeled cost. Latency columns are $\bar{T}/65$, not wall-clock.
-4. **Structured Trace Audit:** 200-sample stratified audit in `results/reports/trace_audit_report.json`. Full-grid 4-bit token inflation $+1.7\%$ to $+6.8\%$; subset $+10\%$ to $+30\%$.
+#### [x] Phase 5: Frozen Statistical Analysis (P0-CORRECTED 2026-08-16)
+1. **Primary test:** problem-clustered bootstrap of pass@1 vs BF16. Llama AWQ-4 MATH −2.76 pp; Qwen AWQ-4 GPQA −5.56 pp. maj@5 McNemar is secondary.
+2. **Pathology:** 25 loops, 0 exact cap hits, 209 near-cap. Not 0/0.
+3. **Cost:** token-implied $C_{\text{pass}}$ at $\$1.50$/A100-h and assumed $65$ tok/s. Not measured wall-clock; not Pareto-optimal.
+4. **Selective prediction:** modal-answer agreement **not yet available**. Gold-hit ECE / 98.23% gate retracted.
+5. **Tokens:** full-grid ratio of means; 200-item even-index subset retracted as a result.
 
 #### [x] Phase 4 Extension: Breadth Benchmark Evaluation (COMPLETED)
 - **GSM8K ($n=1,319$):** ✅ **100% COMPLETED** (24 cells, seeds 42–44). Qwen: BF16 91.26%, FP8 91.33%, AWQ-4 91.05%, GPTQ-4 91.13%; Llama: BF16 88.68%, FP8 88.80%, AWQ-4 87.11%, GPTQ-4 88.96%.

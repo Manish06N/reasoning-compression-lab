@@ -2,11 +2,22 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, paper-p0-reanalysis]
   pull_request:
     branches: [main]
 
 jobs:
+  canonical-analysis:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Recompute canonical report and fail on drift
+        run: python scripts/analysis/revision_reanalysis.py --check
+
   test:
     runs-on: ubuntu-latest
     steps:

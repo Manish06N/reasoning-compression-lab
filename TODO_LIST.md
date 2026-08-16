@@ -1,7 +1,7 @@
 # TODO List & Experiment Roadmap — Publication Readiness
 **Project:** Reasoning Compression Lab (`reasoning-compression-lab`)  
 **Target:** Paper 1 Publication Readiness (Quantization, Reliability, and Cost Frontier for Reasoning Models)  
-**Status:** **ALL CAMPAIGNS 100% COMPLETED — 88 Cells (MATH-500, GSM8K, GPQA-Diamond) Backed Up & Manuscript Compiled**  
+**Status:** **88-cell campaign complete. P0 reanalysis on branch `paper-p0-reanalysis`. Do not cite 0/0 pathologies or the 98.23% safety gate.**  
 **Controlling Reference:** [docs/PUBLICATION_READINESS.md](docs/PUBLICATION_READINESS.md) · [docs/plans/2026-08-14-publication-recovery.md](docs/plans/2026-08-14-publication-recovery.md) · [AGENTS.md](AGENTS.md)
 
 ---
@@ -16,6 +16,8 @@
 ---
 
 ## 2. Completed Experiments & Verified Campaign Matrices
+
+Pathology on the **full 88-cell grid** (not this table's old 0/0 columns): **25 loops**, **0 exact cap hits**, **209 near-cap**. See `results/README.md`.
 
 ### A. MATH-500 Headline Confirmatory Matrix ($n=500$, 5 Seeds)
 | Model | Quant Format | Seed 42 | Seed 43 | Seed 44 | Seed 45 | Seed 46 | Mean ± Std | Truncations | Repetition Loops | Status |
@@ -59,7 +61,7 @@ Per-seed accuracies and mean tokens from `results/README.md` and `results/report
 ## 3. Master TODO List
 
 ### [x] Phase 0–4: Completed Foundation & Confirmatory 40-Cell Grid (MATH-500)
-* [x] **Phase 0–4:** All 40 cells on MATH-500 completed with 0 truncations and 0 loops.
+* [x] **Phase 0–4:** All 40 MATH-500 cells completed. Pathology after P0 reanalysis: 25 loops / 0 exact cap hits / 209 near-cap on the full 88-cell grid — **not** 0/0.
 
 ### [x] Phase 5: Frozen Statistical Analysis & Calibration
 * [x] **P5.1 Statistical Hypothesis Testing:** Paired McNemar on maj@5 ($p > 0.29$ after Holm–Bonferroni; not a pass@1-mean test).

@@ -14,12 +14,14 @@ modal-agreement gate cannot be recomputed from the public artifact.
 
 from __future__ import annotations
 
+import argparse
 import glob
 import json
 import math
 import os
 import random
 import statistics
+import sys
 from collections import defaultdict
 from typing import Any
 
@@ -173,6 +175,7 @@ def paired_delta_bootstrap(
         "ci90_hi_pp": hi90 * 100,
         "p_value": p,
         "excludes_zero": (lo95 > 0) or (hi95 < 0),
+        # lo90/hi90 are accuracy fractions; TOST margin is in percentage points.
         "tost_equiv_1pp": (lo90 * 100 >= -EQUIV_MARGIN_PP) and (hi90 * 100 <= EQUIV_MARGIN_PP),
     }
 
@@ -550,93 +553,89 @@ def print_math(report: dict[str, Any]) -> None:
     print(f"Loop threshold = {LOOP_THRESHOLD} consecutive identical words")
 
 
-def phase5_compat(math_report: dict[str, Any]) -> dict[str, Any]:
-    """Keep figure-generation keys, with corrected pathology and clustered CIs."""
-    summary = {}
-    for key, s in math_report["summary_statistics"].items():
-        summary[key] = {
-            "model": key.split("_")[0] + "_" + key.split("_")[1] if False else key.rsplit("_", 1)[0],
-            "format": key.rsplit("_", 1)[1],
-            "seed_accs": {int(k): v for k, v in s["seed_accs"].items()},
-            "mean_acc": s["mean_acc"],
-            "std_acc": s["std_acc"],
-            "pooled_correct": s["pooled_correct"],
-            "wilson_ci_95": tuple(s["wilson_ci_95"]),
-            "clustered_acc_ci95": s["clustered_acc_ci95"],
-            "mean_tokens": s["mean_tokens"],
-            "truncations": s["token_limit_hits"],
-            "loops": s["loops"],
-            "near_cap": s["near_cap"],
-        }
-        # model key is Qwen-7B_BF16 → model Qwen-7B
-        summary[key]["model"] = key[: key.rfind("_")]
-    return {
-        "dataset": "HuggingFaceH4/MATH-500",
-        "sample_count_per_cell": 500,
-        "total_evaluated_completions": 20000,
-        "seeds": MATH_SEEDS,
-        "loop_threshold": LOOP_THRESHOLD,
-        "near_cap_threshold": NEAR_CAP,
-        "summary_statistics": summary,
-        "mcnemar_paired_contrasts": [
-            {
-                "contrast": c["contrast"],
-                "model": c["model"],
-                "format": c["format"],
-                "n11": c.get("n11"),
-                "n10": c.get("n10"),
-                "n01": c.get("n01"),
-                "n00": c.get("n00"),
-                "p_value": c.get("mcnemar_p"),
-                "holm_alpha": c.get("holm_alpha_mcnemar"),
-                "is_significant": c.get("holm_significant_mcnemar"),
-            }
-            for c in math_report["pass1_contrasts"]
-        ],
-        "pass1_contrasts": math_report["pass1_contrasts"],
-        "token_analysis": math_report["token_analysis"],
-        "calibration_metrology": {},
-        "deployment_economics": math_report["deployment_economics"],
-        "note": "calibration_metrology omitted: gold-hit ECE is circular; see revision_reanalysis_report.json",
-    }
+CANONICAL_REPORT = os.path.join(REPORT_DIR, "revision_reanalysis_report.json")
+DEPRECATED_STUB = {
+    "deprecated": True,
+    "canonical": "results/reports/revision_reanalysis_report.json",
+    "reason": "This filename is kept so old links do not 404. Do not cite it. Recompute with scripts/analysis/revision_reanalysis.py.",
+}
 
 
-def main() -> None:
-    os.makedirs(REPORT_DIR, exist_ok=True)
+def json_diff(expected: Any, actual: Any, path: str = "$") -> list[str]:
+    """Return human-readable mismatches. Floats compared with abs_tol=1e-9."""
+    diffs: list[str] = []
+    if isinstance(expected, bool) or isinstance(actual, bool):
+        if expected != actual:
+            diffs.append(f"{path}: {expected!r} vs {actual!r}")
+        return diffs
+    if isinstance(expected, dict) and isinstance(actual, dict):
+        ek, ak = set(expected), set(actual)
+        for key in sorted(ek - ak):
+            diffs.append(f"{path}.{key}: missing in generated report")
+        for key in sorted(ak - ek):
+            diffs.append(f"{path}.{key}: unexpected in generated report")
+        for key in sorted(ek & ak):
+            diffs.extend(json_diff(expected[key], actual[key], f"{path}.{key}"))
+        return diffs
+    if isinstance(expected, list) and isinstance(actual, list):
+        if len(expected) != len(actual):
+            diffs.append(f"{path}: len {len(expected)} vs {len(actual)}")
+            return diffs
+        for i, (exp, act) in enumerate(zip(expected, actual)):
+            diffs.extend(json_diff(exp, act, f"{path}[{i}]"))
+        return diffs
+    if isinstance(expected, (int, float)) and isinstance(actual, (int, float)):
+        if not math.isclose(float(expected), float(actual), rel_tol=0.0, abs_tol=1e-9):
+            diffs.append(f"{path}: {expected!r} vs {actual!r}")
+        return diffs
+    if expected != actual:
+        diffs.append(f"{path}: {expected!r} vs {actual!r}")
+    return diffs
+
+
+def compute_report(quiet: bool = False) -> dict[str, Any]:
     math_data = load_dir(MATH_DIR)
     gsm_data = load_dir(GSM_DIR)
     gpqa_data = load_dir(GPQA_DIR)
-
+    if not math_data or not gsm_data or not gpqa_data:
+        raise FileNotFoundError(
+            f"Missing released JSON under {MATH_DIR}, {GSM_DIR}, or {GPQA_DIR}. "
+            "This script only reads results/ from the repo checkout."
+        )
     math_report = analyze_benchmark(math_data, MATH_SEEDS, 500, "math500")
     gsm_report = analyze_benchmark(gsm_data, BREADTH_SEEDS, 1319, "gsm8k")
     gpqa_report = analyze_benchmark(gpqa_data, BREADTH_SEEDS, 198, "gpqa")
-
-    print_math(math_report)
-    print("\n" + "=" * 110)
-    print("GSM8K / GPQA pass@1 clustered bootstrap vs BF16")
-    print("=" * 110)
-    for bench, rep in [("GSM8K", gsm_report), ("GPQA", gpqa_report)]:
-        print(f"\n{bench}")
-        for c in rep["pass1_contrasts"]:
+    if not quiet:
+        print_math(math_report)
+        print("\n" + "=" * 110)
+        print("GSM8K / GPQA pass@1 clustered bootstrap vs BF16")
+        print("=" * 110)
+        for bench, rep in [("GSM8K", gsm_report), ("GPQA", gpqa_report)]:
+            print(f"\n{bench}")
+            for c in rep["pass1_contrasts"]:
+                print(
+                    f"  {c['contrast']:<28} {c['delta_pp']:+6.2f} pp  "
+                    f"[{c['ci95_lo_pp']:+5.2f},{c['ci95_hi_pp']:+5.2f}]  p={c['p_value']:.4f}  "
+                    f"Holm-sig={c['holm_significant_pass1']}"
+                )
             print(
-                f"  {c['contrast']:<28} {c['delta_pp']:+6.2f} pp  "
-                f"[{c['ci95_lo_pp']:+5.2f},{c['ci95_hi_pp']:+5.2f}]  p={c['p_value']:.4f}  "
-                f"Holm-sig={c['holm_significant_pass1']}"
+                f"  loops={rep['total_loops']}  near-cap={rep['total_near_cap']}  "
+                f"cap-hits={rep['total_token_limit_hits']}"
             )
-        print(
-            f"  loops={rep['total_loops']}  near-cap={rep['total_near_cap']}  "
-            f"cap-hits={rep['total_token_limit_hits']}"
-        )
-
-    master = {
+    return {
         "meta": {
+            "canonical": True,
+            "script": "scripts/analysis/revision_reanalysis.py",
             "loop_threshold": LOOP_THRESHOLD,
             "token_cap": TOKEN_CAP,
             "near_cap_threshold": NEAR_CAP,
             "n_boot": N_BOOT,
             "equiv_margin_pp": EQUIV_MARGIN_PP,
             "extracted_answers_available": False,
-            "schema_note": "Released JSON has extractive_match, completion_tokens, repetition_flag; no answer strings or finish_reason.",
+            "schema_note": (
+                "Released JSON has extractive_match, completion_tokens, "
+                "repetition_flag; no answer strings or finish_reason."
+            ),
         },
         "math500": math_report,
         "gsm8k": gsm_report,
@@ -651,66 +650,70 @@ def main() -> None:
             ),
         },
     }
-    out_rev = os.path.join(REPORT_DIR, "revision_reanalysis_report.json")
-    with open(out_rev, "w") as fp:
+
+
+def write_deprecated_stubs() -> None:
+    for name in (
+        "phase5_statistical_analysis_report.json",
+        "multitask_benchmark_summary.json",
+        "selective_prediction_report.json",
+        "trace_audit_report.json",
+    ):
+        path = os.path.join(REPORT_DIR, name)
+        with open(path, "w") as fp:
+            json.dump(DEPRECATED_STUB, fp, indent=2)
+            fp.write("\n")
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(
+        description="Canonical Paper 1 reanalysis from released results/*.json (stdlib only)."
+    )
+    parser.add_argument(
+        "--check",
+        action="store_true",
+        help="Recompute and exit nonzero if the result differs from the checked-in canonical JSON.",
+    )
+    parser.add_argument(
+        "--quiet",
+        action="store_true",
+        help="Do not print tables (used by CI).",
+    )
+    args = parser.parse_args(argv)
+
+    os.makedirs(REPORT_DIR, exist_ok=True)
+    master = compute_report(quiet=args.quiet or args.check)
+
+    if args.check:
+        if not os.path.isfile(CANONICAL_REPORT):
+            print(f"ERROR: missing checked-in report {CANONICAL_REPORT}", file=sys.stderr)
+            return 1
+        with open(CANONICAL_REPORT) as fp:
+            expected = json.load(fp)
+        diffs = json_diff(expected, master)
+        if diffs:
+            print(f"ERROR: {len(diffs)} drift(s) vs {CANONICAL_REPORT}", file=sys.stderr)
+            for line in diffs[:50]:
+                print(f"  {line}", file=sys.stderr)
+            if len(diffs) > 50:
+                print(f"  ... {len(diffs) - 50} more", file=sys.stderr)
+            return 1
+        print(f"OK: recomputed report matches {CANONICAL_REPORT}")
+        return 0
+
+    with open(CANONICAL_REPORT, "w") as fp:
         json.dump(master, fp, indent=2)
         fp.write("\n")
-    print(f"\nWrote {out_rev}")
-
-    phase5 = phase5_compat(math_report)
-    out_p5 = os.path.join(REPORT_DIR, "phase5_statistical_analysis_report.json")
-    with open(out_p5, "w") as fp:
-        json.dump(phase5, fp, indent=2)
-        fp.write("\n")
-
-    multitask = {"math500": {}, "gsm8k": {}, "gpqa_diamond": {}}
-    for label, rep, key in (
-        ("math500", math_report, "math500"),
-        ("gsm8k", gsm_report, "gsm8k"),
-        ("gpqa_diamond", gpqa_report, "gpqa_diamond"),
-    ):
-        for cell, s in rep["summary_statistics"].items():
-            multitask[key][cell] = {
-                "model": cell[: cell.rfind("_")],
-                "format": cell.rsplit("_", 1)[1],
-                "accuracy_mean": s["mean_acc"],
-                "accuracy_std": s["std_acc"],
-                "mean_tokens": s["mean_tokens"],
-                "truncations": s["token_limit_hits"],
-                "loops": s["loops"],
-                "near_cap": s["near_cap"],
-                "clustered_acc_ci95": s["clustered_acc_ci95"],
-            }
-    with open(os.path.join(REPORT_DIR, "multitask_benchmark_summary.json"), "w") as fp:
-        json.dump(multitask, fp, indent=2)
-        fp.write("\n")
-
-    with open(os.path.join(REPORT_DIR, "selective_prediction_report.json"), "w") as fp:
-        json.dump(
-            {
-                "definition": "Oracle gold-hit gate: serve if #gold-correct >= k OR #gold-wrong >= k. Not deployable. Compact JSON has no extracted answers.",
-                "math500": math_report["selective_oracle"],
-            },
-            fp,
-            indent=2,
-        )
-        fp.write("\n")
-
-    token_audit = {
-        "definition": "Full MATH-500 grid, all 5 seeds, paired vs BF16. Not a 200-item even-index subset.",
-        "analysis": math_report["token_analysis"],
-    }
-    with open(os.path.join(REPORT_DIR, "trace_audit_report.json"), "w") as fp:
-        json.dump(token_audit, fp, indent=2)
-        fp.write("\n")
-
-    print("Updated phase5 / multitask / selective / token reports.")
+    write_deprecated_stubs()
+    print(f"\nWrote {CANONICAL_REPORT}")
+    print("Replaced legacy report filenames with deprecation stubs.")
     print(
         f"GRID TOTALS  loops={master['grid_totals']['loops']}  "
         f"near-cap={master['grid_totals']['near_cap']}  "
         f"cap-hits={master['grid_totals']['token_limit_hits']}"
     )
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

@@ -1,8 +1,16 @@
 #!/usr/bin/env python3
 """
-Structured Qualitative Trace Audit (>= 200 Stratified Problem Samples)
-Analyzes per-problem completions across difficulty levels and formats
-to audit step-by-step reasoning preservation and token inflation mechanisms.
+DEPRECATED.
+
+This script reproduces an earlier analysis that is not used in the
+revised manuscript.
+
+Known issues:
+- 200-item even-index / seed-42 subset used a different estimator than the paper
+- mean-of-ratios on that subset is not the full-grid ratio of means
+- script does not read generated trace text
+
+Use scripts/analysis/revision_reanalysis.py instead.
 """
 
 import json

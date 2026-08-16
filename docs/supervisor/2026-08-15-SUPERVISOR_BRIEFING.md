@@ -1,5 +1,7 @@
 # Doctoral Progress Briefing — August 2026
 
+> **Superseding note (2026-08-16):** This 15 August briefing predates the P0 reanalysis. Do not cite its 0/0 pathology claim, McNemar “parity,” 98.23% gate, or Pareto-optimal FP8. Current story: [`../../README.md`](../../README.md) and [`../../paper/main.tex`](../../paper/main.tex).
+
 **PhD Scholar:** Manish Nandish  
 **Supervisor:** Department of Computer Science & Engineering, IIT Patna  
 **Thesis Spine:** *Reliable and Cost-Efficient Deployment of Reasoning LLMs under Compression, Evaluation, and Multilingual Constraints*  

@@ -21,11 +21,12 @@ Compile with `pdflatex` → `bibtex` → `pdflatex` → `pdflatex`. Figures are 
 | `results/math500/` | 40 validation JSON files |
 | `results/gsm8k/` | 24 validation JSON files |
 | `results/gpqa/` | 24 validation JSON files |
-| `results/reports/revision_reanalysis_report.json` | **Canonical** corrected tables (pathology keys, clustered pass@1, token strata) |
-| `results/reports/phase5_statistical_analysis_report.json` | Regenerated from the revision script |
-| `results/reports/multitask_benchmark_summary.json` | MATH-500 / GSM8K / GPQA with real loop/near-cap counts |
-| `results/reports/trace_audit_report.json` | Full-grid paired token analysis (not the old 200-item even-index subset) |
-| `results/reports/selective_prediction_report.json` | Oracle gold-hit diagnostic, labeled as not deployable |
+| `results/reports/revision_reanalysis_report.json` | **Canonical** corrected tables |
+| `results/reports/runtime_manifest.json` | Effective 56k launch settings (not `configs/models/` defaults) |
+| `results/reports/phase5_statistical_analysis_report.json` | Deprecation stub |
+| `results/reports/multitask_benchmark_summary.json` | Deprecation stub |
+| `results/reports/trace_audit_report.json` | Deprecation stub |
+| `results/reports/selective_prediction_report.json` | Deprecation stub |
 
 ## How numbers were computed (read before citing)
 
@@ -37,12 +38,16 @@ Compile with `pdflatex` → `bibtex` → `pdflatex` → `pdflatex`. Figures are 
 
 ## Reproduce the corrected tables
 
-From the repo root (stdlib only):
+From a clean checkout (stdlib only; no `/scratch` or `outputs-hpc-*`):
 
 ```bash
-python3 scripts/analysis/revision_reanalysis.py
+python3 scripts/analysis/revision_reanalysis.py --check
 ```
+
+Exits 0 only if the recomputed object matches `results/reports/revision_reanalysis_report.json`.
 
 ## Stack
 
-Pinned `qrm-official`: vLLM 0.7.0, eager, A100-80GB. FP8 runs as Marlin W8A16 fallback. HPC patches: `patches/qrm_hpc_compat.patch` and `patches/lighteval_local_dataset.patch`. Files under `configs/models/` are **not** the campaign launcher.
+Published 56k campaign: `requirements-qrm-paper-vllm070.lock` (`qrm-official`, vLLM 0.7.0, eager, A100-80GB). Effective launch settings: `results/reports/runtime_manifest.json`. The `qreason` file `requirements-hpc.txt` is **vLLM 0.8.5** and is labeled as legacy.
+
+`configs/models/` is **not** the campaign launcher. HPC patches: `patches/qrm_hpc_compat.patch` and `patches/lighteval_local_dataset.patch`.

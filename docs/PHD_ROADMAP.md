@@ -1,5 +1,7 @@
 # PhD Roadmap Master Report
 
+> **Superseding note (2026-08-16):** Paper 1 title and findings are in [`../README.md`](../README.md) and [`../paper/main.tex`](../paper/main.tex). This roadmap's older “Serving-Stack Shift” title and 2026-08-14 “Needs revision” banner are historical. Canonical numbers: `results/reports/revision_reanalysis_report.json`.
+
 **From Beginner-Level Understanding to A100 Execution**
 
 *Reliable and Cost-Efficient Deployment of Reasoning LLMs under Compression, Evaluation, and Multilingual Constraints*

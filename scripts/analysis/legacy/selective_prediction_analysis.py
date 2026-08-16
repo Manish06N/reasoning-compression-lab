@@ -1,10 +1,16 @@
 #!/usr/bin/env python3
-"""Oracle gold-hit selective-prediction diagnostic (NOT deployable).
+"""
+DEPRECATED.
 
-The compact validation JSON has no extracted answer strings. This script therefore
-gates on gold-correct seed counts, not on modal-answer agreement. For K=5, k=3
-coverage is identically 100% because max(c, 5-c) >= 3 always. Do not cite these
-numbers as an operational safety gate. Prefer scripts/analysis/revision_reanalysis.py.
+This script reproduces an earlier analysis that is not used in the
+revised manuscript.
+
+Known issues:
+- selective prediction used gold-hit counts, not modal-answer agreement
+- compact JSON has no extracted answer strings
+- the old 98.23% figure is not an operational safety gate
+
+Use scripts/analysis/revision_reanalysis.py instead.
 """
 
 import json

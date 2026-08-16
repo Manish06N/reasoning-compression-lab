@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 """
-MATH-500 Fine-Grained Subject and Difficulty Stratification Analysis.
-Cross-references validation files with MATH-500 dataset metadata (level and subject)
-to compute accuracy, completion tokens, and token inflation across:
-- 5 Difficulty Levels (Level 1 to Level 5)
-- 7 Subject Categories (Algebra, Counting & Probability, Geometry, Intermediate Algebra, Number Theory, Prealgebra, Precalculus)
+DEPRECATED.
+
+Requires a local MATH-500 dataset checkout (external / Hugging Face cache).
+That path is not part of a clean clone. Difficulty tables in the current
+manuscript, if any, must be regenerated from a documented, vendored metadata
+file — not from this script.
+
+Use scripts/analysis/revision_reanalysis.py for canonical accuracy/token numbers.
 """
 
 import json

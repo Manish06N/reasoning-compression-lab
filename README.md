@@ -1,104 +1,117 @@
 # Reasoning Compression Lab (`reasoning-compression-lab`)
 
-**Deployment-science evaluation harness and reliability–cost frontier benchmark for compressed reasoning LLMs.**
+Evaluation harness and artifacts for **Paper 1**: quantized reasoning models under **one pinned serving stack**.
 
 * **PhD Scholar:** Manish Nandish (IIT Patna)
-* **Cluster:** PARAM Rudra HPC (C-DAC / NSM), NVIDIA A100-PCIE-80GB GPUs
+* **Cluster:** PARAM Rudra HPC (C-DAC / NSM), NVIDIA A100-PCIE-80GB
 * **GitHub:** [https://github.com/Manish06N/reasoning-compression-lab](https://github.com/Manish06N/reasoning-compression-lab)
-* **Paper 1 (J1):** *Beyond Pass@1: Reliability–Cost Frontiers of Quantized Reasoning Models under Controlled Serving-Stack Shift*
+* **Paper 1 (J1):** *Beyond Pass@1: Reliability and Token-Cost Effects of Quantized Reasoning Models under a Pinned Serving Stack*
+
+Canonical manuscript: [`paper/main.tex`](paper/main.tex) → [`paper/main.pdf`](paper/main.pdf). Scoreboard: [`results/README.md`](results/README.md). Canonical numbers: [`results/reports/revision_reanalysis_report.json`](results/reports/revision_reanalysis_report.json).
 
 ---
 
-## 1. Executive Summary & Breakthrough Results (August 2026)
+## 1. What this repository claims (August 2026)
 
-This repository contains the official codebase, execution pipelines, statistical analysis tools, and open-source reproducibility artifacts for evaluating post-training quantization (BF16, FP8, AWQ-4, GPTQ-4) on long-form reasoning models (`DeepSeek-R1-Distill-Qwen-7B` and `DeepSeek-R1-Distill-Llama-8B`).
+The published campaign is **88 cells / 56,408 completions** on DeepSeek-R1-Distill-Qwen-7B and DeepSeek-R1-Distill-Llama-8B in BF16, FP8, AWQ-4, and GPTQ-4:
 
-### Headline Confirmatory Accuracy Matrix (MATH-500, $n=500$, Seeds 42–46, 20,000 Completions)
-Canonical preprint: [`paper/main.tex`](paper/main.tex) → [`paper/main.pdf`](paper/main.pdf) (12 pages). Scoreboard: [`results/README.md`](results/README.md). **88 cells / 56,408 completions** (MATH-500 40 + GSM8K 24 + GPQA-Diamond 24).
+| Benchmark | *n* | Seeds | Completions |
+|---|---|---|---|
+| MATH-500 | 500 | 42–46 | 20,000 |
+| GSM8K | 1,319 | 42–44 | 31,656 |
+| GPQA-Diamond | 198 | 42–44 | 4,752 |
 
-All 40 MATH-500 cells under the pinned `qrm-official` stack (`vLLM 0.7.0` eager, $T=0.6, p=0.95, \text{max\_tokens}=32,768$) show **0 heuristic truncations** and **0 identical-word loops** (token-cap and consecutive-word detectors; official QRM rows do not store `finish_reason`):
+**Pinned stack (not a vLLM 0.7 vs 0.8.5 factorial):** `qrm-official`, vLLM **0.7.0** eager, A100-80GB, $T=0.6$, top-$p=0.95$, repetition penalty $1.0$, max new tokens $32{,}768$, `gpu_memory_utilization=0.75`. FP8 checkpoints run as Marlin **W8A16** on A100, not native W8A8. Environment lock: [`requirements-qrm-paper-vllm070.lock`](requirements-qrm-paper-vllm070.lock). Effective launch settings: [`results/reports/runtime_manifest.json`](results/reports/runtime_manifest.json).
 
-| Model & Format | Seed 42 | Seed 43 | Seed 44 | Seed 45 | Seed 46 | Mean ± Std | 95% Wilson CI | Truncations | Repetition Loops |
-|---|---|---|---|---|---|---|---|---|---|
-| **Qwen-7B BF16** | 94.4% | 94.0% | 93.8% | 94.6% | 93.2% | **94.00% ± 0.55%** | [93.0%, 94.9%] | 0 | 0 |
-| **Qwen-7B FP8** | 94.4% | 95.2% | 94.8% | 92.6% | 95.0% | **94.40% ± 1.05%** | [93.4%, 95.2%] | 0 | 0 |
-| **Qwen-7B AWQ-4** | 92.4% | 92.8% | 93.2% | 93.0% | 94.2% | **93.12% ± 0.67%** | [92.1%, 94.0%] | 0 | 0 |
-| **Qwen-7B GPTQ-4** | 93.8% | 92.6% | 93.4% | 94.6% | 93.0% | **93.48% ± 0.77%** | [92.4%, 94.4%] | 0 | 0 |
-| **Llama-8B BF16** | 89.0% | 88.4% | 90.2% | 89.8% | 88.8% | **89.24% ± 0.74%** | [88.0%, 90.4%] | 0 | 0 |
-| **Llama-8B FP8** | 89.0% | 89.6% | 88.6% | 89.2% | 91.2% | **89.52% ± 1.01%** | [88.3%, 90.7%] | 0 | 0 |
-| **Llama-8B AWQ-4** | 84.4% | 84.8% | 89.2% | 87.4% | 86.6% | **86.48% ± 1.96%** | [85.1%, 87.8%] | 0 | 0 |
-| **Llama-8B GPTQ-4** | 88.0% | 89.6% | 86.8% | 89.4% | 90.8% | **88.92% ± 1.55%** | [87.6%, 90.1%] | 0 | 0 |
+Files under `configs/models/` are **not** the campaign launcher. They contain different `max_model_len` / KV-cache defaults and must not be read as the effective 56k stack.
 
-### Breadth Benchmark Results (sample std over seeds)
-* **GSM8K** ($n=1{,}319$, 3 seeds): Qwen BF16 $91.26\% \pm 0.29\%$; FP8 $91.33\% \pm 0.16\%$; AWQ-4 $91.05\% \pm 1.14\%$; GPTQ-4 $91.13\% \pm 0.27\%$. Llama BF16 $88.68\% \pm 0.46\%$; FP8 $88.80\% \pm 0.62\%$; AWQ-4 $87.11\% \pm 0.23\%$; GPTQ-4 $88.96\% \pm 0.70\%$.
-* **GPQA-Diamond** ($n=198$, 3 seeds): Qwen BF16 $50.34\% \pm 2.96\%$; FP8 $49.49\% \pm 1.52\%$; AWQ-4 $44.78\% \pm 3.04\%$; GPTQ-4 $47.98\% \pm 1.75\%$. Llama BF16 $46.13\% \pm 1.91\%$; FP8 $47.81\% \pm 0.29\%$; AWQ-4 $46.97\% \pm 2.02\%$; GPTQ-4 $44.95\% \pm 4.32\%$.
+### MATH-500 pass@1 (seed-wise; clustered tests vs BF16 in the paper)
+
+| Model & Format | 42 | 43 | 44 | 45 | 46 | Mean ± Std |
+|---|---|---|---|---|---|---|
+| Qwen-7B BF16 | 94.4% | 94.0% | 93.8% | 94.6% | 93.2% | **94.00% ± 0.55%** |
+| Qwen-7B FP8 | 94.4% | 95.2% | 94.8% | 92.6% | 95.0% | **94.40% ± 1.05%** |
+| Qwen-7B AWQ-4 | 92.4% | 92.8% | 93.2% | 93.0% | 94.2% | **93.12% ± 0.67%** |
+| Qwen-7B GPTQ-4 | 93.8% | 92.6% | 93.4% | 94.6% | 93.0% | **93.48% ± 0.77%** |
+| Llama-8B BF16 | 89.0% | 88.4% | 90.2% | 89.8% | 88.8% | **89.24% ± 0.74%** |
+| Llama-8B FP8 | 89.0% | 89.6% | 88.6% | 89.2% | 91.2% | **89.52% ± 1.01%** |
+| Llama-8B AWQ-4 | 84.4% | 84.8% | 89.2% | 87.4% | 86.6% | **86.48% ± 1.96%** |
+| Llama-8B GPTQ-4 | 88.0% | 89.6% | 86.8% | 89.4% | 90.8% | **88.92% ± 1.55%** |
+
+### Canonical findings (use these; ignore older 0/0 / safety-gate text)
+
+1. **Pinned serving stack.** Weight format is the experimental factor. This paper does **not** claim a Serving-Stack Shift result.
+2. **Pathology (full 56,408-row grid).** **25** identical-word loop flags (threshold = 20 consecutive identical words). **0** exact $32{,}768$ cap hits after re-encoding. **209** near-cap generations (`completion_tokens >= 32{,}500`). `finish_reason` is not in the compact JSON.
+3. **Pass@1 (problem-clustered bootstrap vs BF16).** Llama AWQ-4: **−2.76 pp** on MATH-500 (95% CI $[−4.16,−1.44]$, $p<0.001$) and **−1.57 pp** on GSM8K. Qwen AWQ-4: **−5.56 pp** on GPQA-Diamond (95% CI $[−9.60,−1.52]$, $p=0.007$). FP8–BF16 95% intervals include 0; MATH $\pm 1$ pp TOST is **not** passed. maj@5 McNemar is secondary and non-significant.
+4. **Token inflation (full MATH-500 grid, all 5 seeds, ratio of means).** Qwen AWQ-4 **+6.33%**, Qwen GPTQ-4 **+6.88%** (paired token CIs exclude 0). Extra length is concentrated on BF16-correct / quantized-wrong items. The old 200-item even-index mean-of-ratios subset is an estimator artifact and is **not** a result.
+5. **Selective prediction.** Modal-answer agreement is **not yet available**: compact validation JSON has extractive_match flags but no extracted answer strings. Gold-hit $k/5$ tables (including the old 98.23% “operational safety gate”) are **not** in the manuscript.
+6. **Cost.** Cost-of-Pass is a **fixed-throughput token-cost proxy** at $\$1.50$/A100-h and an assumed $65$ tok/s, shared across formats. It is not measured wall-clock, and FP8 is not called Pareto-optimal.
+
+### Breadth means (sample std over seeds)
+
+* **GSM8K:** Qwen BF16 $91.26\% \pm 0.29\%$; FP8 $91.33\% \pm 0.16\%$; AWQ-4 $91.05\% \pm 1.14\%$; GPTQ-4 $91.13\% \pm 0.27\%$. Llama BF16 $88.68\% \pm 0.46\%$; FP8 $88.80\% \pm 0.62\%$; AWQ-4 $87.11\% \pm 0.23\%$; GPTQ-4 $88.96\% \pm 0.70\%$.
+* **GPQA-Diamond:** Qwen BF16 $50.34\% \pm 2.96\%$; FP8 $49.49\% \pm 1.52\%$; AWQ-4 $44.78\% \pm 3.04\%$; GPTQ-4 $47.98\% \pm 1.75\%$. Llama BF16 $46.13\% \pm 1.91\%$; FP8 $47.81\% \pm 0.29\%$; AWQ-4 $46.97\% \pm 2.02\%$; GPTQ-4 $44.95\% \pm 4.32\%$.
 
 ---
 
-## 2. Key Scientific Findings
+## 2. Canonical analysis pipeline
 
-1. **FP8 vs BF16 (maj@5 McNemar):** On A100 Marlin W8A16 (not native W8A8), paired McNemar tests on *maj@5* find no significant discordance after Holm–Bonferroni ($p > 0.29$). That is not a test of pass@1 means. Llama AWQ-4 still drops $2.76$ pp on mean pass@1.
-2. **Architecture sensitivity:** Qwen-7B 4-bit stays above $93.1\%$ on MATH-500; Llama-8B AWQ-4 is the weak cell ($86.48\%$ vs $89.24\%$ BF16).
-3. **Pathology heuristics:** Token-cap and identical-word detectors flag 0/0 across all 88 cells. Phrase-level loops and `finish_reason=length` are not in the saved schema.
-4. **Token inflation & modeled $C_{\text{pass}}$:** Full-grid MATH-500 4-bit inflation is $+1.7\%$ to $+6.8\%$ vs BF16; the 200-item audit subset is $+10\%$ to $+30\%$. Cost-of-Pass is modeled at $\$1.50$/A100-h and $65$ tok/s (not measured wall-clock). Under that model, FP8 is lowest $C_{\mathrm{pass}}$.
+```text
+results/{math500,gsm8k,gpqa}/*.json     # released per-cell records
+        ↓
+scripts/analysis/revision_reanalysis.py # stdlib only; no scratch / HPC JSONL paths
+        ↓
+results/reports/revision_reanalysis_report.json
+        ↓
+paper/main.tex tables
+```
+
+```bash
+python3 scripts/analysis/revision_reanalysis.py          # rewrite canonical JSON
+python3 scripts/analysis/revision_reanalysis.py --check  # exit 1 on drift vs git
+```
+
+Older scripts live in [`scripts/analysis/legacy/`](scripts/analysis/legacy/) and must not be used for paper numbers.
+
+Answer-string recovery (HPC JSONLs, if they still exist) is documented in [`docs/ANSWER_NORMALIZATION.md`](docs/ANSWER_NORMALIZATION.md) and [`scripts/hpc/qrm_parity/check_campaign_jsonls.sh`](scripts/hpc/qrm_parity/check_campaign_jsonls.sh). Do not invent a new judge before that recovery.
 
 ---
 
-## 3. Repository Structure
+## 3. Repository structure
 
 ```
 reasoning-compression-lab/
-├── configs/               # Campaign cell configurations (MATH-500, GSM8K, GPQA-Diamond)
-├── docs/                  # PhD Roadmap, literature surveys, supervisor briefing, hardware policies
-│   ├── literature/        # Reading maps and base paper summaries
-│   ├── supervisor/        # Monthly PhD briefing reports
-│   └── PHD_ROADMAP.md     # 3-year PhD thesis strategy
-├── paper/                 # Canonical LaTeX (`main.tex` → `main.pdf`); markdown mirror `main.md`
-├── paper_figures/         # Vector PDF and PNG publication plots (Figures 1–4)
-├── results/               # Statistical analysis, calibration, and trace audit JSON reports
-├── scripts/
-│   ├── analysis/          # Statistical testing, calibration (ECE/Brier/AURC), and plot generation
-│   ├── hpc/               # Autonomous 24/7 SLURM campaign daemons & submission scripts
-│   └── macbook/           # Bidirectional sync and backup scripts
-├── slurm/                 # Reproducible SLURM submission templates
-├── AGENTS.md              # Master operating system & AI agent memory
-├── CHANGELOG.md           # Chronological execution & code modification log
-└── TODO_LIST.md           # Granular experiment roadmap and milestone tracker
+├── configs/               # Cell lists; configs/models/*.json are NOT the 56k launcher
+├── docs/                  # Roadmap, literature, supervisor notes
+├── paper/                 # Canonical LaTeX (main.tex → main.pdf)
+├── results/               # Per-cell JSON + canonical reports
+├── scripts/analysis/      # revision_reanalysis.py (canonical)
+│   └── legacy/            # Deprecated analysis (wrong keys / gold-hit gate)
+├── scripts/hpc/           # SLURM + qrm-official launchers
+├── requirements-qrm-paper-vllm070.lock   # 56k campaign environment
+├── requirements-hpc-legacy-vllm085.txt   # earlier qreason / vLLM 0.8.5 harness
+├── AGENTS.md
+└── CHANGELOG.md
 ```
 
 ---
 
-## 4. Hardware & SLURM Execution Guidelines
+## 4. Hardware & SLURM
 
-All experiments are conducted on the **PARAM Rudra HPC** (IIT Patna) under strict resource controls:
-* **Partition:** `gpu` partition with NVIDIA A100-PCIE-80GB GPUs.
-* **Allocation Policy:** Exactly 1 GPU per job (`--gres=gpu:1`), 2 GPUs max concurrently per user (`QOSMaxGRESPerUser`).
-* **Serving Stack:** Pinned `qrm-official` environment (`vLLM==0.7.0`, `--enforce-eager`, `--gpu-memory-utilization 0.75`).
-* **AWQ Requirement:** Always pass `--dtype float16` when serving AWQ checkpoints.
+* **Partition:** `gpu`, NVIDIA A100-PCIE-80GB, `--gres=gpu:1`. Do not set `#SBATCH --mem`.
+* **QOS:** max 2 GPUs concurrent per user.
+* **Paper env:** conda env `qrm-official` (not `qreason`). See `scripts/hpc/qrm_parity/install_official_qrm_env.sh`.
+* **AWQ:** pass `--dtype float16`.
 
----
-
-## 5. Autonomous 24/7 Queue Manager Daemon
-
-The campaign is managed autonomously via `scripts/hpc/queue_manager_daemon.py`:
-```bash
-# Launch background queue daemon in tmux
-tmux new-session -d -s gpqa_daemon "python3 scripts/hpc/queue_manager_daemon.py --config configs/campaign_cells_gpqa.json"
-```
-Features:
-* Maintains continuous 2-channel execution (1 GPU Qwen + 1 GPU Llama) without exceeding cluster submit limits.
-* Real-time Telegram progress alerts and hourly rollup dashboards.
-* Automatic completion detection and self-healing retries for preempted jobs.
+Do **not** start a new 50k campaign, extra seeds, or a vLLM 0.7 vs 0.8.5 factorial until the Phase 1 artifact work and the two small systems jobs (measured throughput; `finish_reason` validation) are done.
 
 ---
 
-## 6. Citation & Reproducibility Package
-
-All raw per-problem outputs, evaluation manifests, and validation JSONs are preserved in `archive/outputs-hpc-campaign-2026-08-14/` and `archive/outputs-hpc-breadth-gsm8k-2026-08-15/`.
+## 5. Citation
 
 ```bibtex
 @article{nandish2026beyondpass1,
-  title={Beyond Pass@1: Reliability--Cost Frontiers of Quantized Reasoning Models under Controlled Serving-Stack Shift},
+  title={Beyond Pass@1: Reliability and Token-Cost Effects of Quantized Reasoning Models under a Pinned Serving Stack},
   author={Nandish, Manish},
   journal={Working Draft},
   institution={Indian Institute of Technology Patna},

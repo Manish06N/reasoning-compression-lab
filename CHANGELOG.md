@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-08-16 (late night) — Phase 1 repo hygiene (one version of the truth)
+
+Branch `paper-p0-reanalysis`. After the P0 manuscript checkpoint (`07b5f9d`):
+
+- Synced `README.md`, `results/README.md`, and `paper/main.md` to `paper/main.tex` (pinned stack; 25 loops / 0 cap hits / 209 near-cap; no safety gate / Pareto / 200-item subset).
+- Moved unsafe analysis scripts to `scripts/analysis/legacy/` with DEPRECATED banners.
+- Canonical path is `revision_reanalysis.py` → `revision_reanalysis_report.json`. Added `--check` and a CI job that fails on JSON drift. TOST flags in the report now match the paper (MATH all false).
+- Labeled environments: `requirements-qrm-paper-vllm070.lock` (published 56k / vLLM 0.7.0) vs `requirements-hpc-legacy-vllm085.txt` (qreason 0.8.5).
+- Added `results/reports/runtime_manifest.json` (launcher-effective settings, not `configs/models/` defaults).
+- Frozen answer-normalization policy in `docs/ANSWER_NORMALIZATION.md`. HPC JSONL check: `scripts/hpc/qrm_parity/check_campaign_jsonls.sh` (cluster only).
+
 ## 2026-08-16 (night) — P0 analysis correction + manuscript rewrite
 
 Addressed the six-review consensus without new GPU jobs:

@@ -4,7 +4,7 @@
 
 The 2026-08-14 audit below is **historical**. It correctly blocked publishing the two-job FP8-only package. It does **not** describe the current evidence. The recovery-plan GPU freeze (no b03/b04 / no broad grid) is **lifted** because Phases 0–6 and both breadth grids finished. Do not launch new GPU jobs unless the user asks.
 
-**Current label:** arXiv-ready preprint package, pending author PDF review and GitHub commit/push from the MacBook.
+**Current label:** P0-corrected preprint on branch `paper-p0-reanalysis`. Canonical numbers: `results/reports/revision_reanalysis_report.json`. Do not cite 0/0 pathologies, the 98.23% gold-hit gate, or Pareto-optimal FP8. Next HPC work is JSONL answer recovery, then measured throughput — not another 50k campaign.
 
 ---
 
