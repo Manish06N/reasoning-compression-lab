@@ -1,0 +1,162 @@
+{
+  "Qwen-7B_BF16": {
+    "th_3": {
+      "threshold": "3/5",
+      "coverage": 100.0,
+      "selective_accuracy": 94.39999999999999,
+      "selective_risk": 5.6000000000000085
+    },
+    "th_4": {
+      "threshold": "4/5",
+      "coverage": 96.39999999999999,
+      "selective_accuracy": 96.47302904564316,
+      "selective_risk": 3.526970954356841
+    },
+    "th_5": {
+      "threshold": "5/5",
+      "coverage": 90.4,
+      "selective_accuracy": 97.56637168141593,
+      "selective_risk": 2.43362831858407
+    }
+  },
+  "Qwen-7B_FP8": {
+    "th_3": {
+      "threshold": "3/5",
+      "coverage": 100.0,
+      "selective_accuracy": 95.0,
+      "selective_risk": 5.0
+    },
+    "th_4": {
+      "threshold": "4/5",
+      "coverage": 95.39999999999999,
+      "selective_accuracy": 97.06498951781971,
+      "selective_risk": 2.9350104821802887
+    },
+    "th_5": {
+      "threshold": "5/5",
+      "coverage": 90.4,
+      "selective_accuracy": 98.23008849557522,
+      "selective_risk": 1.7699115044247833
+    }
+  },
+  "Qwen-7B_AWQ-4": {
+    "th_3": {
+      "threshold": "3/5",
+      "coverage": 100.0,
+      "selective_accuracy": 94.39999999999999,
+      "selective_risk": 5.6000000000000085
+    },
+    "th_4": {
+      "threshold": "4/5",
+      "coverage": 94.6,
+      "selective_accuracy": 95.9830866807611,
+      "selective_risk": 4.0169133192388955
+    },
+    "th_5": {
+      "threshold": "5/5",
+      "coverage": 88.2,
+      "selective_accuracy": 97.73242630385488,
+      "selective_risk": 2.2675736961451207
+    }
+  },
+  "Qwen-7B_GPTQ-4": {
+    "th_3": {
+      "threshold": "3/5",
+      "coverage": 100.0,
+      "selective_accuracy": 94.0,
+      "selective_risk": 6.0
+    },
+    "th_4": {
+      "threshold": "4/5",
+      "coverage": 96.2,
+      "selective_accuracy": 96.04989604989605,
+      "selective_risk": 3.9501039501039514
+    },
+    "th_5": {
+      "threshold": "5/5",
+      "coverage": 88.8,
+      "selective_accuracy": 97.74774774774775,
+      "selective_risk": 2.252252252252248
+    }
+  },
+  "Llama-8B_BF16": {
+    "th_3": {
+      "threshold": "3/5",
+      "coverage": 100.0,
+      "selective_accuracy": 91.2,
+      "selective_risk": 8.799999999999997
+    },
+    "th_4": {
+      "threshold": "4/5",
+      "coverage": 92.80000000000001,
+      "selective_accuracy": 93.96551724137932,
+      "selective_risk": 6.034482758620683
+    },
+    "th_5": {
+      "threshold": "5/5",
+      "coverage": 78.60000000000001,
+      "selective_accuracy": 96.69211195928753,
+      "selective_risk": 3.30788804071247
+    }
+  },
+  "Llama-8B_FP8": {
+    "th_3": {
+      "threshold": "3/5",
+      "coverage": 100.0,
+      "selective_accuracy": 91.0,
+      "selective_risk": 9.0
+    },
+    "th_4": {
+      "threshold": "4/5",
+      "coverage": 93.60000000000001,
+      "selective_accuracy": 93.80341880341881,
+      "selective_risk": 6.196581196581192
+    },
+    "th_5": {
+      "threshold": "5/5",
+      "coverage": 81.8,
+      "selective_accuracy": 95.59902200488997,
+      "selective_risk": 4.400977995110026
+    }
+  },
+  "Llama-8B_AWQ-4": {
+    "th_3": {
+      "threshold": "3/5",
+      "coverage": 100.0,
+      "selective_accuracy": 89.8,
+      "selective_risk": 10.200000000000003
+    },
+    "th_4": {
+      "threshold": "4/5",
+      "coverage": 90.60000000000001,
+      "selective_accuracy": 91.61147902869757,
+      "selective_risk": 8.388520971302427
+    },
+    "th_5": {
+      "threshold": "5/5",
+      "coverage": 73.2,
+      "selective_accuracy": 95.90163934426229,
+      "selective_risk": 4.098360655737707
+    }
+  },
+  "Llama-8B_GPTQ-4": {
+    "th_3": {
+      "threshold": "3/5",
+      "coverage": 100.0,
+      "selective_accuracy": 91.2,
+      "selective_risk": 8.799999999999997
+    },
+    "th_4": {
+      "threshold": "4/5",
+      "coverage": 91.4,
+      "selective_accuracy": 94.31072210065645,
+      "selective_risk": 5.689277899343551
+    },
+    "th_5": {
+      "threshold": "5/5",
+      "coverage": 78.0,
+      "selective_accuracy": 96.41025641025641,
+      "selective_risk": 3.589743589743591
+    }
+  }
+}

@@ -1,0 +1,606 @@
+{
+  "difficulty_levels": {
+    "1": {
+      "Qwen-7B_BF16": {
+        "count": 43,
+        "accuracy_mean": 98.6046511627907,
+        "accuracy_std": 1.2737733895469041,
+        "tokens_mean": 2839.827906976744
+      },
+      "Qwen-7B_FP8": {
+        "count": 43,
+        "accuracy_mean": 98.6046511627907,
+        "accuracy_std": 2.080063234883524,
+        "tokens_mean": 3073.748837209302
+      },
+      "Qwen-7B_AWQ-4": {
+        "count": 43,
+        "accuracy_mean": 98.13953488372093,
+        "accuracy_std": 1.9457209919397096,
+        "tokens_mean": 3171.5441860465116
+      },
+      "Qwen-7B_GPTQ-4": {
+        "count": 43,
+        "accuracy_mean": 96.27906976744184,
+        "accuracy_std": 2.080063234883521,
+        "tokens_mean": 3404.3906976744183
+      },
+      "Llama-8B_BF16": {
+        "count": 43,
+        "accuracy_mean": 93.95348837209302,
+        "accuracy_std": 3.120094852325287,
+        "tokens_mean": 3667.172093023256
+      },
+      "Llama-8B_FP8": {
+        "count": 43,
+        "accuracy_mean": 94.88372093023254,
+        "accuracy_std": 3.032187165210531,
+        "tokens_mean": 3218.106976744186
+      },
+      "Llama-8B_AWQ-4": {
+        "count": 43,
+        "accuracy_mean": 95.34883720930233,
+        "accuracy_std": 1.644434374852434,
+        "tokens_mean": 3344.558139534883
+      },
+      "Llama-8B_GPTQ-4": {
+        "count": 43,
+        "accuracy_mean": 96.27906976744187,
+        "accuracy_std": 2.651570756044506,
+        "tokens_mean": 3376.6883720930227
+      }
+    },
+    "2": {
+      "Qwen-7B_BF16": {
+        "count": 90,
+        "accuracy_mean": 89.11111111111111,
+        "accuracy_std": 0.929622251704531,
+        "tokens_mean": 4872.842222222222
+      },
+      "Qwen-7B_FP8": {
+        "count": 90,
+        "accuracy_mean": 90.44444444444444,
+        "accuracy_std": 4.2017045335975665,
+        "tokens_mean": 4656.757777777778
+      },
+      "Qwen-7B_AWQ-4": {
+        "count": 90,
+        "accuracy_mean": 90.66666666666666,
+        "accuracy_std": 1.6850834320114605,
+        "tokens_mean": 5089.837777777777
+      },
+      "Qwen-7B_GPTQ-4": {
+        "count": 90,
+        "accuracy_mean": 88.66666666666666,
+        "accuracy_std": 2.137264895741261,
+        "tokens_mean": 5027.817777777777
+      },
+      "Llama-8B_BF16": {
+        "count": 90,
+        "accuracy_mean": 84.66666666666666,
+        "accuracy_std": 2.1372648957412594,
+        "tokens_mean": 5471.3133333333335
+      },
+      "Llama-8B_FP8": {
+        "count": 90,
+        "accuracy_mean": 85.11111111111111,
+        "accuracy_std": 2.018433569398329,
+        "tokens_mean": 5231.517777777777
+      },
+      "Llama-8B_AWQ-4": {
+        "count": 90,
+        "accuracy_mean": 81.11111111111111,
+        "accuracy_std": 3.0429030972509237,
+        "tokens_mean": 5496.171111111112
+      },
+      "Llama-8B_GPTQ-4": {
+        "count": 90,
+        "accuracy_mean": 83.33333333333333,
+        "accuracy_std": 3.424674446093876,
+        "tokens_mean": 5800.359999999999
+      }
+    },
+    "3": {
+      "Qwen-7B_BF16": {
+        "count": 105,
+        "accuracy_mean": 95.80952380952381,
+        "accuracy_std": 1.0858813572372772,
+        "tokens_mean": 4049.8876190476194
+      },
+      "Qwen-7B_FP8": {
+        "count": 105,
+        "accuracy_mean": 95.23809523809523,
+        "accuracy_std": 1.5058465048420868,
+        "tokens_mean": 3907.510476190476
+      },
+      "Qwen-7B_AWQ-4": {
+        "count": 105,
+        "accuracy_mean": 94.09523809523809,
+        "accuracy_std": 0.796819072889593,
+        "tokens_mean": 4238.148571428572
+      },
+      "Qwen-7B_GPTQ-4": {
+        "count": 105,
+        "accuracy_mean": 94.28571428571428,
+        "accuracy_std": 1.9047619047619013,
+        "tokens_mean": 4265.822857142857
+      },
+      "Llama-8B_BF16": {
+        "count": 105,
+        "accuracy_mean": 89.9047619047619,
+        "accuracy_std": 2.483505678172435,
+        "tokens_mean": 4619.533333333335
+      },
+      "Llama-8B_FP8": {
+        "count": 105,
+        "accuracy_mean": 90.0952380952381,
+        "accuracy_std": 1.730085916627137,
+        "tokens_mean": 4844.253333333333
+      },
+      "Llama-8B_AWQ-4": {
+        "count": 105,
+        "accuracy_mean": 85.71428571428571,
+        "accuracy_std": 1.1664236870396103,
+        "tokens_mean": 4825.100952380953
+      },
+      "Llama-8B_GPTQ-4": {
+        "count": 105,
+        "accuracy_mean": 89.71428571428571,
+        "accuracy_std": 1.8319413392067945,
+        "tokens_mean": 4950.369523809524
+      }
+    },
+    "4": {
+      "Qwen-7B_BF16": {
+        "count": 128,
+        "accuracy_mean": 95.78125,
+        "accuracy_std": 0.8907620508587015,
+        "tokens_mean": 3839.4515625
+      },
+      "Qwen-7B_FP8": {
+        "count": 128,
+        "accuracy_mean": 96.40625,
+        "accuracy_std": 1.4192111034831991,
+        "tokens_mean": 3827.353125
+      },
+      "Qwen-7B_AWQ-4": {
+        "count": 128,
+        "accuracy_mean": 94.53125,
+        "accuracy_std": 1.2352647110032733,
+        "tokens_mean": 3929.4703125
+      },
+      "Qwen-7B_GPTQ-4": {
+        "count": 128,
+        "accuracy_mean": 96.5625,
+        "accuracy_std": 1.1848242881330548,
+        "tokens_mean": 3801.575
+      },
+      "Llama-8B_BF16": {
+        "count": 128,
+        "accuracy_mean": 91.5625,
+        "accuracy_std": 1.6937096397405311,
+        "tokens_mean": 4426.4296875
+      },
+      "Llama-8B_FP8": {
+        "count": 128,
+        "accuracy_mean": 91.09375,
+        "accuracy_std": 0.42790824805091104,
+        "tokens_mean": 4150.95
+      },
+      "Llama-8B_AWQ-4": {
+        "count": 128,
+        "accuracy_mean": 87.03125,
+        "accuracy_std": 2.2507594204512396,
+        "tokens_mean": 4545.159375
+      },
+      "Llama-8B_GPTQ-4": {
+        "count": 128,
+        "accuracy_mean": 89.84375,
+        "accuracy_std": 1.7469281074217107,
+        "tokens_mean": 4604.7390625
+      }
+    },
+    "5": {
+      "Qwen-7B_BF16": {
+        "count": 134,
+        "accuracy_mean": 92.6865671641791,
+        "accuracy_std": 1.106895296581446,
+        "tokens_mean": 3942.7164179104475
+      },
+      "Qwen-7B_FP8": {
+        "count": 134,
+        "accuracy_mean": 93.13432835820895,
+        "accuracy_std": 1.2262445317279853,
+        "tokens_mean": 4122.149253731343
+      },
+      "Qwen-7B_AWQ-4": {
+        "count": 134,
+        "accuracy_mean": 91.04477611940298,
+        "accuracy_std": 1.6687074458953632,
+        "tokens_mean": 4404.6283582089545
+      },
+      "Qwen-7B_GPTQ-4": {
+        "count": 134,
+        "accuracy_mean": 92.23880597014924,
+        "accuracy_std": 1.946030568717206,
+        "tokens_mean": 4553.805970149254
+      },
+      "Llama-8B_BF16": {
+        "count": 134,
+        "accuracy_mean": 88.0597014925373,
+        "accuracy_std": 1.750155134262476,
+        "tokens_mean": 4675.783582089552
+      },
+      "Llama-8B_FP8": {
+        "count": 134,
+        "accuracy_mean": 88.80597014925374,
+        "accuracy_std": 2.8417063827850426,
+        "tokens_mean": 4673.2238805970155
+      },
+      "Llama-8B_AWQ-4": {
+        "count": 134,
+        "accuracy_mean": 87.3134328358209,
+        "accuracy_std": 3.460305408767053,
+        "tokens_mean": 4786.128358208955
+      },
+      "Llama-8B_GPTQ-4": {
+        "count": 134,
+        "accuracy_mean": 88.80597014925374,
+        "accuracy_std": 1.1799543508090997,
+        "tokens_mean": 4804.671641791045
+      }
+    }
+  },
+  "subject_categories": {
+    "Algebra": {
+      "Qwen-7B_BF16": {
+        "count": 124,
+        "accuracy_mean": 91.61290322580645,
+        "accuracy_std": 1.6722936575264296,
+        "tokens_mean": 4203.462903225806
+      },
+      "Qwen-7B_FP8": {
+        "count": 124,
+        "accuracy_mean": 91.61290322580645,
+        "accuracy_std": 1.3494516557001195,
+        "tokens_mean": 4386.324193548387
+      },
+      "Qwen-7B_AWQ-4": {
+        "count": 124,
+        "accuracy_mean": 90.16129032258064,
+        "accuracy_std": 2.0874482428298022,
+        "tokens_mean": 4588.843548387096
+      },
+      "Qwen-7B_GPTQ-4": {
+        "count": 124,
+        "accuracy_mean": 90.48387096774192,
+        "accuracy_std": 0.36065612540319436,
+        "tokens_mean": 4665.946774193549
+      },
+      "Llama-8B_BF16": {
+        "count": 124,
+        "accuracy_mean": 86.7741935483871,
+        "accuracy_std": 1.4649921068213647,
+        "tokens_mean": 4807.735483870968
+      },
+      "Llama-8B_FP8": {
+        "count": 124,
+        "accuracy_mean": 87.41935483870967,
+        "accuracy_std": 2.102968517807302,
+        "tokens_mean": 4698.998387096774
+      },
+      "Llama-8B_AWQ-4": {
+        "count": 124,
+        "accuracy_mean": 84.83870967741936,
+        "accuracy_std": 2.378690516734292,
+        "tokens_mean": 4783.451612903225
+      },
+      "Llama-8B_GPTQ-4": {
+        "count": 124,
+        "accuracy_mean": 86.12903225806451,
+        "accuracy_std": 1.9253768365021438,
+        "tokens_mean": 4999.682258064516
+      }
+    },
+    "Counting & Probability": {
+      "Qwen-7B_BF16": {
+        "count": 38,
+        "accuracy_mean": 97.89473684210525,
+        "accuracy_std": 1.1768778828946278,
+        "tokens_mean": 4355.421052631578
+      },
+      "Qwen-7B_FP8": {
+        "count": 38,
+        "accuracy_mean": 97.36842105263159,
+        "accuracy_std": 1.8608073189119698,
+        "tokens_mean": 4116.284210526315
+      },
+      "Qwen-7B_AWQ-4": {
+        "count": 38,
+        "accuracy_mean": 94.73684210526315,
+        "accuracy_std": 1.860807318911965,
+        "tokens_mean": 4596.61052631579
+      },
+      "Qwen-7B_GPTQ-4": {
+        "count": 38,
+        "accuracy_mean": 98.42105263157893,
+        "accuracy_std": 1.4413751513293867,
+        "tokens_mean": 3971.615789473685
+      },
+      "Llama-8B_BF16": {
+        "count": 38,
+        "accuracy_mean": 92.10526315789474,
+        "accuracy_std": 1.860807318911965,
+        "tokens_mean": 5155.115789473684
+      },
+      "Llama-8B_FP8": {
+        "count": 38,
+        "accuracy_mean": 94.73684210526315,
+        "accuracy_std": 1.860807318911965,
+        "tokens_mean": 5108.989473684212
+      },
+      "Llama-8B_AWQ-4": {
+        "count": 38,
+        "accuracy_mean": 90.0,
+        "accuracy_std": 6.000923289995463,
+        "tokens_mean": 5182.852631578948
+      },
+      "Llama-8B_GPTQ-4": {
+        "count": 38,
+        "accuracy_mean": 91.57894736842105,
+        "accuracy_std": 2.201736911931776,
+        "tokens_mean": 5433.652631578947
+      }
+    },
+    "Geometry": {
+      "Qwen-7B_BF16": {
+        "count": 41,
+        "accuracy_mean": 90.2439024390244,
+        "accuracy_std": 2.987182613150221,
+        "tokens_mean": 4364.843902439024
+      },
+      "Qwen-7B_FP8": {
+        "count": 41,
+        "accuracy_mean": 91.70731707317074,
+        "accuracy_std": 2.181529734146135,
+        "tokens_mean": 4370.0
+      },
+      "Qwen-7B_AWQ-4": {
+        "count": 41,
+        "accuracy_mean": 90.2439024390244,
+        "accuracy_std": 1.7246506858208466,
+        "tokens_mean": 4162.756097560976
+      },
+      "Qwen-7B_GPTQ-4": {
+        "count": 41,
+        "accuracy_mean": 90.2439024390244,
+        "accuracy_std": 4.562996813138956,
+        "tokens_mean": 4832.468292682927
+      },
+      "Llama-8B_BF16": {
+        "count": 41,
+        "accuracy_mean": 81.95121951219514,
+        "accuracy_std": 3.6989636312446597,
+        "tokens_mean": 5528.643902439024
+      },
+      "Llama-8B_FP8": {
+        "count": 41,
+        "accuracy_mean": 83.90243902439025,
+        "accuracy_std": 3.698963631244658,
+        "tokens_mean": 5225.073170731707
+      },
+      "Llama-8B_AWQ-4": {
+        "count": 41,
+        "accuracy_mean": 79.02439024390245,
+        "accuracy_std": 3.6989636312446597,
+        "tokens_mean": 5641.5902439024385
+      },
+      "Llama-8B_GPTQ-4": {
+        "count": 41,
+        "accuracy_mean": 81.46341463414635,
+        "accuracy_std": 4.081268422117444,
+        "tokens_mean": 5878.9756097560985
+      }
+    },
+    "Intermediate Algebra": {
+      "Qwen-7B_BF16": {
+        "count": 97,
+        "accuracy_mean": 95.05154639175257,
+        "accuracy_std": 1.1293248608353958,
+        "tokens_mean": 3556.5896907216497
+      },
+      "Qwen-7B_FP8": {
+        "count": 97,
+        "accuracy_mean": 95.87628865979381,
+        "accuracy_std": 1.785619389246265,
+        "tokens_mean": 3660.3690721649486
+      },
+      "Qwen-7B_AWQ-4": {
+        "count": 97,
+        "accuracy_mean": 94.22680412371133,
+        "accuracy_std": 1.8727734149056634,
+        "tokens_mean": 3882.2783505154644
+      },
+      "Qwen-7B_GPTQ-4": {
+        "count": 97,
+        "accuracy_mean": 95.4639175257732,
+        "accuracy_std": 0.5646624304177028,
+        "tokens_mean": 3766.7649484536078
+      },
+      "Llama-8B_BF16": {
+        "count": 97,
+        "accuracy_mean": 92.98969072164948,
+        "accuracy_std": 1.9830292847083788,
+        "tokens_mean": 3993.3195876288655
+      },
+      "Llama-8B_FP8": {
+        "count": 97,
+        "accuracy_mean": 91.75257731958763,
+        "accuracy_std": 1.6300400310146226,
+        "tokens_mean": 3949.9319587628866
+      },
+      "Llama-8B_AWQ-4": {
+        "count": 97,
+        "accuracy_mean": 91.1340206185567,
+        "accuracy_std": 2.785413626001294,
+        "tokens_mean": 4146.105154639175
+      },
+      "Llama-8B_GPTQ-4": {
+        "count": 97,
+        "accuracy_mean": 92.78350515463917,
+        "accuracy_std": 2.4177400823832085,
+        "tokens_mean": 4214.985567010309
+      }
+    },
+    "Number Theory": {
+      "Qwen-7B_BF16": {
+        "count": 62,
+        "accuracy_mean": 96.45161290322582,
+        "accuracy_std": 1.7668469596940866,
+        "tokens_mean": 3583.2903225806454
+      },
+      "Qwen-7B_FP8": {
+        "count": 62,
+        "accuracy_mean": 95.80645161290325,
+        "accuracy_std": 1.8389926211276426,
+        "tokens_mean": 3557.5451612903225
+      },
+      "Qwen-7B_AWQ-4": {
+        "count": 62,
+        "accuracy_mean": 96.12903225806451,
+        "accuracy_std": 2.446088852919856,
+        "tokens_mean": 3854.258064516129
+      },
+      "Qwen-7B_GPTQ-4": {
+        "count": 62,
+        "accuracy_mean": 96.12903225806453,
+        "accuracy_std": 1.838992621127643,
+        "tokens_mean": 3977.9806451612903
+      },
+      "Llama-8B_BF16": {
+        "count": 62,
+        "accuracy_mean": 91.61290322580645,
+        "accuracy_std": 3.3054679890192307,
+        "tokens_mean": 4297.2
+      },
+      "Llama-8B_FP8": {
+        "count": 62,
+        "accuracy_mean": 89.35483870967741,
+        "accuracy_std": 3.713182075232689,
+        "tokens_mean": 4506.935483870968
+      },
+      "Llama-8B_AWQ-4": {
+        "count": 62,
+        "accuracy_mean": 89.03225806451613,
+        "accuracy_std": 5.633628773088058,
+        "tokens_mean": 4398.6354838709685
+      },
+      "Llama-8B_GPTQ-4": {
+        "count": 62,
+        "accuracy_mean": 90.96774193548387,
+        "accuracy_std": 1.838992621127645,
+        "tokens_mean": 4549.022580645161
+      }
+    },
+    "Prealgebra": {
+      "Qwen-7B_BF16": {
+        "count": 82,
+        "accuracy_mean": 94.63414634146342,
+        "accuracy_std": 1.0907648670730674,
+        "tokens_mean": 3855.331707317073
+      },
+      "Qwen-7B_FP8": {
+        "count": 82,
+        "accuracy_mean": 95.3658536585366,
+        "accuracy_std": 1.020317105529365,
+        "tokens_mean": 3841.0243902439024
+      },
+      "Qwen-7B_AWQ-4": {
+        "count": 82,
+        "accuracy_mean": 94.8780487804878,
+        "accuracy_std": 1.5900493671225986,
+        "tokens_mean": 4080.2878048780485
+      },
+      "Qwen-7B_GPTQ-4": {
+        "count": 82,
+        "accuracy_mean": 94.14634146341464,
+        "accuracy_std": 1.3359086768418698,
+        "tokens_mean": 4136.260975609756
+      },
+      "Llama-8B_BF16": {
+        "count": 82,
+        "accuracy_mean": 89.75609756097562,
+        "accuracy_std": 2.807527910541794,
+        "tokens_mean": 4559.1365853658535
+      },
+      "Llama-8B_FP8": {
+        "count": 82,
+        "accuracy_mean": 91.95121951219512,
+        "accuracy_std": 1.3904578354867478,
+        "tokens_mean": 4293.158536585366
+      },
+      "Llama-8B_AWQ-4": {
+        "count": 82,
+        "accuracy_mean": 88.78048780487806,
+        "accuracy_std": 2.643839437643759,
+        "tokens_mean": 4470.387804878049
+      },
+      "Llama-8B_GPTQ-4": {
+        "count": 82,
+        "accuracy_mean": 91.70731707317074,
+        "accuracy_std": 0.5453824335365337,
+        "tokens_mean": 4519.624390243903
+      }
+    },
+    "Precalculus": {
+      "Qwen-7B_BF16": {
+        "count": 56,
+        "accuracy_mean": 93.92857142857144,
+        "accuracy_std": 1.597191412499848,
+        "tokens_mean": 4583.857142857143
+      },
+      "Qwen-7B_FP8": {
+        "count": 56,
+        "accuracy_mean": 95.0,
+        "accuracy_std": 3.6596252735569945,
+        "tokens_mean": 4174.225
+      },
+      "Qwen-7B_AWQ-4": {
+        "count": 56,
+        "accuracy_mean": 92.85714285714285,
+        "accuracy_std": 2.187044413199262,
+        "tokens_mean": 4788.757142857144
+      },
+      "Qwen-7B_GPTQ-4": {
+        "count": 56,
+        "accuracy_mean": 91.78571428571429,
+        "accuracy_std": 2.9880715233359827,
+        "tokens_mean": 4728.589285714286
+      },
+      "Llama-8B_BF16": {
+        "count": 56,
+        "accuracy_mean": 88.21428571428571,
+        "accuracy_std": 4.300569492425823,
+        "tokens_mean": 5034.642857142857
+      },
+      "Llama-8B_FP8": {
+        "count": 56,
+        "accuracy_mean": 87.5,
+        "accuracy_std": 2.187044413199268,
+        "tokens_mean": 4816.742857142857
+      },
+      "Llama-8B_AWQ-4": {
+        "count": 56,
+        "accuracy_mean": 78.92857142857142,
+        "accuracy_std": 3.871336319406929,
+        "tokens_mean": 5452.992857142856
+      },
+      "Llama-8B_GPTQ-4": {
+        "count": 56,
+        "accuracy_mean": 85.71428571428572,
+        "accuracy_std": 3.7880720420707914,
+        "tokens_mean": 5201.282142857143
+      }
+    }
+  }
+}
