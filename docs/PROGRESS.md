@@ -29,7 +29,7 @@
 | **C** | Does `repetition_penalty` explain failure? | Our harness, with vs without | **Answered** - both fail |
 | **D** | Is 32k budget too tight? | Qwen 64k max_tokens | **Canceled** - not needed after A |
 
-Plain English: [notes.md sections 31-36](../notes.md)
+Plain English: [archive/notes_2026-07-03.md](archive/notes_2026-07-03.md)
 
 ## Next gated action
 
