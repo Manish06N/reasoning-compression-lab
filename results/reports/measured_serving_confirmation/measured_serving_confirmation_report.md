@@ -16,6 +16,8 @@
 | **Llama-8B** | **AWQ-4** | 86.48% | 70.2 ± 2.7 | 40.12s | 391.1 ± 0.5 | 0.086 | 11.63s | $0.0056 | +18.5% |
 | **Llama-8B** | **GPTQ-4** | 88.92% | 63.5 ± 0.4 | 46.31s | 366.2 ± 0.8 | 0.079 | 12.60s | $0.0059 | +24.9% |
 
+Reported $\pm$ is **sample SD** (`statistics.stdev`, $n-1$). The runner's CV-expansion trigger uses **population SD** (`np.std`, $n$ divisor) on the first three repeats. Do not call the trigger statistic a sample SD. Cost-of-Pass is **scenario-based** at $\$1.50$/A100-hour, not billed cluster cost.
+
 ## 2. Secondary Fixed-Token Microbenchmark (Pure Decode Speed)
 
 | Model | Format | Fixed Tokens | Raw Decode Tok/s | Speedup vs BF16 |

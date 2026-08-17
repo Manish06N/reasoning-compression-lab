@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main, paper-p0-reanalysis]
+    branches: [main, paper-p0-reanalysis, paper-serving-confirmation]
   pull_request:
     branches: [main]
 
@@ -17,6 +17,8 @@ jobs:
           python-version: "3.11"
       - name: Recompute canonical report and fail on drift
         run: python scripts/analysis/revision_reanalysis.py --check
+      - name: Recompute serving confirmation report and fail on drift
+        run: python scripts/analysis/measured_serving_confirmation_analysis.py --check
 
   test:
     runs-on: ubuntu-latest

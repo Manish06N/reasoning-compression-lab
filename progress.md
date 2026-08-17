@@ -9,18 +9,18 @@ Canonical dated record for **Paper 1: Beyond Pass@1** (`reasoning-compression-la
 
 ---
 
-## Current Status Snapshot (2026-08-17: measured serving integrated)
+## Current Status Snapshot (2026-08-17: serving confirmation integrated)
 
 | Area | Status |
 |------|--------|
-| **Active Branch** | `paper-measured-serving` (HPC `6612999` + MacBook manuscript integration). Do not merge to `main`. |
+| **Active Branch** | `paper-serving-confirmation` (HPC `76ebc3d` + MacBook manuscript integration). Do not merge to `main`. |
 | **Gold-Free Modal Agreement** | **Complete.** Compact artifact SHA256 `23e9ead0...`; `modal_agreement_analysis.py --check` passes on MacBook. |
-| **Measured Serving Systems Benchmark** | **Complete (48+8 JSON files).** Primary cost evidence in `paper/main.tex`. Qwen FP8 batched $+18.7\%$ tok/s, $-19.8\%$ $C_{\mathrm{pass}}$ vs BF16. Not a unique “true Pareto optimum.” |
-| **Scientific Authority** | [`paper/main.tex`](paper/main.tex) / [`paper/main.pdf`](paper/main.pdf). Canonical JSON: `revision_reanalysis_report.json`, `modal_agreement_report.json`, `measured_serving_report.json`. |
+| **Measured Serving Systems Benchmark** | **Confirmation preferred (52+8 JSON files).** Qwen GPTQ-4 batched $-45.9\%$ scenario $C_{\mathrm{pass}}$ vs BF16; Qwen FP8 $-36.0\%$ with large wall-clock SD. First unconstrained run is provenance only. Not a unique “true Pareto optimum.” |
+| **Scientific Authority** | [`paper/main.tex`](paper/main.tex) / [`paper/main.pdf`](paper/main.pdf). Canonical JSON: `revision_reanalysis_report.json`, `modal_agreement_report.json`, `measured_serving_confirmation_report.json`. |
 | **MATH-500 Confirmatory Grid** | **100% Complete** (40 cells, 20,000 completions, seeds 42–46). Qwen: BF16 94.00%, FP8 94.40%, AWQ4 93.12%, GPTQ4 93.48%; Llama: BF16 89.24%, FP8 89.52%, AWQ4 86.48%, GPTQ4 88.92% |
 | **GSM8K Breadth Grid** | **100% Complete** (24 cells, $n=1,319$, seeds 42–44) |
 | **GPQA-Diamond Breadth Grid** | **100% Complete** (24 cells, $n=198$, seeds 42–44). Qwen: BF16 50.34%, FP8 49.49%, AWQ-4 44.78%, GPTQ-4 47.98%; Llama: BF16 46.13%, FP8 47.81%, AWQ-4 46.97%, GPTQ-4 44.95% |
-| **Next GPU experiment** | Small `finish_reason` / termination-metadata validation — **not submitted**. |
+| **Next GPU experiment** | **None.** Experimental GPU work is closed for the current manuscript. |
 
 ### 2026-08-13 run diagnosis: what worked, what did not, and why
 

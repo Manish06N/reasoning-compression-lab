@@ -90,27 +90,29 @@ Full MATH-500 grid, all 5 seeds, **ratio of means** vs BF16:
 | Llama AWQ-4 | +1.72% |
 | Llama GPTQ-4 | +3.95% |
 
-Cost-of-Pass in the paper has two layers: (1) **primary** measured GPU-sec/query on the frozen 100-problem MATH-500 serving subset (`results/measured_serving/`, report `reports/measured_serving/measured_serving_report.json`) at a $\$1.50$/A100-h scenario; (2) **historical** shared-$65$ tok/s token proxy. Do not cite a unique “true Pareto optimum.”
+Cost-of-Pass in the paper has two layers: (1) **primary** confirmation GPU-sec/query on balanced MATH-500 subsets with `max_num_seqs=8` (`results/measured_serving_confirmation/`, report `reports/measured_serving_confirmation/measured_serving_confirmation_report.json`) at a $\$1.50$/A100-h scenario; (2) **historical** shared-$65$ tok/s token proxy. The earlier unconstrained timing (`results/measured_serving/`) is provenance only. Do not cite a unique “true Pareto optimum.” Do not average the two serving runs.
 
-Batched Condition B (100-prompt `llm.generate`, $R=3$ wall-clock repeats; campaign MATH-500 pass@1):
+Confirmation Condition B (100-prompt `llm.generate`, `max_num_seqs=8` pinned, CV-governed $R$; campaign MATH-500 pass@1). Reported $\pm$ is **sample SD**:
 
-| Cell | tok/s | GPU-s/q | VRAM (GB) | $C_{\mathrm{pass}}$ |
-|---|---|---|---|---|
-| Qwen BF16 | $694.27\pm 0.65$ | 5.62 | 56.00 | \$0.0025 |
-| Qwen FP8 | $824.27\pm 4.00$ | 4.52 | 56.02 | \$0.0020 |
-| Qwen AWQ-4 | $687.51\pm 0.59$ | 5.89 | 56.00 | \$0.0026 |
-| Qwen GPTQ-4 | $602.65\pm 1.40$ | 6.70 | 55.17 | \$0.0030 |
-| Llama BF16 | $649.72\pm 0.51$ | 6.86 | 56.71 | \$0.0032 |
-| Llama FP8 | $759.48\pm 6.96$ | 6.37 | 56.72 | \$0.0030 |
-| Llama AWQ-4 | $545.68\pm 125.62$ | 10.15 | 56.72 | \$0.0049 |
-| Llama GPTQ-4 | $785.55\pm 12.33$ | 6.58 | 56.74 | \$0.0031 |
+| Cell | tok/s | GPU-s/q | VRAM (GB) | $C_{\mathrm{pass}}$ | vs BF16 $C_{\mathrm{pass}}$ |
+|---|---|---|---|---|---|
+| Qwen BF16 | $252.72\pm 0.56$ | 13.44 | 54.98 | \$0.0060 | anchor |
+| Qwen FP8 ($R=5$) | $449.79\pm 97.53$ | 8.64 | 54.99 | \$0.0038 | −36.0% |
+| Qwen AWQ-4 | $418.15\pm 2.03$ | 7.82 | 55.09 | \$0.0035 | −41.3% |
+| Qwen GPTQ-4 | $488.26\pm 0.64$ | 7.23 | 53.89 | \$0.0032 | −45.9% |
+| Llama BF16 | $366.98\pm 1.90$ | 10.13 | 55.94 | \$0.0047 | anchor |
+| Llama FP8 | $481.42\pm 1.36$ | 9.32 | 55.95 | \$0.0043 | −8.2% |
+| Llama AWQ-4 | $391.11\pm 0.48$ | 11.63 | 56.14 | \$0.0056 | +18.5% |
+| Llama GPTQ-4 | $366.16\pm 0.79$ | 12.60 | 56.01 | \$0.0059 | +24.9% |
 
-Qwen FP8 vs BF16 batched: **+18.7%** tok/s, **−19.8%** $C_{\mathrm{pass}}$. Llama AWQ-4 std includes a mixed-node slower repeat. Peak VRAM is the 0.75 utilization pool.
+Qwen FP8 Condition B has identical token counts across five repeats and two wall-clock regimes; all five are retained. Peak VRAM is the 0.75 utilization pool, not weight footprint. Qwen jobs: `ragpu003`. Llama jobs: `ragpu004`. Single-request effects were architecture dependent (Qwen 4-bit faster than BF16; Llama 4-bit not).
 
 Reproduce:
 
 ```bash
-python3 scripts/analysis/measured_serving_analysis.py --check
+python3 scripts/analysis/measured_serving_confirmation_analysis.py --check
+python3 scripts/hpc/qrm_parity/validate_measured_serving_confirmation.py
+python3 scripts/analysis/measured_serving_analysis.py --check   # superseded first run only
 ```
 
 ---
@@ -154,11 +156,16 @@ results/
 ├── reports/
 │   ├── revision_reanalysis_report.json   # CANONICAL pass@1 / pathology / tokens
 │   ├── modal_agreement_report.json       # gold-free MATH-500 modal agreement
-│   ├── measured_serving/                 # tok/s, latency, VRAM, measured C_pass
+│   ├── measured_serving/                 # first unconstrained timing (provenance)
+│   ├── measured_serving_confirmation/    # preferred tok/s, latency, scenario C_pass
 │   └── runtime_manifest.json             # effective 56k launch settings
 ├── measured_serving/
-│   ├── input_subset.json                 # frozen 100 MATH-500 prompts (use full_prompt)
+│   ├── input_subset.json                 # first-run 100 MATH-500 prompts (provenance)
 │   └── raw/                              # 48 task-realistic + 8 microbenchmark JSON
+├── measured_serving_confirmation/
+│   ├── condition_a_subset.json           # balanced 20 prompts (4/level)
+│   ├── condition_b_subset.json           # balanced 100 prompts (20/level)
+│   └── raw/                              # 52 task-realistic + 8 microbenchmark JSON
 ├── recovered/
 │   └── math500_modal_inputs.jsonl        # compact extracted answers (no CoT)
 └── README.md

@@ -226,10 +226,18 @@ def analyze_confirmation_data(raw_dir: Path) -> Dict[str, Any]:
     return report
 
 
+def _pop_std(xs: List[float]) -> float:
+    if len(xs) < 2:
+        return 0.0
+    mean = statistics.mean(xs)
+    return math.sqrt(sum((x - mean) ** 2 for x in xs) / len(xs))
+
+
 def generate_confirmation_markdown_reports(
     report: Dict[str, Any],
     output_md: Path,
     output_val_md: Path,
+    raw_dir: Path | None = None,
 ) -> None:
     """Generate human-readable summary and validation markdown reports."""
     output_md.parent.mkdir(parents=True, exist_ok=True)
@@ -272,6 +280,12 @@ def generate_confirmation_markdown_reports(
             )
 
     lines.append("")
+    lines.append(
+        "Reported $\\pm$ is **sample SD** (`statistics.stdev`, $n-1$). "
+        "The runner's CV-expansion trigger uses **population SD** (`np.std`, $n$ divisor) on the first three repeats. "
+        "Do not call the trigger statistic a sample SD. Cost-of-Pass is **scenario-based** at $1.50/A100-hour, not billed cluster cost."
+    )
+    lines.append("")
     lines.append("## 2. Secondary Fixed-Token Microbenchmark (Pure Decode Speed)")
     lines.append("")
     lines.append("| Model | Format | Fixed Tokens | Raw Decode Tok/s | Speedup vs BF16 |")
@@ -289,6 +303,101 @@ def generate_confirmation_markdown_reports(
 
     output_md.write_text("\n".join(lines) + "\n", encoding="utf-8")
     print(f"Confirmation markdown report written to: {output_md}")
+
+    val_raw = raw_dir if raw_dir is not None else REPO_ROOT / "results" / "measured_serving_confirmation" / "raw"
+    _write_confirmation_validation_md(report, output_val_md, val_raw)
+    print(f"Confirmation validation markdown written to: {output_val_md}")
+
+
+def _write_confirmation_validation_md(report: Dict[str, Any], output_val_md: Path, raw_dir: Path) -> None:
+    """Document SD convention, CV trigger, Qwen FP8 B five-rep structure, and hardware split."""
+    task_runs, _micro = load_raw_confirmation_data(raw_dir)
+    cv_trigger_pct = 3.0
+
+    v: List[str] = []
+    v.append("# Measured serving confirmation — validation notes")
+    v.append("")
+    v.append("Independent of the campaign 56k accuracy grid. Preferred serving evidence for the manuscript.")
+    v.append("")
+    v.append("## Dispersion conventions")
+    v.append("")
+    v.append("- Report $\\pm$ and `std_tokens_per_second` use **sample SD** (`statistics.stdev`, divisor $n-1$).")
+    v.append("- The HPC runner expands $R=3\\to 5$ when **population** CV of the first three tok/s values exceeds 3% (`np.std` without `ddof`, divisor $n$).")
+    v.append("- Llama-8B FP8 Condition A has sample CV $3.67\\%$ but population CV $3.00\\%$, which is **not** $> 3.0$, so $R=3$ is correct under the frozen rule.")
+    v.append("- Do not drop slow repeats after expansion. All technically valid repeats enter the reported mean/SD.")
+    v.append("")
+    v.append("## Hardware")
+    v.append("")
+    v.append("- All Qwen-7B confirmation files: host `ragpu003`, `torch` `gpu_count=1`.")
+    v.append("- All Llama-8B confirmation files: host `ragpu004`, `torch` `gpu_count=1`.")
+    v.append("- `nvidia_smi` lists both node UUIDs; the used-device UUID is **not** isolated.")
+    v.append("- Valid wording: **within-architecture same-node (one visible A100) controlled serving comparisons.** Cross-architecture absolute tok/s is cautious.")
+    v.append("- Do **not** claim a specific UUID or “all eight on one GPU.”")
+    v.append("")
+    v.append("## Memory fields")
+    v.append("")
+    v.append("`model_weights_memory_gb` is `torch.cuda.memory_allocated()` after `LLM()` init. Values $\\sim 54$–$56$ GB track the engine pool at `gpu_memory_utilization=0.75`, not an isolated weight footprint. Do **not** publish a format-to-format weight table from these fields.")
+    v.append("")
+    v.append("## Truncation / generation cap")
+    v.append("")
+    v.append("Compact confirmation JSON has no `finish_reason`. Max mean output tokens per request is $\\ll 32768$. Allowed wording: no serving-confirmation **mean** output reached the 32,768-token generation cap. The 56k campaign still has 25 loops / 209 near-cap rows.")
+    v.append("")
+    v.append("## Cost-of-Pass")
+    v.append("")
+    v.append("Scenario: $C_{\\mathrm{pass}} = (\\mathrm{GPU\\text{-}sec}/q \\times 1.50/3600) / $ campaign MATH-500 pass@1. Label **scenario-based measured Cost-of-Pass**, not true dollar cost.")
+    v.append("")
+    v.append("## Replicate tok/s (task-realistic)")
+    v.append("")
+    v.append("| Cell | Cond | R | mean tok/s | sample SD | sample CV% | pop SD | pop CV% (first 3) | trigger? | expanded? | host(s) |")
+    v.append("|---|---|---|---|---|---|---|---|---|---|---|")
+
+    qwen_fp8_b_rows: List[Dict[str, Any]] = []
+    for model in MODELS:
+        for fmt in FORMATS:
+            for cond in CONDITIONS:
+                runs = task_runs.get((model, fmt, cond), [])
+                if not runs:
+                    continue
+                toks = [float(r["output_tokens_per_second"]) for r in runs]
+                first3 = toks[:3]
+                mean = statistics.mean(toks)
+                ssd = statistics.stdev(toks) if len(toks) > 1 else 0.0
+                scv = (ssd / mean * 100.0) if mean > 0 else 0.0
+                psd = _pop_std(toks)
+                pcv3 = (_pop_std(first3) / statistics.mean(first3) * 100.0) if first3 else 0.0
+                trig = pcv3 > cv_trigger_pct
+                expanded = len(runs) == 5
+                hosts = sorted({str(r.get("gpu_metadata", {}).get("hostname", "?")) for r in runs})
+                short = "A" if cond.startswith("A") else "B"
+                v.append(
+                    f"| {model} {fmt} | {short} | {len(runs)} | {mean:.2f} | {ssd:.2f} | {scv:.2f} | {psd:.2f} | {pcv3:.2f} | "
+                    f"{'Y' if trig else 'N'} | {'Y' if expanded else 'N'} | {','.join(hosts)} |"
+                )
+                if model == "Qwen-7B" and fmt == "FP8" and cond.startswith("B"):
+                    qwen_fp8_b_rows = runs
+
+    v.append("")
+    v.append("## Qwen-7B FP8 Condition B (retain all five)")
+    v.append("")
+    v.append("Not a formatting bug. Generated token counts are identical; wall-clock elapsed time is not.")
+    v.append("")
+    v.append("| Rep | host | elapsed s | output tokens | tok/s | gpu-sec/q |")
+    v.append("|---|---|---|---|---|---|")
+    for r in qwen_fp8_b_rows:
+        host = r.get("gpu_metadata", {}).get("hostname", "?")
+        v.append(
+            f"| {r.get('repetition')} | {host} | {r['elapsed_seconds']:.3f} | {r['total_output_tokens']} | "
+            f"{r['output_tokens_per_second']:.4f} | {r['gpu_seconds_per_query']:.4f} |"
+        )
+    v.append("")
+    v.append("First-three population CV exceeds 3%, so $R=5$ triggered. Averaging all five makes Qwen FP8 Condition-B Cost-of-Pass more conservative than dropping the slow repeats. Report $449.8 \\pm 97.5$ tok/s (sample SD) and do not claim a tight FP8 throughput.")
+    v.append("")
+    v.append("## Overturned first-run claim")
+    v.append("")
+    v.append("The earlier unconstrained serving run (`results/measured_serving/`) is **not** averaged with this confirmation. Confirmation is preferred evidence. The first-run claim that all four 4-bit configurations were slower than matched BF16 under single-stream is **not supported** here: Qwen AWQ/GPTQ exceed Qwen BF16 Condition-A tok/s; Llama AWQ/GPTQ do not.")
+    v.append("")
+
+    output_val_md.write_text("\n".join(v) + "\n", encoding="utf-8")
 
 
 def json_diff(expected: Any, actual: Any, path: str = "") -> List[str]:
@@ -367,7 +476,7 @@ def main():
     args.report_json.write_text(json.dumps(results, indent=2) + "\n", encoding="utf-8")
     print(f"Saved confirmation JSON report: {args.report_json}")
 
-    generate_confirmation_markdown_reports(results, args.report_md, args.validation_md)
+    generate_confirmation_markdown_reports(results, args.report_md, args.validation_md, args.raw_dir)
     print("\nMEASURED SERVING CONFIRMATION ANALYSIS COMPLETED SUCCESSFULLY!")
     return 0
 

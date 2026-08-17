@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-08-17 — Integrate controlled serving confirmation
+
+Branch `paper-serving-confirmation` (HPC commit `76ebc3d` plus MacBook manuscript integration). Independent audit of 52 task-realistic + 8 microbenchmark confirmation JSON files. Primary Cost-of-Pass is now confirmation GPU-sec/query at a $\$1.50$/A100-h scenario with `max_num_seqs=8` pinned and balanced 20/100 MATH-500 subsets. Qwen GPTQ-4 is $-45.9\%$ scenario $C_{\mathrm{pass}}$ vs BF16; Qwen FP8 is $-36.0\%$ with sample SD $97.5$ tok/s on Condition B ($R=5$, identical token counts). Llama AWQ/GPTQ raise $C_{\mathrm{pass}}$. Overturned the first-run claim that all 4-bit cells are slower than BF16 in single-stream (false for Qwen). First unconstrained serving run retained as provenance only. Canonical checks: `revision_reanalysis.py --check`, `modal_agreement_analysis.py --check`, `measured_serving_analysis.py --check`, `measured_serving_confirmation_analysis.py --check`, confirmation validator. Experimental GPU work is closed for the current manuscript.
+
 ## 2026-08-17 — Integrate measured serving results
 
 Branch `paper-measured-serving` (HPC commit `6612999` plus MacBook manuscript integration). Independent audit of 48 task-realistic + 8 microbenchmark JSON files. Primary Cost-of-Pass is now measured GPU-sec/query at a $\$1.50$/A100-h scenario (campaign MATH-500 pass@1). Batched Qwen-7B FP8 is $+18.7\%$ tok/s and $-19.8\%$ $C_{\mathrm{pass}}$ vs BF16. Rejected hardcoded “Pareto Optimal” / “true Pareto optimum”; Qwen-7B FP8 is nondominated on (pass@1, measured $C_{\mathrm{pass}}$) in the eight-point batched set. Protocol caveats documented (Condition B `max_num_seqs` not pinned to 8; Condition A first-20 not 4-per-level; VRAM is the 0.75 pool; mixed-node Llama AWQ-4/GPTQ-4). Canonical checks: `revision_reanalysis.py --check`, `modal_agreement_analysis.py --check`, `measured_serving_analysis.py --check`.

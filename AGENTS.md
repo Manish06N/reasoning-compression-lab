@@ -3,9 +3,9 @@
 **Cluster:** PARAM Rudra HPC (C-DAC / NSM), NVIDIA A100 80GB GPUs  
 **Repository:** `/scratch/manishn_iitp/reasoning-compression-lab`  
 **GitHub:** [https://github.com/Manish06N/reasoning-compression-lab](https://github.com/Manish06N/reasoning-compression-lab)  
-**Last Updated:** 2026-08-17 (measured serving integrated on `paper-measured-serving`)
+**Last Updated:** 2026-08-17 (controlled serving confirmation integrated on `paper-serving-confirmation`)
 
-**Superseding scientific claims (use these, not the 2026-08-15 blocks below):** Paper title is *Pinned Serving Stack*, not Controlled Serving-Stack Shift. Pathology: **25 loops / 0 exact cap hits / 209 near-cap**. FP8–BF16 clustered CIs include 0; do not cite “FP8 parity.” Cost primary evidence is measured GPU-sec $C_{\mathrm{pass}}$ (Qwen FP8 batched $+18.7\%$ tok/s, $-19.8\%$ $C_{\mathrm{pass}}$ vs BF16). Do not cite a unique “true Pareto optimum” or “Pareto-optimal FP8.” Campaign evaluator: LightEval **0.8.0**. Canonical: `paper/main.tex`, `results/reports/revision_reanalysis_report.json`, `modal_agreement_report.json`, `measured_serving/measured_serving_report.json`.
+**Superseding scientific claims (use these, not the 2026-08-15 blocks below):** Paper title is *Pinned Serving Stack*, not Controlled Serving-Stack Shift. Pathology: **25 loops / 0 exact cap hits / 209 near-cap**. FP8–BF16 clustered CIs include 0; do not cite “FP8 parity.” Cost primary evidence is **confirmation** GPU-sec $C_{\mathrm{pass}}$ with `max_num_seqs=8` (Qwen GPTQ-4 batched $-45.9\%$ $C_{\mathrm{pass}}$ vs BF16; Qwen FP8 $-36.0\%$ with large wall-clock SD; Llama AWQ/GPTQ raise $C_{\mathrm{pass}}$). Do not cite a unique “true Pareto optimum,” “all 4-bit slower in single-stream,” or the superseded first-run $+18.7\%$ / $-19.8\%$ numbers. Campaign evaluator: LightEval **0.8.0**. Canonical: `paper/main.tex`, `results/reports/revision_reanalysis_report.json`, `modal_agreement_report.json`, `measured_serving_confirmation/measured_serving_confirmation_report.json`. **Experimental GPU work is closed. No further GPU jobs are required for the current manuscript.**
 
 ---
 
@@ -31,7 +31,7 @@ graph TD
 
 | Output | Type | Title / Focus | Target Venues (Verify Q1) | Hardware / Stack | Status / Target Date |
 |---|---|---|---|---|---|
-| **J1** | Main Journal | *Beyond Pass@1: Reliability and Token-Cost Effects of Quantized Reasoning Models under a Pinned Serving Stack* | *Future Generation Computer Systems (FGCS)*, *Journal of Systems and Software (JSS)*, *Neurocomputing* | HPC 2× A100, `qrm-official` (vLLM 0.7.0 eager) | **88/88 cells + measured serving**; do not merge to `main` until asked |
+| **J1** | Main Journal | *Beyond Pass@1: Reliability and Token-Cost Effects of Quantized Reasoning Models under a Pinned Serving Stack* | *Future Generation Computer Systems (FGCS)*, *Journal of Systems and Software (JSS)*, *Neurocomputing* | HPC 2× A100, `qrm-official` (vLLM 0.7.0 eager) | **88/88 cells + serving confirmation**; do not merge to `main` until asked |
 | **C1** | Conference / Workshop | *Trace-Level Evaluation Metrology for Compressed Reasoning Models* | NeurIPS/ICLR/ACL Workshops (Eval4NLP, Efficient Natural Language, MLPerf) | HPC A100 | Submission Month 6–12 (Post-J1 pilot packaging) |
 | **J2** | Journal 2 | *Reasoning-Aware Speculative Decoding: Acceptance Dynamics and Serving Acceleration* | *JSS*, *Engineering Applications of AI (EAAI)*, *FGCS* | HPC 2× A100 | Year 2 (Methods & draft model training) |
 | **C2** | Conference / Workshop | *High-Throughput Speculative Serving of Compressed Reasoning LLMs* | MLSys / EuroSys / ACL Demo Track | HPC A100 | Year 2 |
@@ -112,7 +112,7 @@ Llama-8B GPTQ-4          88.0%     89.6%     86.8%     89.4%     90.8%    88.92%
 ```
 
 ### Key Empirical Findings
-**Superseded 2026-08-15 bullets (do not cite):** “FP8 parity,” “0 truncations / 0 loops,” “Pareto-optimal FP8.” Current findings are in `README.md` and `paper/main.tex`: clustered pass@1 (Llama AWQ-4 MATH $-2.76$ pp); 25 loops / 0 cap hits / 209 near-cap; Qwen 4-bit MATH token inflation $+6.3$–$6.9\%$; gold-free modal agreement; measured batched Qwen FP8 $+18.7\%$ tok/s / $-19.8\%$ $C_{\mathrm{pass}}$.
+**Superseded 2026-08-15 bullets (do not cite):** “FP8 parity,” “0 truncations / 0 loops,” “Pareto-optimal FP8.” Current findings are in `README.md` and `paper/main.tex`: clustered pass@1 (Llama AWQ-4 MATH $-2.76$ pp); 25 loops / 0 cap hits / 209 near-cap; Qwen 4-bit MATH token inflation $+6.3$–$6.9\%$; gold-free modal agreement; confirmation batched Qwen GPTQ-4 $-45.9\%$ scenario $C_{\mathrm{pass}}$ vs BF16.
 
 ---
 
@@ -141,7 +141,7 @@ gantt
 #### [x] Phase 5: Frozen Statistical Analysis & Calibration (COMPLETED)
 1. **Paired Statistical Testing:** Paired McNemar tests confirm exact statistical parity between BF16 and quantized formats under Holm-Bonferroni correction ($p > 0.05$).
 2. **Sample-Consistency Calibration:** `maj@5` evaluated; ECE $\le 0.034$ (Qwen) / $\le 0.072$ (Llama); Brier score $< 0.022$; AURC $\le 0.0054$.
-3. **Systems & Economics:** Primary Cost-of-Pass uses measured GPU-seconds on a 100-problem MATH-500 subset at a $\$1.50$/A100-h scenario. The old shared-$65$ tok/s proxy is historical. Do not cite a unique Pareto optimum.
+3. **Systems & Economics:** Primary Cost-of-Pass uses confirmation GPU-seconds (balanced MATH-500 subsets, `max_num_seqs=8`) at a $\$1.50$/A100-h scenario. The old shared-$65$ tok/s proxy is historical. The first unconstrained serving run is provenance only. Do not cite a unique Pareto optimum.
 4. **Structured Trace Audit:** 200-sample stratified audit documented in `results/trace_audit_report.json` with 0 degenerations.
 
 #### [x] Phase 4 Extension: Breadth Benchmark Evaluation (COMPLETED)
