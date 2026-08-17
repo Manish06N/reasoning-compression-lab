@@ -9,18 +9,18 @@ Canonical dated record for **Paper 1: Beyond Pass@1** (`reasoning-compression-la
 
 ---
 
-## Current Status Snapshot (2026-08-16: Measured Serving Benchmark on `paper-measured-serving`)
+## Current Status Snapshot (2026-08-17: measured serving integrated)
 
 | Area | Status |
 |------|--------|
-| **Active Branch** | `paper-measured-serving` (branched from `paper-modal-agreement` HEAD `845d879`). |
-| **Gold-Free Modal Agreement** | **100% Completed & Validated.** 20,000/20,000 reproduced; 0 transitivity violations across 4,000 groups; risk-coverage frontier computed via 10,000 bootstrap replicates; committed & pushed. |
-| **Measured Serving Systems Benchmark** | **ACTIVE on HPC 2× A100 GPUs.** Evaluating real throughput (tok/s, req/s), latency distribution (mean, median, P90, P95), peak VRAM, and GPU-sec/query across all 8 configurations under frozen protocol `docs/MEASURED_SERVING_PROTOCOL.md`. |
-| **Scientific Authority** | [`paper/main.tex`](paper/main.tex) / [`paper/main.pdf`](paper/main.pdf). Table 6 to be updated with empirical systems measurements upon benchmark completion. |
+| **Active Branch** | `paper-measured-serving` (HPC `6612999` + MacBook manuscript integration). Do not merge to `main`. |
+| **Gold-Free Modal Agreement** | **Complete.** Compact artifact SHA256 `23e9ead0...`; `modal_agreement_analysis.py --check` passes on MacBook. |
+| **Measured Serving Systems Benchmark** | **Complete (48+8 JSON files).** Primary cost evidence in `paper/main.tex`. Qwen FP8 batched $+18.7\%$ tok/s, $-19.8\%$ $C_{\mathrm{pass}}$ vs BF16. Not a unique “true Pareto optimum.” |
+| **Scientific Authority** | [`paper/main.tex`](paper/main.tex) / [`paper/main.pdf`](paper/main.pdf). Canonical JSON: `revision_reanalysis_report.json`, `modal_agreement_report.json`, `measured_serving_report.json`. |
 | **MATH-500 Confirmatory Grid** | **100% Complete** (40 cells, 20,000 completions, seeds 42–46). Qwen: BF16 94.00%, FP8 94.40%, AWQ4 93.12%, GPTQ4 93.48%; Llama: BF16 89.24%, FP8 89.52%, AWQ4 86.48%, GPTQ4 88.92% |
 | **GSM8K Breadth Grid** | **100% Complete** (24 cells, $n=1,319$, seeds 42–44) |
 | **GPQA-Diamond Breadth Grid** | **100% Complete** (24 cells, $n=198$, seeds 42–44). Qwen: BF16 50.34%, FP8 49.49%, AWQ-4 44.78%, GPTQ-4 47.98%; Llama: BF16 46.13%, FP8 47.81%, AWQ-4 46.97%, GPTQ-4 44.95% |
-| **Backups** | Dual verified backups in local project `archive/` and `/home/manishn_iitp/archive/`; 88 JSON files in `results/`; compact modal artifact in `results/recovered/math500_modal_inputs.jsonl` |
+| **Next GPU experiment** | Small `finish_reason` / termination-metadata validation — **not submitted**. |
 
 ### 2026-08-13 run diagnosis: what worked, what did not, and why
 

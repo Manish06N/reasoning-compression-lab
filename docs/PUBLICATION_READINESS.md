@@ -4,7 +4,7 @@
 
 The 2026-08-14 audit below is **historical**. It correctly blocked publishing the two-job FP8-only package. It does **not** describe the current evidence. The recovery-plan GPU freeze (no b03/b04 / no broad grid) is **lifted** because Phases 0–6 and both breadth grids finished. Do not launch new GPU jobs unless the user asks.
 
-**Current label:** P0-corrected preprint plus gold-free MATH-500 modal agreement on branch `paper-modal-agreement`. Canonical numbers: `results/reports/revision_reanalysis_report.json` and `results/reports/modal_agreement_report.json`. Do not cite 0/0 pathologies, the 98.23% gold-hit gate, Pareto-optimal FP8, or FP8 “parity.” Next HPC work is measured throughput / latency / peak VRAM for the 8 MATH configurations — not another 50k campaign.
+**Current label:** P0-corrected preprint plus gold-free MATH-500 modal agreement plus measured serving on branch `paper-measured-serving`. Canonical numbers: `results/reports/revision_reanalysis_report.json`, `results/reports/modal_agreement_report.json`, `results/reports/measured_serving/measured_serving_report.json`. Do not cite 0/0 pathologies, the 98.23% gold-hit gate, “true Pareto optimum,” or FP8 “parity.” Next candidate HPC work is a small `finish_reason` validation — not submitted.
 
 ---
 

@@ -11,7 +11,7 @@ Unzip `arxiv_source.zip` and upload:
 - `main.tex`
 - `references.bib`
 
-Compile with `pdflatex` → `bibtex` → `pdflatex` → `pdflatex`. Figures are drawn by `pgfplots`; no separate PDFs are required.
+Compile with `xelatex` → `bibtex` → `xelatex` → `xelatex` (fallback: `pdflatex` if xelatex is unavailable). Figures are drawn by `pgfplots`; no separate PDFs are required.
 
 ## Result records (in the git repo)
 
@@ -24,6 +24,8 @@ Compile with `pdflatex` → `bibtex` → `pdflatex` → `pdflatex`. Figures are 
 | `results/reports/revision_reanalysis_report.json` | **Canonical** corrected pass@1 / pathology / token tables |
 | `results/reports/modal_agreement_report.json` | Gold-free MATH-500 modal agreement |
 | `results/recovered/math500_modal_inputs.jsonl` | Compact extracted answers (20,000 rows; no CoT / problem text) |
+| `results/reports/measured_serving/measured_serving_report.json` | Measured tok/s, latency, VRAM, GPU-sec/query, scenario $C_{\mathrm{pass}}$ |
+| `results/measured_serving/raw/` | 48 task-realistic + 8 microbenchmark JSON files |
 | `results/reports/runtime_manifest.json` | Effective 56k launch settings (not `configs/models/` defaults) |
 | `results/reports/phase5_statistical_analysis_report.json` | Deprecation stub |
 | `results/reports/multitask_benchmark_summary.json` | Deprecation stub |
@@ -37,7 +39,7 @@ Compile with `pdflatex` → `bibtex` → `pdflatex` → `pdflatex`. Figures are 
 - Compact per-cell JSON has **no** traces, token IDs, or `finish_reason`. Recovered MATH-500 answers are in `results/recovered/math500_modal_inputs.jsonl`. Do not report the old gold-hit 98.23% gate.
 - Modal agreement uses unique-mode clustering with gold scoring only after the serve/abstain decision. Five-sample token-cost proxy $T_5$ sums all five seeds before abstention.
 - Campaign/extraction evaluator: **LightEval 0.8.0**. A throwaway MacBook LightEval 0.8.1 install was not used for paper numbers.
-- **Cost-of-Pass** assumes $\$1.50$ per A100-hour and $65$ tok/s, shared across formats. It is a token ranking, not measured wall-clock.
+- **Cost-of-Pass (primary):** measured GPU-sec/query on `results/measured_serving/` at $\$1.50$/A100-h (scenario) and campaign MATH-500 pass@1. Report: `results/reports/measured_serving/measured_serving_report.json`. The old shared $65$ tok/s token ranking is a sensitivity only.
 - **Token inflation:** full-grid ratio of means over all seeds. The old 200-item mean-of-ratios subset is an estimator artifact and is not used in the paper.
 
 ## Reproduce the corrected tables
@@ -47,9 +49,10 @@ From a clean checkout (stdlib only; no `/scratch` or `outputs-hpc-*`):
 ```bash
 python3 scripts/analysis/revision_reanalysis.py --check
 python3 scripts/analysis/modal_agreement_analysis.py --check
+python3 scripts/analysis/measured_serving_analysis.py --check
 ```
 
-`revision_reanalysis.py --check` must match `results/reports/revision_reanalysis_report.json`. On MacBook, `modal_agreement_analysis.py --check` validates the compact artifact SHA and report internals (LightEval 0.8.0 re-extraction is HPC-only).
+`revision_reanalysis.py --check` must match `results/reports/revision_reanalysis_report.json`. On MacBook, `modal_agreement_analysis.py --check` validates the compact artifact SHA and report internals (LightEval 0.8.0 re-extraction is HPC-only). `measured_serving_analysis.py --check` recomputes aggregates from `results/measured_serving/raw/`.
 
 ## Stack
 

@@ -101,3 +101,17 @@ Each configuration is evaluated under two distinct serving regimes:
    $$\text{Cost / query} = (\text{GPU-sec / query}) \times \left(\frac{\$1.50}{3600}\right)$$
    $$C_{\text{pass}}^{\text{meas}} = \frac{\text{Cost / query}}{\text{Pass@1}}$$
    where $\text{Pass@1}$ is the frozen canonical accuracy from the 40-cell MATH-500 campaign.
+
+---
+
+## 7. Implementation notes after execution (do not rewrite the frozen design above)
+
+These are observed differences between the frozen protocol and `scripts/hpc/qrm_parity/benchmark_serving.py` as run:
+
+- Condition B submits all 100 prompts in one `llm.generate` call. The JSON field `concurrency` is labeled `8`, but `LLM(..., max_num_seqs=8)` was **not** set (vLLM 0.7.0 default continuous batching).
+- Condition A uses `prompts_all[:20]`. The frozen 100-item list is 20 problems per MATH level; the first 20 are **not** 4-per-level (observed counts 5/7/3/3/2).
+- `results/measured_serving/input_subset.json` `problem`/`solution` sidecar fields are misaligned with `full_prompt`. Serving used `full_prompt`.
+- Sampling seed `20260816` is shared across the three repeats, so output token counts are identical; $R=3$ measures wall-clock noise.
+- Peak VRAM is `torch.cuda.max_memory_allocated()` after `gpu_memory_utilization=0.75` preallocation, not isolated weight footprint.
+- Llama AWQ-4 and Llama GPTQ-4 raw files include more than one hostname (cache reuse / re-execution).
+- Do not cite a unique “true Pareto optimum.” Compute dominance on stated objectives.

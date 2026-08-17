@@ -37,7 +37,7 @@
 \begin{abstract}
 Post-training quantization is a common serving default for reasoning language models, but pass@1 on a single seed can hide changes in trace length, termination behavior, and sample-level reliability. We pin one serving stack---vLLM~0.7.0~\cite{kwon2023vllm} eager execution on an NVIDIA A100-80GB, with FP8 checkpoints executed as Marlin W8A16~\cite{frantar2024marlin} rather than native W8A8---and vary only the weight checkpoint among BF16, FP8, AWQ-4, and GPTQ-4 for DeepSeek-R1-Distill-Qwen-7B and DeepSeek-R1-Distill-Llama-8B. The grid has 88 cells and 56{,}408 completions on MATH-500~\cite{hendrycks2021math,lightman2023lets} (5 seeds), GSM8K~\cite{cobbe2021gsm8k} (3 seeds), and GPQA-Diamond~\cite{rein2023gpqa} (3 seeds).
 
-On MATH-500, FP8--BF16 pass@1 differences are $+0.40$ and $+0.28$ percentage points (pp). Problem-clustered bootstrap 95\% intervals include zero; a $\pm 1$\,pp TOST equivalence test is \emph{not} passed. Four-bit effects are architecture- and task-dependent: Llama AWQ-4 loses $2.76$\,pp on MATH-500 ($95\%$ CI $[-4.16,-1.44]$, $p<0.001$) and $1.57$\,pp on GSM8K; Qwen AWQ-4 loses $5.56$\,pp on GPQA-Diamond ($95\%$ CI $[-9.60,-1.52]$, $p=0.007$). Majority-vote McNemar tests on maj@5 remain non-significant and do not answer the pass@1 question. Mean MATH-500 length rises $6.3$--$6.8\%$ for Qwen 4-bit (paired token CIs exclude zero); the increase is concentrated on items where BF16 is correct and the quantized run is not. Identical-word loops are rare but nonzero ($25/56{,}408$); none of the rows hit the $32{,}768$ token cap after re-encoding, yet $209$ completions sit at $\ge 32{,}500$ tokens, and Qwen 4-bit near-cap counts on MATH-500 are about $1.7\times$ BF16. Using recovered answer strings, gold-free modal agreement is an observable abstention signal: 5/5 consensus has very low selective error on MATH-500 but costs five generations per query, and Llama AWQ-4 reduces 5/5 coverage by $6.0$\,pp versus BF16 ($95\%$ paired CI $[-9.4,-2.6]$). Cost-of-Pass is a token ranking at a shared $65$ tok/s assumption, not measured wall-clock.
+On MATH-500, FP8--BF16 pass@1 differences are $+0.40$ and $+0.28$ percentage points (pp). Problem-clustered bootstrap 95\% intervals include zero; a $\pm 1$\,pp TOST equivalence test is \emph{not} passed. Four-bit effects are architecture- and task-dependent: Llama AWQ-4 loses $2.76$\,pp on MATH-500 ($95\%$ CI $[-4.16,-1.44]$, $p<0.001$) and $1.57$\,pp on GSM8K; Qwen AWQ-4 loses $5.56$\,pp on GPQA-Diamond ($95\%$ CI $[-9.60,-1.52]$, $p=0.007$). Majority-vote McNemar tests on maj@5 remain non-significant and do not answer the pass@1 question. Mean MATH-500 length rises $6.3$--$6.8\%$ for Qwen 4-bit (paired token CIs exclude zero); the increase is concentrated on items where BF16 is correct and the quantized run is not. Identical-word loops are rare but nonzero ($25/56{,}408$); none of the rows hit the $32{,}768$ token cap after re-encoding, yet $209$ completions sit at $\ge 32{,}500$ tokens, and Qwen 4-bit near-cap counts on MATH-500 are about $1.7\times$ BF16. Using recovered answer strings, gold-free modal agreement is an observable abstention signal: 5/5 consensus has very low selective error on MATH-500 but costs five generations per query, and Llama AWQ-4 reduces 5/5 coverage by $6.0$\,pp versus BF16 ($95\%$ paired CI $[-9.4,-2.6]$). On a frozen 100-problem MATH-500 serving subset, batched Qwen-7B FP8 decode is $+18.7\%$ faster than matched BF16 ($824$ vs.\ $694$ tok/s) and $-19.8\%$ lower in measured Cost-of-Pass at a $\$1.50$/A100-hour scenario. Four-bit throughput is concurrency-dependent: every 4-bit cell is slower than BF16 in single-stream decode, while batched Llama GPTQ-4 reaches $786$ tok/s. Peak allocated VRAM stays $\sim 55$--$57$\,GB across formats under \texttt{gpu\_memory\_utilization=0.75} and does not measure weight-footprint savings.
 \end{abstract}
 
 \vspace{0.6em}
@@ -51,7 +51,7 @@ We ask four questions under that pin:
     \item \textbf{RQ1.} Does quantization change \emph{pass@1} relative to matched BF16, with problem-clustered uncertainty?
     \item \textbf{RQ2.} Do identical-word loops and near-budget terminations occur, and do they differ by format?
     \item \textbf{RQ3.} What can be said about multi-sample reliability without gold labels at serve time?
-    \item \textbf{RQ4.} How does output length change a \emph{token-implied} Cost-of-Pass when throughput is held fixed?
+    \item \textbf{RQ4.} How do measured decode throughput and GPU-seconds per query change Cost-of-Pass relative to a shared-throughput token proxy?
 \end{itemize}
 
 \noindent\textbf{Contributions.}
@@ -59,11 +59,12 @@ We ask four questions under that pin:
 (2)~Problem-clustered pass@1 inference showing FP8--BF16 intervals that include zero, a statistically detectable Llama AWQ-4 drop on MATH-500/GSM8K, and a Qwen AWQ-4 drop on GPQA-Diamond---effects that maj@5 McNemar tests miss.
 (3)~Evidence that 4-bit token inflation is real for Qwen on the full MATH-500 grid, is \emph{not} an artifact of a 200-item even-index subset, and is concentrated on format-induced failures rather than uniformly longer correct traces.
 (4)~Gold-free modal-answer agreement on MATH-500: higher observable agreement is associated with lower selective error, while 4-bit AWQ reduces strict-consensus coverage in some configurations even when selective error among retained predictions stays low.
+(5)~Measured serving on the same pinned stack (48 task-realistic runs $+$ 8 fixed-token microbenchmarks): Cost-of-Pass uses campaign MATH-500 pass@1 and measured GPU-seconds rather than a shared $65$ tok/s assumption.
 
 \section{Related Work}
 GPTQ~\cite{frantar2022gptq} and AWQ~\cite{lin2023awq} were originally validated mainly on short-form benchmarks; SmoothQuant~\cite{xiao2023smoothquant} addresses activation quantization, which we do not run. Liu et al.~\cite{liu2025qrm} evaluate DeepSeek-R1 distillations across weight, activation, and KV quantization and report near-lossless W8/W4A16 in many settings, with \emph{no} systematic output lengthening. Lian et al.~\cite{lian2026quantinflates} report the opposite: low-bit PTQ can inflate chain-of-thought length. Li et al.~\cite{li2025quantmeets} localize 4-bit math failures to early process errors. Alimaskina et al.~\cite{alimaskina2026extremelowbit} study loops and delayed commitment under extreme low-bit inference. Our delta is a single pinned vLLM~0.7.0 eager path~\cite{kwon2023vllm} with five MATH-500 seeds and paired item-level tests, not a new compressor.
 
-Hochlehnert et al.~\cite{sanyal2025sober} show that seeds, prompts, decoding, and software move reasoning scores; we freeze those factors. Zhong et al.~\cite{zhong2025quantized} study uncertainty calibration of quantized LLMs using model probabilities---a quantity we do not log. Self-consistency~\cite{wang2022selfconsistency} and later unsupervised estimators~\cite{zollo2026unsupervised} treat sample agreement as confidence; selective classification~\cite{geifman2017selective} supplies the risk--coverage language. Erol et al.~\cite{erol2025costofpass} define Cost-of-Pass as expected monetary cost per correct solution; we apply it only as a fixed-throughput token proxy.
+Hochlehnert et al.~\cite{sanyal2025sober} show that seeds, prompts, decoding, and software move reasoning scores; we freeze those factors. Zhong et al.~\cite{zhong2025quantized} study uncertainty calibration of quantized LLMs using model probabilities---a quantity we do not log. Self-consistency~\cite{wang2022selfconsistency} and later unsupervised estimators~\cite{zollo2026unsupervised} treat sample agreement as confidence; selective classification~\cite{geifman2017selective} supplies the risk--coverage language. Erol et al.~\cite{erol2025costofpass} define Cost-of-Pass as expected monetary cost per correct solution; we report it twice: a historical shared-$65$ tok/s token proxy, and a measured GPU-second version on a frozen MATH-500 serving subset.
 
 \section{Experimental Methodology}
 \subsection{Models and precision formats}
@@ -74,6 +75,16 @@ MATH-500~\cite{hendrycks2021math,lightman2023lets} ($n=500$, seeds $42$--$46$): 
 
 \subsection{Hardware and serving stack}
 PARAM Rudra HPC (IIT Patna / NSM), NVIDIA A100-PCIE-80GB. Publication runs use the official QRM \texttt{inference.py} path~\cite{liu2025qrm} with \texttt{gpu\_memory\_utilization=0.75}. Engine pin: \texttt{vLLM==0.7.0}, eager execution. Source files under \texttt{configs/models/} are \emph{not} the campaign launcher; they differ in \texttt{max\_model\_len} and KV-cache defaults and should not be read as the effective stack.
+
+\subsection{Measured serving}
+\label{sec:measured-serving}
+After the 56k accuracy campaign we timed the same eight checkpoints on A100-80GB under vLLM~0.7.0 eager (protocol: \texttt{docs/MEASURED\_SERVING\_PROTOCOL.md}). Workload: a frozen 100-problem MATH-500 list (20 problems per difficulty label). Prompts are stored as \texttt{full\_prompt} in \texttt{results/measured\_serving/input\_subset.json}; the sidecar \texttt{problem}/\texttt{solution} metadata in that JSON is misaligned with the prompts and is not used. Condition~A: sequential single-request decode of the first 20 prompts of that list (level counts $5/7/3/3/2$, not a re-stratified 4-per-level draw), $R=3$. Condition~B: one \texttt{llm.generate} call over all 100 prompts (continuous batching; labeled $C=8$ in the protocol, but \texttt{max\_num\_seqs} was not pinned to 8). Secondary microbenchmark: 10 prompts forced to exactly 512 tokens (\texttt{ignore\_eos}). Three warmup queries are discarded. Sampling matches the campaign ($T=0.6$, top-$p=0.95$) with seed $20260816$. Repetitions share that seed, so output token counts are identical across reps; the $R=3$ spread is wall-clock noise, not generation variability. Jobs ran on \texttt{ragpu003}/\texttt{ragpu004}/\texttt{ragpu008} (PyTorch 2.5.1+cu124). Llama AWQ-4 and Llama GPTQ-4 have records from more than one hostname.
+
+Output tok/s $=(\sum \text{output tokens})/\Delta t_{\mathrm{steady}}$. GPU-sec/query $=\Delta t_{\mathrm{steady}}/N$ on one GPU. Peak VRAM is \texttt{torch.cuda.max\_memory\_allocated} after the $0.75$ utilization preallocation ($\sim 60$\,GB reserved of 80\,GB). Measured
+\begin{equation}
+C_{\mathrm{pass}}^{\mathrm{meas}} = \frac{(\text{GPU-sec/query})\times (\$1.50/3600)}{\mathrm{pass@1}},
+\end{equation}
+using the frozen 40-cell MATH-500 means---not accuracy on the 100-item subset. The $\$1.50$/A100-hour rate is a cloud pricing \emph{scenario}, not a billed cluster price.
 
 \subsection{Metrics}
 \label{sec:metrics}
@@ -89,12 +100,12 @@ A row is a \emph{loop} if the longest consecutive identical-word run is $\ge 20$
 \paragraph{Length.}
 Primary estimator: ratio of means over all seeds, plus the mean paired per-item token delta with a clustered bootstrap CI. We also report the mean of per-item ratios, which is a different estimand and is dominated by short BF16 traces. Length is stratified by the $2\times 2$ of BF16/quantized extractive correctness.
 
-\paragraph{Token-implied Cost-of-Pass.}
+\paragraph{Historical token-implied $C_{\mathrm{pass}}$.}
 Following Erol et al.~\cite{erol2025costofpass}, $C_{\mathrm{pass}} = (\text{cost per query}) / \text{pass@1}$ with
 \begin{equation}
 \text{Cost per query} = (\bar{T}/\tau)\times (R/3600),
 \end{equation}
-$\tau = 65$ tok/s (unmeasured) and $R=\$1.50$ per A100-hour. Because $\tau$ and $R$ are shared, ranking by $C_{\mathrm{pass}}$ is ranking by $\bar{T}/\mathrm{pass@1}$. Measured 4-bit kernel speedups can reverse it.
+$\tau = 65$ tok/s (unmeasured) and $R=\$1.50$ per A100-hour. Because $\tau$ and $R$ are shared, ranking by $C_{\mathrm{pass}}$ is ranking by $\bar{T}/\mathrm{pass@1}$. We retain this proxy only as a sensitivity to the pre-measurement draft; primary systems/cost evidence is the measured GPU-second version in Section~\ref{sec:measured-serving} and Table~\ref{tab:serving-batched}.
 
 \paragraph{Observable modal agreement.}
 \label{sec:modal-def}
@@ -185,7 +196,7 @@ Llama GPTQ-4 & $+3.9\%$ & $+184\ [+12,+359]$ & $+66$ & $+5915$ \\
 
 \begin{table}[t]
 \centering
-\caption{Token-implied Cost-of-Pass on MATH-500 at $\$1.50$/A100-hour and a shared $65$ tok/s. Not measured wall-clock. Ranking equals ranking by mean tokens $/$ pass@1.}
+\caption{Historical token-implied Cost-of-Pass on MATH-500 at $\$1.50$/A100-hour and a shared $65$ tok/s. Not measured wall-clock. Ranking equals ranking by mean tokens $/$ pass@1. Primary cost evidence is Table~\ref{tab:serving-batched}.}
 \label{tab:economics}
 \small
 \begin{tabular}{lccc}
@@ -205,7 +216,7 @@ Llama GPTQ-4 & 4{,}840.5 & \$0.03103 & \$0.03490 \\
 \end{tabular}
 \end{table}
 
-Under the shared-$\tau$ model (Table~\ref{tab:economics}, Figure~\ref{fig:pareto}), FP8 has the lowest token-implied $C_{\mathrm{pass}}$ by $\$0.00015$ on Qwen. That margin is smaller than seed noise in length. We do not call it Pareto-optimal.
+Under the shared-$\tau$ model (Table~\ref{tab:economics}), FP8 has the lowest token-implied $C_{\mathrm{pass}}$ by $\$0.00015$ on Qwen. That margin is smaller than seed noise in length. We do not call it Pareto-optimal. Measured batched decode on this stack is an order of magnitude faster than $65$ tok/s, so the proxy overstates dollars; relative 4-bit rankings can also flip (Section~\ref{sec:serving-results}).
 
 \begin{table*}[t]
 \centering
@@ -323,26 +334,26 @@ Llama-8B & GPTQ-4 & 93.8 & 2.77 & 86.4 & 0.46 & 75.4 & 0.27 & 24{,}203 \\
 \begin{tikzpicture}
 \begin{axis}[
     width=0.85\linewidth, height=6.2cm,
-    xlabel={Token-implied $C_{\mathrm{pass}}$ (cents / correct) at 65 tok/s},
+    xlabel={Measured $C_{\mathrm{pass}}$ (\$ $\times 10^{-3}$ / correct)},
     ylabel={MATH-500 mean pass@1 (\%)},
-    xmin=2.65, xmax=3.65,
+    xmin=1.8, xmax=5.2,
     ymin=85, ymax=96,
     grid=major,
-    title={Modeled token-cost ranking, not measured latency},
+    title={Measured batched GPU-seconds, \$1.50/A100-h scenario},
 ]
-\addplot[only marks, mark=*, blue, mark size=3pt] coordinates {(2.736,94.00)};
-\addplot[only marks, mark=square*, green!60!black, mark size=3pt] coordinates {(2.721,94.40)};
-\addplot[only marks, mark=triangle*, red, mark size=3.5pt] coordinates {(2.936,93.12)};
-\addplot[only marks, mark=diamond*, orange, mark size=3.5pt] coordinates {(2.940,93.48)};
-\addplot[dashed, gray] coordinates {(2.736,94.00) (2.721,94.40) (2.936,93.12) (2.940,93.48)};
-\addplot[only marks, mark=*, blue, mark size=3pt] coordinates {(3.345,89.24)};
-\addplot[only marks, mark=square*, green!60!black, mark size=3pt] coordinates {(3.259,89.52)};
-\addplot[only marks, mark=triangle*, red, mark size=3.5pt] coordinates {(3.511,86.48)};
-\addplot[only marks, mark=diamond*, orange, mark size=3.5pt] coordinates {(3.490,88.92)};
-\addplot[dotted, gray] coordinates {(3.345,89.24) (3.259,89.52) (3.511,86.48) (3.490,88.92)};
+\addplot[only marks, mark=*, blue, mark size=3pt] coordinates {(2.491,94.00)};
+\addplot[only marks, mark=square*, green!60!black, mark size=3pt] coordinates {(1.997,94.40)};
+\addplot[only marks, mark=triangle*, red, mark size=3.5pt] coordinates {(2.635,93.12)};
+\addplot[only marks, mark=diamond*, orange, mark size=3.5pt] coordinates {(2.988,93.48)};
+\addplot[dashed, gray] coordinates {(2.491,94.00) (1.997,94.40) (2.635,93.12) (2.988,93.48)};
+\addplot[only marks, mark=*, blue, mark size=3pt] coordinates {(3.204,89.24)};
+\addplot[only marks, mark=square*, green!60!black, mark size=3pt] coordinates {(2.967,89.52)};
+\addplot[only marks, mark=triangle*, red, mark size=3.5pt] coordinates {(4.888,86.48)};
+\addplot[only marks, mark=diamond*, orange, mark size=3.5pt] coordinates {(3.083,88.92)};
+\addplot[dotted, gray] coordinates {(3.204,89.24) (2.967,89.52) (4.888,86.48) (3.083,88.92)};
 \end{axis}
 \end{tikzpicture}
-\caption{Token-implied $C_{\mathrm{pass}}$ versus pass@1 (cents). Solid/dashed lines are Qwen/Llama. Throughput is assumed equal, so the plot is a re-parameterization of Table~\ref{tab:headline_results}.}
+\caption{Measured batched $C_{\mathrm{pass}}$ versus campaign MATH-500 pass@1 (\$ $\times 10^{-3}$). Solid/dashed lines are Qwen/Llama visual guides, not a fitted frontier. Nondominated on (pass@1, $C_{\mathrm{pass}}$): Qwen-7B FP8 (pooled); Llama-8B FP8 (within Llama). Not a unique ``true Pareto optimum.''}
 \label{fig:pareto}
 \end{figure}
 
@@ -420,6 +431,40 @@ Llama-8B & GPTQ-4 & 93.8 & 2.77 & 86.4 & 0.46 & 75.4 & 0.27 & 24{,}203 \\
 \label{fig:seed}
 \end{figure}
 
+\subsection{Measured serving throughput and Cost-of-Pass}
+\label{sec:serving-results}
+Table~\ref{tab:serving-batched} reports the batched condition (100 prompts, continuous batching). Qwen-7B FP8 is $+18.7\%$ output tok/s versus BF16 ($824.27\pm 4.00$ vs.\ $694.27\pm 0.65$) and $-19.8\%$ measured $C_{\mathrm{pass}}$ ($\$0.0020$ vs.\ $\$0.0025$) at $\$1.50$/A100-hour. Llama-8B FP8 is $+16.9\%$ tok/s and $-7.4\%$ $C_{\mathrm{pass}}$. These FP8 numbers are A100 Marlin W8A16, not Hopper W8A8.
+
+Four-bit speed is not one number. Batched Llama GPTQ-4 reaches $785.55\pm 12.33$ tok/s ($+20.9\%$ vs.\ Llama BF16). Qwen GPTQ-4 is slower than Qwen BF16 ($-13.2\%$). Llama AWQ-4 batched mean $545.68\pm 125.62$ tok/s includes a same-token, slower third repeat on a different node ($368$ tok/s vs.\ $\sim 634$ tok/s on the other two); we report the protocol $R=3$ mean and do not drop the outlier. Single-stream 4-bit is uniformly slower than matched BF16 (Appendix Table~\ref{tab:serving-single}): Qwen AWQ-4 $-8.9\%$, Qwen GPTQ-4 $-14.5\%$, Llama AWQ-4 $-5.4\%$, Llama GPTQ-4 $-2.5\%$ tok/s. That is Marlin dequant overhead at concurrency 1, not a memory-capacity result.
+
+Token inflation does not automatically cancel a kernel speedup. On the batched subset, Qwen AWQ-4 is $+3.8\%$ mean output tokens vs.\ BF16 and $-1.0\%$ tok/s, so GPU-sec/query still rises $+4.8\%$. Qwen GPTQ-4 is $+3.6\%$ tokens and $-13.2\%$ tok/s. Llama GPTQ-4 is $+15.9\%$ tokens but $+20.9\%$ tok/s (time ratio $0.96$). Cost is tokens $\times$ cost-per-token; neither factor alone is the ranking.
+
+Peak allocated VRAM is $55.2$--$56.7$\,GB for every batched cell. That is the $0.75$ utilization pool, not a measurement of 4-bit weight-footprint savings. Memory and latency are separate.
+
+On (pass@1, measured $C_{\mathrm{pass}}$) over the eight batched points, the nondominated set is $\{$Qwen-7B FP8$\}$. Within Llama the nondominated point is Llama FP8. Qwen GPTQ-4 is dominated. We do not call any cell a ``true Pareto optimum'': the frontier is two-objective, scenario-priced, and stack-specific (Figure~\ref{fig:pareto}). The old $65$ tok/s proxy (Table~\ref{tab:economics}) remains a sensitivity, not the primary cost evidence.
+
+\begin{table*}[t]
+\centering
+\caption{Measured batched serving (Condition~B: 100-prompt \texttt{llm.generate}, $R=3$ wall-clock repeats). Output tok/s is mean$\pm$ population std. GPU-sec/query $=\Delta t/N$ on one A100. $C_{\mathrm{pass}}$ uses campaign MATH-500 pass@1 and $\$1.50$/A100-hour. Peak VRAM is allocated bytes after \texttt{gpu\_memory\_utilization=0.75}. Llama AWQ-4 std is inflated by a mixed-node repeat (see text).}
+\label{tab:serving-batched}
+\small
+\begin{tabular}{llccccc}
+\toprule
+\textbf{Model} & \textbf{Fmt} & \textbf{tok/s} & \textbf{req/s} & \textbf{GPU-s/q} & \textbf{VRAM (GB)} & \textbf{$C_{\mathrm{pass}}$} \\
+\midrule
+Qwen-7B & BF16   & $694.27\pm 0.65$ & 0.178 & 5.62 & 56.00 & \$0.0025 \\
+Qwen-7B & FP8    & $824.27\pm 4.00$ & 0.221 & 4.52 & 56.02 & \$0.0020 \\
+Qwen-7B & AWQ-4  & $687.51\pm 0.59$ & 0.170 & 5.89 & 56.00 & \$0.0026 \\
+Qwen-7B & GPTQ-4 & $602.65\pm 1.40$ & 0.149 & 6.70 & 55.17 & \$0.0030 \\
+\midrule
+Llama-8B & BF16   & $649.72\pm 0.51$ & 0.146 & 6.86 & 56.71 & \$0.0032 \\
+Llama-8B & FP8    & $759.48\pm 6.96$ & 0.157 & 6.37 & 56.72 & \$0.0030 \\
+Llama-8B & AWQ-4  & $545.68\pm 125.62$ & 0.105 & 10.15 & 56.72 & \$0.0049 \\
+Llama-8B & GPTQ-4 & $785.55\pm 12.33$ & 0.152 & 6.58 & 56.74 & \$0.0031 \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
 \FloatBarrier
 
 \section{Discussion}
@@ -429,12 +474,14 @@ Pass@1 and stochastic output stability are related but distinct. Llama AWQ-4's d
 
 We previously wrote that pinning vLLM~0.7.0 ``removed'' truncations and loops seen on vLLM~0.8.5. Those earlier runs also differed in harness, decoding flags (including a bug that dropped \texttt{repetition\_penalty}), and prompt profile. The final grid still contains 25 loops. We therefore do not attribute pathology rates causally to the engine version. A clean stack $\times$ format factorial remains future work, not a result in this paper.
 
-FP8 is a reasonable \emph{accuracy} default on this A100 W8A16 path for these two distillations. It is not a measured speed default.
+FP8 is a reasonable \emph{accuracy} default on this A100 W8A16 path for these two distillations. On the measured batched subset it is also the lowest $C_{\mathrm{pass}}$ point in the eight-cell (pass@1, cost) set, at $+18.7\%$ Qwen tok/s versus BF16. It is still not Hopper native W8A8, and single-stream FP8 does not show the same cost cut (Qwen FP8 $C_{\mathrm{pass}}$ $+1.0\%$ vs.\ BF16 at $C=1$).
+
+Cost is tokens and cost-per-token. Qwen 4-bit lengthening on the 56k MATH-500 grid is real; on the serving subset it does not, by itself, decide dollars. Batched 4-bit kernels can raise tok/s (Llama GPTQ-4 $+20.9\%$) or not (Qwen GPTQ-4 $-13.2\%$). Single-stream 4-bit is slower than BF16 on every cell we timed: dequant overhead dominates when the GPU is not batch-saturated. Peak allocated VRAM does not separate formats under a $0.75$ utilization cap; do not read Table~\ref{tab:serving-batched} as a memory-compression result.
 
 \section{Limitations}
 \begin{enumerate}
     \item \textbf{A100 W8A16 fallback.} FP8 numbers do not transfer to Hopper native W8A8.
-    \item \textbf{Unmeasured serving cost.} $C_{\mathrm{pass}}$ and $T_5$ are token-cost proxies, not measured wall-clock, latency, peak VRAM, energy, or dollars. Weight-only 4-bit kernels typically raise decode throughput; a monetary ranking can flip.
+    \item \textbf{Measured serving scope.} Throughput, latency, GPU-sec/query, and scenario $C_{\mathrm{pass}}$ are measured on a 100-problem MATH-500 subset (20 sequential prompts for Condition~A), not the full 56k campaign. Pass@1 in $C_{\mathrm{pass}}$ is the 40-cell campaign mean. The $\$1.50$/A100-hour rate is a pricing scenario. Condition~B is a 100-prompt \texttt{llm.generate} (continuous batching; \texttt{max\_num\_seqs} not pinned to 8). Condition~A first-20 level counts are $5/7/3/3/2$. Repetitions share sampling seed $20260816$. Llama AWQ-4/GPTQ-4 records mix hostnames. Peak allocated VRAM is the $0.75$ engine pool, not isolated weight footprint. Energy is not measured.
     \item \textbf{Pathology metrology.} The loop detector is identical-word runs $\ge 20$. Phrase-level cycles and \texttt{finish\_reason} were not saved in the original campaign. Near-cap is a proxy.
     \item \textbf{Modal agreement.} Five generations are required per attempted MATH problem. Only MATH-500 has five seeds in this campaign. Mathematical answer equivalence is evaluator- and task-specific (campaign LightEval~0.8.0 / math-verify). High agreement can still be wrong. The signal is not general uncertainty calibration, not softmax calibration, and not a safety property.
     \item \textbf{Checkpoint provenance.} AWQ-4 is a community quantization of unknown calibration set and quantizer revision. GPTQ-4/FP8 are RedHatAI artifacts (appendix).
@@ -443,7 +490,7 @@ FP8 is a reasonable \emph{accuracy} default on this A100 W8A16 path for these tw
 \end{enumerate}
 
 \section{Conclusion}
-On a pinned vLLM~0.7.0 eager stack, FP8-checkpoint (W8A16) pass@1 stays close to BF16 for two R1 distillations, while 4-bit effects are model- and task-dependent and are visible to clustered pass@1 tests that maj@5 McNemar misses. Loops are rare but nonzero; near-cap terminations are more common for Qwen 4-bit on MATH-500. Mean token inflation, where it exists, is concentrated on failures. Observable 5-sample agreement on MATH-500 yields low selective error at strict consensus, at the cost of five generations, and Llama AWQ-4 reduces 5/5 coverage relative to BF16. Token-implied Cost-of-Pass at a shared throughput is a length ranking, not a measured frontier. The contribution is a stack-pinned measurement of those effects, not a new compressor and not a serving-stack shift.
+On a pinned vLLM~0.7.0 eager stack, FP8-checkpoint (W8A16) pass@1 stays close to BF16 for two R1 distillations, while 4-bit effects are model- and task-dependent and are visible to clustered pass@1 tests that maj@5 McNemar misses. Loops are rare but nonzero; near-cap terminations are more common for Qwen 4-bit on MATH-500. Mean token inflation, where it exists, is concentrated on failures. Observable 5-sample agreement on MATH-500 yields low selective error at strict consensus, at the cost of five generations, and Llama AWQ-4 reduces 5/5 coverage relative to BF16. Measured batched serving makes Qwen FP8 both faster ($+18.7\%$ tok/s) and cheaper ($-19.8\%$ $C_{\mathrm{pass}}$) than Qwen BF16 under a $\$1.50$/A100-hour scenario; 4-bit speed depends on concurrency and kernel, and allocated VRAM does not separate formats. The contribution is a stack-pinned measurement of those effects, not a new compressor and not a serving-stack shift.
 
 \section*{Artifacts}
 Code, patches, validation JSON, and analysis reports:
@@ -451,7 +498,6 @@ Code, patches, validation JSON, and analysis reports:
 Per-cell records: \texttt{results/math500/}, \texttt{results/gsm8k/}, \texttt{results/gpqa/}.
 Canonical pass@1 tables: \texttt{revision\_reanalysis\_report.json}.
 Modal agreement: \texttt{modal\_agreement\_report.json}.
-Compact recovered answers: \texttt{math500\_modal\_inputs.jsonl}.
 JSON rows contain \texttt{extractive\_match}, \texttt{completion\_tokens}, \texttt{repetition\_flag}; they do \emph{not} contain traces, token IDs, or \texttt{finish\_reason}. See \texttt{paper/ARTIFACT.md}. GPQA is a gated benchmark; public records must not republish item text.
 
 \section*{Acknowledgment}
@@ -496,6 +542,8 @@ Llama GPTQ-4 & \texttt{RedHatAI/DeepSeek-R1-Distill-Llama-8B-quantized.w4a16}\\
 
 AWQ-4 checkpoints are third-party community uploads; calibration corpus and quantization code revision are unknown. GPTQ-4 and FP8 are RedHatAI compressed-tensors artifacts. Dataset revision SHAs for MATH-500 / GSM8K / GPQA-Diamond were not pinned in the campaign launcher beyond the QRM task names.
 
+Serving protocol and raw JSON live under \texttt{docs/MEASURED\_SERVING\_PROTOCOL.md} and \texttt{results/measured\_serving/raw/}. Aggregates: \texttt{measured\_serving\_report.json}.
+
 \section{Reanalysis}
 Pathology, clustered bootstrap, and token strata are produced by the canonical reanalysis script from the released per-cell JSON. Loop threshold $=20$. Near-cap threshold $=32{,}500$. Bootstrap $B=10{,}000$, seed $0$.
 
@@ -523,6 +571,54 @@ Llama GPTQ-4 & $-0.2\ [-2.2,+1.8]$ & $-1.4\ [-3.8,+1.0]$ & $-0.8\ [-4.2,+2.6]$ \
 \bottomrule
 \end{tabular}
 \end{table*}
+
+\section{Measured serving: single-stream and microbenchmark}
+\label{app:serving}
+Condition~A (Table~\ref{tab:serving-single}) is sequential decode of the first 20 prompts of the frozen 100-item list. Median latency is the mean of the three per-run medians. Fixed-token microbenchmark (Table~\ref{tab:serving-micro}): 10 prompts $\times$ 512 tokens, $T=0.0$, \texttt{ignore\_eos}. Llama AWQ-4 microbenchmark ($438$ tok/s) ran on \texttt{ragpu003}, the same slower node as the batched outlier.
+
+\begin{table*}[t]
+\centering
+\caption{Measured single-stream serving (Condition~A: 20 sequential prompts, $R=3$). Latency columns are means of per-run median/P90. $C_{\mathrm{pass}}$ uses campaign MATH-500 pass@1 and $\$1.50$/A100-hour.}
+\label{tab:serving-single}
+\small
+\begin{tabular}{llccccc}
+\toprule
+\textbf{Model} & \textbf{Fmt} & \textbf{tok/s} & \textbf{Med.\ lat (s)} & \textbf{P90 lat (s)} & \textbf{GPU-s/q} & \textbf{$C_{\mathrm{pass}}$} \\
+\midrule
+Qwen-7B & BF16   & $79.91\pm 0.07$ & 32.97 & 77.76 & 45.44 & \$0.0201 \\
+Qwen-7B & FP8    & $85.89\pm 0.79$ & 41.87 & 69.14 & 46.07 & \$0.0203 \\
+Qwen-7B & AWQ-4  & $72.76\pm 0.16$ & 51.47 & 174.46 & 73.96 & \$0.0331 \\
+Qwen-7B & GPTQ-4 & $68.34\pm 0.66$ & 46.20 & 81.85 & 48.38 & \$0.0216 \\
+\midrule
+Llama-8B & BF16   & $73.41\pm 0.70$ & 47.66 & 192.52 & 74.79 & \$0.0349 \\
+Llama-8B & FP8    & $80.44\pm 1.22$ & 40.23 & 113.75 & 60.87 & \$0.0283 \\
+Llama-8B & AWQ-4  & $69.43\pm 2.09$ & 49.00 & 212.65 & 79.97 & \$0.0385 \\
+Llama-8B & GPTQ-4 & $71.60\pm 0.96$ & 59.53 & 227.90 & 99.00 & \$0.0464 \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\begin{table}[t]
+\centering
+\caption{Fixed-token decode microbenchmark (10 prompts $\times$ 512 tokens). Isolates kernel decode speed from trace-length variation.}
+\label{tab:serving-micro}
+\small
+\begin{tabular}{llc}
+\toprule
+\textbf{Model} & \textbf{Fmt} & \textbf{Raw decode tok/s} \\
+\midrule
+Qwen-7B & BF16   & 724.67 \\
+Qwen-7B & FP8    & 787.55 \\
+Qwen-7B & AWQ-4  & 678.55 \\
+Qwen-7B & GPTQ-4 & 608.84 \\
+\midrule
+Llama-8B & BF16   & 709.73 \\
+Llama-8B & FP8    & 761.49 \\
+Llama-8B & AWQ-4  & 437.58 \\
+Llama-8B & GPTQ-4 & 743.30 \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \FloatBarrier
 \bibliographystyle{plain}

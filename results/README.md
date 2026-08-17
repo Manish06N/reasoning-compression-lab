@@ -90,7 +90,28 @@ Full MATH-500 grid, all 5 seeds, **ratio of means** vs BF16:
 | Llama AWQ-4 | +1.72% |
 | Llama GPTQ-4 | +3.95% |
 
-Cost-of-Pass in the paper is a **fixed-throughput token-cost proxy** ($\$1.50$/A100-h, assumed $65$ tok/s). Not measured tokens/sec or VRAM.
+Cost-of-Pass in the paper has two layers: (1) **primary** measured GPU-sec/query on the frozen 100-problem MATH-500 serving subset (`results/measured_serving/`, report `reports/measured_serving/measured_serving_report.json`) at a $\$1.50$/A100-h scenario; (2) **historical** shared-$65$ tok/s token proxy. Do not cite a unique “true Pareto optimum.”
+
+Batched Condition B (100-prompt `llm.generate`, $R=3$ wall-clock repeats; campaign MATH-500 pass@1):
+
+| Cell | tok/s | GPU-s/q | VRAM (GB) | $C_{\mathrm{pass}}$ |
+|---|---|---|---|---|
+| Qwen BF16 | $694.27\pm 0.65$ | 5.62 | 56.00 | \$0.0025 |
+| Qwen FP8 | $824.27\pm 4.00$ | 4.52 | 56.02 | \$0.0020 |
+| Qwen AWQ-4 | $687.51\pm 0.59$ | 5.89 | 56.00 | \$0.0026 |
+| Qwen GPTQ-4 | $602.65\pm 1.40$ | 6.70 | 55.17 | \$0.0030 |
+| Llama BF16 | $649.72\pm 0.51$ | 6.86 | 56.71 | \$0.0032 |
+| Llama FP8 | $759.48\pm 6.96$ | 6.37 | 56.72 | \$0.0030 |
+| Llama AWQ-4 | $545.68\pm 125.62$ | 10.15 | 56.72 | \$0.0049 |
+| Llama GPTQ-4 | $785.55\pm 12.33$ | 6.58 | 56.74 | \$0.0031 |
+
+Qwen FP8 vs BF16 batched: **+18.7%** tok/s, **−19.8%** $C_{\mathrm{pass}}$. Llama AWQ-4 std includes a mixed-node slower repeat. Peak VRAM is the 0.75 utilization pool.
+
+Reproduce:
+
+```bash
+python3 scripts/analysis/measured_serving_analysis.py --check
+```
 
 ---
 
@@ -133,7 +154,11 @@ results/
 ├── reports/
 │   ├── revision_reanalysis_report.json   # CANONICAL pass@1 / pathology / tokens
 │   ├── modal_agreement_report.json       # gold-free MATH-500 modal agreement
+│   ├── measured_serving/                 # tok/s, latency, VRAM, measured C_pass
 │   └── runtime_manifest.json             # effective 56k launch settings
+├── measured_serving/
+│   ├── input_subset.json                 # frozen 100 MATH-500 prompts (use full_prompt)
+│   └── raw/                              # 48 task-realistic + 8 microbenchmark JSON
 ├── recovered/
 │   └── math500_modal_inputs.jsonl        # compact extracted answers (no CoT)
 └── README.md

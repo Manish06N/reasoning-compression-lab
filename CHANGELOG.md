@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-08-17 — Integrate measured serving results
+
+Branch `paper-measured-serving` (HPC commit `6612999` plus MacBook manuscript integration). Independent audit of 48 task-realistic + 8 microbenchmark JSON files. Primary Cost-of-Pass is now measured GPU-sec/query at a $\$1.50$/A100-h scenario (campaign MATH-500 pass@1). Batched Qwen-7B FP8 is $+18.7\%$ tok/s and $-19.8\%$ $C_{\mathrm{pass}}$ vs BF16. Rejected hardcoded “Pareto Optimal” / “true Pareto optimum”; Qwen-7B FP8 is nondominated on (pass@1, measured $C_{\mathrm{pass}}$) in the eight-point batched set. Protocol caveats documented (Condition B `max_num_seqs` not pinned to 8; Condition A first-20 not 4-per-level; VRAM is the 0.75 pool; mixed-node Llama AWQ-4/GPTQ-4). Canonical checks: `revision_reanalysis.py --check`, `modal_agreement_analysis.py --check`, `measured_serving_analysis.py --check`.
+
 ## 2026-08-16 (late night) — Finalize observable modal-agreement paper integration
 
 Tighten wording on branch `paper-modal-agreement`: five-sample token-cost proxy (not dollars); no FP8 “parity”; LightEval **0.8.0** is the campaign evaluator and a throwaway MacBook LightEval 0.8.1 install is documented as unused; limitations list finish_reason, five-generation cost, and MATH-500-only five-seed coverage.

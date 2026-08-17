@@ -2,7 +2,7 @@
 
 **Hardware:** NVIDIA A100-PCIE-80GB (PARAM Rudra HPC)  
 **Serving Engine:** vLLM 0.7.0 eager (`qrm-official` conda env) | **Toolchain:** PyTorch 2.5.1+cu124, CUDA 12.4  
-**Dataset:** MATH-500 stratified benchmark subset ($n=100$) | **Repetitions:** $R=3$ independent runs  
+**Dataset:** MATH-500 stratified benchmark subset ($n=100$) | **Repetitions:** $R=3$ wall-clock repeats (shared sampling seed)  
 **Pricing Baseline:** $\$1.50 / \text{A100 GPU-hour}$ ($\$0.00041667 / \text{GPU-second}$)  
 
 ---
@@ -58,13 +58,18 @@
 
 ## 3. Comparison: Old Fixed-Throughput Proxy vs New Measured Serving Cost
 
-| Model & Format | Pass@1 (Accuracy) | Old Proxy Cost/Query | Old Proxy $C_{\text{pass}}$ | Measured Batched Cost/Query | Measured Batched $C_{\text{pass}}$ | Status / Pareto Shift |
+| Model & Format | Pass@1 (Accuracy) | Old Proxy Cost/Query | Old Proxy $C_{\text{pass}}$ | Measured Batched Cost/Query | Measured Batched $C_{\text{pass}}$ | (pass@1, $C_{\text{pass}}$) |
 |---|---|---|---|---|---|---|
-| **Qwen-7B BF16** | 94.00% | $0.0243 | $0.0258 | $0.0023 | $0.0025 | Trade-off |
-| **Qwen-7B FP8** | 94.40% | $0.0243 | $0.0257 | $0.0019 | $0.0020 | Pareto Optimal |
-| **Qwen-7B AWQ-4** | 93.12% | $0.0258 | $0.0277 | $0.0025 | $0.0026 | Trade-off |
-| **Qwen-7B GPTQ-4** | 93.48% | $0.0260 | $0.0278 | $0.0028 | $0.0030 | Pareto Optimal |
-| **Llama-8B BF16** | 89.24% | $0.0285 | $0.0319 | $0.0029 | $0.0032 | Trade-off |
-| **Llama-8B FP8** | 89.52% | $0.0279 | $0.0311 | $0.0027 | $0.0030 | Pareto Optimal |
-| **Llama-8B AWQ-4** | 86.48% | $0.0290 | $0.0335 | $0.0042 | $0.0049 | Trade-off |
-| **Llama-8B GPTQ-4** | 88.92% | $0.0296 | $0.0333 | $0.0027 | $0.0031 | Trade-off |
+| **Qwen-7B BF16** | 94.00% | $0.0243 | $0.0258 | $0.0023 | $0.0025 | dominated on (pass@1, C_pass) |
+| **Qwen-7B FP8** | 94.40% | $0.0243 | $0.0257 | $0.0019 | $0.0020 | nondominated (pass@1, C_pass) |
+| **Qwen-7B AWQ-4** | 93.12% | $0.0258 | $0.0277 | $0.0025 | $0.0026 | dominated on (pass@1, C_pass) |
+| **Qwen-7B GPTQ-4** | 93.48% | $0.0260 | $0.0278 | $0.0028 | $0.0030 | dominated on (pass@1, C_pass) |
+| **Llama-8B BF16** | 89.24% | $0.0285 | $0.0319 | $0.0029 | $0.0032 | dominated on (pass@1, C_pass) |
+| **Llama-8B FP8** | 89.52% | $0.0279 | $0.0311 | $0.0027 | $0.0030 | dominated on (pass@1, C_pass) |
+| **Llama-8B AWQ-4** | 86.48% | $0.0290 | $0.0335 | $0.0042 | $0.0049 | dominated on (pass@1, C_pass) |
+| **Llama-8B GPTQ-4** | 88.92% | $0.0296 | $0.0333 | $0.0027 | $0.0031 | dominated on (pass@1, C_pass) |
+
+### Pareto note
+
+There is no unique ``true Pareto optimum.'' On batched (pass@1, measured $C_{\text{pass}}$) the nondominated pooled set is: Qwen-7B FP8.
+Qwen FP8 is Pareto-efficient in that two-objective set; Qwen GPTQ-4 is dominated. $1.50$/A100-h is a pricing scenario. Pass@1 is the 40-cell MATH-500 campaign mean.

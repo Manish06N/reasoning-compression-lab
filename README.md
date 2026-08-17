@@ -45,7 +45,7 @@ Files under `configs/models/` are **not** the campaign launcher. They contain di
 3. **Pass@1 (problem-clustered bootstrap vs BF16).** Llama AWQ-4: **−2.76 pp** on MATH-500 (95% CI $[−4.16,−1.44]$, $p<0.001$) and **−1.57 pp** on GSM8K. Qwen AWQ-4: **−5.56 pp** on GPQA-Diamond (95% CI $[−9.60,−1.52]$, $p=0.007$). FP8–BF16 95% intervals include 0; MATH $\pm 1$ pp TOST is **not** passed. maj@5 McNemar is secondary and non-significant.
 4. **Token inflation (full MATH-500 grid, all 5 seeds, ratio of means).** Qwen AWQ-4 **+6.33%**, Qwen GPTQ-4 **+6.88%** (paired token CIs exclude 0). Extra length is concentrated on BF16-correct / quantized-wrong items. The old 200-item even-index mean-of-ratios subset is an estimator artifact and is **not** a result.
 5. **Selective prediction.** Gold-free modal-answer agreement is available from recovered MATH-500 answer strings (`results/recovered/math500_modal_inputs.jsonl`). On MATH-500, higher observable answer agreement is associated with lower selective error. Strict 5/5 consensus has selective error at most 0.27% in this sample but costs five generations; Llama AWQ-4 reduces 5/5 coverage by **6.0 pp** vs BF16 (95% paired CI $[-9.4,-2.6]$). No clear FP8–BF16 modal-coverage difference was detected. Gold-hit $k/5$ tables (including the old 98.23% “operational safety gate”) are **not** in the manuscript.
-6. **Cost.** Cost-of-Pass is a **fixed-throughput token-cost proxy** at $\$1.50$/A100-h and an assumed $65$ tok/s, shared across formats. It is not measured wall-clock, and FP8 is not called Pareto-optimal.
+6. **Cost.** Primary Cost-of-Pass uses **measured GPU-seconds** on a frozen 100-problem MATH-500 subset at a $\$1.50$/A100-h **scenario**, with campaign MATH-500 pass@1. Batched Qwen-7B FP8 is $+18.7\%$ tok/s and $-19.8\%$ $C_{\mathrm{pass}}$ vs BF16. The old shared $65$ tok/s token proxy is retained only as a sensitivity. FP8 is Pareto-efficient on (pass@1, measured $C_{\mathrm{pass}}$) in this eight-point batched set; it is **not** called a unique “true Pareto optimum.” Peak allocated VRAM (~55–57 GB) is the 0.75 engine pool, not weight-footprint savings. Four-bit speed is concurrency-dependent (single-stream 4-bit is slower than BF16).
 
 ### Breadth means (sample std over seeds)
 
@@ -69,6 +69,7 @@ paper/main.tex tables
 ```bash
 python3 scripts/analysis/revision_reanalysis.py --check
 python3 scripts/analysis/modal_agreement_analysis.py --check   # compact-artifact path on MacBook; LightEval 0.8.0 re-extraction is HPC-only
+python3 scripts/analysis/measured_serving_analysis.py --check
 ```
 
 Older scripts live in [`scripts/analysis/legacy/`](scripts/analysis/legacy/) and must not be used for paper numbers.
@@ -103,7 +104,7 @@ reasoning-compression-lab/
 * **Paper env:** conda env `qrm-official` (not `qreason`). See `scripts/hpc/qrm_parity/install_official_qrm_env.sh`.
 * **AWQ:** pass `--dtype float16`.
 
-Do **not** start a new 50k campaign, extra seeds, or a vLLM 0.7 vs 0.8.5 factorial until the Phase 1 artifact work and the two small systems jobs (measured throughput; `finish_reason` validation) are done.
+Do **not** start a new 50k campaign, extra seeds, or a vLLM 0.7 vs 0.8.5 factorial. Measured serving is complete on `paper-measured-serving`. The next candidate experiment is a small `finish_reason` / termination-metadata validation — not submitted yet.
 
 ---
 

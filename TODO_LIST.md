@@ -12,7 +12,7 @@
 * **Breadth Benchmark 1 — GSM8K ($n=1,319$, Seeds 42–44, 24 Cells):** ✅ 100% Completed, validated, and backed up.
 * **Breadth Benchmark 2 — GPQA-Diamond ($n=198$, Seeds 42–44, 24 Cells):** ✅ 100% Completed, validated, and backed up.
 * **Gold-Free Modal Agreement Analysis:** ✅ 100% Completed, validated, and pushed on branch `paper-modal-agreement` (HEAD `845d879`).
-* **Measured Serving Systems Benchmark:** 🔄 **ACTIVE** on branch `paper-measured-serving` (8 configurations on NVIDIA A100 GPUs).
+* **Measured Serving Systems Benchmark:** ✅ **Complete** on branch `paper-measured-serving` (48 task-realistic + 8 microbenchmark JSON files; manuscript integrated).
 * **Manuscript Status:** Canonical source [`paper/main.tex`](paper/main.tex) compiled to [`paper/main.pdf`](paper/main.pdf).
 
 ---
@@ -69,7 +69,7 @@ Pathology on the **full 88-cell grid**: **25 loops**, **0 exact cap hits**, **20
 * [x] Generated `results/recovered/math500_modal_inputs.jsonl` (3.8 MB, SHA256 `23e9ead021111959cf047323572889c95be0496e9475d6870b06c8b2c9a6149b`).
 * [x] Committed and pushed branch `paper-modal-agreement` to GitHub (HEAD `845d879`).
 
-### [ ] 2. Measured Serving Performance Systems Benchmark (IN PROGRESS)
+### [x] 2. Measured Serving Performance Systems Benchmark (COMPLETE)
 * [x] Created experiment branch `paper-measured-serving`.
 * [x] Froze serving protocol in [`docs/MEASURED_SERVING_PROTOCOL.md`](docs/MEASURED_SERVING_PROTOCOL.md).
 * [x] Generated stratified 100-prompt benchmark subset in `results/measured_serving/input_subset.json` (seed 20260816, 20 per level).
@@ -78,13 +78,10 @@ Pathology on the **full 88-cell grid**: **25 loops**, **0 exact cap hits**, **20
 * [x] Implemented validation audit [`scripts/hpc/qrm_parity/validate_measured_serving.py`](scripts/hpc/qrm_parity/validate_measured_serving.py).
 * [x] Implemented analysis engine [`scripts/analysis/measured_serving_analysis.py`](scripts/analysis/measured_serving_analysis.py).
 * [x] Launched 8 benchmark jobs on PARAM Rudra HPC across 2 parallel pipelines (1 GPU each, max 2 GPUs).
-* [ ] **Next:** Wait for all 8 benchmark jobs to complete.
-* [ ] **Next:** Run `validate_measured_serving.py` to audit 48 task-realistic + 8 microbenchmark runs.
-* [ ] **Next:** Run `measured_serving_analysis.py` to generate `measured_serving_report.json` and `measured_serving_report.md`.
-* [ ] **Next:** Commit benchmark artifacts to `paper-measured-serving` and push to GitHub.
+* [x] 48 task-realistic + 8 microbenchmark JSON files present; `measured_serving_analysis.py --check` passes.
+* [x] Manuscript integration on MacBook (measured serving is primary cost evidence; 65 tok/s proxy is historical).
 
-### [ ] 3. Manuscript & Production Finalization (UPCOMING)
-* [ ] Rsync serving benchmark results to MacBook.
-* [ ] Update Table 6 (Serving Systems & Cost Frontier) in `paper/main.tex` and `paper/main.md` with measured throughput, latency, VRAM, and Cost-of-Pass.
-* [ ] Recompile publication PDF [`paper/main.pdf`](paper/main.pdf) with XeLaTeX.
+### [ ] 3. Manuscript & Production Finalization
+* [x] Integrate measured throughput, latency, VRAM, and Cost-of-Pass into `paper/main.tex`.
 * [ ] Final author review before journal submission to *Future Generation Computer Systems (FGCS)* / *Journal of Systems and Software (JSS)*.
+* [ ] Small `finish_reason` / termination-metadata validation — **do not submit yet**.

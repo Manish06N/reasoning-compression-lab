@@ -5,13 +5,13 @@
       "format": "BF16",
       "conditions": {
         "A_single_stream_c1": {
-          "output_tokens_per_second_mean": 79.90689693659674,
+          "output_tokens_per_second_mean": 79.90689693659672,
           "output_tokens_per_second_std": 0.06890128109232799,
-          "requests_per_second_mean": 0.0220080690031389,
+          "requests_per_second_mean": 0.022008069003138904,
           "requests_per_second_std": 1.8976886937405108e-05,
           "gpu_seconds_per_query_mean": 45.43791383629044,
           "gpu_seconds_per_query_std": 0.03915646276667044,
-          "mean_output_tokens": 3630.8000000000006,
+          "mean_output_tokens": 3630.8,
           "peak_vram_gb_mean": 54.966042041778564,
           "peak_vram_gb_std": 0.0,
           "latency_mean_sec": 45.437850420052804,
@@ -23,10 +23,10 @@
           "repetitions": 3
         },
         "B_batched_throughput_c8": {
-          "output_tokens_per_second_mean": 694.2711239553115,
+          "output_tokens_per_second_mean": 694.2711239553116,
           "output_tokens_per_second_std": 0.6492207282450744,
           "requests_per_second_mean": 0.1779466019974809,
-          "requests_per_second_std": 0.000166399866783123,
+          "requests_per_second_std": 0.00016639986678312297,
           "gpu_seconds_per_query_mean": 5.619668278222282,
           "gpu_seconds_per_query_std": 0.005255189784336165,
           "mean_output_tokens": 3901.57,
@@ -55,7 +55,7 @@
           "output_tokens_per_second_mean": 85.88867777447153,
           "output_tokens_per_second_std": 0.7856079242872761,
           "requests_per_second_mean": 0.021709618394811128,
-          "requests_per_second_std": 0.0001985738829162155,
+          "requests_per_second_std": 0.00019857388291621546,
           "gpu_seconds_per_query_mean": 46.06636222886542,
           "gpu_seconds_per_query_std": 0.41871014194535566,
           "mean_output_tokens": 3956.25,
@@ -63,7 +63,7 @@
           "peak_vram_gb_std": 0.0,
           "latency_mean_sec": 46.06629678842922,
           "latency_median_sec": 41.87223879992962,
-          "latency_p90_sec": 69.14123070935408,
+          "latency_p90_sec": 69.14123070935409,
           "latency_p95_sec": 77.6008250991504,
           "measured_cost_per_query_dollars": 0.019194317595360593,
           "measured_cost_of_pass_dollars": 0.020332963554407408,
@@ -71,12 +71,12 @@
         },
         "B_batched_throughput_c8": {
           "output_tokens_per_second_mean": 824.269788207987,
-          "output_tokens_per_second_std": 3.995273702958176,
+          "output_tokens_per_second_std": 3.9952737029581757,
           "requests_per_second_mean": 0.22105023176073968,
           "requests_per_second_std": 0.0010714406746685791,
           "gpu_seconds_per_query_mean": 4.523965258995692,
           "gpu_seconds_per_query_std": 0.021997483911305238,
-          "mean_output_tokens": 3728.8799999999997,
+          "mean_output_tokens": 3728.88,
           "peak_vram_gb_mean": 56.01738691329956,
           "peak_vram_gb_std": 0.0,
           "latency_mean_sec": 4.523965258995692,
@@ -103,7 +103,7 @@
           "output_tokens_per_second_std": 0.15744529886970363,
           "requests_per_second_mean": 0.013521425214877633,
           "requests_per_second_std": 2.9257312013546857e-05,
-          "gpu_seconds_per_query_mean": 73.95704686840376,
+          "gpu_seconds_per_query_mean": 73.95704686840375,
           "gpu_seconds_per_query_std": 0.15990356231661446,
           "mean_output_tokens": 5381.4,
           "peak_vram_gb_mean": 55.07836103439331,
@@ -112,26 +112,26 @@
           "latency_median_sec": 51.47345462565621,
           "latency_p90_sec": 174.4649639122189,
           "latency_p95_sec": 246.13080138750377,
-          "measured_cost_per_query_dollars": 0.030815436195168237,
-          "measured_cost_of_pass_dollars": 0.03309217804463943,
+          "measured_cost_per_query_dollars": 0.03081543619516823,
+          "measured_cost_of_pass_dollars": 0.033092178044639424,
           "repetitions": 3
         },
         "B_batched_throughput_c8": {
           "output_tokens_per_second_mean": 687.5120793796792,
           "output_tokens_per_second_std": 0.5902193449294963,
-          "requests_per_second_mean": 0.16979967186133704,
+          "requests_per_second_mean": 0.16979967186133707,
           "requests_per_second_std": 0.000145770604038943,
-          "gpu_seconds_per_query_mean": 5.889297231708963,
-          "gpu_seconds_per_query_std": 0.005058894228973842,
-          "mean_output_tokens": 4048.9600000000005,
+          "gpu_seconds_per_query_mean": 5.889297231708964,
+          "gpu_seconds_per_query_std": 0.005058894228973841,
+          "mean_output_tokens": 4048.96,
           "peak_vram_gb_mean": 56.00370931625366,
           "peak_vram_gb_std": 0.0,
-          "latency_mean_sec": 5.889297231708963,
-          "latency_median_sec": 5.889297231708963,
-          "latency_p90_sec": 5.889297231708963,
-          "latency_p95_sec": 5.889297231708963,
-          "measured_cost_per_query_dollars": 0.0024538738465454016,
-          "measured_cost_of_pass_dollars": 0.0026351738042798556,
+          "latency_mean_sec": 5.889297231708964,
+          "latency_median_sec": 5.889297231708964,
+          "latency_p90_sec": 5.889297231708964,
+          "latency_p95_sec": 5.889297231708964,
+          "measured_cost_per_query_dollars": 0.002453873846545402,
+          "measured_cost_of_pass_dollars": 0.002635173804279856,
           "repetitions": 3
         }
       },
@@ -164,9 +164,9 @@
           "repetitions": 3
         },
         "B_batched_throughput_c8": {
-          "output_tokens_per_second_mean": 602.6491882239189,
+          "output_tokens_per_second_mean": 602.6491882239188,
           "output_tokens_per_second_std": 1.3956660097658609,
-          "requests_per_second_mean": 0.1491547157663711,
+          "requests_per_second_mean": 0.14915471576637113,
           "requests_per_second_std": 0.00034542511806066764,
           "gpu_seconds_per_query_mean": 6.704483703648051,
           "gpu_seconds_per_query_std": 0.01552054080626247,
@@ -198,7 +198,7 @@
           "requests_per_second_mean": 0.013371797450219143,
           "requests_per_second_std": 0.00012688175733863738,
           "gpu_seconds_per_query_mean": 74.7910351211826,
-          "gpu_seconds_per_query_std": 0.7138396730987623,
+          "gpu_seconds_per_query_std": 0.7138396730987624,
           "mean_output_tokens": 5490.2,
           "peak_vram_gb_mean": 55.923137187957764,
           "peak_vram_gb_std": 0.0,
@@ -212,11 +212,11 @@
         },
         "B_batched_throughput_c8": {
           "output_tokens_per_second_mean": 649.7174707788004,
-          "output_tokens_per_second_std": 0.5110954828122387,
+          "output_tokens_per_second_std": 0.5110954828122388,
           "requests_per_second_mean": 0.14570531198505543,
           "requests_per_second_std": 0.00011461801494739013,
           "gpu_seconds_per_query_mean": 6.863172006855408,
-          "gpu_seconds_per_query_std": 0.005395887969025841,
+          "gpu_seconds_per_query_std": 0.00539588796902584,
           "mean_output_tokens": 4459.12,
           "peak_vram_gb_mean": 56.70994424819946,
           "peak_vram_gb_std": 0.0,
@@ -244,24 +244,24 @@
           "output_tokens_per_second_std": 1.2207583522201944,
           "requests_per_second_mean": 0.01643236300536723,
           "requests_per_second_std": 0.00024938628864264965,
-          "gpu_seconds_per_query_mean": 60.86955183098714,
+          "gpu_seconds_per_query_mean": 60.869551830987135,
           "gpu_seconds_per_query_std": 0.9246092095232246,
           "mean_output_tokens": 4895.05,
           "peak_vram_gb_mean": 55.930598735809326,
           "peak_vram_gb_std": 0.0,
           "latency_mean_sec": 60.86948240424196,
           "latency_median_sec": 40.22923766821623,
-          "latency_p90_sec": 113.74957758734631,
-          "latency_p95_sec": 161.80839988812815,
-          "measured_cost_per_query_dollars": 0.02536231326291131,
-          "measured_cost_of_pass_dollars": 0.028331449131938462,
+          "latency_p90_sec": 113.7495775873463,
+          "latency_p95_sec": 161.80839988812812,
+          "measured_cost_per_query_dollars": 0.025362313262911308,
+          "measured_cost_of_pass_dollars": 0.02833144913193846,
           "repetitions": 3
         },
         "B_batched_throughput_c8": {
-          "output_tokens_per_second_mean": 759.4759946440126,
+          "output_tokens_per_second_mean": 759.4759946440125,
           "output_tokens_per_second_std": 6.961458971036039,
           "requests_per_second_mean": 0.15689416067626982,
-          "requests_per_second_std": 0.0014381129489878593,
+          "requests_per_second_std": 0.001438112948987859,
           "gpu_seconds_per_query_mean": 6.374261085242033,
           "gpu_seconds_per_query_std": 0.05864913004679621,
           "mean_output_tokens": 4840.69,
@@ -288,18 +288,18 @@
       "conditions": {
         "A_single_stream_c1": {
           "output_tokens_per_second_mean": 69.43334312375647,
-          "output_tokens_per_second_std": 2.094234201840504,
-          "requests_per_second_mean": 0.01251581176241408,
+          "output_tokens_per_second_std": 2.0942342018405036,
+          "requests_per_second_mean": 0.012515811762414081,
           "requests_per_second_std": 0.00037749933788910645,
           "gpu_seconds_per_query_mean": 79.97056786082685,
           "gpu_seconds_per_query_std": 2.3752860320508615,
-          "mean_output_tokens": 5547.649999999999,
+          "mean_output_tokens": 5547.65,
           "peak_vram_gb_mean": 56.132617473602295,
           "peak_vram_gb_std": 0.0,
           "latency_mean_sec": 79.970503513515,
           "latency_median_sec": 48.99518143509825,
           "latency_p90_sec": 212.6502859932682,
-          "latency_p95_sec": 276.3560917605957,
+          "latency_p95_sec": 276.35609176059563,
           "measured_cost_per_query_dollars": 0.033321069942011186,
           "measured_cost_of_pass_dollars": 0.038530376898717834,
           "repetitions": 3
@@ -309,17 +309,17 @@
           "output_tokens_per_second_std": 125.61933622963268,
           "requests_per_second_mean": 0.10522437872320477,
           "requests_per_second_std": 0.02422357389841794,
-          "gpu_seconds_per_query_mean": 10.145663023044667,
+          "gpu_seconds_per_query_mean": 10.145663023044666,
           "gpu_seconds_per_query_std": 2.789513393238572,
           "mean_output_tokens": 5185.83,
           "peak_vram_gb_mean": 56.71515130996704,
           "peak_vram_gb_std": 0.0,
-          "latency_mean_sec": 10.145663023044667,
-          "latency_median_sec": 10.145663023044667,
-          "latency_p90_sec": 10.145663023044667,
-          "latency_p95_sec": 10.145663023044667,
-          "measured_cost_per_query_dollars": 0.004227359592935278,
-          "measured_cost_of_pass_dollars": 0.0048882511481675274,
+          "latency_mean_sec": 10.145663023044666,
+          "latency_median_sec": 10.145663023044666,
+          "latency_p90_sec": 10.145663023044666,
+          "latency_p95_sec": 10.145663023044666,
+          "measured_cost_per_query_dollars": 0.004227359592935277,
+          "measured_cost_of_pass_dollars": 0.004888251148167527,
           "repetitions": 3
         }
       },
@@ -334,19 +334,19 @@
       "format": "GPTQ-4",
       "conditions": {
         "A_single_stream_c1": {
-          "output_tokens_per_second_mean": 71.60155216802652,
+          "output_tokens_per_second_mean": 71.60155216802653,
           "output_tokens_per_second_std": 0.963351116813775,
           "requests_per_second_mean": 0.010102939407386066,
           "requests_per_second_std": 0.00013592830974344943,
           "gpu_seconds_per_query_mean": 98.99887509805461,
-          "gpu_seconds_per_query_std": 1.321572168467155,
+          "gpu_seconds_per_query_std": 1.3215721684671553,
           "mean_output_tokens": 7087.2,
           "peak_vram_gb_mean": 55.99148511886597,
           "peak_vram_gb_std": 0.0,
           "latency_mean_sec": 98.99876615963876,
           "latency_median_sec": 59.528660180668034,
           "latency_p90_sec": 227.89757585426207,
-          "latency_p95_sec": 457.2626813932011,
+          "latency_p95_sec": 457.26268139320115,
           "measured_cost_per_query_dollars": 0.04124953129085609,
           "measured_cost_of_pass_dollars": 0.04638948638197941,
           "repetitions": 3
@@ -355,7 +355,7 @@
           "output_tokens_per_second_mean": 785.5454867889475,
           "output_tokens_per_second_std": 12.332239505094938,
           "requests_per_second_mean": 0.1520221327516537,
-          "requests_per_second_std": 0.002386587896815745,
+          "requests_per_second_std": 0.0023865878968157444,
           "gpu_seconds_per_query_mean": 6.5796013145893815,
           "gpu_seconds_per_query_std": 0.1026717053600528,
           "mean_output_tokens": 5167.31,
@@ -383,13 +383,13 @@
       "format": "FP8",
       "conditions": {
         "A_single_stream_c1": {
-          "delta_output_tok_sec_pct": 7.485938094456506,
+          "delta_output_tok_sec_pct": 7.485938094456525,
           "delta_gpu_seconds_per_query_pct": 1.383092531138722,
           "delta_peak_vram_pct": 0.027581685063637878,
           "delta_cost_of_pass_pct": 0.9535031560067594
         },
         "B_batched_throughput_c8": {
-          "delta_output_tok_sec_pct": 18.724480936505596,
+          "delta_output_tok_sec_pct": 18.72448093650558,
           "delta_gpu_seconds_per_query_pct": -19.497645857011396,
           "delta_peak_vram_pct": 0.02459299232032643,
           "delta_cost_of_pass_pct": -19.838757527108807
@@ -401,16 +401,16 @@
       "format": "AWQ-4",
       "conditions": {
         "A_single_stream_c1": {
-          "delta_output_tok_sec_pct": -8.93877695053246,
-          "delta_gpu_seconds_per_query_pct": 62.765058129353655,
+          "delta_output_tok_sec_pct": -8.938776950532446,
+          "delta_gpu_seconds_per_query_pct": 62.765058129353626,
           "delta_peak_vram_pct": 0.20434251483738763,
-          "delta_cost_of_pass_pct": 64.30321589518087
+          "delta_cost_of_pass_pct": 64.30321589518083
         },
         "B_batched_throughput_c8": {
-          "delta_output_tok_sec_pct": -0.9735453978159907,
-          "delta_gpu_seconds_per_query_pct": 4.797951411679672,
+          "delta_output_tok_sec_pct": -0.973545397816007,
+          "delta_gpu_seconds_per_query_pct": 4.797951411679687,
           "delta_peak_vram_pct": 0.00017028799557074114,
-          "delta_cost_of_pass_pct": 5.788310059040904
+          "delta_cost_of_pass_pct": 5.788310059040922
         }
       }
     },
@@ -419,13 +419,13 @@
       "format": "GPTQ-4",
       "conditions": {
         "A_single_stream_c1": {
-          "delta_output_tok_sec_pct": -14.478420605019213,
+          "delta_output_tok_sec_pct": -14.478420605019195,
           "delta_gpu_seconds_per_query_pct": 6.484189128250171,
           "delta_peak_vram_pct": -1.9977072518256687,
           "delta_cost_of_pass_pct": 7.076527364735949
         },
         "B_batched_throughput_c8": {
-          "delta_output_tok_sec_pct": -13.19685243560411,
+          "delta_output_tok_sec_pct": -13.196852435604143,
           "delta_gpu_seconds_per_query_pct": 19.303904994352035,
           "delta_peak_vram_pct": -1.4950672974327015,
           "delta_cost_of_pass_pct": 19.96755530026842
@@ -438,12 +438,12 @@
       "conditions": {
         "A_single_stream_c1": {
           "delta_output_tok_sec_pct": 9.566855435348163,
-          "delta_gpu_seconds_per_query_pct": -18.613839569994887,
+          "delta_gpu_seconds_per_query_pct": -18.613839569994898,
           "delta_peak_vram_pct": 0.013342505851351338,
-          "delta_cost_of_pass_pct": -18.868398606192404
+          "delta_cost_of_pass_pct": -18.868398606192414
         },
         "B_batched_throughput_c8": {
-          "delta_output_tok_sec_pct": 16.89326958279996,
+          "delta_output_tok_sec_pct": 16.893269582799938,
           "delta_gpu_seconds_per_query_pct": -7.123687430899557,
           "delta_peak_vram_pct": 0.013668616583053878,
           "delta_cost_of_pass_pct": -7.4141852807582325
@@ -462,9 +462,9 @@
         },
         "B_batched_throughput_c8": {
           "delta_output_tok_sec_pct": -16.013380514445945,
-          "delta_gpu_seconds_per_query_pct": 47.82760818045186,
+          "delta_gpu_seconds_per_query_pct": 47.82760818045183,
           "delta_peak_vram_pct": 0.009181920096392,
-          "delta_cost_of_pass_pct": 52.545510569189645
+          "delta_cost_of_pass_pct": 52.54551056918962
         }
       }
     },
@@ -473,7 +473,7 @@
       "format": "GPTQ-4",
       "conditions": {
         "A_single_stream_c1": {
-          "delta_output_tok_sec_pct": -2.468594661276852,
+          "delta_output_tok_sec_pct": -2.468594661276833,
           "delta_gpu_seconds_per_query_pct": 32.367301692841224,
           "delta_peak_vram_pct": 0.12221762645125865,
           "delta_cost_of_pass_pct": 32.84365725448885
@@ -487,5 +487,36 @@
       }
     }
   },
-  "cost_analysis_summary": {}
+  "cost_analysis_summary": {
+    "pricing_scenario_usd_per_a100_hour": 1.5,
+    "pass1_source": "canonical 40-cell MATH-500 campaign means, not the 100-item serving subset",
+    "reject_true_pareto_optimum": true,
+    "batched_C8": {
+      "dims": "maximize pass@1, minimize measured C_pass",
+      "nondominated_pooled": [
+        "Qwen-7B FP8"
+      ],
+      "nondominated_qwen": [
+        "Qwen-7B FP8"
+      ],
+      "nondominated_llama": [
+        "Llama-8B FP8"
+      ],
+      "fp8_pareto_efficient_pooled": true
+    },
+    "single_stream_C1": {
+      "dims": "maximize pass@1, minimize measured C_pass",
+      "nondominated_pooled": [
+        "Qwen-7B BF16",
+        "Qwen-7B FP8"
+      ],
+      "nondominated_qwen": [
+        "Qwen-7B BF16",
+        "Qwen-7B FP8"
+      ],
+      "nondominated_llama": [
+        "Llama-8B FP8"
+      ]
+    }
+  }
 }
