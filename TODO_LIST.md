@@ -14,7 +14,7 @@
 * **Gold-Free Modal Agreement Analysis:** ✅ 100% Completed, validated, and pushed on branch `paper-modal-agreement` (HEAD `845d879`).
 * **Measured Serving Confirmation:** ✅ **Complete** (52 task-realistic + 8 microbenchmark JSON files; `max_num_seqs=8` pinned). Integrated on `paper-serving-confirmation` then into `paper-major-revision`.
 * **Major revision (CPU):** ✅ Frozen at `d707e44` — mismatch excess $D$, bootstrap $p$ formula, Holm-18 sensitivity, hybrid $C_{\mathrm{pass}}$ intervals.
-* **Manuscript Status:** Canonical source [`paper/main.tex`](paper/main.tex) compiled to [`paper/main.pdf`](paper/main.pdf) (20 pages). ArXiv zip: [`paper/arxiv_source.zip`](paper/arxiv_source.zip).
+* **Manuscript Status:** Canonical source [`paper/main.tex`](paper/main.tex) compiled to [`paper/main.pdf`](paper/main.pdf) (21 pages). ArXiv zip: [`paper/arxiv_source.zip`](paper/arxiv_source.zip).
 
 ---
 
@@ -89,7 +89,7 @@ Pathology on the **full 88-cell grid**: **25 loops**, **0 exact cap hits**, **20
 
 ### [x] 4. Post-Confirmation Sequence & Paper 1 (J1) Submission Protocol
 * [x] **Confirmation audit, manuscript rewrite, freeze:** `paper-major-revision` commit `d707e44` pushed. Canonical `--check` passed. `paper/arxiv_source.zip` rebuilt from current tex/bib/bbl.
-* [ ] **Visual PDF QA:** inspect the 20-page `paper/main.pdf` (serving tables, 2×2 length, Related Work, Holm-18, paths/URLs). Do not chase zero overfull-box warnings.
+* [ ] **Visual PDF QA:** inspect the 21-page `paper/main.pdf` (serving tables, 2×2 length, Related Work, Holm-18, paths/URLs). Do not chase zero overfull-box warnings.
 * [ ] **Independent referee review** of the revised paper. No new analysis unless a finding requires it.
 * [ ] **Official journal / arXiv upload when asked.** Do not merge to `main` until asked.
 * [ ] **PhD Thesis Pivot — Paper 2 (J2):** not started. GPU remains closed for Paper 1.

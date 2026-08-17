@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-08-17 (major revision frozen at `d707e44` on `paper-major-revision`)
 **Repo:** https://github.com/Manish06N/reasoning-compression-lab  
-**Canonical log:** [progress.md](../progress.md) · **publication decision:** [PUBLICATION_READINESS.md](PUBLICATION_READINESS.md) · **canonical paper:** [paper/main.tex](../paper/main.tex) / 20-page [paper/main.pdf](../paper/main.pdf) · **ops:** [CHANGELOG.md](../CHANGELOG.md)
+**Canonical log:** [progress.md](../progress.md) · **publication decision:** [PUBLICATION_READINESS.md](PUBLICATION_READINESS.md) · **canonical paper:** [paper/main.tex](../paper/main.tex) / 21-page [paper/main.pdf](../paper/main.pdf) · **ops:** [CHANGELOG.md](../CHANGELOG.md)
 
 > **Freeze (2026-08-17):** Science is frozen on `paper-major-revision` (`d707e44`, pushed). Next: visual PDF QA, then independent referee review. GPU work is closed. Do not merge to `main`. The 2026-08-16 table below is historical chronology, not current execution authority.
 
@@ -35,7 +35,7 @@ Plain English: [archive/notes_2026-07-03.md](archive/notes_2026-07-03.md)
 
 ## Next gated action
 
-Visual QA of the 20-page `paper/main.pdf`, then independent referee review. Upload `paper/arxiv_source.zip` to arXiv only when asked. Do not launch new GPU jobs. Do not merge to `main`. The 2026-08-14 recovery Phase 0 freeze is historical.
+Visual QA of the 21-page `paper/main.pdf`, then independent referee review. Upload `paper/arxiv_source.zip` to arXiv only when asked. Do not launch new GPU jobs. Do not merge to `main`. The 2026-08-14 recovery Phase 0 freeze is historical.
 
 ---
 

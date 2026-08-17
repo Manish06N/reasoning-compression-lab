@@ -1,8 +1,8 @@
 # Paper 1 artifacts
 
 **Preprint source:** `paper/main.tex` + `paper/references.bib` (figures are TikZ/pgfplots in the tex)  
-**Compiled PDF:** `paper/main.pdf` (20 pages, xelatex)  
-**ArXiv upload zip:** `paper/arxiv_source.zip` — rebuilt 2026-08-18 from current `main.tex` (75,003 B) + `references.bib` (7,650 B) + `main.bbl` (6,613 B) after the reviewer-proofing patch. Do not upload a zip from before this rebuild.
+**Compiled PDF:** `paper/main.pdf` (21 pages, xelatex)
+**ArXiv upload zip:** `paper/arxiv_source.zip` — rebuilt 2026-08-18 from current `main.tex` (75,778 B) + `references.bib` (7,650 B) + `main.bbl` (6,613 B) after the final audit-cleanup patch. Do not upload a zip from before this rebuild.
 
 ## What to upload to arXiv
 

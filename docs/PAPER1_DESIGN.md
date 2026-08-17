@@ -1,6 +1,6 @@
 # Paper 1 Design — controlled revision
 
-> **Freeze (2026-08-17):** Canonical title is *Beyond Pass@1: Accuracy, Agreement, and Serving-Cost Effects of Public R1-Distill Quantization Checkpoints under a Pinned Stack* (`paper/main.tex`, 20-page PDF). Branch `paper-major-revision` @ `d707e44`. This file’s “Serving-Stack Shift” title and 2026-08-14 “Needs revision” status are historical. GPU work is closed.
+> **Freeze (2026-08-17):** Canonical title is *Beyond Pass@1: Accuracy, Agreement, and Serving-Cost Effects of Public R1-Distill Quantization Checkpoints under a Pinned Stack* (`paper/main.tex`, 21-page PDF). Branch `paper-major-revision` @ `d707e44`. This file’s “Serving-Stack Shift” title and 2026-08-14 “Needs revision” status are historical. GPU work is closed.
 
 **Status (2026-08-14 — historical): Needs revision; design was not frozen for submission.**
 

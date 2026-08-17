@@ -150,7 +150,7 @@ gantt
 - **GPQA-Diamond ($n=198$):** ✅ **100% COMPLETED** (24 cells, seeds 42–44). Qwen: BF16 50.34%, FP8 49.49%, AWQ-4 44.78%, GPTQ-4 47.98%; Llama: BF16 46.13%, FP8 47.81%, AWQ-4 46.97%, GPTQ-4 44.95%.
 
 #### [x] Phase 6: Manuscript Completion & Submission Packaging (COMPLETED)
-- Canonical manuscript: [`paper/main.tex`](paper/main.tex) compiled to [`paper/main.pdf`](paper/main.pdf) (**20 pages**). Markdown mirror: [`paper/main.md`](paper/main.md) (do not cite for numbers).
+- Canonical manuscript: [`paper/main.tex`](paper/main.tex) compiled to [`paper/main.pdf`](paper/main.pdf) (**21 pages**). Markdown mirror: [`paper/main.md`](paper/main.md) (do not cite for numbers).
 - ArXiv zip: [`paper/arxiv_source.zip`](paper/arxiv_source.zip) rebuilt from current `main.tex` + `references.bib` + `main.bbl`.
 - Target venue: *Future Generation Computer Systems (FGCS)* / *Journal of Systems and Software (JSS)* (Q1).
 - All 88 validation JSON files across MATH-500, GSM8K, and GPQA are in `results/` on `paper-major-revision` (`d707e44`). Next: visual PDF QA, then referee review. Do not merge to `main`.

@@ -16,7 +16,7 @@
 | **Llama-8B** | **AWQ-4** | 86.48% | 70.2±2.7 | 89.51 | $0.0431 [0.0415,0.0450] | 391.1±0.5 | 11.63 | $0.0056 [0.0055,0.0058] | +18.5% [+16.6,+20.5] |
 | **Llama-8B** | **GPTQ-4** | 88.92% | 63.5±0.4 | 86.95 | $0.0407 [0.0398,0.0418] | 366.2±0.8 | 12.60 | $0.0059 [0.0058,0.0060] | +24.9% [+23.0,+26.7] |
 
-Reported $\pm$ is **sample SD** (`statistics.stdev`, $n-1$). Hybrid scenario Cost-of-Pass uses confirmation GPU-sec in the numerator and campaign MATH-500 pass@1 in the denominator at $1.50/A100-h$. Intervals are Monte Carlo 95% (timing-rep × clustered pass@1). Llama GPTQ-4 mean throughput is within 0.2% of Llama BF16; do not say statistically tied.
+Reported $\pm$ is **sample SD** (`statistics.stdev`, $n-1$). Hybrid scenario Cost-of-Pass uses confirmation GPU-sec in the numerator and campaign MATH-500 pass@1 in the denominator at $1.50/A100-h$. Intervals are Monte Carlo 95% (timing-rep × clustered pass@1). Llama GPTQ-4 mean throughput is about 0.2% lower than Llama BF16; do not say statistically tied.
 
 ## 1b. Ranking disagreement (token-proxy vs Condition A vs Condition B)
 

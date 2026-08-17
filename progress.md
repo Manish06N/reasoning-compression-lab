@@ -16,7 +16,7 @@ Canonical dated record for **Paper 1: Beyond Pass@1** (`reasoning-compression-la
 | **Active Branch** | `paper-major-revision` @ `d707e44` (pushed). Do not merge to `main`. |
 | **Gold-Free Modal Agreement** | **Complete.** Compact artifact SHA256 `23e9ead0...`; Wilson/Clopper–Pearson risk intervals attached. |
 | **Measured Serving Systems Benchmark** | **Confirmation preferred (52+8 JSON files).** Hybrid scenario $C_{\mathrm{pass}}$; rankings disagree across proxy / Cond A / Cond B. Qwen FP8 Cond B is five-rep bimodal. First unconstrained run is provenance only. |
-| **Scientific Authority** | [`paper/main.tex`](paper/main.tex) / [`paper/main.pdf`](paper/main.pdf) (20 pages). Canonical JSON: `revision_reanalysis_report.json`, `modal_agreement_report.json`, `measured_serving_confirmation_report.json`. Frozen tables: `results/reports/major_revision_tables.md`. |
+| **Scientific Authority** | [`paper/main.tex`](paper/main.tex) / [`paper/main.pdf`](paper/main.pdf) (21 pages). Canonical JSON: `revision_reanalysis_report.json`, `modal_agreement_report.json`, `measured_serving_confirmation_report.json`. Frozen tables: `results/reports/major_revision_tables.md`. |
 | **ArXiv source** | [`paper/arxiv_source.zip`](paper/arxiv_source.zip) rebuilt from current `main.tex` + `references.bib` + `main.bbl`. |
 | **MATH-500 Confirmatory Grid** | **100% Complete** (40 cells, 20,000 completions, seeds 42–46). Qwen: BF16 94.00%, FP8 94.40%, AWQ4 93.12%, GPTQ4 93.48%; Llama: BF16 89.24%, FP8 89.52%, AWQ4 86.48%, GPTQ4 88.92% |
 | **GSM8K Breadth Grid** | **100% Complete** (24 cells, $n=1,319$, seeds 42–44) |

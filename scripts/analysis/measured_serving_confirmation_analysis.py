@@ -476,7 +476,7 @@ def qwen_fp8_condition_b_stats(
         "fast_regime": _regime(fast),
         "note": (
             "Do not collapse the five repeats into a lone -36.0% abstract sentence. "
-            "Llama GPTQ-4 mean throughput is within 0.2% of Llama BF16; "
+            "Llama GPTQ-4 mean throughput is about 0.2% lower than Llama BF16; "
             "do not say statistically tied."
         ),
     }
@@ -552,7 +552,7 @@ def generate_confirmation_markdown_reports(
         "Hybrid scenario Cost-of-Pass uses confirmation GPU-sec in the numerator and "
         "campaign MATH-500 pass@1 in the denominator at $1.50/A100-h$. "
         "Intervals are Monte Carlo 95% (timing-rep × clustered pass@1). "
-        "Llama GPTQ-4 mean throughput is within 0.2% of Llama BF16; do not say statistically tied."
+        "Llama GPTQ-4 mean throughput is about 0.2% lower than Llama BF16; do not say statistically tied."
     )
     lines.append("")
     lines.append("## 1b. Ranking disagreement (token-proxy vs Condition A vs Condition B)")

@@ -60,7 +60,7 @@ We ask four questions under that pin:
 (C1)~A pinned protocol with problem-clustered pass@1, $\pm 1$\,pp TOST, and an explicit distinction from maj@5 consensus.
 (C2)~Checkpoint-specific accuracy: the tested Llama AWQ-4 checkpoint shows the largest MATH-500 and GSM8K pass@1 drops among the evaluated Llama cells; the tested Qwen AWQ-4 checkpoint shows the largest GPQA-Diamond drop among the evaluated Qwen cells; FP8--BF16 MATH intervals include zero but fail TOST.
 (C3)~Length estimands on the full MATH-500 grid: ratio of means, $2\times 2$ correctness strata with clustered CIs, a clustered mismatch-excess contrast $D$, a BF16 failure-length control, and a BF16-correct conditional $\Delta$, following Lian et al.
-(C4)~Post-hoc gold-free unique-mode abstention on five MATH-500 seeds, with Wilson/Clopper--Pearson intervals on selective risk.
+(C4)~Post-hoc gold-free unique-mode abstention on five MATH-500 seeds, with Wilson intervals on selective risk.
 (C5)~Cost-estimator disagreement: rankings from a historical $65$ tok/s token proxy, sequential Condition~A, and batched Condition~B aggregate hybrid Cost-of-Pass proxies do not agree. The released grid and analysis artifacts support reproducibility of these contributions.
 
 \section{Related Work}
@@ -340,7 +340,7 @@ Table~\ref{tab:difficulty}: Level~1 is easy for every format in this sample. The
 
 \subsection{Observable modal agreement on MATH-500}
 \label{sec:modal}
-Because MATH-500 was evaluated with five generations per item, we additionally examine whether observable answer agreement provides a useful gold-free abstention signal. Recovered answer strings make RQ3 measurable as observable multi-sample agreement, selective prediction, and abstention---not as model safety or softmax calibration, and not as G-Pass@$k$~\cite{liu2025gpass}. Table~\ref{tab:modal} reports coverage and selective risk at three discrete thresholds. On MATH-500, higher observable answer agreement is associated with lower selective error. At 5/5 consensus, observed selective error is at most $0.27\%$ across the evaluated configurations, but coverage ranges from $70.2\%$ (Llama AWQ-4) to $88.8\%$ (Qwen FP8). Several $0.00\%$ risk cells have bootstrap intervals $[0,0]$; Wilson 95\% upper bounds on those $0/n$ cells are $0.79$--$1.08\%$. Zero observed errors is not zero true error.
+Because MATH-500 was evaluated with five generations per item, we additionally examine whether observable answer agreement provides a useful gold-free abstention signal. Recovered answer strings make RQ3 measurable as observable multi-sample agreement, selective prediction, and abstention---not as model safety or softmax calibration, and not as G-Pass@$k$~\cite{liu2025gpass}. Table~\ref{tab:modal} reports coverage and selective risk at three discrete thresholds. On MATH-500, higher observable answer agreement is associated with lower selective error. At 5/5 consensus, observed selective error is at most $0.27\%$ across the evaluated configurations, but coverage ranges from $70.2\%$ (Llama AWQ-4) to $88.8\%$ (Qwen FP8). Several $0.00\%$ risk cells have bootstrap intervals $[0,0]$; Wilson 95\% upper bounds on those $0/n$ cells are $0.82\%--1.08\%$. Zero observed errors is not zero true error.
 
 AWQ-4 reduces strict-consensus coverage in some configurations, most clearly for Llama-8B: $70.2\%$ versus $76.2\%$ for BF16, a paired difference of $-6.0$\,pp ($95\%$ CI $[-9.4,-2.6]$). Llama AWQ-4 $\ge 4/5$ coverage falls $3.2$\,pp ($[-6.0,-0.6]$). Qwen AWQ-4 $\ge 4/5$ coverage falls $2.2$\,pp ($[-4.0,-0.6]$). The $\ge 3/5$ AWQ contrasts, and all GPTQ-4 coverage contrasts, have paired intervals that include zero. No clear FP8--BF16 difference was detected in modal-agreement coverage or selective risk under these configurations. Appendix Table~\ref{tab:modal-paired} lists the full threshold pattern.
 
@@ -417,31 +417,55 @@ Llama-8B & GPTQ-4 & 93.8 & 2.77 & 86.4 & 0.46 & 75.4 & 0.27 & 24{,}203 \\
 ]
 \nextgroupplot[title={Qwen-7B (\texttt{ragpu003})}]
 \addplot[only marks, mark=*, blue, mark size=3pt,
-    error bars/.cd, x dir=both, x explicit]
-    coordinates {(5.957,94.00) +- (0.100,0)};
+    error bars/.cd, x dir=both, x explicit, y dir=none]
+    table[row sep=\\, x=x, y=y, x error minus=xm, x error plus=xp] {
+    x y xm xp \\
+    5.956865 94.00 0.103286 0.114559 \\
+    };
 \addplot[only marks, mark=square*, green!60!black, mark size=3pt,
-    error bars/.cd, x dir=both, x explicit]
-    coordinates {(3.814,94.40) +- (0.700,0)};
+    error bars/.cd, x dir=both, x explicit, y dir=none]
+    table[row sep=\\, x=x, y=y, x error minus=xm, x error plus=xp] {
+    x y xm xp \\
+    3.814391 94.40 0.671988 0.660611 \\
+    };
 \addplot[only marks, mark=triangle*, red, mark size=3.5pt,
-    error bars/.cd, x dir=both, x explicit]
-    coordinates {(3.499,93.12) +- (0.100,0)};
+    error bars/.cd, x dir=both, x explicit, y dir=none]
+    table[row sep=\\, x=x, y=y, x error minus=xm, x error plus=xp] {
+    x y xm xp \\
+    3.499199 93.12 0.064740 0.070019 \\
+    };
 \addplot[only marks, mark=diamond*, orange, mark size=3.5pt,
-    error bars/.cd, x dir=both, x explicit]
-    coordinates {(3.223,93.48) +- (0.050,0)};
+    error bars/.cd, x dir=both, x explicit, y dir=none]
+    table[row sep=\\, x=x, y=y, x error minus=xm, x error plus=xp] {
+    x y xm xp \\
+    3.222761 93.48 0.058101 0.063274 \\
+    };
 \legend{BF16, FP8, AWQ-4, GPTQ-4}
 \nextgroupplot[title={Llama-8B (\texttt{ragpu004})}]
 \addplot[only marks, mark=*, blue, mark size=3pt,
-    error bars/.cd, x dir=both, x explicit]
-    coordinates {(4.728,89.24) +- (0.100,0)};
+    error bars/.cd, x dir=both, x explicit, y dir=none]
+    table[row sep=\\, x=x, y=y, x error minus=xm, x error plus=xp] {
+    x y xm xp \\
+    4.728241 89.24 0.106368 0.115058 \\
+    };
 \addplot[only marks, mark=square*, green!60!black, mark size=3pt,
-    error bars/.cd, x dir=both, x explicit]
-    coordinates {(4.340,89.52) +- (0.100,0)};
+    error bars/.cd, x dir=both, x explicit, y dir=none]
+    table[row sep=\\, x=x, y=y, x error minus=xm, x error plus=xp] {
+    x y xm xp \\
+    4.340136 89.52 0.098358 0.107171 \\
+    };
 \addplot[only marks, mark=triangle*, red, mark size=3.5pt,
-    error bars/.cd, x dir=both, x explicit]
-    coordinates {(5.605,86.48) +- (0.150,0)};
+    error bars/.cd, x dir=both, x explicit, y dir=none]
+    table[row sep=\\, x=x, y=y, x error minus=xm, x error plus=xp] {
+    x y xm xp \\
+    5.604882 86.48 0.139051 0.151922 \\
+    };
 \addplot[only marks, mark=diamond*, orange, mark size=3.5pt,
-    error bars/.cd, x dir=both, x explicit]
-    coordinates {(5.905,88.92) +- (0.100,0)};
+    error bars/.cd, x dir=both, x explicit, y dir=none]
+    table[row sep=\\, x=x, y=y, x error minus=xm, x error plus=xp] {
+    x y xm xp \\
+    5.905101 88.92 0.130589 0.141440 \\
+    };
 \end{groupplot}
 \end{tikzpicture}
 \caption{Confirmation Condition~B aggregate hybrid Cost-of-Pass proxy versus campaign MATH-500 pass@1 (\$ $\times 10^{-3}$). Whiskers are 95\% uncertainty intervals conditional on the observed timing repetitions and clustered accuracy bootstrap. Points are not joined. Panels are interpreted within model family; Qwen and Llama confirmation jobs ran on different hosts, so no pooled cross-host frontier is inferred. Within Qwen, Condition~B nondominated points are FP8 and GPTQ-4; within Llama, FP8. Not a unique Pareto-efficient cell. Qwen FP8's wide whisker is the five-rep wall-clock spread.}

@@ -3,7 +3,7 @@
 ## Current project state (2026-08-17 freeze)
 
 - Canonical scientific freeze: `paper-major-revision` @ `d707e44` — [PUBLICATION_READINESS.md](PUBLICATION_READINESS.md).
-- Next: visual PDF QA of the 20-page `paper/main.pdf`, then referee review. GPU work is closed. Do not merge to `main`.
+- Next: visual PDF QA of the 21-page `paper/main.pdf`, then referee review. GPU work is closed. Do not merge to `main`.
 - The 2026-08-14 “Needs revision” bullets below are historical (FP8-only package). Do not re-open recovery Phase 0.
 
 ## Current project state (2026-08-14 — historical)

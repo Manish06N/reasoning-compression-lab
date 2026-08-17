@@ -1,6 +1,6 @@
 # PhD Roadmap Master Report
 
-> **Freeze (2026-08-17):** Paper 1 title and findings are in [`../README.md`](../README.md) and [`../paper/main.tex`](../paper/main.tex) (20-page PDF; `d707e44` on `paper-major-revision`). This roadmap's older “Serving-Stack Shift” title and 2026-08-14 “Needs revision” banner are historical. Canonical numbers: `results/reports/revision_reanalysis_report.json`. GPU work is closed.
+> **Freeze (2026-08-17):** Paper 1 title and findings are in [`../README.md`](../README.md) and [`../paper/main.tex`](../paper/main.tex) (21-page PDF; `d707e44` on `paper-major-revision`). This roadmap's older “Serving-Stack Shift” title and 2026-08-14 “Needs revision” banner are historical. Canonical numbers: `results/reports/revision_reanalysis_report.json`. GPU work is closed.
 
 **From Beginner-Level Understanding to A100 Execution**
 
