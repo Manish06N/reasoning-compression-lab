@@ -1,0 +1,33 @@
+{
+  "benchmark_type": "task_realistic",
+  "condition": "B_batched_throughput_c8",
+  "concurrency": 8,
+  "model": "Qwen-7B",
+  "format": "AWQ-4",
+  "repetition": 2,
+  "n_requests": 100,
+  "total_input_tokens": 8198,
+  "total_output_tokens": 404896,
+  "mean_output_tokens_per_req": 4048.96,
+  "elapsed_seconds": 588.5337477773428,
+  "output_tokens_per_second": 687.9741417193673,
+  "requests_per_second": 0.16991379063250003,
+  "gpu_seconds_per_query": 5.885337477773428,
+  "peak_vram_allocated_gb": 56.00370931625366,
+  "peak_vram_reserved_gb": 56.681640625,
+  "gpu_metadata": {
+    "hostname": "ragpu008",
+    "timestamp": "2026-08-16T20:20:01.849591+00:00",
+    "torch_version": "2.5.1+cu124",
+    "cuda_version": "12.4",
+    "gpu_count": 1,
+    "gpu_devices": [
+      {
+        "device_id": 0,
+        "name": "NVIDIA A100 80GB PCIe",
+        "total_memory_gb": 79.138427734375
+      }
+    ],
+    "nvidia_smi": "550.54.14, NVIDIA A100 80GB PCIe, GPU-910aeb04-b4ee-3f62-3402-6aabdf32bfeb, 81920 MiB\n550.54.14, NVIDIA A100 80GB PCIe, GPU-e9e023ab-467e-ffb7-336e-0db2d28b842b, 81920 MiB"
+  }
+}

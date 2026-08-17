@@ -1,0 +1,491 @@
+{
+  "configurations": {
+    "Qwen-7B_BF16": {
+      "model": "Qwen-7B",
+      "format": "BF16",
+      "conditions": {
+        "A_single_stream_c1": {
+          "output_tokens_per_second_mean": 79.90689693659674,
+          "output_tokens_per_second_std": 0.06890128109232799,
+          "requests_per_second_mean": 0.0220080690031389,
+          "requests_per_second_std": 1.8976886937405108e-05,
+          "gpu_seconds_per_query_mean": 45.43791383629044,
+          "gpu_seconds_per_query_std": 0.03915646276667044,
+          "mean_output_tokens": 3630.8000000000006,
+          "peak_vram_gb_mean": 54.966042041778564,
+          "peak_vram_gb_std": 0.0,
+          "latency_mean_sec": 45.437850420052804,
+          "latency_median_sec": 32.96795963868499,
+          "latency_p90_sec": 77.76045005097986,
+          "latency_p95_sec": 84.97894654100145,
+          "measured_cost_per_query_dollars": 0.018932464098454352,
+          "measured_cost_of_pass_dollars": 0.020140919253674845,
+          "repetitions": 3
+        },
+        "B_batched_throughput_c8": {
+          "output_tokens_per_second_mean": 694.2711239553115,
+          "output_tokens_per_second_std": 0.6492207282450744,
+          "requests_per_second_mean": 0.1779466019974809,
+          "requests_per_second_std": 0.000166399866783123,
+          "gpu_seconds_per_query_mean": 5.619668278222282,
+          "gpu_seconds_per_query_std": 0.005255189784336165,
+          "mean_output_tokens": 3901.57,
+          "peak_vram_gb_mean": 56.00361394882202,
+          "peak_vram_gb_std": 0.0,
+          "latency_mean_sec": 5.619668278222282,
+          "latency_median_sec": 5.619668278222282,
+          "latency_p90_sec": 5.619668278222282,
+          "latency_p95_sec": 5.619668278222282,
+          "measured_cost_per_query_dollars": 0.0023415284492592846,
+          "measured_cost_of_pass_dollars": 0.0024909877119779623,
+          "repetitions": 3
+        }
+      },
+      "microbenchmark": {
+        "raw_decode_tokens_per_second": 724.6688975671533,
+        "fixed_tokens": 512
+      },
+      "canonical_pass1": 0.94
+    },
+    "Qwen-7B_FP8": {
+      "model": "Qwen-7B",
+      "format": "FP8",
+      "conditions": {
+        "A_single_stream_c1": {
+          "output_tokens_per_second_mean": 85.88867777447153,
+          "output_tokens_per_second_std": 0.7856079242872761,
+          "requests_per_second_mean": 0.021709618394811128,
+          "requests_per_second_std": 0.0001985738829162155,
+          "gpu_seconds_per_query_mean": 46.06636222886542,
+          "gpu_seconds_per_query_std": 0.41871014194535566,
+          "mean_output_tokens": 3956.25,
+          "peak_vram_gb_mean": 54.981202602386475,
+          "peak_vram_gb_std": 0.0,
+          "latency_mean_sec": 46.06629678842922,
+          "latency_median_sec": 41.87223879992962,
+          "latency_p90_sec": 69.14123070935408,
+          "latency_p95_sec": 77.6008250991504,
+          "measured_cost_per_query_dollars": 0.019194317595360593,
+          "measured_cost_of_pass_dollars": 0.020332963554407408,
+          "repetitions": 3
+        },
+        "B_batched_throughput_c8": {
+          "output_tokens_per_second_mean": 824.269788207987,
+          "output_tokens_per_second_std": 3.995273702958176,
+          "requests_per_second_mean": 0.22105023176073968,
+          "requests_per_second_std": 0.0010714406746685791,
+          "gpu_seconds_per_query_mean": 4.523965258995692,
+          "gpu_seconds_per_query_std": 0.021997483911305238,
+          "mean_output_tokens": 3728.8799999999997,
+          "peak_vram_gb_mean": 56.01738691329956,
+          "peak_vram_gb_std": 0.0,
+          "latency_mean_sec": 4.523965258995692,
+          "latency_median_sec": 4.523965258995692,
+          "latency_p90_sec": 4.523965258995692,
+          "latency_p95_sec": 4.523965258995692,
+          "measured_cost_per_query_dollars": 0.0018849855245815384,
+          "measured_cost_of_pass_dollars": 0.001996806699768579,
+          "repetitions": 3
+        }
+      },
+      "microbenchmark": {
+        "raw_decode_tokens_per_second": 787.5538174535254,
+        "fixed_tokens": 512
+      },
+      "canonical_pass1": 0.944
+    },
+    "Qwen-7B_AWQ-4": {
+      "model": "Qwen-7B",
+      "format": "AWQ-4",
+      "conditions": {
+        "A_single_stream_c1": {
+          "output_tokens_per_second_mean": 72.7641976513425,
+          "output_tokens_per_second_std": 0.15744529886970363,
+          "requests_per_second_mean": 0.013521425214877633,
+          "requests_per_second_std": 2.9257312013546857e-05,
+          "gpu_seconds_per_query_mean": 73.95704686840376,
+          "gpu_seconds_per_query_std": 0.15990356231661446,
+          "mean_output_tokens": 5381.4,
+          "peak_vram_gb_mean": 55.07836103439331,
+          "peak_vram_gb_std": 0.0,
+          "latency_mean_sec": 73.95696403185526,
+          "latency_median_sec": 51.47345462565621,
+          "latency_p90_sec": 174.4649639122189,
+          "latency_p95_sec": 246.13080138750377,
+          "measured_cost_per_query_dollars": 0.030815436195168237,
+          "measured_cost_of_pass_dollars": 0.03309217804463943,
+          "repetitions": 3
+        },
+        "B_batched_throughput_c8": {
+          "output_tokens_per_second_mean": 687.5120793796792,
+          "output_tokens_per_second_std": 0.5902193449294963,
+          "requests_per_second_mean": 0.16979967186133704,
+          "requests_per_second_std": 0.000145770604038943,
+          "gpu_seconds_per_query_mean": 5.889297231708963,
+          "gpu_seconds_per_query_std": 0.005058894228973842,
+          "mean_output_tokens": 4048.9600000000005,
+          "peak_vram_gb_mean": 56.00370931625366,
+          "peak_vram_gb_std": 0.0,
+          "latency_mean_sec": 5.889297231708963,
+          "latency_median_sec": 5.889297231708963,
+          "latency_p90_sec": 5.889297231708963,
+          "latency_p95_sec": 5.889297231708963,
+          "measured_cost_per_query_dollars": 0.0024538738465454016,
+          "measured_cost_of_pass_dollars": 0.0026351738042798556,
+          "repetitions": 3
+        }
+      },
+      "microbenchmark": {
+        "raw_decode_tokens_per_second": 678.5530756995735,
+        "fixed_tokens": 512
+      },
+      "canonical_pass1": 0.9312
+    },
+    "Qwen-7B_GPTQ-4": {
+      "model": "Qwen-7B",
+      "format": "GPTQ-4",
+      "conditions": {
+        "A_single_stream_c1": {
+          "output_tokens_per_second_mean": 68.33764030569705,
+          "output_tokens_per_second_std": 0.6611906832593338,
+          "requests_per_second_mean": 0.020669854757254524,
+          "requests_per_second_std": 0.0001999881079985266,
+          "gpu_seconds_per_query_mean": 48.384194105366866,
+          "gpu_seconds_per_query_std": 0.47135160006614407,
+          "mean_output_tokens": 3306.15,
+          "peak_vram_gb_mean": 53.86798143386841,
+          "peak_vram_gb_std": 0.0,
+          "latency_mean_sec": 48.38415245351692,
+          "latency_median_sec": 46.2017187140882,
+          "latency_p90_sec": 81.84541284566124,
+          "latency_p95_sec": 86.33322459806999,
+          "measured_cost_per_query_dollars": 0.020160080877236197,
+          "measured_cost_of_pass_dollars": 0.021566196916170517,
+          "repetitions": 3
+        },
+        "B_batched_throughput_c8": {
+          "output_tokens_per_second_mean": 602.6491882239189,
+          "output_tokens_per_second_std": 1.3956660097658609,
+          "requests_per_second_mean": 0.1491547157663711,
+          "requests_per_second_std": 0.00034542511806066764,
+          "gpu_seconds_per_query_mean": 6.704483703648051,
+          "gpu_seconds_per_query_std": 0.01552054080626247,
+          "mean_output_tokens": 4040.43,
+          "peak_vram_gb_mean": 55.166322231292725,
+          "peak_vram_gb_std": 0.0,
+          "latency_mean_sec": 6.704483703648051,
+          "latency_median_sec": 6.704483703648051,
+          "latency_p90_sec": 6.704483703648051,
+          "latency_p95_sec": 6.704483703648051,
+          "measured_cost_per_query_dollars": 0.0027935348765200214,
+          "measured_cost_of_pass_dollars": 0.002988377060890053,
+          "repetitions": 3
+        }
+      },
+      "microbenchmark": {
+        "raw_decode_tokens_per_second": 608.8432106915014,
+        "fixed_tokens": 512
+      },
+      "canonical_pass1": 0.9348
+    },
+    "Llama-8B_BF16": {
+      "model": "Llama-8B",
+      "format": "BF16",
+      "conditions": {
+        "A_single_stream_c1": {
+          "output_tokens_per_second_mean": 73.41384236119313,
+          "output_tokens_per_second_std": 0.6966062241405853,
+          "requests_per_second_mean": 0.013371797450219143,
+          "requests_per_second_std": 0.00012688175733863738,
+          "gpu_seconds_per_query_mean": 74.7910351211826,
+          "gpu_seconds_per_query_std": 0.7138396730987623,
+          "mean_output_tokens": 5490.2,
+          "peak_vram_gb_mean": 55.923137187957764,
+          "peak_vram_gb_std": 0.0,
+          "latency_mean_sec": 74.79096609428525,
+          "latency_median_sec": 47.65676673874259,
+          "latency_p90_sec": 192.5220829509199,
+          "latency_p95_sec": 215.80008630529053,
+          "measured_cost_per_query_dollars": 0.031162931300492754,
+          "measured_cost_of_pass_dollars": 0.03492036228204029,
+          "repetitions": 3
+        },
+        "B_batched_throughput_c8": {
+          "output_tokens_per_second_mean": 649.7174707788004,
+          "output_tokens_per_second_std": 0.5110954828122387,
+          "requests_per_second_mean": 0.14570531198505543,
+          "requests_per_second_std": 0.00011461801494739013,
+          "gpu_seconds_per_query_mean": 6.863172006855408,
+          "gpu_seconds_per_query_std": 0.005395887969025841,
+          "mean_output_tokens": 4459.12,
+          "peak_vram_gb_mean": 56.70994424819946,
+          "peak_vram_gb_std": 0.0,
+          "latency_mean_sec": 6.863172006855408,
+          "latency_median_sec": 6.863172006855408,
+          "latency_p90_sec": 6.863172006855408,
+          "latency_p95_sec": 6.863172006855408,
+          "measured_cost_per_query_dollars": 0.0028596550028564204,
+          "measured_cost_of_pass_dollars": 0.003204454283792493,
+          "repetitions": 3
+        }
+      },
+      "microbenchmark": {
+        "raw_decode_tokens_per_second": 709.7278574903202,
+        "fixed_tokens": 512
+      },
+      "canonical_pass1": 0.8924
+    },
+    "Llama-8B_FP8": {
+      "model": "Llama-8B",
+      "format": "FP8",
+      "conditions": {
+        "A_single_stream_c1": {
+          "output_tokens_per_second_mean": 80.43723852942287,
+          "output_tokens_per_second_std": 1.2207583522201944,
+          "requests_per_second_mean": 0.01643236300536723,
+          "requests_per_second_std": 0.00024938628864264965,
+          "gpu_seconds_per_query_mean": 60.86955183098714,
+          "gpu_seconds_per_query_std": 0.9246092095232246,
+          "mean_output_tokens": 4895.05,
+          "peak_vram_gb_mean": 55.930598735809326,
+          "peak_vram_gb_std": 0.0,
+          "latency_mean_sec": 60.86948240424196,
+          "latency_median_sec": 40.22923766821623,
+          "latency_p90_sec": 113.74957758734631,
+          "latency_p95_sec": 161.80839988812815,
+          "measured_cost_per_query_dollars": 0.02536231326291131,
+          "measured_cost_of_pass_dollars": 0.028331449131938462,
+          "repetitions": 3
+        },
+        "B_batched_throughput_c8": {
+          "output_tokens_per_second_mean": 759.4759946440126,
+          "output_tokens_per_second_std": 6.961458971036039,
+          "requests_per_second_mean": 0.15689416067626982,
+          "requests_per_second_std": 0.0014381129489878593,
+          "gpu_seconds_per_query_mean": 6.374261085242033,
+          "gpu_seconds_per_query_std": 0.05864913004679621,
+          "mean_output_tokens": 4840.69,
+          "peak_vram_gb_mean": 56.71769571304321,
+          "peak_vram_gb_std": 0.0,
+          "latency_mean_sec": 6.374261085242033,
+          "latency_median_sec": 6.374261085242033,
+          "latency_p90_sec": 6.374261085242033,
+          "latency_p95_sec": 6.374261085242033,
+          "measured_cost_per_query_dollars": 0.0026559421188508472,
+          "measured_cost_of_pass_dollars": 0.002966870105954923,
+          "repetitions": 3
+        }
+      },
+      "microbenchmark": {
+        "raw_decode_tokens_per_second": 761.4877038811866,
+        "fixed_tokens": 512
+      },
+      "canonical_pass1": 0.8952
+    },
+    "Llama-8B_AWQ-4": {
+      "model": "Llama-8B",
+      "format": "AWQ-4",
+      "conditions": {
+        "A_single_stream_c1": {
+          "output_tokens_per_second_mean": 69.43334312375647,
+          "output_tokens_per_second_std": 2.094234201840504,
+          "requests_per_second_mean": 0.01251581176241408,
+          "requests_per_second_std": 0.00037749933788910645,
+          "gpu_seconds_per_query_mean": 79.97056786082685,
+          "gpu_seconds_per_query_std": 2.3752860320508615,
+          "mean_output_tokens": 5547.649999999999,
+          "peak_vram_gb_mean": 56.132617473602295,
+          "peak_vram_gb_std": 0.0,
+          "latency_mean_sec": 79.970503513515,
+          "latency_median_sec": 48.99518143509825,
+          "latency_p90_sec": 212.6502859932682,
+          "latency_p95_sec": 276.3560917605957,
+          "measured_cost_per_query_dollars": 0.033321069942011186,
+          "measured_cost_of_pass_dollars": 0.038530376898717834,
+          "repetitions": 3
+        },
+        "B_batched_throughput_c8": {
+          "output_tokens_per_second_mean": 545.6757399141569,
+          "output_tokens_per_second_std": 125.61933622963268,
+          "requests_per_second_mean": 0.10522437872320477,
+          "requests_per_second_std": 0.02422357389841794,
+          "gpu_seconds_per_query_mean": 10.145663023044667,
+          "gpu_seconds_per_query_std": 2.789513393238572,
+          "mean_output_tokens": 5185.83,
+          "peak_vram_gb_mean": 56.71515130996704,
+          "peak_vram_gb_std": 0.0,
+          "latency_mean_sec": 10.145663023044667,
+          "latency_median_sec": 10.145663023044667,
+          "latency_p90_sec": 10.145663023044667,
+          "latency_p95_sec": 10.145663023044667,
+          "measured_cost_per_query_dollars": 0.004227359592935278,
+          "measured_cost_of_pass_dollars": 0.0048882511481675274,
+          "repetitions": 3
+        }
+      },
+      "microbenchmark": {
+        "raw_decode_tokens_per_second": 437.58492352069095,
+        "fixed_tokens": 512
+      },
+      "canonical_pass1": 0.8648
+    },
+    "Llama-8B_GPTQ-4": {
+      "model": "Llama-8B",
+      "format": "GPTQ-4",
+      "conditions": {
+        "A_single_stream_c1": {
+          "output_tokens_per_second_mean": 71.60155216802652,
+          "output_tokens_per_second_std": 0.963351116813775,
+          "requests_per_second_mean": 0.010102939407386066,
+          "requests_per_second_std": 0.00013592830974344943,
+          "gpu_seconds_per_query_mean": 98.99887509805461,
+          "gpu_seconds_per_query_std": 1.321572168467155,
+          "mean_output_tokens": 7087.2,
+          "peak_vram_gb_mean": 55.99148511886597,
+          "peak_vram_gb_std": 0.0,
+          "latency_mean_sec": 98.99876615963876,
+          "latency_median_sec": 59.528660180668034,
+          "latency_p90_sec": 227.89757585426207,
+          "latency_p95_sec": 457.2626813932011,
+          "measured_cost_per_query_dollars": 0.04124953129085609,
+          "measured_cost_of_pass_dollars": 0.04638948638197941,
+          "repetitions": 3
+        },
+        "B_batched_throughput_c8": {
+          "output_tokens_per_second_mean": 785.5454867889475,
+          "output_tokens_per_second_std": 12.332239505094938,
+          "requests_per_second_mean": 0.1520221327516537,
+          "requests_per_second_std": 0.002386587896815745,
+          "gpu_seconds_per_query_mean": 6.5796013145893815,
+          "gpu_seconds_per_query_std": 0.1026717053600528,
+          "mean_output_tokens": 5167.31,
+          "peak_vram_gb_mean": 56.74449014663696,
+          "peak_vram_gb_std": 0.0,
+          "latency_mean_sec": 6.5796013145893815,
+          "latency_median_sec": 6.5796013145893815,
+          "latency_p90_sec": 6.5796013145893815,
+          "latency_p95_sec": 6.5796013145893815,
+          "measured_cost_per_query_dollars": 0.002741500547745576,
+          "measured_cost_of_pass_dollars": 0.0030831090280539542,
+          "repetitions": 3
+        }
+      },
+      "microbenchmark": {
+        "raw_decode_tokens_per_second": 743.2995101682747,
+        "fixed_tokens": 512
+      },
+      "canonical_pass1": 0.8892
+    }
+  },
+  "comparisons_vs_bf16": {
+    "Qwen-7B_FP8_vs_BF16": {
+      "model": "Qwen-7B",
+      "format": "FP8",
+      "conditions": {
+        "A_single_stream_c1": {
+          "delta_output_tok_sec_pct": 7.485938094456506,
+          "delta_gpu_seconds_per_query_pct": 1.383092531138722,
+          "delta_peak_vram_pct": 0.027581685063637878,
+          "delta_cost_of_pass_pct": 0.9535031560067594
+        },
+        "B_batched_throughput_c8": {
+          "delta_output_tok_sec_pct": 18.724480936505596,
+          "delta_gpu_seconds_per_query_pct": -19.497645857011396,
+          "delta_peak_vram_pct": 0.02459299232032643,
+          "delta_cost_of_pass_pct": -19.838757527108807
+        }
+      }
+    },
+    "Qwen-7B_AWQ-4_vs_BF16": {
+      "model": "Qwen-7B",
+      "format": "AWQ-4",
+      "conditions": {
+        "A_single_stream_c1": {
+          "delta_output_tok_sec_pct": -8.93877695053246,
+          "delta_gpu_seconds_per_query_pct": 62.765058129353655,
+          "delta_peak_vram_pct": 0.20434251483738763,
+          "delta_cost_of_pass_pct": 64.30321589518087
+        },
+        "B_batched_throughput_c8": {
+          "delta_output_tok_sec_pct": -0.9735453978159907,
+          "delta_gpu_seconds_per_query_pct": 4.797951411679672,
+          "delta_peak_vram_pct": 0.00017028799557074114,
+          "delta_cost_of_pass_pct": 5.788310059040904
+        }
+      }
+    },
+    "Qwen-7B_GPTQ-4_vs_BF16": {
+      "model": "Qwen-7B",
+      "format": "GPTQ-4",
+      "conditions": {
+        "A_single_stream_c1": {
+          "delta_output_tok_sec_pct": -14.478420605019213,
+          "delta_gpu_seconds_per_query_pct": 6.484189128250171,
+          "delta_peak_vram_pct": -1.9977072518256687,
+          "delta_cost_of_pass_pct": 7.076527364735949
+        },
+        "B_batched_throughput_c8": {
+          "delta_output_tok_sec_pct": -13.19685243560411,
+          "delta_gpu_seconds_per_query_pct": 19.303904994352035,
+          "delta_peak_vram_pct": -1.4950672974327015,
+          "delta_cost_of_pass_pct": 19.96755530026842
+        }
+      }
+    },
+    "Llama-8B_FP8_vs_BF16": {
+      "model": "Llama-8B",
+      "format": "FP8",
+      "conditions": {
+        "A_single_stream_c1": {
+          "delta_output_tok_sec_pct": 9.566855435348163,
+          "delta_gpu_seconds_per_query_pct": -18.613839569994887,
+          "delta_peak_vram_pct": 0.013342505851351338,
+          "delta_cost_of_pass_pct": -18.868398606192404
+        },
+        "B_batched_throughput_c8": {
+          "delta_output_tok_sec_pct": 16.89326958279996,
+          "delta_gpu_seconds_per_query_pct": -7.123687430899557,
+          "delta_peak_vram_pct": 0.013668616583053878,
+          "delta_cost_of_pass_pct": -7.4141852807582325
+        }
+      }
+    },
+    "Llama-8B_AWQ-4_vs_BF16": {
+      "model": "Llama-8B",
+      "format": "AWQ-4",
+      "conditions": {
+        "A_single_stream_c1": {
+          "delta_output_tok_sec_pct": -5.422000959781896,
+          "delta_gpu_seconds_per_query_pct": 6.925339021250259,
+          "delta_peak_vram_pct": 0.37458607685128187,
+          "delta_cost_of_pass_pct": 10.33784984107737
+        },
+        "B_batched_throughput_c8": {
+          "delta_output_tok_sec_pct": -16.013380514445945,
+          "delta_gpu_seconds_per_query_pct": 47.82760818045186,
+          "delta_peak_vram_pct": 0.009181920096392,
+          "delta_cost_of_pass_pct": 52.545510569189645
+        }
+      }
+    },
+    "Llama-8B_GPTQ-4_vs_BF16": {
+      "model": "Llama-8B",
+      "format": "GPTQ-4",
+      "conditions": {
+        "A_single_stream_c1": {
+          "delta_output_tok_sec_pct": -2.468594661276852,
+          "delta_gpu_seconds_per_query_pct": 32.367301692841224,
+          "delta_peak_vram_pct": 0.12221762645125865,
+          "delta_cost_of_pass_pct": 32.84365725448885
+        },
+        "B_batched_throughput_c8": {
+          "delta_output_tok_sec_pct": 20.905704728446576,
+          "delta_gpu_seconds_per_query_pct": -4.131773063282938,
+          "delta_peak_vram_pct": 0.06091682666148421,
+          "delta_cost_of_pass_pct": -3.7867681980135988
+        }
+      }
+    }
+  },
+  "cost_analysis_summary": {}
+}

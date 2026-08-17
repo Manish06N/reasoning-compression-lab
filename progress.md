@@ -9,19 +9,18 @@ Canonical dated record for **Paper 1: Beyond Pass@1** (`reasoning-compression-la
 
 ---
 
-## Current Status Snapshot (2026-08-16 night: P0 reanalysis on `paper-p0-reanalysis`)
+## Current Status Snapshot (2026-08-16: Measured Serving Benchmark on `paper-measured-serving`)
 
 | Area | Status |
 |------|--------|
-| **Publication verdict** | P0-corrected preprint on branch `paper-p0-reanalysis`. Canonical JSON: `results/reports/revision_reanalysis_report.json`. Not a release tag. |
-| **Scientific authority** | [`paper/main.tex`](paper/main.tex) / [`paper/main.pdf`](paper/main.pdf). Do not cite 0/0 pathologies, 98.23% safety gate, Pareto-optimal FP8, or the 200-item subset. |
-| **Execution authority** | Grid complete. Next HPC: check JSONLs, then measured throughput — not another 50k campaign. Scoreboard: [`results/README.md`](results/README.md). |
+| **Active Branch** | `paper-measured-serving` (branched from `paper-modal-agreement` HEAD `845d879`). |
+| **Gold-Free Modal Agreement** | **100% Completed & Validated.** 20,000/20,000 reproduced; 0 transitivity violations across 4,000 groups; risk-coverage frontier computed via 10,000 bootstrap replicates; committed & pushed. |
+| **Measured Serving Systems Benchmark** | **ACTIVE on HPC 2× A100 GPUs.** Evaluating real throughput (tok/s, req/s), latency distribution (mean, median, P90, P95), peak VRAM, and GPU-sec/query across all 8 configurations under frozen protocol `docs/MEASURED_SERVING_PROTOCOL.md`. |
+| **Scientific Authority** | [`paper/main.tex`](paper/main.tex) / [`paper/main.pdf`](paper/main.pdf). Table 6 to be updated with empirical systems measurements upon benchmark completion. |
 | **MATH-500 Confirmatory Grid** | **100% Complete** (40 cells, 20,000 completions, seeds 42–46). Qwen: BF16 94.00%, FP8 94.40%, AWQ4 93.12%, GPTQ4 93.48%; Llama: BF16 89.24%, FP8 89.52%, AWQ4 86.48%, GPTQ4 88.92% |
-| **Phase 5 Statistical Analysis** | **P0-corrected** — clustered pass@1 bootstrap (Llama AWQ-4 MATH −2.76 pp; Qwen AWQ-4 GPQA −5.56 pp); 25 loops / 0 cap hits / 209 near-cap; token-implied $C_{\mathrm{pass}}$ at assumed 65 tok/s |
 | **GSM8K Breadth Grid** | **100% Complete** (24 cells, $n=1,319$, seeds 42–44) |
 | **GPQA-Diamond Breadth Grid** | **100% Complete** (24 cells, $n=198$, seeds 42–44). Qwen: BF16 50.34%, FP8 49.49%, AWQ-4 44.78%, GPTQ-4 47.98%; Llama: BF16 46.13%, FP8 47.81%, AWQ-4 46.97%, GPTQ-4 44.95% |
-| **Hardware Utilization** | Campaign finished. Do not submit extra GPU jobs unless asked. |
-| **Backups** | Dual verified backups in local project `archive/` and `/home/manishn_iitp/archive/`; 88 JSON files in `results/` |
+| **Backups** | Dual verified backups in local project `archive/` and `/home/manishn_iitp/archive/`; 88 JSON files in `results/`; compact modal artifact in `results/recovered/math500_modal_inputs.jsonl` |
 
 ### 2026-08-13 run diagnosis: what worked, what did not, and why
 
