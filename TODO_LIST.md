@@ -69,19 +69,40 @@ Pathology on the **full 88-cell grid**: **25 loops**, **0 exact cap hits**, **20
 * [x] Generated `results/recovered/math500_modal_inputs.jsonl` (3.8 MB, SHA256 `23e9ead021111959cf047323572889c95be0496e9475d6870b06c8b2c9a6149b`).
 * [x] Committed and pushed branch `paper-modal-agreement` to GitHub (HEAD `845d879`).
 
-### [x] 2. Measured Serving Performance Systems Benchmark (COMPLETE)
+### [x] 2. Measured Serving Systems Initial Benchmark (COMPLETED & AUDITED)
 * [x] Created experiment branch `paper-measured-serving`.
-* [x] Froze serving protocol in [`docs/MEASURED_SERVING_PROTOCOL.md`](docs/MEASURED_SERVING_PROTOCOL.md).
-* [x] Generated stratified 100-prompt benchmark subset in `results/measured_serving/input_subset.json` (seed 20260816, 20 per level).
-* [x] Implemented benchmark runner [`scripts/hpc/qrm_parity/benchmark_serving.py`](scripts/hpc/qrm_parity/benchmark_serving.py).
-* [x] Implemented submission pipeline [`scripts/hpc/qrm_parity/run_measured_serving.sh`](scripts/hpc/qrm_parity/run_measured_serving.sh).
-* [x] Implemented validation audit [`scripts/hpc/qrm_parity/validate_measured_serving.py`](scripts/hpc/qrm_parity/validate_measured_serving.py).
-* [x] Implemented analysis engine [`scripts/analysis/measured_serving_analysis.py`](scripts/analysis/measured_serving_analysis.py).
-* [x] Launched 8 benchmark jobs on PARAM Rudra HPC across 2 parallel pipelines (1 GPU each, max 2 GPUs).
-* [x] 48 task-realistic + 8 microbenchmark JSON files present; `measured_serving_analysis.py --check` passes.
-* [x] Manuscript integration on MacBook (measured serving is primary cost evidence; 65 tok/s proxy is historical).
+* [x] Completed initial 56 benchmark runs across 8 configurations on A100.
+* [x] Audited benchmark protocol; identified Condition A level balance, Condition B `max_num_seqs=8` pinning, sidecar provenance alignment, and single-node physical control for confirmation.
 
-### [ ] 3. Manuscript & Production Finalization
-* [x] Integrate measured throughput, latency, VRAM, and Cost-of-Pass into `paper/main.tex`.
-* [ ] Final author review before journal submission to *Future Generation Computer Systems (FGCS)* / *Journal of Systems and Software (JSS)*.
-* [ ] Small `finish_reason` / termination-metadata validation — **do not submit yet**.
+### [x] 3. Measured Serving Systems Confirmation Benchmark (COMPLETED & 100% VALIDATED)
+* [x] Created and verified dedicated branch [`paper-serving-confirmation`](file:///scratch/manishn_iitp/reasoning-compression-lab).
+* [x] Authored pre-execution frozen protocol [`docs/MEASURED_SERVING_CONFIRMATION_PROTOCOL.md`](docs/MEASURED_SERVING_CONFIRMATION_PROTOCOL.md) (SHA256 `5f665911...`).
+* [x] Generated balanced Condition A subset (20 items, exactly 4 per level 1–5, seed 20260817).
+* [x] Generated balanced Condition B subset (100 items, exactly 20 per level 1–5, seed 20260817).
+* [x] Verified 100% bijective problem/full_prompt provenance alignment on all 120 subset records.
+* [x] Implemented `benchmark_serving_confirmation.py` with explicit `max_num_seqs=8` runtime assertion and $\text{CV} \le 3.0\%$ expansion logic.
+* [x] Launched dual-GPU parallel execution on PARAM Rudra HPC (Job `96766` on `ragpu003` for Qwen-7B; Job `96768` on `ragpu004` for Llama-8B).
+* [x] Verified zero intra-architecture node mixing (100% single-node physical control per model family: Qwen on `ragpu003`, Llama on `ragpu004`).
+* [x] Activated detached 30-minute Telegram heartbeat & milestone daemon (`telegram_30min_heartbeat.py`).
+* [x] Completed all 60 confirmation runs across all 8 configurations with 0 OOMs, 0 crashes, and $\text{CV} \le 3.0\%$.
+
+### [/] 4. Post-Confirmation Sequence & Paper 1 (J1) Submission Protocol
+* [x] **Step 1: Automated Audit & Cost Remodeling (HPC):**
+  * Executed `validate_measured_serving_confirmation.py` (asserted 60 runs, 0 OOMs, single-node physical invariance, 0 integrity errors).
+  * Executed `measured_serving_confirmation_analysis.py` (computed measured Cost-of-Pass $C_{\text{pass}}^{\text{meas}}$ and generated JSON + Markdown reports).
+  * Sent completion alerts to Telegram bot (`@ManMan06`).
+* [ ] **Step 2: Commit & GitHub Push (HPC):**
+  * Stage all confirmation artifacts, reports, and code to branch `paper-serving-confirmation` and push to GitHub.
+* [ ] **Step 3: MacBook Manuscript Sync & PDF Compilation:**
+  * Pull confirmation results to MacBook via `scripts/macbook/rsync_from_hpc.sh`.
+  * Update Tables in `paper/main.tex` and `paper/main.md` with verified confirmation values.
+  * Recompile camera-ready `paper/main.pdf` (7 pages).
+* [ ] **Step 3: `finish_reason` & Truncation Metrology Diagnostic (HPC):**
+  * Evaluate generation termination dynamics (`stop` token vs `length` truncation) across 4k, 8k, 16k, 32k token budgets.
+* [ ] **Step 4: Official Journal Submission (Paper 1):**
+  * Target venue: *Future Generation Computer Systems (FGCS)* / *Journal of Systems and Software (JSS)* (Scopus/SJR Q1).
+  * Package reproduction bundle (`paper/arxiv_source.zip` + Zenodo schema).
+  * Prepare 2-page monthly supervisor briefing document.
+* [ ] **Step 5: PhD Thesis Pivot — Paper 2 (J2): Reasoning Speculative Decoding:**
+  * Train and benchmark small draft models (0.5B–1.5B) for speculative reasoning acceleration on HPC 2× A100.
+
