@@ -116,7 +116,7 @@ def main():
     ax.set_xticks(x)
     ax.set_xticklabels(labels, fontsize=8)
     ax.set_ylabel("Mean paired token delta vs BF16")
-    ax.set_title("Length change concentrates on format-induced failures")
+    ax.set_title("Mismatch-associated lengthening vs jointly-correct pairs")
     ax.legend(frameon=True)
     fig.tight_layout()
     for dest in ("paper_figures", "paper"):

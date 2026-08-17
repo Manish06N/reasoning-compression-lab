@@ -73,7 +73,7 @@ Detectors (see `scripts/analysis/revision_reanalysis.py`):
 | Exact cap hits | **0** |
 | Near-cap ($\ge 32{,}500$ tokens) | **209** |
 
-MATH-500 Qwen 4-bit near-cap counts are about $1.7\times$ the matched BF16 cell. Phrase-level / n-gram cycles and `P(finish_reason=length | tokens >= 32500)` are **not** in this release.
+MATH-500 Qwen 4-bit near-cap counts are 25 (AWQ-4) and 24 (GPTQ-4) versus 14 for matched BF16. Phrase-level / n-gram cycles and `P(finish_reason=length | tokens >= 32500)` are **not** in this release.
 
 ---
 
@@ -90,7 +90,7 @@ Full MATH-500 grid, all 5 seeds, **ratio of means** vs BF16:
 | Llama AWQ-4 | +1.72% |
 | Llama GPTQ-4 | +3.95% |
 
-Cost-of-Pass in the paper has two layers: (1) **primary** confirmation GPU-sec/query on balanced MATH-500 subsets with `max_num_seqs=8` (`results/measured_serving_confirmation/`, report `reports/measured_serving_confirmation/measured_serving_confirmation_report.json`) at a $\$1.50$/A100-h scenario; (2) **historical** shared-$65$ tok/s token proxy. The earlier unconstrained timing (`results/measured_serving/`) is provenance only. Do not cite a unique “true Pareto optimum.” Do not average the two serving runs.
+Cost-of-Pass in the paper has two layers: (1) **primary** hybrid scenario $C_{\mathrm{pass}}$ from confirmation GPU-sec/query on balanced MATH-500 subsets with `max_num_seqs=8` (`results/measured_serving_confirmation/`, report `reports/measured_serving_confirmation/measured_serving_confirmation_report.json`) over campaign MATH-500 pass@1 at a $\$1.50$/A100-h scenario, with Monte Carlo 95% intervals; (2) **historical** shared-$65$ tok/s token proxy (appendix). Rankings disagree across those estimators. Frozen paper tables: [`reports/major_revision_tables.md`](reports/major_revision_tables.md). The earlier unconstrained timing (`results/measured_serving/`) is provenance only. Do not average the two serving runs.
 
 Confirmation Condition B (100-prompt `llm.generate`, `max_num_seqs=8` pinned, CV-governed $R$; campaign MATH-500 pass@1). Reported $\pm$ is **sample SD**:
 
@@ -105,7 +105,7 @@ Confirmation Condition B (100-prompt `llm.generate`, `max_num_seqs=8` pinned, CV
 | Llama AWQ-4 | $391.11\pm 0.48$ | 11.63 | 56.14 | \$0.0056 | +18.5% |
 | Llama GPTQ-4 | $366.16\pm 0.79$ | 12.60 | 56.01 | \$0.0059 | +24.9% |
 
-Qwen FP8 Condition B has identical token counts across five repeats and two wall-clock regimes; all five are retained. Peak VRAM is the 0.75 utilization pool, not weight footprint. Qwen jobs: `ragpu003`. Llama jobs: `ragpu004`. Single-request effects were architecture dependent (Qwen 4-bit faster than BF16; Llama 4-bit not).
+Qwen FP8 Condition B has identical token counts across five repeats and two wall-clock regimes; all five are retained. Peak VRAM is the 0.75 utilization pool, not weight footprint. Qwen jobs: `ragpu003`. Llama jobs: `ragpu004`. Under Condition A, the tested Qwen AWQ-4/GPTQ-4 checkpoints exceeded matched Qwen BF16 throughput, whereas the tested Llama AWQ-4/GPTQ-4 checkpoints did not.
 
 Reproduce:
 

@@ -271,21 +271,49 @@ def gold_hit_histogram(cell_seeds: dict[int, dict[str, Any]], seeds: list[int], 
     }
 
 
+STRATUM_KEYS = ("both_correct", "bf16_only", "quant_only", "both_wrong")
+
+
+def _ci_from_boot(obs_mean: float, boot: list[float]) -> dict[str, float]:
+    if not boot:
+        return {"mean": obs_mean, "ci95_lo": obs_mean, "ci95_hi": obs_mean, "excludes_zero": False}
+    lo, hi = percentile(boot, 2.5), percentile(boot, 97.5)
+    return {
+        "mean": obs_mean,
+        "ci95_lo": lo,
+        "ci95_hi": hi,
+        "excludes_zero": (lo > 0.0) or (hi < 0.0),
+    }
+
+
 def token_strata(
     bf16_seeds: dict[int, dict[str, Any]],
     other_seeds: dict[int, dict[str, Any]],
     seeds: list[int],
     n_items: int,
 ) -> dict[str, Any]:
-    """Paired (item, seed) token comparison stratified by correctness."""
-    pairs = {"both_correct": [], "bf16_only": [], "quant_only": [], "both_wrong": []}
-    all_bf16 = []
-    all_other = []
-    per_item_ratio = []
-    per_item_delta = []
+    """Paired (item, seed) token comparison stratified by correctness.
+
+    Clustered CIs resample items and keep all seeds. Existing ``delta_ci95`` uses
+    the same Random(BOOT_SEED) item-index stream as ``bootstrap_means``.
+    """
+    pairs: dict[str, list[float]] = {k: [] for k in STRATUM_KEYS}
+    item_stratum: list[dict[str, list[float]]] = [{k: [] for k in STRATUM_KEYS} for _ in range(n_items)]
+    item_lian: list[list[float]] = [[] for _ in range(n_items)]
+    item_bf16_ok: list[list[float]] = [[] for _ in range(n_items)]
+    item_bf16_bad: list[list[float]] = [[] for _ in range(n_items)]
+    all_bf16: list[float] = []
+    all_other: list[float] = []
+    all_bf16_ok: list[float] = []
+    all_bf16_bad: list[float] = []
+    all_lian: list[float] = []
+    keep_bf16: list[float] = []
+    keep_other: list[float] = []
+    per_item_ratio: list[float] = []
+    per_item_delta: list[float] = []
     for i in range(n_items):
-        bf16_tok_item = []
-        other_tok_item = []
+        bf16_tok_item: list[float] = []
+        other_tok_item: list[float] = []
         for s in seeds:
             b_row = bf16_seeds[s]["details"][i]
             o_row = other_seeds[s]["details"][i]
@@ -299,13 +327,26 @@ def token_strata(
             other_tok_item.append(ot)
             rec = ot - bt
             if bc and oc:
-                pairs["both_correct"].append(rec)
+                key = "both_correct"
             elif bc and not oc:
-                pairs["bf16_only"].append(rec)
+                key = "bf16_only"
             elif (not bc) and oc:
-                pairs["quant_only"].append(rec)
+                key = "quant_only"
             else:
-                pairs["both_wrong"].append(rec)
+                key = "both_wrong"
+            pairs[key].append(rec)
+            item_stratum[i][key].append(rec)
+            if bc:
+                item_lian[i].append(rec)
+                all_lian.append(rec)
+                item_bf16_ok[i].append(bt)
+                all_bf16_ok.append(bt)
+            else:
+                item_bf16_bad[i].append(bt)
+                all_bf16_bad.append(bt)
+            if bt < NEAR_CAP and ot < NEAR_CAP:
+                keep_bf16.append(bt)
+                keep_other.append(ot)
         b_mean = sum(bf16_tok_item) / len(seeds)
         o_mean = sum(other_tok_item) / len(seeds)
         per_item_delta.append(o_mean - b_mean)
@@ -323,10 +364,85 @@ def token_strata(
             "p95": percentile(xs, 95),
         }
 
+    rng = random.Random(BOOT_SEED)
+    boot_delta: list[float] = []
+    boot_strata: dict[str, list[float]] = {k: [] for k in STRATUM_KEYS}
+    boot_lian: list[float] = []
+    boot_bf16_ok: list[float] = []
+    boot_bf16_bad: list[float] = []
+    boot_excess: list[float] = []
+    n_boot_skipped_empty = 0
+    for _ in range(N_BOOT):
+        # Same item-index stream as bootstrap_means(per_item_delta).
+        s_delta = 0.0
+        picks: list[int] = []
+        for _i in range(n_items):
+            j = rng.randrange(n_items)
+            picks.append(j)
+            s_delta += per_item_delta[j]
+        boot_delta.append(s_delta / n_items)
+        stratum_means: dict[str, float] = {}
+        for key in STRATUM_KEYS:
+            pooled: list[float] = []
+            for j in picks:
+                pooled.extend(item_stratum[j][key])
+            if pooled:
+                m_key = sum(pooled) / len(pooled)
+                boot_strata[key].append(m_key)
+                stratum_means[key] = m_key
+        if "both_correct" in stratum_means and "bf16_only" in stratum_means:
+            boot_excess.append(stratum_means["bf16_only"] - stratum_means["both_correct"])
+        else:
+            n_boot_skipped_empty += 1
+        lian_pool: list[float] = []
+        ok_pool: list[float] = []
+        bad_pool: list[float] = []
+        for j in picks:
+            lian_pool.extend(item_lian[j])
+            ok_pool.extend(item_bf16_ok[j])
+            bad_pool.extend(item_bf16_bad[j])
+        if lian_pool:
+            boot_lian.append(sum(lian_pool) / len(lian_pool))
+        if ok_pool:
+            boot_bf16_ok.append(sum(ok_pool) / len(ok_pool))
+        if bad_pool:
+            boot_bf16_bad.append(sum(bad_pool) / len(bad_pool))
+
+    d_lo, d_hi = percentile(boot_delta, 2.5), percentile(boot_delta, 97.5)
     ratio_of_means = (sum(all_other) / len(all_other)) / (sum(all_bf16) / len(all_bf16)) - 1.0
     mean_of_ratios = (mean(per_item_ratio) - 1.0) if per_item_ratio else 0.0
-    boot = bootstrap_means(per_item_delta)
-    d_lo, d_hi = percentile(boot, 2.5), percentile(boot, 97.5)
+    if keep_bf16 and keep_other:
+        rom_excl = (sum(keep_other) / len(keep_other)) / (sum(keep_bf16) / len(keep_bf16)) - 1.0
+        n_excl = len(keep_bf16)
+    else:
+        rom_excl = 0.0
+        n_excl = 0
+    strata_out: dict[str, Any] = {}
+    for key in STRATUM_KEYS:
+        rec = summarize(pairs[key])
+        rec.update(_ci_from_boot(rec["mean"], boot_strata[key]))
+        rec["n"] = int(len(pairs[key]))
+        strata_out[key] = rec
+    lian_mean = mean(all_lian) if all_lian else 0.0
+    lian_ci = _ci_from_boot(lian_mean, boot_lian)
+    bf16_ok_mean = mean(all_bf16_ok) if all_bf16_ok else 0.0
+    bf16_bad_mean = mean(all_bf16_bad) if all_bf16_bad else 0.0
+    both_n = int(len(pairs["both_correct"]))
+    mismatch_n = int(len(pairs["bf16_only"]))
+    obs_excess = (
+        (mean(pairs["bf16_only"]) - mean(pairs["both_correct"]))
+        if both_n and mismatch_n
+        else 0.0
+    )
+    excess_ci = _ci_from_boot(obs_excess, boot_excess)
+    if boot_excess:
+        p_hi = sum(1 for x in boot_excess if x >= 0.0) / len(boot_excess)
+        p_lo = sum(1 for x in boot_excess if x <= 0.0) / len(boot_excess)
+        excess_p = min(1.0, 2.0 * min(p_hi, p_lo))
+    else:
+        excess_p = 1.0
+    n_problems_both = sum(1 for rec in item_stratum if rec["both_correct"])
+    n_problems_mismatch = sum(1 for rec in item_stratum if rec["bf16_only"])
     return {
         "ratio_of_means_pct": ratio_of_means * 100,
         "mean_of_per_item_ratios_pct": mean_of_ratios * 100,
@@ -336,7 +452,42 @@ def token_strata(
         "iqr_delta": [percentile(per_item_delta, 25), percentile(per_item_delta, 75)],
         "p90_delta": percentile(per_item_delta, 90),
         "p95_delta": percentile(per_item_delta, 95),
-        "strata": {k: summarize(v) for k, v in pairs.items()},
+        "strata": strata_out,
+        "bf16_length_when_correct": {
+            "n": int(len(all_bf16_ok)),
+            **_ci_from_boot(bf16_ok_mean, boot_bf16_ok),
+        },
+        "bf16_length_when_incorrect": {
+            "n": int(len(all_bf16_bad)),
+            **_ci_from_boot(bf16_bad_mean, boot_bf16_bad),
+        },
+        "lian_bf16_correct_delta": {
+            "n": int(len(all_lian)),
+            "note": "mean(quant-BF16) on (item, seed) where BF16 is correct (Both-OK ∪ BF16-only)",
+            **lian_ci,
+        },
+        "mismatch_excess_vs_both_correct": {
+            "note": (
+                "D = mean(token_delta | BF16-only) - mean(token_delta | Both-OK). "
+                "Same problem-clustered resamples; empty-stratum replicates skipped. Not causal."
+            ),
+            **excess_ci,
+            "p_value": excess_p,
+            "n_boot": N_BOOT,
+            "n_boot_valid": int(len(boot_excess)),
+            "n_boot_skipped_empty_stratum": int(n_boot_skipped_empty),
+            "both_correct": {
+                "n_item_seed": both_n,
+                "n_problems": int(n_problems_both),
+            },
+            "bf16_only": {
+                "n_item_seed": mismatch_n,
+                "n_problems": int(n_problems_mismatch),
+            },
+        },
+        "ratio_of_means_excl_nearcap_pct": rom_excl * 100,
+        "n_pairs_excl_nearcap": n_excl,
+        "n_pairs_total": int(len(all_bf16)),
     }
 
 
@@ -394,6 +545,76 @@ def holm(p_values: list[float], alpha: float = 0.05) -> list[dict[str, Any]]:
         out[i]["holm_alpha"] = thresh
         out[i]["significant"] = p_values[i] < thresh
     return out
+
+
+def holm_adjusted_pvalues(p_values: list[float]) -> list[float]:
+    """Holm step-down adjusted p-values, same order as input."""
+    m = len(p_values)
+    if m == 0:
+        return []
+    indexed = sorted(enumerate(p_values), key=lambda x: x[1])
+    adjusted = [1.0] * m
+    prev = 0.0
+    for rank, (idx, p) in enumerate(indexed, start=1):
+        adj = min(1.0, (m - rank + 1) * p)
+        adj = max(adj, prev)
+        adjusted[idx] = adj
+        prev = adj
+    return adjusted
+
+
+def apply_holm18(
+    math_report: dict[str, Any],
+    gsm_report: dict[str, Any],
+    gpqa_report: dict[str, Any],
+) -> dict[str, Any]:
+    """Secondary Holm over all 18 pass@1 contrasts. Does not replace within-benchmark Holm."""
+    attached: list[dict[str, Any]] = []
+    for bench_name, report in (
+        ("MATH-500", math_report),
+        ("GSM8K", gsm_report),
+        ("GPQA-Diamond", gpqa_report),
+    ):
+        for c in report["pass1_contrasts"]:
+            attached.append({"benchmark": bench_name, "contrast_rec": c})
+    pvals = [row["contrast_rec"]["p_value"] for row in attached]
+    adj = holm_adjusted_pvalues(pvals)
+    holm18 = holm(pvals)
+    rows: list[dict[str, Any]] = []
+    changes: list[dict[str, Any]] = []
+    for row, a, h in zip(attached, adj, holm18):
+        c = row["contrast_rec"]
+        within = bool(c["holm_significant_pass1"])
+        global_sig = bool(h["significant"])
+        c["holm_p_global18"] = a
+        c["holm_alpha_global18"] = h["holm_alpha"]
+        c["holm_significant_global18"] = global_sig
+        rec = {
+            "benchmark": row["benchmark"],
+            "contrast": c["contrast"],
+            "p_value": c["p_value"],
+            "holm_significant_within_benchmark": within,
+            "holm_p_global18": a,
+            "holm_significant_global18": global_sig,
+        }
+        if within != global_sig:
+            rec["status_change"] = (
+                "within-benchmark significant → global-18 not significant"
+                if within and not global_sig
+                else "within-benchmark not significant → global-18 significant"
+            )
+            changes.append(dict(rec))
+        rows.append(rec)
+    return {
+        "note": (
+            "Secondary sensitivity only. Primary inference remains Holm–Bonferroni "
+            "within each benchmark's six prespecified format contrasts."
+        ),
+        "n_contrasts": 18,
+        "alpha": 0.05,
+        "contrasts": rows,
+        "status_changes": changes,
+    }
 
 
 def analyze_benchmark(
@@ -523,31 +744,53 @@ def print_math(report: dict[str, Any]) -> None:
                 f"{s['mean_tokens']:8.1f} {s['loops']:5d} {s['near_cap']:5d} {s['max_completion_tokens']:7d}"
             )
     print("\nPaired pass@1 clustered bootstrap vs BF16")
-    print(f"{'Contrast':<28} {'Δpp':>7} {'95% CI':<18} {'p':>8} {'TOST±1pp':>9} {'McNemar p':>10}")
+    print(
+        f"{'Contrast':<28} {'Δpp':>7} {'95% CI':<18} {'90% CI':<18} {'p':>8} "
+        f"{'Holm':>5} {'TOST±1pp':>9} {'McNemar p':>10}"
+    )
     for c in report["pass1_contrasts"]:
         print(
             f"{c['contrast']:<28} {c['delta_pp']:+6.2f}  "
             f"[{c['ci95_lo_pp']:+5.2f},{c['ci95_hi_pp']:+5.2f}]  "
-            f"{c['p_value']:8.4f} {str(c['tost_equiv_1pp']):>9} {c.get('mcnemar_p', float('nan')):10.4f}"
+            f"[{c['ci90_lo_pp']:+5.2f},{c['ci90_hi_pp']:+5.2f}]  "
+            f"{c['p_value']:8.4f} {str(c['holm_significant_pass1']):>5} "
+            f"{str(c['tost_equiv_1pp']):>9} {c.get('mcnemar_p', float('nan')):10.4f}"
         )
-    print("\nToken inflation vs BF16 (all 5 seeds)")
-    print(f"{'Contrast':<22} {'RoM%':>8} {'mean-ratio%':>12} {'Δtok':>8} {'old200 mean-ratio':>18} {'old200 RoM':>12}")
+    print("\nToken inflation vs BF16 (all 5 seeds); 2×2 clustered 95% CIs; Lian = BF16-correct Δ")
+    print(f"{'Contrast':<22} {'RoM%':>8} {'excl-cap%':>10} {'Δtok':>8} {'Lian Δ':>22}")
     for m in MODELS:
         for fmt in ["FP8", "AWQ-4", "GPTQ-4"]:
             t = report["token_analysis"][f"{m}_{fmt}"]
-            old = t.get("old_200_even_seed42", {})
+            lian = t["lian_bf16_correct_delta"]
             print(
-                f"{m+' '+fmt:<22} {t['ratio_of_means_pct']:+7.2f} {t['mean_of_per_item_ratios_pct']:+11.2f} "
-                f"{t['mean_paired_delta_tokens']:+7.1f} {old.get('mean_of_ratios_pct', 0):+17.2f} "
-                f"{old.get('ratio_of_means_pct', 0):+11.2f}"
+                f"{m+' '+fmt:<22} {t['ratio_of_means_pct']:+7.2f} "
+                f"{t['ratio_of_means_excl_nearcap_pct']:+9.2f} "
+                f"{t['mean_paired_delta_tokens']:+7.1f} "
+                f"{lian['mean']:+7.1f} [{lian['ci95_lo']:+.0f},{lian['ci95_hi']:+.0f}]"
             )
             strata = t["strata"]
             print(
-                "    strata Δtok  "
+                "    2x2 Δtok  "
                 + "  ".join(
-                    f"{k}={strata[k]['mean']:+.0f}(n={strata[k]['n']})"
-                    for k in ("both_correct", "bf16_only", "quant_only", "both_wrong")
+                    f"{k}={strata[k]['mean']:+.0f}"
+                    f"[{strata[k]['ci95_lo']:+.0f},{strata[k]['ci95_hi']:+.0f}](n={strata[k]['n']})"
+                    for k in STRATUM_KEYS
                 )
+            )
+            ok = t["bf16_length_when_correct"]
+            bad = t["bf16_length_when_incorrect"]
+            print(
+                f"    BF16 len  correct={ok['mean']:.0f}[{ok['ci95_lo']:.0f},{ok['ci95_hi']:.0f}](n={ok['n']})"
+                f"  incorrect={bad['mean']:.0f}[{bad['ci95_lo']:.0f},{bad['ci95_hi']:.0f}](n={bad['n']})"
+            )
+            ex = t["mismatch_excess_vs_both_correct"]
+            print(
+                f"    mismatch excess D={ex['mean']:+.0f} "
+                f"[{ex['ci95_lo']:+.0f},{ex['ci95_hi']:+.0f}] "
+                f"p={ex['p_value']:.4f} "
+                f"n_ok={ex['both_correct']['n_item_seed']}/{ex['both_correct']['n_problems']}prob "
+                f"n_mis={ex['bf16_only']['n_item_seed']}/{ex['bf16_only']['n_problems']}prob "
+                f"boot_valid={ex['n_boot_valid']} skip={ex['n_boot_skipped_empty_stratum']}"
             )
     print(f"\nTotal loops={report['total_loops']}  near-cap={report['total_near_cap']}  cap-hits={report['total_token_limit_hits']}")
     print(f"Loop threshold = {LOOP_THRESHOLD} consecutive identical words")
@@ -605,23 +848,40 @@ def compute_report(quiet: bool = False) -> dict[str, Any]:
     math_report = analyze_benchmark(math_data, MATH_SEEDS, 500, "math500")
     gsm_report = analyze_benchmark(gsm_data, BREADTH_SEEDS, 1319, "gsm8k")
     gpqa_report = analyze_benchmark(gpqa_data, BREADTH_SEEDS, 198, "gpqa")
+    holm18 = apply_holm18(math_report, gsm_report, gpqa_report)
     if not quiet:
         print_math(math_report)
         print("\n" + "=" * 110)
-        print("GSM8K / GPQA pass@1 clustered bootstrap vs BF16")
+        print("GSM8K / GPQA pass@1 clustered bootstrap vs BF16 (90% CI = TOST interval)")
         print("=" * 110)
         for bench, rep in [("GSM8K", gsm_report), ("GPQA", gpqa_report)]:
             print(f"\n{bench}")
+            print(
+                f"  {'Contrast':<28} {'Δpp':>7} {'95% CI':<18} {'90% CI':<18} "
+                f"{'p':>8} {'Holm':>5} {'TOST±1pp':>9}"
+            )
             for c in rep["pass1_contrasts"]:
                 print(
-                    f"  {c['contrast']:<28} {c['delta_pp']:+6.2f} pp  "
-                    f"[{c['ci95_lo_pp']:+5.2f},{c['ci95_hi_pp']:+5.2f}]  p={c['p_value']:.4f}  "
-                    f"Holm-sig={c['holm_significant_pass1']}"
+                    f"  {c['contrast']:<28} {c['delta_pp']:+6.2f}  "
+                    f"[{c['ci95_lo_pp']:+5.2f},{c['ci95_hi_pp']:+5.2f}]  "
+                    f"[{c['ci90_lo_pp']:+5.2f},{c['ci90_hi_pp']:+5.2f}]  "
+                    f"{c['p_value']:8.4f} {str(c['holm_significant_pass1']):>5} "
+                    f"{str(c['tost_equiv_1pp']):>9}"
                 )
             print(
                 f"  loops={rep['total_loops']}  near-cap={rep['total_near_cap']}  "
                 f"cap-hits={rep['total_token_limit_hits']}"
             )
+        print("\nHolm-18 sensitivity (secondary; primary remains within-benchmark Holm-6)")
+        if holm18["status_changes"]:
+            for ch in holm18["status_changes"]:
+                print(
+                    f"  STATUS CHANGE  {ch['benchmark']} {ch['contrast']}: "
+                    f"p={ch['p_value']:.4f}  {ch['status_change']}  "
+                    f"holm18_p={ch['holm_p_global18']:.4f}"
+                )
+        else:
+            print("  No within-benchmark vs global-18 significance status changes.")
     return {
         "meta": {
             "canonical": True,
@@ -630,6 +890,7 @@ def compute_report(quiet: bool = False) -> dict[str, Any]:
             "token_cap": TOKEN_CAP,
             "near_cap_threshold": NEAR_CAP,
             "n_boot": N_BOOT,
+            "boot_seed": BOOT_SEED,
             "equiv_margin_pp": EQUIV_MARGIN_PP,
             "extracted_answers_available": False,
             "schema_note": (
@@ -640,6 +901,7 @@ def compute_report(quiet: bool = False) -> dict[str, Any]:
         "math500": math_report,
         "gsm8k": gsm_report,
         "gpqa_diamond": gpqa_report,
+        "holm18_sensitivity": holm18,
         "grid_totals": {
             "loops": math_report["total_loops"] + gsm_report["total_loops"] + gpqa_report["total_loops"],
             "near_cap": math_report["total_near_cap"] + gsm_report["total_near_cap"] + gpqa_report["total_near_cap"],

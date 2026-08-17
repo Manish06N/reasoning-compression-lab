@@ -62,7 +62,17 @@
             0.029106029106029108
           ],
           "five_sample_token_cost_per_served": 20892.504166666666,
-          "five_sample_token_cost_per_correct_served": 21246.61440677966
+          "five_sample_token_cost_per_correct_served": 21246.61440677966,
+          "selective_risk_errors": 8,
+          "selective_risk_wilson_ci_95": [
+            0.008468917956316031,
+            0.032539264494719305
+          ],
+          "selective_risk_clopper_pearson_ci_95": [
+            0.008468917956316031,
+            0.032539264494719305
+          ],
+          "zero_observed_not_zero_true": false
         },
         "tau_4": {
           "threshold": ">=4/5",
@@ -86,7 +96,17 @@
             0.010775862068965525
           ],
           "five_sample_token_cost_per_served": 21474.09421841542,
-          "five_sample_token_cost_per_correct_served": 21566.455913978494
+          "five_sample_token_cost_per_correct_served": 21566.455913978494,
+          "selective_risk_errors": 2,
+          "selective_risk_wilson_ci_95": [
+            0.0011752452709967009,
+            0.015478893131204432
+          ],
+          "selective_risk_clopper_pearson_ci_95": [
+            0.0011752452709967009,
+            0.015478893131204432
+          ],
+          "zero_observed_not_zero_true": false
         },
         "tau_5": {
           "threshold": "5/5",
@@ -110,7 +130,17 @@
             0.00691244239631339
           ],
           "five_sample_token_cost_per_served": 22688.69230769231,
-          "five_sample_token_cost_per_correct_served": 22740.14058956916
+          "five_sample_token_cost_per_correct_served": 22740.14058956916,
+          "selective_risk_errors": 1,
+          "selective_risk_wilson_ci_95": [
+            0.00039948852343671057,
+            0.0127026102274186
+          ],
+          "selective_risk_clopper_pearson_ci_95": [
+            0.00039948852343671057,
+            0.0127026102274186
+          ],
+          "zero_observed_not_zero_true": false
         }
       },
       "token_economics": {
@@ -150,7 +180,17 @@
             0.028865979381443307
           ],
           "five_sample_token_cost_per_served": 20743.656314699794,
-          "five_sample_token_cost_per_correct_served": 21093.023157894735
+          "five_sample_token_cost_per_correct_served": 21093.023157894735,
+          "selective_risk_errors": 8,
+          "selective_risk_wilson_ci_95": [
+            0.00841616995982596,
+            0.03233931308542928
+          ],
+          "selective_risk_clopper_pearson_ci_95": [
+            0.00841616995982596,
+            0.03233931308542928
+          ],
+          "zero_observed_not_zero_true": false
         },
         "tau_4": {
           "threshold": ">=4/5",
@@ -174,7 +214,17 @@
             0.0
           ],
           "five_sample_token_cost_per_served": 21639.710583153348,
-          "five_sample_token_cost_per_correct_served": 21639.710583153348
+          "five_sample_token_cost_per_correct_served": 21639.710583153348,
+          "selective_risk_errors": 0,
+          "selective_risk_wilson_ci_95": [
+            0.0,
+            0.008228615407033856
+          ],
+          "selective_risk_clopper_pearson_ci_95": [
+            0.0,
+            0.007935687087289867
+          ],
+          "zero_observed_not_zero_true": true
         },
         "tau_5": {
           "threshold": "5/5",
@@ -198,7 +248,17 @@
             0.0
           ],
           "five_sample_token_cost_per_served": 22565.734234234234,
-          "five_sample_token_cost_per_correct_served": 22565.734234234234
+          "five_sample_token_cost_per_correct_served": 22565.734234234234,
+          "selective_risk_errors": 0,
+          "selective_risk_wilson_ci_95": [
+            8.673617379884035e-19,
+            0.008577720407596655
+          ],
+          "selective_risk_clopper_pearson_ci_95": [
+            0.0,
+            0.008273868627250991
+          ],
+          "zero_observed_not_zero_true": true
         }
       },
       "token_economics": {
@@ -238,7 +298,17 @@
             0.026640711785101138
           ],
           "five_sample_token_cost_per_served": 22261.584551148226,
-          "five_sample_token_cost_per_correct_served": 22591.735169491527
+          "five_sample_token_cost_per_correct_served": 22591.735169491527,
+          "selective_risk_errors": 7,
+          "selective_risk_wilson_ci_95": [
+            0.0070965532423677875,
+            0.02985441377747061
+          ],
+          "selective_risk_clopper_pearson_ci_95": [
+            0.0070965532423677875,
+            0.02985441377747061
+          ],
+          "zero_observed_not_zero_true": false
         },
         "tau_4": {
           "threshold": ">=4/5",
@@ -262,7 +332,17 @@
             0.011061946902654829
           ],
           "five_sample_token_cost_per_served": 23384.427631578947,
-          "five_sample_token_cost_per_correct_served": 23487.442731277533
+          "five_sample_token_cost_per_correct_served": 23487.442731277533,
+          "selective_risk_errors": 2,
+          "selective_risk_wilson_ci_95": [
+            0.0012036149496031708,
+            0.015848911894766775
+          ],
+          "selective_risk_clopper_pearson_ci_95": [
+            0.0012036149496031708,
+            0.015848911894766775
+          ],
+          "zero_observed_not_zero_true": false
         },
         "tau_5": {
           "threshold": "5/5",
@@ -286,7 +366,17 @@
             0.007092198581560294
           ],
           "five_sample_token_cost_per_served": 24683.5625,
-          "five_sample_token_cost_per_correct_served": 24740.83294663573
+          "five_sample_token_cost_per_correct_served": 24740.83294663573,
+          "selective_risk_errors": 1,
+          "selective_risk_wilson_ci_95": [
+            0.00040873859005564894,
+            0.012993976324904542
+          ],
+          "selective_risk_clopper_pearson_ci_95": [
+            0.00040873859005564894,
+            0.012993976324904542
+          ],
+          "zero_observed_not_zero_true": false
         }
       },
       "token_economics": {
@@ -326,7 +416,17 @@
             0.0258815008479364
           ],
           "five_sample_token_cost_per_served": 22469.763102725366,
-          "five_sample_token_cost_per_correct_served": 22804.41914893617
+          "five_sample_token_cost_per_correct_served": 22804.41914893617,
+          "selective_risk_errors": 7,
+          "selective_risk_wilson_ci_95": [
+            0.007126382312642451,
+            0.029978277640041056
+          ],
+          "selective_risk_clopper_pearson_ci_95": [
+            0.007126382312642451,
+            0.029978277640041056
+          ],
+          "zero_observed_not_zero_true": false
         },
         "tau_4": {
           "threshold": ">=4/5",
@@ -350,7 +450,17 @@
             0.010869565217391353
           ],
           "five_sample_token_cost_per_served": 23099.303879310344,
-          "five_sample_token_cost_per_correct_served": 23199.300865800866
+          "five_sample_token_cost_per_correct_served": 23199.300865800866,
+          "selective_risk_errors": 2,
+          "selective_risk_wilson_ci_95": [
+            0.0011828489662578726,
+            0.015578082911093034
+          ],
+          "selective_risk_clopper_pearson_ci_95": [
+            0.0011828489662578726,
+            0.015578082911093034
+          ],
+          "zero_observed_not_zero_true": false
         },
         "tau_5": {
           "threshold": "5/5",
@@ -374,7 +484,17 @@
             0.0
           ],
           "five_sample_token_cost_per_served": 24696.029953917052,
-          "five_sample_token_cost_per_correct_served": 24696.029953917052
+          "five_sample_token_cost_per_correct_served": 24696.029953917052,
+          "selective_risk_errors": 0,
+          "selective_risk_wilson_ci_95": [
+            0.0,
+            0.008773629685596515
+          ],
+          "selective_risk_clopper_pearson_ci_95": [
+            0.0,
+            0.008463701732413398
+          ],
+          "zero_observed_not_zero_true": true
         }
       },
       "token_economics": {
@@ -414,7 +534,17 @@
             0.046025104602510414
           ],
           "five_sample_token_cost_per_served": 24769.102127659575,
-          "five_sample_token_cost_per_correct_served": 25529.55701754386
+          "five_sample_token_cost_per_correct_served": 25529.55701754386,
+          "selective_risk_errors": 14,
+          "selective_risk_wilson_ci_95": [
+            0.01782508134197193,
+            0.049373468358473796
+          ],
+          "selective_risk_clopper_pearson_ci_95": [
+            0.01782508134197193,
+            0.049373468358473796
+          ],
+          "zero_observed_not_zero_true": false
         },
         "tau_4": {
           "threshold": ">=4/5",
@@ -438,7 +568,17 @@
             0.015765765765765716
           ],
           "five_sample_token_cost_per_served": 26518.17312072893,
-          "five_sample_token_cost_per_correct_served": 26700.6376146789
+          "five_sample_token_cost_per_correct_served": 26700.6376146789,
+          "selective_risk_errors": 3,
+          "selective_risk_wilson_ci_95": [
+            0.002326745434924374,
+            0.019896690570598584
+          ],
+          "selective_risk_clopper_pearson_ci_95": [
+            0.002326745434924374,
+            0.019896690570598584
+          ],
+          "zero_observed_not_zero_true": false
         },
         "tau_5": {
           "threshold": "5/5",
@@ -462,7 +602,17 @@
             0.008064516129032251
           ],
           "five_sample_token_cost_per_served": 30555.06036745407,
-          "five_sample_token_cost_per_correct_served": 30635.468421052632
+          "five_sample_token_cost_per_correct_served": 30635.468421052632,
+          "selective_risk_errors": 1,
+          "selective_risk_wilson_ci_95": [
+            0.00046346938935608924,
+            0.014715401511390044
+          ],
+          "selective_risk_clopper_pearson_ci_95": [
+            0.00046346938935608924,
+            0.014715401511390044
+          ],
+          "zero_observed_not_zero_true": false
         }
       },
       "token_economics": {
@@ -502,7 +652,17 @@
             0.048141993403336886
           ],
           "five_sample_token_cost_per_served": 24206.334042553193,
-          "five_sample_token_cost_per_correct_served": 25004.345054945054
+          "five_sample_token_cost_per_correct_served": 25004.345054945054,
+          "selective_risk_errors": 15,
+          "selective_risk_wilson_ci_95": [
+            0.019434590277648208,
+            0.05198478046487694
+          ],
+          "selective_risk_clopper_pearson_ci_95": [
+            0.019434590277648208,
+            0.05198478046487694
+          ],
+          "zero_observed_not_zero_true": false
         },
         "tau_4": {
           "threshold": ">=4/5",
@@ -526,7 +686,17 @@
             0.01834862385321101
           ],
           "five_sample_token_cost_per_served": 25681.663656884877,
-          "five_sample_token_cost_per_correct_served": 25915.66514806378
+          "five_sample_token_cost_per_correct_served": 25915.66514806378,
+          "selective_risk_errors": 4,
+          "selective_risk_wilson_ci_95": [
+            0.0035167794968303905,
+            0.02298357893442653
+          ],
+          "selective_risk_clopper_pearson_ci_95": [
+            0.0035167794968303905,
+            0.02298357893442653
+          ],
+          "zero_observed_not_zero_true": false
         },
         "tau_5": {
           "threshold": "5/5",
@@ -550,7 +720,17 @@
             0.0
           ],
           "five_sample_token_cost_per_served": 29097.12787723785,
-          "five_sample_token_cost_per_correct_served": 29097.12787723785
+          "five_sample_token_cost_per_correct_served": 29097.12787723785,
+          "selective_risk_errors": 0,
+          "selective_risk_wilson_ci_95": [
+            0.0,
+            0.009729117180773596
+          ],
+          "selective_risk_clopper_pearson_ci_95": [
+            0.0,
+            0.009390109284315606
+          ],
+          "zero_observed_not_zero_true": true
         }
       },
       "token_economics": {
@@ -590,7 +770,17 @@
             0.05434782608695654
           ],
           "five_sample_token_cost_per_served": 25410.178111587982,
-          "five_sample_token_cost_per_correct_served": 26372.256124721604
+          "five_sample_token_cost_per_correct_served": 26372.256124721604,
+          "selective_risk_errors": 17,
+          "selective_risk_wilson_ci_95": [
+            0.022899499247908715,
+            0.05764141111720997
+          ],
+          "selective_risk_clopper_pearson_ci_95": [
+            0.022899499247908715,
+            0.05764141111720997
+          ],
+          "zero_observed_not_zero_true": false
         },
         "tau_4": {
           "threshold": ">=4/5",
@@ -614,7 +804,17 @@
             0.033175355450236976
           ],
           "five_sample_token_cost_per_served": 27993.24586288416,
-          "five_sample_token_cost_per_correct_served": 28532.87469879518
+          "five_sample_token_cost_per_correct_served": 28532.87469879518,
+          "selective_risk_errors": 8,
+          "selective_risk_wilson_ci_95": [
+            0.009613740318248156,
+            0.036870635579804065
+          ],
+          "selective_risk_clopper_pearson_ci_95": [
+            0.009613740318248156,
+            0.036870635579804065
+          ],
+          "zero_observed_not_zero_true": false
         },
         "tau_5": {
           "threshold": "5/5",
@@ -638,7 +838,17 @@
             0.0
           ],
           "five_sample_token_cost_per_served": 33735.45014245014,
-          "five_sample_token_cost_per_correct_served": 33735.45014245014
+          "five_sample_token_cost_per_correct_served": 33735.45014245014,
+          "selective_risk_errors": 0,
+          "selective_risk_wilson_ci_95": [
+            8.673617379884035e-19,
+            0.010825845529609503
+          ],
+          "selective_risk_clopper_pearson_ci_95": [
+            0.0,
+            0.010454594894747538
+          ],
+          "zero_observed_not_zero_true": true
         }
       },
       "token_economics": {
@@ -678,7 +888,17 @@
             0.0431034482758621
           ],
           "five_sample_token_cost_per_served": 25802.253731343284,
-          "five_sample_token_cost_per_correct_served": 26537.844298245614
+          "five_sample_token_cost_per_correct_served": 26537.844298245614,
+          "selective_risk_errors": 13,
+          "selective_risk_wilson_ci_95": [
+            0.016269159507307295,
+            0.046841759097675434
+          ],
+          "selective_risk_clopper_pearson_ci_95": [
+            0.016269159507307295,
+            0.046841759097675434
+          ],
+          "zero_observed_not_zero_true": false
         },
         "tau_4": {
           "threshold": ">=4/5",
@@ -702,7 +922,17 @@
             0.011682242990654235
           ],
           "five_sample_token_cost_per_served": 28012.16898148148,
-          "five_sample_token_cost_per_correct_served": 28142.458139534883
+          "five_sample_token_cost_per_correct_served": 28142.458139534883,
+          "selective_risk_errors": 2,
+          "selective_risk_wilson_ci_95": [
+            0.0012705309095591847,
+            0.016721008587191888
+          ],
+          "selective_risk_clopper_pearson_ci_95": [
+            0.0012705309095591847,
+            0.016721008587191888
+          ],
+          "zero_observed_not_zero_true": false
         },
         "tau_5": {
           "threshold": "5/5",
@@ -726,7 +956,17 @@
             0.008152173913043459
           ],
           "five_sample_token_cost_per_served": 32098.824933687003,
-          "five_sample_token_cost_per_correct_served": 32184.19414893617
+          "five_sample_token_cost_per_correct_served": 32184.19414893617,
+          "selective_risk_errors": 1,
+          "selective_risk_wilson_ci_95": [
+            0.0004683884496572291,
+            0.014869907015292064
+          ],
+          "selective_risk_clopper_pearson_ci_95": [
+            0.0004683884496572291,
+            0.014869907015292064
+          ],
+          "zero_observed_not_zero_true": false
         }
       },
       "token_economics": {

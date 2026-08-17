@@ -3,9 +3,9 @@
 **Cluster:** PARAM Rudra HPC (C-DAC / NSM), NVIDIA A100 80GB GPUs  
 **Repository:** `/scratch/manishn_iitp/reasoning-compression-lab`  
 **GitHub:** [https://github.com/Manish06N/reasoning-compression-lab](https://github.com/Manish06N/reasoning-compression-lab)  
-**Last Updated:** 2026-08-17 (controlled serving confirmation integrated on `paper-serving-confirmation`)
+**Last Updated:** 2026-08-17 (P0 closure on `paper-major-revision`; GPU frozen)
 
-**Superseding scientific claims (use these, not the 2026-08-15 blocks below):** Paper title is *Pinned Serving Stack*, not Controlled Serving-Stack Shift. Pathology: **25 loops / 0 exact cap hits / 209 near-cap**. FP8–BF16 clustered CIs include 0; do not cite “FP8 parity.” Cost primary evidence is **confirmation** GPU-sec $C_{\mathrm{pass}}$ with `max_num_seqs=8` (Qwen GPTQ-4 batched $-45.9\%$ $C_{\mathrm{pass}}$ vs BF16; Qwen FP8 $-36.0\%$ with large wall-clock SD; Llama AWQ/GPTQ raise $C_{\mathrm{pass}}$). Do not cite a unique “true Pareto optimum,” “all 4-bit slower in single-stream,” or the superseded first-run $+18.7\%$ / $-19.8\%$ numbers. Campaign evaluator: LightEval **0.8.0**. Canonical: `paper/main.tex`, `results/reports/revision_reanalysis_report.json`, `modal_agreement_report.json`, `measured_serving_confirmation/measured_serving_confirmation_report.json`. **Experimental GPU work is closed. No further GPU jobs are required for the current manuscript.**
+**Superseding scientific claims (use these, not the 2026-08-15 blocks below):** Title is *Beyond Pass@1: Accuracy, Agreement, and Serving-Cost Effects of Public R1-Distill Quantization Checkpoints under a Pinned Stack*. Distinctive result: **estimand disagreement** (pass@1 vs maj@5, length estimators, token-proxy vs sequential vs batched GPU-second cost). Pathology: **25 loops / 0 exact cap hits / 209 near-cap completions**. Checkpoint language only (tested `jakiAJK` Llama AWQ-4; tested Qwen AWQ-4 on GPQA). FP8–BF16 clustered CIs include 0; TOST $\pm 1$ pp fails. Length: clustered mismatch excess $D$ excludes 0 in all six MATH contrasts. Cost: **hybrid scenario** $C_{\mathrm{pass}}$ with Monte Carlo intervals; rankings disagree across proxy / Cond A / Cond B; Qwen FP8 Cond B is five-rep bimodal, not a lone $-36.0\%$. Do not cite architecture-dependent, statistically tied, unique cheapest, “true Pareto,” or first-run $+18.7\%$ / $-19.8\%$. Frozen tables: `results/reports/major_revision_tables.md`. Campaign evaluator: LightEval **0.8.0**. **Experimental GPU work is closed. No further GPU jobs are required for the current manuscript.** Do not merge to `main`. Do not commit/push until asked.
 
 ---
 
@@ -31,7 +31,7 @@ graph TD
 
 | Output | Type | Title / Focus | Target Venues (Verify Q1) | Hardware / Stack | Status / Target Date |
 |---|---|---|---|---|---|
-| **J1** | Main Journal | *Beyond Pass@1: Reliability and Token-Cost Effects of Quantized Reasoning Models under a Pinned Serving Stack* | *Future Generation Computer Systems (FGCS)*, *Journal of Systems and Software (JSS)*, *Neurocomputing* | HPC 2× A100, `qrm-official` (vLLM 0.7.0 eager) | **88/88 cells + serving confirmation**; do not merge to `main` until asked |
+| **J1** | Main Journal | *Beyond Pass@1: Accuracy, Agreement, and Serving-Cost Effects of Public R1-Distill Quantization Checkpoints under a Pinned Stack* | *Future Generation Computer Systems (FGCS)*, *Journal of Systems and Software (JSS)*, *Neurocomputing* | HPC 2× A100, `qrm-official` (vLLM 0.7.0 eager) | **88/88 cells + serving confirmation + major-revision CPU analysis**; do not merge to `main` until asked |
 | **C1** | Conference / Workshop | *Trace-Level Evaluation Metrology for Compressed Reasoning Models* | NeurIPS/ICLR/ACL Workshops (Eval4NLP, Efficient Natural Language, MLPerf) | HPC A100 | Submission Month 6–12 (Post-J1 pilot packaging) |
 | **J2** | Journal 2 | *Reasoning-Aware Speculative Decoding: Acceptance Dynamics and Serving Acceleration* | *JSS*, *Engineering Applications of AI (EAAI)*, *FGCS* | HPC 2× A100 | Year 2 (Methods & draft model training) |
 | **C2** | Conference / Workshop | *High-Throughput Speculative Serving of Compressed Reasoning LLMs* | MLSys / EuroSys / ACL Demo Track | HPC A100 | Year 2 |
@@ -83,7 +83,7 @@ ssh -L 8080:<NODE>:8080 -N manishn_iitp@paramrudra.iitp.ac.in -p 4422
 ## 3. Paper 1 (J1): Scientific Positioning & Breakthrough Results
 
 ### Provisional Title
-> **"Beyond Pass@1: Reliability and Token-Cost Effects of Quantized Reasoning Models under a Pinned Serving Stack"**
+> **"Beyond Pass@1: Accuracy, Agreement, and Serving-Cost Effects of Public R1-Distill Quantization Checkpoints under a Pinned Stack"**
 
 ### Novelty Positioning Against Prior Literature
 * **The Literature Gap:** Prior works (QRM 2025, A Sober Look 2025, Quantized LLMs Can Still Be Calibrated 2025, Cost-of-Pass 2025, Quantization Inflates Reasoning 2026, Reliability Scaling Laws 2026) studied accuracy, seed variance, or token count in isolation.

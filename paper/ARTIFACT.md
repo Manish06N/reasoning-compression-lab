@@ -22,6 +22,7 @@ Compile with `xelatex` → `bibtex` → `xelatex` → `xelatex` (fallback: `pdfl
 | `results/gsm8k/` | 24 validation JSON files |
 | `results/gpqa/` | 24 validation JSON files |
 | `results/reports/revision_reanalysis_report.json` | **Canonical** corrected pass@1 / pathology / token tables |
+| `results/reports/major_revision_tables.md` | Frozen paper-ready tables after independent recompute |
 | `results/reports/modal_agreement_report.json` | Gold-free MATH-500 modal agreement |
 | `results/recovered/math500_modal_inputs.jsonl` | Compact extracted answers (20,000 rows; no CoT / problem text) |
 | `results/reports/measured_serving_confirmation/measured_serving_confirmation_report.json` | **Preferred** tok/s, latency, VRAM, GPU-sec/query, scenario $C_{\mathrm{pass}}$ |

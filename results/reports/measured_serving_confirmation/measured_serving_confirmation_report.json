@@ -7,7 +7,13 @@
     "gpu_dollar_per_second": 0.0004166666666666667,
     "condition_a_workload": "Balanced 20 MATH-500 prompts (4 per Level 1-5), concurrency=1",
     "condition_b_workload": "Balanced 100 MATH-500 prompts (20 per Level 1-5), max_num_seqs=8 pinned",
-    "secondary_microbenchmark": "10 sample prompts, fixed 512 tokens pure decode"
+    "secondary_microbenchmark": "10 sample prompts, fixed 512 tokens pure decode",
+    "hybrid_cpass_note": "Numerator = Condition A or B GPU-sec on the serving subset; denominator = campaign MATH-500 pass@1. Serving prompts are not re-scored. Monte Carlo combines empirical timing-rep GPU-sec/query with problem-clustered bootstrap of campaign pass@1 (10,000 draws, seed 0).",
+    "do_not_say": [
+      "statistically tied",
+      "true Pareto optimum",
+      "true dollar cost"
+    ]
   },
   "configurations": {
     "Qwen-7B_BF16": {
@@ -23,12 +29,24 @@
           "mean_requests_per_second": 0.009755558385630556,
           "mean_gpu_seconds_per_query": 102.50571950015922,
           "std_gpu_seconds_per_query": 0.0915168179569294,
+          "gpu_seconds_per_query_reps": [
+            102.51260484978556,
+            102.41095447354019,
+            102.59359917715192
+          ],
+          "tokens_per_second_reps": [
+            43.918013853975516,
+            43.96160570071843,
+            43.88334200290587
+          ],
           "mean_total_output_tokens": 90043,
           "mean_elapsed_seconds": 2050.1143900031843,
           "model_weights_memory_gb": 54.91669321060181,
           "peak_allocated_engine_vram_gb": 54.95647430419922,
           "cost_per_query_dollars": 0.042710716458399675,
           "measured_cost_pass_dollars": 0.04543693240255285,
+          "hybrid_scenario_cost_pass_dollars": 0.04543693240255285,
+          "cost_pass_label": "hybrid scenario Cost-of-Pass: confirmation GPU-sec/query over campaign MATH-500 pass@1 at $1.50/A100-h",
           "latency_median_sec": 59.18953819821278,
           "latency_p90_sec": 244.83299624671542,
           "latency_p95_sec": 272.64264443044874,
@@ -36,7 +54,11 @@
           "gpu_seconds_delta_vs_bf16_pct": 0.0,
           "cost_pass_delta_vs_bf16_pct": 0.0,
           "old_proxy_cost_pass_dollars": 0.02584,
-          "measured_vs_old_proxy_gap_pct": 75.83952168170609
+          "measured_vs_old_proxy_gap_pct": 75.83952168170609,
+          "hybrid_cpass_ci95": [
+            0.04465380732004556,
+            0.04630389902254952
+          ]
         },
         "B_batched_throughput_c8": {
           "repetition_count": 3,
@@ -46,17 +68,33 @@
           "mean_requests_per_second": 0.07441227307061987,
           "mean_gpu_seconds_per_query": 13.438686661571264,
           "std_gpu_seconds_per_query": 0.029533640605510073,
+          "gpu_seconds_per_query_reps": [
+            13.443714528754354,
+            13.406961833760143,
+            13.465383622199298
+          ],
+          "tokens_per_second_reps": [
+            252.62586413419496,
+            253.3183910054801,
+            252.21932737221897
+          ],
           "mean_total_output_tokens": 339623,
           "mean_elapsed_seconds": 1343.8686661571264,
           "model_weights_memory_gb": 54.91669321060181,
           "peak_allocated_engine_vram_gb": 54.978673458099365,
           "cost_per_query_dollars": 0.005599452775654694,
           "measured_cost_pass_dollars": 0.005956864654951802,
+          "hybrid_scenario_cost_pass_dollars": 0.005956864654951802,
+          "cost_pass_label": "hybrid scenario Cost-of-Pass: confirmation GPU-sec/query over campaign MATH-500 pass@1 at $1.50/A100-h",
           "speedup_vs_bf16": 1.0,
           "gpu_seconds_delta_vs_bf16_pct": 0.0,
           "cost_pass_delta_vs_bf16_pct": 0.0,
           "old_proxy_cost_pass_dollars": 0.02584,
-          "measured_vs_old_proxy_gap_pct": -76.94711820839085
+          "measured_vs_old_proxy_gap_pct": -76.94711820839085,
+          "hybrid_cpass_ci95": [
+            0.005853578976519554,
+            0.006071423682262787
+          ]
         }
       },
       "microbenchmark": {
@@ -78,12 +116,24 @@
           "mean_requests_per_second": 0.011819903129370365,
           "mean_gpu_seconds_per_query": 84.60316241780917,
           "std_gpu_seconds_per_query": 0.11271734196361292,
+          "gpu_seconds_per_query_reps": [
+            84.65459343567491,
+            84.47390301972628,
+            84.68099079802633
+          ],
+          "tokens_per_second_reps": [
+            62.462056521692205,
+            62.59566340583577,
+            62.442585403987046
+          ],
           "mean_total_output_tokens": 105754,
           "mean_elapsed_seconds": 1692.0632483561833,
           "model_weights_memory_gb": 54.930466175079346,
           "peak_allocated_engine_vram_gb": 54.969581604003906,
           "cost_per_query_dollars": 0.03525131767408716,
           "measured_cost_pass_dollars": 0.03734249753610928,
+          "hybrid_scenario_cost_pass_dollars": 0.03734249753610928,
+          "cost_pass_label": "hybrid scenario Cost-of-Pass: confirmation GPU-sec/query over campaign MATH-500 pass@1 at $1.50/A100-h",
           "latency_median_sec": 43.60323156788945,
           "latency_p90_sec": 197.0077507788938,
           "latency_p95_sec": 325.91468280516574,
@@ -91,7 +141,15 @@
           "gpu_seconds_delta_vs_bf16_pct": -17.464934805244926,
           "cost_pass_delta_vs_bf16_pct": -17.814659657765084,
           "old_proxy_cost_pass_dollars": 0.02575,
-          "measured_vs_old_proxy_gap_pct": 45.019407907220504
+          "measured_vs_old_proxy_gap_pct": 45.019407907220504,
+          "hybrid_cpass_ci95": [
+            0.03673542900592659,
+            0.03800271418077529
+          ],
+          "hybrid_cpass_delta_vs_bf16_ci95_pct": [
+            -18.600549815331107,
+            -17.050833604133274
+          ]
         },
         "B_batched_throughput_c8": {
           "repetition_count": 5,
@@ -101,17 +159,41 @@
           "mean_requests_per_second": 0.12033009034042903,
           "mean_gpu_seconds_per_query": 8.641883599102497,
           "std_gpu_seconds_per_query": 1.919113829183874,
+          "gpu_seconds_per_query_reps": [
+            10.652205346003175,
+            10.65914263240993,
+            8.198999609053136,
+            6.85632698610425,
+            6.842743421941996
+          ],
+          "tokens_per_second_reps": [
+            350.9076175857346,
+            350.6792364926716,
+            455.90196099932217,
+            545.1811162996894,
+            546.2633580580987
+          ],
           "mean_total_output_tokens": 373794,
           "mean_elapsed_seconds": 864.1883599102497,
           "model_weights_memory_gb": 54.930466175079346,
           "peak_allocated_engine_vram_gb": 54.99449110031128,
           "cost_per_query_dollars": 0.0036007848329593743,
           "measured_cost_pass_dollars": 0.0038143907128806932,
+          "hybrid_scenario_cost_pass_dollars": 0.0038143907128806932,
+          "cost_pass_label": "hybrid scenario Cost-of-Pass: confirmation GPU-sec/query over campaign MATH-500 pass@1 at $1.50/A100-h",
           "speedup_vs_bf16": 1.779774186977836,
           "gpu_seconds_delta_vs_bf16_pct": -35.69398694431588,
           "cost_pass_delta_vs_bf16_pct": -35.966470050484034,
           "old_proxy_cost_pass_dollars": 0.02575,
-          "measured_vs_old_proxy_gap_pct": -85.1868321829876
+          "measured_vs_old_proxy_gap_pct": -85.1868321829876,
+          "hybrid_cpass_ci95": [
+            0.003142402933010737,
+            0.004475001370621948
+          ],
+          "hybrid_cpass_delta_vs_bf16_ci95_pct": [
+            -47.17505912746195,
+            -24.845371141700152
+          ]
         }
       },
       "microbenchmark": {
@@ -133,12 +215,24 @@
           "mean_requests_per_second": 0.020817233377377814,
           "mean_gpu_seconds_per_query": 48.03981083706021,
           "std_gpu_seconds_per_query": 0.4410940837833837,
+          "gpu_seconds_per_query_reps": [
+            48.54086059071123,
+            47.86850621663034,
+            47.710065703839064
+          ],
+          "tokens_per_second_reps": [
+            76.09671429490157,
+            77.1655581497279,
+            77.42181750344504
+          ],
           "mean_total_output_tokens": 73876,
           "mean_elapsed_seconds": 960.7962167412043,
           "model_weights_memory_gb": 54.79032373428345,
           "peak_allocated_engine_vram_gb": 55.070966720581055,
           "cost_per_query_dollars": 0.020016587848775087,
           "measured_cost_pass_dollars": 0.021495476641725825,
+          "hybrid_scenario_cost_pass_dollars": 0.021495476641725825,
+          "cost_pass_label": "hybrid scenario Cost-of-Pass: confirmation GPU-sec/query over campaign MATH-500 pass@1 at $1.50/A100-h",
           "latency_median_sec": 26.471790997932356,
           "latency_p90_sec": 110.43189940179391,
           "latency_p95_sec": 130.37251468586425,
@@ -146,7 +240,15 @@
           "gpu_seconds_delta_vs_bf16_pct": -53.1345069608671,
           "cost_pass_delta_vs_bf16_pct": -52.69161999915709,
           "old_proxy_cost_pass_dollars": 0.02773,
-          "measured_vs_old_proxy_gap_pct": -22.482954771994866
+          "measured_vs_old_proxy_gap_pct": -22.482954771994866,
+          "hybrid_cpass_ci95": [
+            0.021067395128514497,
+            0.021948012992077947
+          ],
+          "hybrid_cpass_delta_vs_bf16_ci95_pct": [
+            -53.29410305957763,
+            -52.049601848378806
+          ]
         },
         "B_batched_throughput_c8": {
           "repetition_count": 3,
@@ -156,17 +258,37 @@
           "mean_requests_per_second": 0.1278744907870638,
           "mean_gpu_seconds_per_query": 7.820290804306666,
           "std_gpu_seconds_per_query": 0.03793903536963867,
+          "gpu_seconds_per_query_reps": [
+            7.855731741860509,
+            7.824871128425002,
+            7.780269542634487
+          ],
+          "tokens_per_second_reps": [
+            416.26166822564403,
+            417.90336816169355,
+            420.29906317265295
+          ],
           "mean_total_output_tokens": 327004,
           "mean_elapsed_seconds": 782.0290804306666,
           "model_weights_memory_gb": 54.79032373428345,
           "peak_allocated_engine_vram_gb": 55.08738851547241,
           "cost_per_query_dollars": 0.003258454501794444,
           "measured_cost_pass_dollars": 0.003499199422030116,
+          "hybrid_scenario_cost_pass_dollars": 0.003499199422030116,
+          "cost_pass_label": "hybrid scenario Cost-of-Pass: confirmation GPU-sec/query over campaign MATH-500 pass@1 at $1.50/A100-h",
           "speedup_vs_bf16": 1.6546087526438404,
           "gpu_seconds_delta_vs_bf16_pct": -41.807625988711685,
           "cost_pass_delta_vs_bf16_pct": -41.25769805561533,
           "old_proxy_cost_pass_dollars": 0.02773,
-          "measured_vs_old_proxy_gap_pct": -87.38117770634649
+          "measured_vs_old_proxy_gap_pct": -87.38117770634649,
+          "hybrid_cpass_ci95": [
+            0.003434459549370427,
+            0.003569218449828956
+          ],
+          "hybrid_cpass_delta_vs_bf16_ci95_pct": [
+            -41.906146659312746,
+            -40.575372194991296
+          ]
         }
       },
       "microbenchmark": {
@@ -188,12 +310,24 @@
           "mean_requests_per_second": 0.018387027470328464,
           "mean_gpu_seconds_per_query": 54.38872276532153,
           "std_gpu_seconds_per_query": 0.4574702725786079,
+          "gpu_seconds_per_query_reps": [
+            54.916803990676996,
+            54.11342538297176,
+            54.13593892231584
+          ],
+          "tokens_per_second_reps": [
+            81.87202592421971,
+            83.08751420150966,
+            83.0529605564226
+          ],
           "mean_total_output_tokens": 89923,
           "mean_elapsed_seconds": 1087.7744553064306,
           "model_weights_memory_gb": 53.77645540237427,
           "peak_allocated_engine_vram_gb": 53.85033416748047,
           "cost_per_query_dollars": 0.022661967818883973,
           "measured_cost_pass_dollars": 0.024242584316307204,
+          "hybrid_scenario_cost_pass_dollars": 0.024242584316307204,
+          "cost_pass_label": "hybrid scenario Cost-of-Pass: confirmation GPU-sec/query over campaign MATH-500 pass@1 at $1.50/A100-h",
           "latency_median_sec": 34.77972851321101,
           "latency_p90_sec": 67.50649070814258,
           "latency_p95_sec": 123.14078801473002,
@@ -201,7 +335,15 @@
           "gpu_seconds_delta_vs_bf16_pct": -46.940792152347115,
           "cost_pass_delta_vs_bf16_pct": -46.64564037570207,
           "old_proxy_cost_pass_dollars": 0.02778,
-          "measured_vs_old_proxy_gap_pct": -12.733677767072699
+          "measured_vs_old_proxy_gap_pct": -12.733677767072699,
+          "hybrid_cpass_ci95": [
+            0.02377729592651064,
+            0.02475094781442112
+          ],
+          "hybrid_cpass_delta_vs_bf16_ci95_pct": [
+            -47.27654354884082,
+            -45.987944886668885
+          ]
         },
         "B_batched_throughput_c8": {
           "repetition_count": 3,
@@ -211,17 +353,37 @@
           "mean_requests_per_second": 0.1383064655704006,
           "mean_gpu_seconds_per_query": 7.2303282816708085,
           "std_gpu_seconds_per_query": 0.00949422003003767,
+          "gpu_seconds_per_query_reps": [
+            7.239729989767074,
+            7.230510677322745,
+            7.220744177922606
+          ],
+          "tokens_per_second_reps": [
+            487.6203953724494,
+            488.24213911639623,
+            488.9025165569074
+          ],
           "mean_total_output_tokens": 353024,
           "mean_elapsed_seconds": 723.0328281670809,
           "model_weights_memory_gb": 53.77645540237427,
           "peak_allocated_engine_vram_gb": 53.8946795463562,
           "cost_per_query_dollars": 0.0030126367840295036,
           "measured_cost_pass_dollars": 0.0032227607873657506,
+          "hybrid_scenario_cost_pass_dollars": 0.0032227607873657506,
+          "cost_pass_label": "hybrid scenario Cost-of-Pass: confirmation GPU-sec/query over campaign MATH-500 pass@1 at $1.50/A100-h",
           "speedup_vs_bf16": 1.9319907798694274,
           "gpu_seconds_delta_vs_bf16_pct": -46.19765707949446,
           "cost_pass_delta_vs_bf16_pct": -45.89837147488746,
           "old_proxy_cost_pass_dollars": 0.02778,
-          "measured_vs_old_proxy_gap_pct": -88.39898924634359
+          "measured_vs_old_proxy_gap_pct": -88.39898924634359,
+          "hybrid_cpass_ci95": [
+            0.003164659879721823,
+            0.003286034886594136
+          ],
+          "hybrid_cpass_delta_vs_bf16_ci95_pct": [
+            -46.41397518204937,
+            -45.3641679586734
+          ]
         }
       },
       "microbenchmark": {
@@ -243,12 +405,24 @@
           "mean_requests_per_second": 0.01505261372906226,
           "mean_gpu_seconds_per_query": 66.4342818522205,
           "std_gpu_seconds_per_query": 0.25191243336463204,
+          "gpu_seconds_per_query_reps": [
+            66.18895624689758,
+            66.42158814556896,
+            66.69230116419494
+          ],
+          "tokens_per_second_reps": [
+            72.60274632635931,
+            72.34846582512162,
+            72.05479367354512
+          ],
           "mean_total_output_tokens": 96110,
           "mean_elapsed_seconds": 1328.68563704441,
           "model_weights_memory_gb": 55.88544797897339,
           "peak_allocated_engine_vram_gb": 55.91501808166504,
           "cost_per_query_dollars": 0.027680950771758542,
           "measured_cost_pass_dollars": 0.031018546360105943,
+          "hybrid_scenario_cost_pass_dollars": 0.031018546360105943,
+          "cost_pass_label": "hybrid scenario Cost-of-Pass: confirmation GPU-sec/query over campaign MATH-500 pass@1 at $1.50/A100-h",
           "latency_median_sec": 32.3994901056091,
           "latency_p90_sec": 126.10181562925399,
           "latency_p95_sec": 257.39616445091866,
@@ -256,7 +430,11 @@
           "gpu_seconds_delta_vs_bf16_pct": 0.0,
           "cost_pass_delta_vs_bf16_pct": 0.0,
           "old_proxy_cost_pass_dollars": 0.03195,
-          "measured_vs_old_proxy_gap_pct": -2.9153478556934482
+          "measured_vs_old_proxy_gap_pct": -2.9153478556934482,
+          "hybrid_cpass_ci95": [
+            0.030325318549253445,
+            0.03175894445315827
+          ]
         },
         "B_batched_throughput_c8": {
           "repetition_count": 3,
@@ -266,17 +444,33 @@
           "mean_requests_per_second": 0.09875006136393491,
           "mean_gpu_seconds_per_query": 10.12675723185142,
           "std_gpu_seconds_per_query": 0.052476057423643786,
+          "gpu_seconds_per_query_reps": [
+            10.075043547153474,
+            10.125264344513417,
+            10.179963803887368
+          ],
+          "tokens_per_second_reps": [
+            368.8599441388985,
+            367.0304175331228,
+            365.05827246467067
+          ],
           "mean_total_output_tokens": 371628,
           "mean_elapsed_seconds": 1012.6757231851419,
           "model_weights_memory_gb": 55.88544797897339,
           "peak_allocated_engine_vram_gb": 55.93748950958252,
           "cost_per_query_dollars": 0.004219482179938091,
           "measured_cost_pass_dollars": 0.004728240900871909,
+          "hybrid_scenario_cost_pass_dollars": 0.004728240900871909,
+          "cost_pass_label": "hybrid scenario Cost-of-Pass: confirmation GPU-sec/query over campaign MATH-500 pass@1 at $1.50/A100-h",
           "speedup_vs_bf16": 1.0,
           "gpu_seconds_delta_vs_bf16_pct": 0.0,
           "cost_pass_delta_vs_bf16_pct": 0.0,
           "old_proxy_cost_pass_dollars": 0.03195,
-          "measured_vs_old_proxy_gap_pct": -85.20112394093299
+          "measured_vs_old_proxy_gap_pct": -85.20112394093299,
+          "hybrid_cpass_ci95": [
+            0.004621872640983012,
+            0.004843299104612134
+          ]
         }
       },
       "microbenchmark": {
@@ -298,12 +492,24 @@
           "mean_requests_per_second": 0.010814412640407988,
           "mean_gpu_seconds_per_query": 92.55399153319497,
           "std_gpu_seconds_per_query": 3.4676787688976414,
+          "gpu_seconds_per_query_reps": [
+            96.55367654673755,
+            90.71750718690456,
+            90.39079086594283
+          ],
+          "tokens_per_second_reps": [
+            75.42281413256099,
+            80.27502326531342,
+            80.5651762777509
+          ],
           "mean_total_output_tokens": 145647,
           "mean_elapsed_seconds": 1851.0798306638997,
           "model_weights_memory_gb": 55.89319944381714,
           "peak_allocated_engine_vram_gb": 55.92291831970215,
           "cost_per_query_dollars": 0.038564163138831244,
           "measured_cost_pass_dollars": 0.04307882388162561,
+          "hybrid_scenario_cost_pass_dollars": 0.04307882388162561,
+          "cost_pass_label": "hybrid scenario Cost-of-Pass: confirmation GPU-sec/query over campaign MATH-500 pass@1 at $1.50/A100-h",
           "latency_median_sec": 37.9985718006889,
           "latency_p90_sec": 253.5493892240029,
           "latency_p95_sec": 341.42055581981936,
@@ -311,7 +517,15 @@
           "gpu_seconds_delta_vs_bf16_pct": 39.3166132796865,
           "cost_pass_delta_vs_bf16_pct": 38.88085979757845,
           "old_proxy_cost_pass_dollars": 0.03112,
-          "measured_vs_old_proxy_gap_pct": 38.42809730599489
+          "measured_vs_old_proxy_gap_pct": 38.42809730599489,
+          "hybrid_cpass_ci95": [
+            0.041451014559811886,
+            0.0450007813883005
+          ],
+          "hybrid_cpass_delta_vs_bf16_ci95_pct": [
+            34.549499384466706,
+            44.651162092372104
+          ]
         },
         "B_batched_throughput_c8": {
           "repetition_count": 3,
@@ -321,17 +535,37 @@
           "mean_requests_per_second": 0.10724269091463635,
           "mean_gpu_seconds_per_query": 9.324694618110856,
           "std_gpu_seconds_per_query": 0.02641354223689377,
+          "gpu_seconds_per_query_reps": [
+            9.316309501007199,
+            9.354282896220685,
+            9.303491457104682
+          ],
+          "tokens_per_second_reps": [
+            481.85281945760585,
+            479.8967542251348,
+            482.5167003912141
+          ],
           "mean_total_output_tokens": 448909,
           "mean_elapsed_seconds": 932.4694618110856,
           "model_weights_memory_gb": 55.89319944381714,
           "peak_allocated_engine_vram_gb": 55.946011543273926,
           "cost_per_query_dollars": 0.003885289424212857,
           "measured_cost_pass_dollars": 0.004340135639201136,
+          "hybrid_scenario_cost_pass_dollars": 0.004340135639201136,
+          "cost_pass_label": "hybrid scenario Cost-of-Pass: confirmation GPU-sec/query over campaign MATH-500 pass@1 at $1.50/A100-h",
           "speedup_vs_bf16": 1.311838017953013,
           "gpu_seconds_delta_vs_bf16_pct": -7.920231475657948,
           "cost_pass_delta_vs_bf16_pct": -8.208237900890476,
           "old_proxy_cost_pass_dollars": 0.03112,
-          "measured_vs_old_proxy_gap_pct": -86.05354871722001
+          "measured_vs_old_proxy_gap_pct": -86.05354871722001,
+          "hybrid_cpass_ci95": [
+            0.004241778131579709,
+            0.0044473064916192885
+          ],
+          "hybrid_cpass_delta_vs_bf16_ci95_pct": [
+            -9.473160381502275,
+            -6.914793900263263
+          ]
         }
       },
       "microbenchmark": {
@@ -353,12 +587,28 @@
           "mean_requests_per_second": 0.011186140241095184,
           "mean_gpu_seconds_per_query": 89.50891076110304,
           "std_gpu_seconds_per_query": 3.6445174656078514,
+          "gpu_seconds_per_query_reps": [
+            96.02735406011342,
+            87.7969788312912,
+            87.92433368042111,
+            87.83508882634342,
+            87.960798407346
+          ],
+          "tokens_per_second_reps": [
+            65.34804651674256,
+            71.47398559189936,
+            71.37045840811818,
+            71.44297437219586,
+            71.34087131564655
+          ],
           "mean_total_output_tokens": 125504,
           "mean_elapsed_seconds": 1790.1782152220608,
           "model_weights_memory_gb": 55.88544797897339,
           "peak_allocated_engine_vram_gb": 56.12648963928223,
           "cost_per_query_dollars": 0.03729537948379293,
           "measured_cost_pass_dollars": 0.043126016979409036,
+          "hybrid_scenario_cost_pass_dollars": 0.043126016979409036,
+          "cost_pass_label": "hybrid scenario Cost-of-Pass: confirmation GPU-sec/query over campaign MATH-500 pass@1 at $1.50/A100-h",
           "latency_median_sec": 40.11634433791041,
           "latency_p90_sec": 246.1403134940566,
           "latency_p95_sec": 351.7582396560163,
@@ -366,7 +616,15 @@
           "gpu_seconds_delta_vs_bf16_pct": 34.73301474111035,
           "cost_pass_delta_vs_bf16_pct": 39.03300457327344,
           "old_proxy_cost_pass_dollars": 0.03353,
-          "measured_vs_old_proxy_gap_pct": 28.61919767196254
+          "measured_vs_old_proxy_gap_pct": 28.61919767196254,
+          "hybrid_cpass_ci95": [
+            0.04151098720443549,
+            0.04504937880432186
+          ],
+          "hybrid_cpass_delta_vs_bf16_ci95_pct": [
+            34.926721964171115,
+            44.60646340982801
+          ]
         },
         "B_batched_throughput_c8": {
           "repetition_count": 3,
@@ -376,17 +634,37 @@
           "mean_requests_per_second": 0.0859621085487471,
           "mean_gpu_seconds_per_query": 11.633044386208057,
           "std_gpu_seconds_per_query": 0.014424565974255267,
+          "gpu_seconds_per_query_reps": [
+            11.62517688907683,
+            11.64969210229814,
+            11.624264167249203
+          ],
+          "tokens_per_second_reps": [
+            391.37641030435174,
+            390.5528111856668,
+            391.407140661763
+          ],
           "mean_total_output_tokens": 454982,
           "mean_elapsed_seconds": 1163.3044386208057,
           "model_weights_memory_gb": 55.88544797897339,
           "peak_allocated_engine_vram_gb": 56.13922357559204,
           "cost_per_query_dollars": 0.0048471018275866905,
           "measured_cost_pass_dollars": 0.0056048818542861825,
+          "hybrid_scenario_cost_pass_dollars": 0.0056048818542861825,
+          "cost_pass_label": "hybrid scenario Cost-of-Pass: confirmation GPU-sec/query over campaign MATH-500 pass@1 at $1.50/A100-h",
           "speedup_vs_bf16": 1.0657503227403995,
           "gpu_seconds_delta_vs_bf16_pct": 14.87432867077087,
           "cost_pass_delta_vs_bf16_pct": 18.540530649625254,
           "old_proxy_cost_pass_dollars": 0.03353,
-          "measured_vs_old_proxy_gap_pct": -83.28397896126995
+          "measured_vs_old_proxy_gap_pct": -83.28397896126995,
+          "hybrid_cpass_ci95": [
+            0.00546583069284357,
+            0.0057568035564218465
+          ],
+          "hybrid_cpass_delta_vs_bf16_ci95_pct": [
+            16.631880611079538,
+            20.53238929177122
+          ]
         }
       },
       "microbenchmark": {
@@ -408,12 +686,24 @@
           "mean_requests_per_second": 0.011500921454045255,
           "mean_gpu_seconds_per_query": 86.95199764010808,
           "std_gpu_seconds_per_query": 0.5652233254257811,
+          "gpu_seconds_per_query_reps": [
+            87.58353858701885,
+            86.49359325803816,
+            86.7788610752672
+          ],
+          "tokens_per_second_reps": [
+            63.03353448679051,
+            63.82784888506111,
+            63.61802784219131
+          ],
           "mean_total_output_tokens": 110414,
           "mean_elapsed_seconds": 1739.0399528021615,
           "model_weights_memory_gb": 55.91999387741089,
           "peak_allocated_engine_vram_gb": 55.979421615600586,
           "cost_per_query_dollars": 0.0362299990167117,
           "measured_cost_pass_dollars": 0.04074448832288765,
+          "hybrid_scenario_cost_pass_dollars": 0.04074448832288765,
+          "cost_pass_label": "hybrid scenario Cost-of-Pass: confirmation GPU-sec/query over campaign MATH-500 pass@1 at $1.50/A100-h",
           "latency_median_sec": 46.31377765660485,
           "latency_p90_sec": 242.82526178111632,
           "latency_p95_sec": 245.1029663781325,
@@ -421,7 +711,15 @@
           "gpu_seconds_delta_vs_bf16_pct": 30.88422906945565,
           "cost_pass_delta_vs_bf16_pct": 31.35524743767679,
           "old_proxy_cost_pass_dollars": 0.03335,
-          "measured_vs_old_proxy_gap_pct": 22.17237877927332
+          "measured_vs_old_proxy_gap_pct": 22.17237877927332,
+          "hybrid_cpass_ci95": [
+            0.039795712445725745,
+            0.041752940926278445
+          ],
+          "hybrid_cpass_delta_vs_bf16_ci95_pct": [
+            29.33026686079863,
+            33.46711314100366
+          ]
         },
         "B_batched_throughput_c8": {
           "repetition_count": 3,
@@ -431,17 +729,37 @@
           "mean_requests_per_second": 0.07935299868425444,
           "mean_gpu_seconds_per_query": 12.601957415317496,
           "std_gpu_seconds_per_query": 0.02722091657828732,
+          "gpu_seconds_per_query_reps": [
+            12.600942752808333,
+            12.575258016809821,
+            12.629671476334334
+          ],
+          "tokens_per_second_reps": [
+            366.18768059807456,
+            366.9356122818218,
+            365.35471319633
+          ],
           "mean_total_output_tokens": 461431,
           "mean_elapsed_seconds": 1260.1957415317495,
           "model_weights_memory_gb": 55.91999387741089,
           "peak_allocated_engine_vram_gb": 56.01451349258423,
           "cost_per_query_dollars": 0.005250815589715624,
           "measured_cost_pass_dollars": 0.005905100753166469,
+          "hybrid_scenario_cost_pass_dollars": 0.005905100753166469,
+          "cost_pass_label": "hybrid scenario Cost-of-Pass: confirmation GPU-sec/query over campaign MATH-500 pass@1 at $1.50/A100-h",
           "speedup_vs_bf16": 0.9977559097819282,
           "gpu_seconds_delta_vs_bf16_pct": 24.442179532860685,
           "cost_pass_delta_vs_bf16_pct": 24.890014636892587,
           "old_proxy_cost_pass_dollars": 0.03335,
-          "measured_vs_old_proxy_gap_pct": -82.29355096501808
+          "measured_vs_old_proxy_gap_pct": -82.29355096501808,
+          "hybrid_cpass_ci95": [
+            0.005774511747478402,
+            0.0060465402921644675
+          ],
+          "hybrid_cpass_delta_vs_bf16_ci95_pct": [
+            23.025351076523645,
+            26.737147313066647
+          ]
         }
       },
       "microbenchmark": {
@@ -451,5 +769,348 @@
       }
     }
   },
-  "summary_table_latex": ""
+  "summary_table_latex": "",
+  "ranking_tables": {
+    "Qwen-7B": {
+      "cells": {
+        "BF16": {
+          "tok_s_A": 43.92098718586661,
+          "gpu_s_q_A": 102.50571950015922,
+          "hybrid_cpass_A": 0.04543693240255285,
+          "tok_s_B": 252.72119417063135,
+          "gpu_s_q_B": 13.438686661571264,
+          "hybrid_cpass_B": 0.005956864654951802,
+          "proxy_cpass_65toks": 0.02584,
+          "ranks": {
+            "tok_s_A": 4,
+            "gpu_s_q_A": 4,
+            "hybrid_cpass_A": 4,
+            "tok_s_B": 4,
+            "gpu_s_q_B": 4,
+            "hybrid_cpass_B": 4,
+            "proxy_cpass_65toks": 2
+          }
+        },
+        "FP8": {
+          "tok_s_A": 62.50010177717167,
+          "gpu_s_q_A": 84.60316241780917,
+          "hybrid_cpass_A": 0.03734249753610928,
+          "tok_s_B": 449.7866578871033,
+          "gpu_s_q_B": 8.641883599102497,
+          "hybrid_cpass_B": 0.0038143907128806932,
+          "proxy_cpass_65toks": 0.02575,
+          "ranks": {
+            "tok_s_A": 3,
+            "gpu_s_q_A": 3,
+            "hybrid_cpass_A": 3,
+            "tok_s_B": 2,
+            "gpu_s_q_B": 3,
+            "hybrid_cpass_B": 3,
+            "proxy_cpass_65toks": 1
+          }
+        },
+        "AWQ-4": {
+          "tok_s_A": 76.89469664935817,
+          "gpu_s_q_A": 48.03981083706021,
+          "hybrid_cpass_A": 0.021495476641725825,
+          "tok_s_B": 418.15469985333016,
+          "gpu_s_q_B": 7.820290804306666,
+          "hybrid_cpass_B": 0.003499199422030116,
+          "proxy_cpass_65toks": 0.02773,
+          "ranks": {
+            "tok_s_A": 2,
+            "gpu_s_q_A": 1,
+            "hybrid_cpass_A": 1,
+            "tok_s_B": 3,
+            "gpu_s_q_B": 2,
+            "hybrid_cpass_B": 2,
+            "proxy_cpass_65toks": 3
+          }
+        },
+        "GPTQ-4": {
+          "tok_s_A": 82.67083356071733,
+          "gpu_s_q_A": 54.38872276532153,
+          "hybrid_cpass_A": 0.024242584316307204,
+          "tok_s_B": 488.25501701525104,
+          "gpu_s_q_B": 7.2303282816708085,
+          "hybrid_cpass_B": 0.0032227607873657506,
+          "proxy_cpass_65toks": 0.02778,
+          "ranks": {
+            "tok_s_A": 1,
+            "gpu_s_q_A": 2,
+            "hybrid_cpass_A": 2,
+            "tok_s_B": 1,
+            "gpu_s_q_B": 1,
+            "hybrid_cpass_B": 1,
+            "proxy_cpass_65toks": 4
+          }
+        }
+      },
+      "rank_order": {
+        "tok_s_A": [
+          "GPTQ-4",
+          "AWQ-4",
+          "FP8",
+          "BF16"
+        ],
+        "gpu_s_q_A": [
+          "AWQ-4",
+          "GPTQ-4",
+          "FP8",
+          "BF16"
+        ],
+        "hybrid_cpass_A": [
+          "AWQ-4",
+          "GPTQ-4",
+          "FP8",
+          "BF16"
+        ],
+        "tok_s_B": [
+          "GPTQ-4",
+          "FP8",
+          "AWQ-4",
+          "BF16"
+        ],
+        "gpu_s_q_B": [
+          "GPTQ-4",
+          "AWQ-4",
+          "FP8",
+          "BF16"
+        ],
+        "hybrid_cpass_B": [
+          "GPTQ-4",
+          "AWQ-4",
+          "FP8",
+          "BF16"
+        ],
+        "proxy_cpass_65toks": [
+          "FP8",
+          "BF16",
+          "AWQ-4",
+          "GPTQ-4"
+        ]
+      },
+      "rankings_disagree": true,
+      "headline": "rankings disagree across token-proxy, Condition A, and Condition B"
+    },
+    "Llama-8B": {
+      "cells": {
+        "BF16": {
+          "tok_s_A": 72.33533527500869,
+          "gpu_s_q_A": 66.4342818522205,
+          "hybrid_cpass_A": 0.031018546360105943,
+          "tok_s_B": 366.982878045564,
+          "gpu_s_q_B": 10.12675723185142,
+          "hybrid_cpass_B": 0.004728240900871909,
+          "proxy_cpass_65toks": 0.03195,
+          "ranks": {
+            "tok_s_A": 2,
+            "gpu_s_q_A": 1,
+            "hybrid_cpass_A": 1,
+            "tok_s_B": 3,
+            "gpu_s_q_B": 2,
+            "hybrid_cpass_B": 2,
+            "proxy_cpass_65toks": 2
+          }
+        },
+        "FP8": {
+          "tok_s_A": 78.7543378918751,
+          "gpu_s_q_A": 92.55399153319497,
+          "hybrid_cpass_A": 0.04307882388162561,
+          "tok_s_B": 481.4220913579849,
+          "gpu_s_q_B": 9.324694618110856,
+          "hybrid_cpass_B": 0.004340135639201136,
+          "proxy_cpass_65toks": 0.03112,
+          "ranks": {
+            "tok_s_A": 1,
+            "gpu_s_q_A": 4,
+            "hybrid_cpass_A": 3,
+            "tok_s_B": 1,
+            "gpu_s_q_B": 1,
+            "hybrid_cpass_B": 1,
+            "proxy_cpass_65toks": 1
+          }
+        },
+        "AWQ-4": {
+          "tok_s_A": 70.1952672409205,
+          "gpu_s_q_A": 89.50891076110304,
+          "hybrid_cpass_A": 0.043126016979409036,
+          "tok_s_B": 391.1121207172605,
+          "gpu_s_q_B": 11.633044386208057,
+          "hybrid_cpass_B": 0.0056048818542861825,
+          "proxy_cpass_65toks": 0.03353,
+          "ranks": {
+            "tok_s_A": 3,
+            "gpu_s_q_A": 3,
+            "hybrid_cpass_A": 4,
+            "tok_s_B": 2,
+            "gpu_s_q_B": 3,
+            "hybrid_cpass_B": 3,
+            "proxy_cpass_65toks": 4
+          }
+        },
+        "GPTQ-4": {
+          "tok_s_A": 63.49313707134764,
+          "gpu_s_q_A": 86.95199764010808,
+          "hybrid_cpass_A": 0.04074448832288765,
+          "tok_s_B": 366.1593353587421,
+          "gpu_s_q_B": 12.601957415317496,
+          "hybrid_cpass_B": 0.005905100753166469,
+          "proxy_cpass_65toks": 0.03335,
+          "ranks": {
+            "tok_s_A": 4,
+            "gpu_s_q_A": 2,
+            "hybrid_cpass_A": 2,
+            "tok_s_B": 4,
+            "gpu_s_q_B": 4,
+            "hybrid_cpass_B": 4,
+            "proxy_cpass_65toks": 3
+          }
+        }
+      },
+      "rank_order": {
+        "tok_s_A": [
+          "FP8",
+          "BF16",
+          "AWQ-4",
+          "GPTQ-4"
+        ],
+        "gpu_s_q_A": [
+          "BF16",
+          "GPTQ-4",
+          "AWQ-4",
+          "FP8"
+        ],
+        "hybrid_cpass_A": [
+          "BF16",
+          "GPTQ-4",
+          "FP8",
+          "AWQ-4"
+        ],
+        "tok_s_B": [
+          "FP8",
+          "AWQ-4",
+          "BF16",
+          "GPTQ-4"
+        ],
+        "gpu_s_q_B": [
+          "FP8",
+          "BF16",
+          "AWQ-4",
+          "GPTQ-4"
+        ],
+        "hybrid_cpass_B": [
+          "FP8",
+          "BF16",
+          "AWQ-4",
+          "GPTQ-4"
+        ],
+        "proxy_cpass_65toks": [
+          "FP8",
+          "BF16",
+          "GPTQ-4",
+          "AWQ-4"
+        ]
+      },
+      "rankings_disagree": true,
+      "headline": "rankings disagree across token-proxy, Condition A, and Condition B"
+    }
+  },
+  "qwen_fp8_condition_b": {
+    "keep_all_five": true,
+    "pass1_canonical": 0.944,
+    "slow_regime_threshold_tok_s": 400.0,
+    "fast_regime_threshold_tok_s": 500.0,
+    "repetitions": [
+      {
+        "repetition": 1,
+        "elapsed_seconds": 1065.2205346003175,
+        "total_output_tokens": 373794,
+        "tokens_per_second": 350.9076175857346,
+        "gpu_seconds_per_query": 10.652205346003175,
+        "hybrid_cpass_dollars": 0.004701714930262701,
+        "regime": "slow"
+      },
+      {
+        "repetition": 2,
+        "elapsed_seconds": 1065.914263240993,
+        "total_output_tokens": 373794,
+        "tokens_per_second": 350.6792364926716,
+        "gpu_seconds_per_query": 10.65914263240993,
+        "hybrid_cpass_dollars": 0.004704776938740259,
+        "regime": "slow"
+      },
+      {
+        "repetition": 3,
+        "elapsed_seconds": 819.8999609053135,
+        "total_output_tokens": 373794,
+        "tokens_per_second": 455.90196099932217,
+        "gpu_seconds_per_query": 8.198999609053136,
+        "hybrid_cpass_dollars": 0.003618908725747324,
+        "regime": "mid"
+      },
+      {
+        "repetition": 4,
+        "elapsed_seconds": 685.632698610425,
+        "total_output_tokens": 373794,
+        "tokens_per_second": 545.1811162996894,
+        "gpu_seconds_per_query": 6.85632698610425,
+        "hybrid_cpass_dollars": 0.0030262742699965796,
+        "regime": "fast"
+      },
+      {
+        "repetition": 5,
+        "elapsed_seconds": 684.2743421941996,
+        "total_output_tokens": 373794,
+        "tokens_per_second": 546.2633580580987,
+        "gpu_seconds_per_query": 6.842743421941996,
+        "hybrid_cpass_dollars": 0.0030202786996566017,
+        "regime": "fast"
+      }
+    ],
+    "mean_tokens_per_second": 449.7866578871033,
+    "std_tokens_per_second": 97.52512354547702,
+    "median_tokens_per_second": 455.90196099932217,
+    "iqr_tokens_per_second": [
+      350.9076175857346,
+      545.1811162996894
+    ],
+    "mean_hybrid_cpass_dollars": 0.0038143907128806932,
+    "std_hybrid_cpass_dollars": 0.0008470664853389274,
+    "median_hybrid_cpass_dollars": 0.003618908725747324,
+    "iqr_hybrid_cpass_dollars": [
+      0.0030262742699965796,
+      0.004701714930262701
+    ],
+    "slow_regime": {
+      "n": 2,
+      "mean_tokens_per_second": 350.7934270392031,
+      "mean_gpu_seconds_per_query": 10.655673989206552,
+      "hybrid_cpass_dollars": 0.00470324593450148,
+      "repetitions": [
+        1,
+        2
+      ]
+    },
+    "mid_regime": {
+      "n": 1,
+      "mean_tokens_per_second": 455.90196099932217,
+      "mean_gpu_seconds_per_query": 8.198999609053136,
+      "hybrid_cpass_dollars": 0.003618908725747324,
+      "repetitions": [
+        3
+      ]
+    },
+    "fast_regime": {
+      "n": 2,
+      "mean_tokens_per_second": 545.722237178894,
+      "mean_gpu_seconds_per_query": 6.849535204023123,
+      "hybrid_cpass_dollars": 0.003023276484826591,
+      "repetitions": [
+        4,
+        5
+      ]
+    },
+    "note": "Do not collapse the five repeats into a lone -36.0% abstract sentence. Llama GPTQ-4 mean throughput is within 0.2% of Llama BF16; do not say statistically tied."
+  }
 }

@@ -13,6 +13,7 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import random
 import statistics
 import sys
 from pathlib import Path
@@ -36,6 +37,13 @@ CANONICAL_PASS1 = {
     ("Llama-8B", "GPTQ-4"): 0.8892,
 }
 
+N_BOOT = 10_000
+BOOT_SEED = 0
+GPU_USD_PER_HOUR = 1.50
+GPU_USD_PER_SEC = GPU_USD_PER_HOUR / 3600.0
+FP8_SLOW_TOKS_THRESHOLD = 400.0
+FP8_FAST_TOKS_THRESHOLD = 500.0
+
 # Old fixed-throughput (65 tok/s) proxy baseline
 OLD_PROXY_COST = {
     ("Qwen-7B", "BF16"): {"mean_tokens": 3789.4, "cost_query_dollars": 0.02429, "cost_pass_dollars": 0.02584},
@@ -47,6 +55,38 @@ OLD_PROXY_COST = {
     ("Llama-8B", "AWQ-4"): {"mean_tokens": 4524.3, "cost_query_dollars": 0.02900, "cost_pass_dollars": 0.03353},
     ("Llama-8B", "GPTQ-4"): {"mean_tokens": 4625.7, "cost_query_dollars": 0.02965, "cost_pass_dollars": 0.03335},
 }
+
+
+def percentile(xs: List[float], p: float) -> float:
+    if not xs:
+        return 0.0
+    ys = sorted(xs)
+    k = (len(ys) - 1) * p / 100.0
+    f = int(k)
+    c = min(f + 1, len(ys) - 1)
+    if f == c:
+        return ys[f]
+    return ys[f] + (ys[c] - ys[f]) * (k - f)
+
+
+def load_math_item_means() -> Dict[Tuple[str, str], List[float]]:
+    """Per-item mean extractive_match across MATH-500 campaign seeds."""
+    analysis_dir = Path(__file__).resolve().parent
+    if str(analysis_dir) not in sys.path:
+        sys.path.insert(0, str(analysis_dir))
+    import revision_reanalysis as rev  # noqa: WPS433 — local sibling module
+
+    data = rev.load_dir(rev.MATH_DIR)
+    out: Dict[Tuple[str, str], List[float]] = {}
+    for model in MODELS:
+        for fmt in FORMATS:
+            out[(model, fmt)] = rev.item_correctness(data[model][fmt], rev.MATH_SEEDS, 500)
+    return out
+
+
+def _rank(values: Dict[str, float], higher_is_better: bool) -> Dict[str, int]:
+    ordered = sorted(values, key=lambda k: values[k], reverse=higher_is_better)
+    return {k: i + 1 for i, k in enumerate(ordered)}
 
 
 def load_raw_confirmation_data(
@@ -142,12 +182,19 @@ def analyze_confirmation_data(raw_dir: Path) -> Dict[str, Any]:
                     "mean_requests_per_second": mean_req_speed,
                     "mean_gpu_seconds_per_query": mean_gpu_sec,
                     "std_gpu_seconds_per_query": std_gpu_sec,
+                    "gpu_seconds_per_query_reps": gpu_secs,
+                    "tokens_per_second_reps": tok_speeds,
                     "mean_total_output_tokens": statistics.mean(tot_out_toks),
                     "mean_elapsed_seconds": statistics.mean(elapseds),
                     "model_weights_memory_gb": weights_mem,
                     "peak_allocated_engine_vram_gb": mean_peak_vram,
                     "cost_per_query_dollars": cost_per_query_dollars,
                     "measured_cost_pass_dollars": cost_pass_dollars,
+                    "hybrid_scenario_cost_pass_dollars": cost_pass_dollars,
+                    "cost_pass_label": (
+                        "hybrid scenario Cost-of-Pass: confirmation GPU-sec/query "
+                        "over campaign MATH-500 pass@1 at $1.50/A100-h"
+                    ),
                 }
 
                 # Condition A specific latencies
@@ -223,7 +270,216 @@ def analyze_confirmation_data(raw_dir: Path) -> Dict[str, Any]:
             key_name = f"{model}_{fmt}"
             report["configurations"][key_name] = cfg
 
+    item_means = load_math_item_means()
+    attach_hybrid_cpass_uncertainty(report, config_data, item_means, task_runs)
+    report["ranking_tables"] = build_ranking_tables(report)
+    report["qwen_fp8_condition_b"] = qwen_fp8_condition_b_stats(
+        task_runs, CANONICAL_PASS1[("Qwen-7B", "FP8")]
+    )
+    report["metadata"]["hybrid_cpass_note"] = (
+        "Numerator = Condition A or B GPU-sec on the serving subset; "
+        "denominator = campaign MATH-500 pass@1. Serving prompts are not re-scored. "
+        "Monte Carlo combines empirical timing-rep GPU-sec/query with problem-clustered "
+        "bootstrap of campaign pass@1 (10,000 draws, seed 0)."
+    )
+    report["metadata"]["do_not_say"] = [
+        "statistically tied",
+        "true Pareto optimum",
+        "true dollar cost",
+    ]
     return report
+
+
+def attach_hybrid_cpass_uncertainty(
+    report: Dict[str, Any],
+    config_data: Dict[Tuple[str, str], Dict[str, Any]],
+    item_means: Dict[Tuple[str, str], List[float]],
+    task_runs: Dict[Tuple[str, str, str], List[Dict[str, Any]]],
+) -> None:
+    """Monte Carlo hybrid Cpass intervals; item resample is paired within model."""
+    n_items = 500
+    for model in MODELS:
+        rng_items = random.Random(BOOT_SEED)
+        rng_time = random.Random(BOOT_SEED + 17)
+        boots: Dict[Tuple[str, str], List[float]] = {
+            (fmt, cond): [] for fmt in FORMATS for cond in CONDITIONS
+        }
+        boots_delta: Dict[Tuple[str, str], List[float]] = {
+            (fmt, cond): [] for fmt in FORMATS if fmt != "BF16" for cond in CONDITIONS
+        }
+        gpu_lists: Dict[Tuple[str, str], List[float]] = {}
+        for fmt in FORMATS:
+            for cond in CONDITIONS:
+                runs = task_runs.get((model, fmt, cond), [])
+                gpu_lists[(fmt, cond)] = [float(r["gpu_seconds_per_query"]) for r in runs]
+        for _ in range(N_BOOT):
+            idx = [rng_items.randrange(n_items) for _ in range(n_items)]
+            p1 = {
+                fmt: sum(item_means[(model, fmt)][i] for i in idx) / n_items
+                for fmt in FORMATS
+            }
+            cpass_star: Dict[Tuple[str, str], float] = {}
+            for fmt in FORMATS:
+                for cond in CONDITIONS:
+                    xs = gpu_lists[(fmt, cond)]
+                    if not xs or p1[fmt] <= 0:
+                        continue
+                    g = sum(xs[rng_time.randrange(len(xs))] for _ in range(len(xs))) / len(xs)
+                    val = (g * GPU_USD_PER_SEC) / p1[fmt]
+                    cpass_star[(fmt, cond)] = val
+                    boots[(fmt, cond)].append(val)
+            for fmt in FORMATS:
+                if fmt == "BF16":
+                    continue
+                for cond in CONDITIONS:
+                    b = cpass_star.get(("BF16", cond))
+                    c = cpass_star.get((fmt, cond))
+                    if b and c:
+                        boots_delta[(fmt, cond)].append((c - b) / b * 100.0)
+        for fmt in FORMATS:
+            cfg = config_data[(model, fmt)]
+            for cond in CONDITIONS:
+                c_dict = cfg["conditions"][cond]
+                dist = boots[(fmt, cond)]
+                c_dict["hybrid_cpass_ci95"] = [percentile(dist, 2.5), percentile(dist, 97.5)]
+                if fmt != "BF16":
+                    ddist = boots_delta[(fmt, cond)]
+                    c_dict["hybrid_cpass_delta_vs_bf16_ci95_pct"] = [
+                        percentile(ddist, 2.5),
+                        percentile(ddist, 97.5),
+                    ]
+            report["configurations"][f"{model}_{fmt}"] = cfg
+
+
+def build_ranking_tables(report: Dict[str, Any]) -> Dict[str, Any]:
+    """Rank four cells per family; headline is rank disagreement across estimators."""
+    out: Dict[str, Any] = {}
+    for model in MODELS:
+        tok_a: Dict[str, float] = {}
+        gpu_a: Dict[str, float] = {}
+        cpass_a: Dict[str, float] = {}
+        tok_b: Dict[str, float] = {}
+        gpu_b: Dict[str, float] = {}
+        cpass_b: Dict[str, float] = {}
+        proxy: Dict[str, float] = {}
+        rows: Dict[str, Any] = {}
+        for fmt in FORMATS:
+            cfg = report["configurations"][f"{model}_{fmt}"]
+            a = cfg["conditions"]["A_single_stream_c1"]
+            b = cfg["conditions"]["B_batched_throughput_c8"]
+            tok_a[fmt] = a["mean_tokens_per_second"]
+            gpu_a[fmt] = a["mean_gpu_seconds_per_query"]
+            cpass_a[fmt] = a["hybrid_scenario_cost_pass_dollars"]
+            tok_b[fmt] = b["mean_tokens_per_second"]
+            gpu_b[fmt] = b["mean_gpu_seconds_per_query"]
+            cpass_b[fmt] = b["hybrid_scenario_cost_pass_dollars"]
+            proxy[fmt] = OLD_PROXY_COST[(model, fmt)]["cost_pass_dollars"]
+            rows[fmt] = {
+                "tok_s_A": tok_a[fmt],
+                "gpu_s_q_A": gpu_a[fmt],
+                "hybrid_cpass_A": cpass_a[fmt],
+                "tok_s_B": tok_b[fmt],
+                "gpu_s_q_B": gpu_b[fmt],
+                "hybrid_cpass_B": cpass_b[fmt],
+                "proxy_cpass_65toks": proxy[fmt],
+            }
+        ranks = {
+            "tok_s_A": _rank(tok_a, True),
+            "gpu_s_q_A": _rank(gpu_a, False),
+            "hybrid_cpass_A": _rank(cpass_a, False),
+            "tok_s_B": _rank(tok_b, True),
+            "gpu_s_q_B": _rank(gpu_b, False),
+            "hybrid_cpass_B": _rank(cpass_b, False),
+            "proxy_cpass_65toks": _rank(proxy, False),
+        }
+        for fmt in FORMATS:
+            rows[fmt]["ranks"] = {metric: ranks[metric][fmt] for metric in ranks}
+        order = {
+            metric: [fmt for fmt, _r in sorted(ranks[metric].items(), key=lambda kv: kv[1])]
+            for metric in ranks
+        }
+        disagree = not (
+            order["proxy_cpass_65toks"] == order["hybrid_cpass_A"] == order["hybrid_cpass_B"]
+        )
+        out[model] = {
+            "cells": rows,
+            "rank_order": order,
+            "rankings_disagree": disagree,
+            "headline": (
+                "rankings disagree across token-proxy, Condition A, and Condition B"
+                if disagree
+                else "rankings agree across token-proxy, Condition A, and Condition B"
+            ),
+        }
+    return out
+
+
+def qwen_fp8_condition_b_stats(
+    task_runs: Dict[Tuple[str, str, str], List[Dict[str, Any]]],
+    pass1: float,
+) -> Dict[str, Any]:
+    runs = task_runs[("Qwen-7B", "FP8", "B_batched_throughput_c8")]
+    reps = []
+    for r in runs:
+        gpu = float(r["gpu_seconds_per_query"])
+        tok = float(r["output_tokens_per_second"])
+        reps.append(
+            {
+                "repetition": r.get("repetition"),
+                "elapsed_seconds": r["elapsed_seconds"],
+                "total_output_tokens": r["total_output_tokens"],
+                "tokens_per_second": tok,
+                "gpu_seconds_per_query": gpu,
+                "hybrid_cpass_dollars": (gpu * GPU_USD_PER_SEC) / pass1,
+                "regime": (
+                    "slow"
+                    if tok < FP8_SLOW_TOKS_THRESHOLD
+                    else ("fast" if tok > FP8_FAST_TOKS_THRESHOLD else "mid")
+                ),
+            }
+        )
+    toks = [x["tokens_per_second"] for x in reps]
+    cpasses = [x["hybrid_cpass_dollars"] for x in reps]
+    slow = [x for x in reps if x["regime"] == "slow"]
+    fast = [x for x in reps if x["regime"] == "fast"]
+    mid = [x for x in reps if x["regime"] == "mid"]
+
+    def _regime(rows: List[Dict[str, Any]]) -> Dict[str, Any]:
+        if not rows:
+            return {"n": 0}
+        gpu = statistics.mean(x["gpu_seconds_per_query"] for x in rows)
+        tok = statistics.mean(x["tokens_per_second"] for x in rows)
+        return {
+            "n": len(rows),
+            "mean_tokens_per_second": tok,
+            "mean_gpu_seconds_per_query": gpu,
+            "hybrid_cpass_dollars": (gpu * GPU_USD_PER_SEC) / pass1,
+            "repetitions": [x["repetition"] for x in rows],
+        }
+
+    return {
+        "keep_all_five": True,
+        "pass1_canonical": pass1,
+        "slow_regime_threshold_tok_s": FP8_SLOW_TOKS_THRESHOLD,
+        "fast_regime_threshold_tok_s": FP8_FAST_TOKS_THRESHOLD,
+        "repetitions": reps,
+        "mean_tokens_per_second": statistics.mean(toks),
+        "std_tokens_per_second": statistics.stdev(toks),
+        "median_tokens_per_second": statistics.median(toks),
+        "iqr_tokens_per_second": [percentile(toks, 25), percentile(toks, 75)],
+        "mean_hybrid_cpass_dollars": statistics.mean(cpasses),
+        "std_hybrid_cpass_dollars": statistics.stdev(cpasses),
+        "median_hybrid_cpass_dollars": statistics.median(cpasses),
+        "iqr_hybrid_cpass_dollars": [percentile(cpasses, 25), percentile(cpasses, 75)],
+        "slow_regime": _regime(slow),
+        "mid_regime": _regime(mid),
+        "fast_regime": _regime(fast),
+        "note": (
+            "Do not collapse the five repeats into a lone -36.0% abstract sentence. "
+            "Llama GPTQ-4 mean throughput is within 0.2% of Llama BF16; "
+            "do not say statistically tied."
+        ),
+    }
 
 
 def _pop_std(xs: List[float]) -> float:
@@ -250,14 +506,13 @@ def generate_confirmation_markdown_reports(
     lines.append(f"**Pricing Baseline:** $1.50 / A100 GPU-Hour ($0.00041667 / GPU-sec)  ")
     lines.append("")
 
-    lines.append("## 1. Executive Summary Table")
+    lines.append("## 1. Executive Summary Table (hybrid scenario Cost-of-Pass)")
     lines.append("")
     lines.append(
-        "| Model | Format | Pass@1 (MATH-500) | Cond A Tok/s (C=1) | Cond A Median Lat (s) | Cond B Tok/s (C=8) | Cond B Req/s | Empirical GPU-sec/q | Measured $C_{\\text{pass}}$ | $C_{\\text{pass}}$ Delta vs BF16 |"
+        "| Model | Format | Pass@1 | A tok/s | A GPU-s/q | A hybrid $C_{pass}$ [95% CI] | "
+        "B tok/s | B GPU-s/q | B hybrid $C_{pass}$ [95% CI] | B $\\Delta$% vs BF16 [95% CI] |"
     )
-    lines.append(
-        "|---|---|---|---|---|---|---|---|---|---|"
-    )
+    lines.append("|---|---|---|---|---|---|---|---|---|---|")
 
     for model in MODELS:
         for fmt in FORMATS:
@@ -265,25 +520,84 @@ def generate_confirmation_markdown_reports(
             p1 = cfg.get("pass1_canonical", 0.0) * 100.0
             cA = cfg.get("conditions", {}).get("A_single_stream_c1", {})
             cB = cfg.get("conditions", {}).get("B_batched_throughput_c8", {})
-
-            cA_tok = f"{cA.get('mean_tokens_per_second', 0.0):.1f} ± {cA.get('std_tokens_per_second', 0.0):.1f}"
-            cA_med = f"{cA.get('latency_median_sec', 0.0):.2f}s"
-            cB_tok = f"{cB.get('mean_tokens_per_second', 0.0):.1f} ± {cB.get('std_tokens_per_second', 0.0):.1f}"
-            cB_req = f"{cB.get('mean_requests_per_second', 0.0):.3f}"
-            gpu_sec = f"{cB.get('mean_gpu_seconds_per_query', 0.0):.2f}s"
-            cpass = f"${cB.get('measured_cost_pass_dollars', 0.0):.4f}"
-            delta_bf16 = cB.get("cost_pass_delta_vs_bf16_pct", 0.0)
-            delta_str = f"{delta_bf16:+.1f}%" if fmt != "BF16" else "Anchor"
-
+            cA_tok = f"{cA.get('mean_tokens_per_second', 0.0):.1f}±{cA.get('std_tokens_per_second', 0.0):.1f}"
+            cB_tok = f"{cB.get('mean_tokens_per_second', 0.0):.1f}±{cB.get('std_tokens_per_second', 0.0):.1f}"
+            a_ci = cA.get("hybrid_cpass_ci95", [0.0, 0.0])
+            b_ci = cB.get("hybrid_cpass_ci95", [0.0, 0.0])
+            a_cpass = (
+                f"${cA.get('hybrid_scenario_cost_pass_dollars', 0.0):.4f} "
+                f"[{a_ci[0]:.4f},{a_ci[1]:.4f}]"
+            )
+            b_cpass = (
+                f"${cB.get('hybrid_scenario_cost_pass_dollars', 0.0):.4f} "
+                f"[{b_ci[0]:.4f},{b_ci[1]:.4f}]"
+            )
+            if fmt == "BF16":
+                delta_str = "anchor"
+            else:
+                dci = cB.get("hybrid_cpass_delta_vs_bf16_ci95_pct", [0.0, 0.0])
+                delta_str = (
+                    f"{cB.get('cost_pass_delta_vs_bf16_pct', 0.0):+.1f}% "
+                    f"[{dci[0]:+.1f},{dci[1]:+.1f}]"
+                )
             lines.append(
-                f"| **{model}** | **{fmt}** | {p1:.2f}% | {cA_tok} | {cA_med} | {cB_tok} | {cB_req} | {gpu_sec} | {cpass} | {delta_str} |"
+                f"| **{model}** | **{fmt}** | {p1:.2f}% | {cA_tok} | "
+                f"{cA.get('mean_gpu_seconds_per_query', 0.0):.2f} | {a_cpass} | {cB_tok} | "
+                f"{cB.get('mean_gpu_seconds_per_query', 0.0):.2f} | {b_cpass} | {delta_str} |"
             )
 
     lines.append("")
     lines.append(
         "Reported $\\pm$ is **sample SD** (`statistics.stdev`, $n-1$). "
-        "The runner's CV-expansion trigger uses **population SD** (`np.std`, $n$ divisor) on the first three repeats. "
-        "Do not call the trigger statistic a sample SD. Cost-of-Pass is **scenario-based** at $1.50/A100-hour, not billed cluster cost."
+        "Hybrid scenario Cost-of-Pass uses confirmation GPU-sec in the numerator and "
+        "campaign MATH-500 pass@1 in the denominator at $1.50/A100-h$. "
+        "Intervals are Monte Carlo 95% (timing-rep × clustered pass@1). "
+        "Llama GPTQ-4 mean throughput is within 0.2% of Llama BF16; do not say statistically tied."
+    )
+    lines.append("")
+    lines.append("## 1b. Ranking disagreement (token-proxy vs Condition A vs Condition B)")
+    lines.append("")
+    ranks = report.get("ranking_tables", {})
+    for model in MODELS:
+        block = ranks.get(model, {})
+        lines.append(f"**{model}:** {block.get('headline', '')}")
+        lines.append("")
+        lines.append("| Format | A tok/s rank | A $C_{pass}$ rank | B tok/s rank | B $C_{pass}$ rank | 65 tok/s proxy $C_{pass}$ rank |")
+        lines.append("|---|---|---|---|---|---|")
+        for fmt in FORMATS:
+            r = block.get("cells", {}).get(fmt, {}).get("ranks", {})
+            lines.append(
+                f"| {fmt} | {r.get('tok_s_A', '?')} | {r.get('hybrid_cpass_A', '?')} | "
+                f"{r.get('tok_s_B', '?')} | {r.get('hybrid_cpass_B', '?')} | {r.get('proxy_cpass_65toks', '?')} |"
+            )
+        lines.append("")
+    fp8 = report.get("qwen_fp8_condition_b", {})
+    lines.append("## 1c. Qwen-7B FP8 Condition B (keep all five repeats)")
+    lines.append("")
+    lines.append(
+        f"Mean {fp8.get('mean_tokens_per_second', 0):.2f} ± {fp8.get('std_tokens_per_second', 0):.2f} tok/s; "
+        f"median {fp8.get('median_tokens_per_second', 0):.2f}; "
+        f"IQR [{fp8.get('iqr_tokens_per_second', [0, 0])[0]:.2f}, {fp8.get('iqr_tokens_per_second', [0, 0])[1]:.2f}]."
+    )
+    lines.append("")
+    lines.append("| Rep | tok/s | GPU-s/q | hybrid $C_{pass}$ | regime |")
+    lines.append("|---|---|---|---|---|")
+    for row in fp8.get("repetitions", []):
+        lines.append(
+            f"| {row.get('repetition')} | {row['tokens_per_second']:.2f} | "
+            f"{row['gpu_seconds_per_query']:.4f} | ${row['hybrid_cpass_dollars']:.4f} | {row['regime']} |"
+        )
+    slow = fp8.get("slow_regime", {})
+    mid = fp8.get("mid_regime", {})
+    fast = fp8.get("fast_regime", {})
+    lines.append("")
+    lines.append(
+        f"Slow regime (~{slow.get('mean_tokens_per_second', 0):.0f} tok/s, n={slow.get('n', 0)}): "
+        f"$C_{{pass}}$ ${slow.get('hybrid_cpass_dollars', 0):.4f}. "
+        f"Mid regime (~{mid.get('mean_tokens_per_second', 0):.0f} tok/s, n={mid.get('n', 0)}): "
+        f"$C_{{pass}}$ ${mid.get('hybrid_cpass_dollars', 0):.4f}. "
+        f"Fast regime (~{fast.get('mean_tokens_per_second', 0):.0f} tok/s, n={fast.get('n', 0)}): "
+        f"$C_{{pass}}$ ${fast.get('hybrid_cpass_dollars', 0):.4f}."
     )
     lines.append("")
     lines.append("## 2. Secondary Fixed-Token Microbenchmark (Pure Decode Speed)")
@@ -344,7 +658,7 @@ def _write_confirmation_validation_md(report: Dict[str, Any], output_val_md: Pat
     v.append("")
     v.append("## Cost-of-Pass")
     v.append("")
-    v.append("Scenario: $C_{\\mathrm{pass}} = (\\mathrm{GPU\\text{-}sec}/q \\times 1.50/3600) / $ campaign MATH-500 pass@1. Label **scenario-based measured Cost-of-Pass**, not true dollar cost.")
+    v.append("Scenario: hybrid $C_{\\mathrm{pass}} = (\\mathrm{GPU\\text{-}sec}/q \\times 1.50/3600) / $ campaign MATH-500 pass@1. Label **hybrid scenario Cost-of-Pass**. Intervals combine timing-rep resampling with problem-clustered pass@1 bootstrap. Do not score the 100 serving prompts unless extractive match is in those JSON files (it is not).")
     v.append("")
     v.append("## Replicate tok/s (task-realistic)")
     v.append("")

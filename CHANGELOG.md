@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-08-17 — P0 closure: mismatch excess, p-value formula, Holm-18 sensitivity
+
+Branch `paper-major-revision`. No GPU jobs. Added clustered mismatch excess $D=\overline{\Delta}_{\mathrm{BF16-only}}-\overline{\Delta}_{\mathrm{Both-OK}}$ (same item resamples; all six MATH CIs exclude 0). Documented two-sided bootstrap tail-area $p$-value ($B=10{,}000$, seed 0, items, seeds fixed). Holm-18 is secondary; only Qwen AWQ-4 GPQA loses significance vs Holm-6. Stale `results/README.md` architecture-dependent / $1.7\times$ wording removed. Condition B natural-mix reweighting stated as unidentifiable. Frozen: `revision_reanalysis_report.json`, `major_revision_tables.md`, `major_revision_validation.md`. Do not merge to `main`.
+
+## 2026-08-17 — Major revision: analysis first, then rewrite
+
+Branch `paper-major-revision` from `paper-serving-confirmation` (`a987b7a`). No new GPU jobs. Extended CPU analyses: 2×2 length clustered CIs, BF16 failure control, Lian BF16-correct estimand, GSM8K/GPQA clustered+TOST tables, hybrid $C_{\mathrm{pass}}$ Monte Carlo, Condition A/B ranking disagreement, Qwen FP8 five-rep regimes, Wilson/Clopper–Pearson modal risk intervals. Frozen tables: `results/reports/major_revision_tables.md`. Manuscript retitled *Beyond Pass@1: Accuracy, Agreement, and Serving-Cost Effects of Public R1-Distill Quantization Checkpoints under a Pinned Stack*. Claims narrowed to checkpoint language; RQ4 is ranking agreement across cost estimators; Related Work includes a comparison table (QRM, Lian, Lotfi, Kurtic, Erol, Hochlehnert, G-Pass@k). Canonical `--check` plus `emit_major_revision_tables.py`. Do not merge to `main`.
+
 ## 2026-08-17 — Integrate controlled serving confirmation
 
 Branch `paper-serving-confirmation` (HPC commit `76ebc3d` plus MacBook manuscript integration). Independent audit of 52 task-realistic + 8 microbenchmark confirmation JSON files. Primary Cost-of-Pass is now confirmation GPU-sec/query at a $\$1.50$/A100-h scenario with `max_num_seqs=8` pinned and balanced 20/100 MATH-500 subsets. Qwen GPTQ-4 is $-45.9\%$ scenario $C_{\mathrm{pass}}$ vs BF16; Qwen FP8 is $-36.0\%$ with sample SD $97.5$ tok/s on Condition B ($R=5$, identical token counts). Llama AWQ/GPTQ raise $C_{\mathrm{pass}}$. Overturned the first-run claim that all 4-bit cells are slower than BF16 in single-stream (false for Qwen). First unconstrained serving run retained as provenance only. Canonical checks: `revision_reanalysis.py --check`, `modal_agreement_analysis.py --check`, `measured_serving_analysis.py --check`, `measured_serving_confirmation_analysis.py --check`, confirmation validator. Experimental GPU work is closed for the current manuscript.

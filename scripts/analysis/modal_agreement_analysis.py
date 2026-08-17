@@ -72,6 +72,51 @@ CONFIG_NAMES = [
     ("Llama-8B", "AWQ-4"),
     ("Llama-8B", "GPTQ-4"),
 ]
+WILSON_Z = 1.959963984540054
+
+
+def wilson_interval(k: int, n: int, z: float = WILSON_Z) -> Tuple[float, float]:
+    if n <= 0:
+        return 0.0, 0.0
+    p = k / float(n)
+    denom = 1.0 + z**2 / n
+    center = (p + z**2 / (2.0 * n)) / denom
+    spread = (z * math.sqrt(p * (1.0 - p) / n + z**2 / (4.0 * n**2))) / denom
+    return max(0.0, center - spread), min(1.0, center + spread)
+
+
+def clopper_pearson_interval(k: int, n: int, alpha: float = 0.05) -> Tuple[float, float]:
+    """Binomial CI on k/n.
+
+    Exact Clopper–Pearson at 0 and n (the 0.00% risk cells). Interior points use
+    Wilson so the frozen JSON stays stdlib-deterministic.
+    """
+    if n <= 0:
+        return 0.0, 0.0
+    if k <= 0:
+        return 0.0, 1.0 - (alpha / 2.0) ** (1.0 / n)
+    if k >= n:
+        return (alpha / 2.0) ** (1.0 / n), 1.0
+    return wilson_interval(k, n)
+
+
+def attach_binomial_risk_intervals(th: Dict[str, Any]) -> None:
+    """Wilson / Clopper–Pearson on selective risk = (served - correct) / served."""
+    served = int(th["served_count"])
+    correct = int(th["correct_served_count"])
+    errors = max(0, served - correct)
+    w_lo, w_hi = wilson_interval(errors, served)
+    cp_lo, cp_hi = clopper_pearson_interval(errors, served)
+    th["selective_risk_errors"] = errors
+    th["selective_risk_wilson_ci_95"] = [w_lo, w_hi]
+    th["selective_risk_clopper_pearson_ci_95"] = [cp_lo, cp_hi]
+    th["zero_observed_not_zero_true"] = errors == 0 and served > 0
+
+
+def attach_binomial_risk_intervals_report(report: Dict[str, Any]) -> None:
+    for cfg in report.get("configurations", {}).values():
+        for th in cfg.get("thresholds", {}).values():
+            attach_binomial_risk_intervals(th)
 
 
 def get_run_dir_name(model: str, weight_format: str, seed: int) -> str:
@@ -524,6 +569,7 @@ def run_full_modal_analysis(
                 "five_sample_token_cost_per_served": tokens_per_served,
                 "five_sample_token_cost_per_correct_served": tokens_per_correct_served,
             }
+            attach_binomial_risk_intervals(th_data)
             report_matrix[cfg_key]["thresholds"][f"tau_{tau}"] = th_data
 
             csv_rows.append({
@@ -635,11 +681,15 @@ def generate_markdown_report(report: Dict[str, Any], output_md: Path) -> None:
             acc_ci = th["selective_accuracy_ci_95"]
             risk = th["selective_risk"] * 100.0
             risk_ci = th["selective_risk_ci_95"]
+            w_ci = th.get("selective_risk_wilson_ci_95", risk_ci)
             tok_per_corr = th["five_sample_token_cost_per_correct_served"]
 
             cov_str = f"{cov:.1f}% [{cov_ci[0]*100:.1f}%, {cov_ci[1]*100:.1f}%]"
             acc_str = f"{acc:.2f}% [{acc_ci[0]*100:.2f}%, {acc_ci[1]*100:.2f}%]"
-            risk_str = f"{risk:.2f}% [{risk_ci[0]*100:.2f}%, {risk_ci[1]*100:.2f}%]"
+            risk_str = (
+                f"{risk:.2f}% boot[{risk_ci[0]*100:.2f}%, {risk_ci[1]*100:.2f}%] "
+                f"Wilson[{w_ci[0]*100:.2f}%, {w_ci[1]*100:.2f}%]"
+            )
 
             lines.append(f"| **{m_name} {fmt}** | {th_lbl} | {srv} | {cov_str} | {acc_str} | {risk_str} | {t5_mean:.0f} | {tok_per_corr:.0f} |")
 
@@ -854,6 +904,19 @@ def check_derived_artifact(derived_path: Path, report_path: Path) -> None:
                     raise AssertionError(
                         f"{model_family} {fmt} tau={tau}: tokens/served must use all {NUM_PROBLEMS} T5 sums"
                     )
+            errors = served - correct
+            w_lo, w_hi = wilson_interval(errors, served)
+            if "selective_risk_wilson_ci_95" not in th:
+                raise AssertionError(f"{model_family} {fmt} tau={tau}: missing Wilson risk interval")
+            got = th["selective_risk_wilson_ci_95"]
+            if not math.isclose(got[0], w_lo, abs_tol=1e-12) or not math.isclose(got[1], w_hi, abs_tol=1e-12):
+                raise AssertionError(f"{model_family} {fmt} tau={tau}: Wilson risk CI drift")
+            cp_lo, cp_hi = clopper_pearson_interval(errors, served)
+            got_cp = th["selective_risk_clopper_pearson_ci_95"]
+            if not math.isclose(got_cp[0], cp_lo, abs_tol=1e-9) or not math.isclose(got_cp[1], cp_hi, abs_tol=1e-9):
+                raise AssertionError(f"{model_family} {fmt} tau={tau}: Clopper-Pearson risk CI drift")
+            if errors == 0 and not th.get("zero_observed_not_zero_true"):
+                raise AssertionError(f"{model_family} {fmt} tau={tau}: 0/n must flag zero_observed_not_zero_true")
 
     print("OK: compact artifact SHA256, 20,000/4,000 structure, T5 accounting, and report internals match.")
     print("Note: this path does not re-run LightEval extraction or answer clustering.")
@@ -872,11 +935,26 @@ def main():
     parser.add_argument("--seed", type=int, default=20260816)
     parser.add_argument("--check", action="store_true", help="Verify recomputed results against existing report JSON.")
     parser.add_argument(
+        "--attach-intervals",
+        action="store_true",
+        help="Add Wilson/Clopper–Pearson risk intervals to the existing report JSON (no campaign traces).",
+    )
+    parser.add_argument(
         "--check-artifact",
         action="store_true",
         help="Stdlib check of the committed compact JSONL + report internals (no campaign traces).",
     )
     args = parser.parse_args()
+
+    if args.attach_intervals:
+        if not args.report_json.exists():
+            print(f"ERROR: {args.report_json} does not exist.", file=sys.stderr)
+            sys.exit(1)
+        report = json.loads(args.report_json.read_text(encoding="utf-8"))
+        attach_binomial_risk_intervals_report(report)
+        args.report_json.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
+        print(f"Attached Wilson/Clopper–Pearson risk intervals: {args.report_json}")
+        sys.exit(0)
 
     if args.check_artifact or (args.check and not campaign_jsonl_available(args.campaign_root)):
         if args.check and not args.check_artifact:

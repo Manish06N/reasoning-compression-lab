@@ -27,7 +27,7 @@ Compact confirmation JSON has no `finish_reason`. Max mean output tokens per req
 
 ## Cost-of-Pass
 
-Scenario: $C_{\mathrm{pass}} = (\mathrm{GPU\text{-}sec}/q \times 1.50/3600) / $ campaign MATH-500 pass@1. Label **scenario-based measured Cost-of-Pass**, not true dollar cost.
+Scenario: hybrid $C_{\mathrm{pass}} = (\mathrm{GPU\text{-}sec}/q \times 1.50/3600) / $ campaign MATH-500 pass@1. Label **hybrid scenario Cost-of-Pass**. Intervals combine timing-rep resampling with problem-clustered pass@1 bootstrap. Do not score the 100 serving prompts unless extractive match is in those JSON files (it is not).
 
 ## Replicate tok/s (task-realistic)
 

@@ -5,7 +5,7 @@ Evaluation harness and artifacts for **Paper 1**: quantized reasoning models und
 * **PhD Scholar:** Manish Nandish (IIT Patna)
 * **Cluster:** PARAM Rudra HPC (C-DAC / NSM), NVIDIA A100-PCIE-80GB
 * **GitHub:** [https://github.com/Manish06N/reasoning-compression-lab](https://github.com/Manish06N/reasoning-compression-lab)
-* **Paper 1 (J1):** *Beyond Pass@1: Reliability and Token-Cost Effects of Quantized Reasoning Models under a Pinned Serving Stack*
+* **Paper 1 (J1):** *Beyond Pass@1: Accuracy, Agreement, and Serving-Cost Effects of Public R1-Distill Quantization Checkpoints under a Pinned Stack*
 
 Canonical manuscript: [`paper/main.tex`](paper/main.tex) → [`paper/main.pdf`](paper/main.pdf). Scoreboard: [`results/README.md`](results/README.md). Canonical numbers: [`results/reports/revision_reanalysis_report.json`](results/reports/revision_reanalysis_report.json). Modal agreement: [`results/reports/modal_agreement_report.json`](results/reports/modal_agreement_report.json).
 
@@ -43,9 +43,9 @@ Files under `configs/models/` are **not** the campaign launcher. They contain di
 1. **Pinned serving stack.** Weight format is the experimental factor. This paper does **not** claim a Serving-Stack Shift result.
 2. **Pathology (full 56,408-row grid).** **25** identical-word loop flags (threshold = 20 consecutive identical words). **0** exact $32{,}768$ cap hits after re-encoding. **209** near-cap generations (`completion_tokens >= 32{,}500`). `finish_reason` is not in the compact JSON.
 3. **Pass@1 (problem-clustered bootstrap vs BF16).** Llama AWQ-4: **−2.76 pp** on MATH-500 (95% CI $[−4.16,−1.44]$, $p<0.001$) and **−1.57 pp** on GSM8K. Qwen AWQ-4: **−5.56 pp** on GPQA-Diamond (95% CI $[−9.60,−1.52]$, $p=0.007$). FP8–BF16 95% intervals include 0; MATH $\pm 1$ pp TOST is **not** passed. maj@5 McNemar is secondary and non-significant.
-4. **Token inflation (full MATH-500 grid, all 5 seeds, ratio of means).** Qwen AWQ-4 **+6.33%**, Qwen GPTQ-4 **+6.88%** (paired token CIs exclude 0). Extra length is concentrated on BF16-correct / quantized-wrong items. The old 200-item even-index mean-of-ratios subset is an estimator artifact and is **not** a result.
-5. **Selective prediction.** Gold-free modal-answer agreement is available from recovered MATH-500 answer strings (`results/recovered/math500_modal_inputs.jsonl`). On MATH-500, higher observable answer agreement is associated with lower selective error. Strict 5/5 consensus has selective error at most 0.27% in this sample but costs five generations; Llama AWQ-4 reduces 5/5 coverage by **6.0 pp** vs BF16 (95% paired CI $[-9.4,-2.6]$). No clear FP8–BF16 modal-coverage difference was detected. Gold-hit $k/5$ tables (including the old 98.23% “operational safety gate”) are **not** in the manuscript.
-6. **Cost.** Primary Cost-of-Pass uses **measured GPU-seconds** from the **controlled confirmation** (balanced MATH-500 subsets, `max_num_seqs=8` pinned, same-node within architecture) at a $\$1.50$/A100-h **scenario**, with campaign MATH-500 pass@1. Batched Qwen-7B GPTQ-4 is $-45.9\%$ $C_{\mathrm{pass}}$ vs BF16; Qwen FP8 is $-36.0\%$ $C_{\mathrm{pass}}$ at $+78\%$ mean tok/s with sample SD $97.5$ tok/s. Llama AWQ/GPTQ **raise** $C_{\mathrm{pass}}$. The old shared $65$ tok/s token proxy is retained only as a sensitivity. Pooled nondominated on (pass@1, scenario $C_{\mathrm{pass}}$): Qwen FP8 and Qwen GPTQ-4; not a unique “true Pareto optimum.” Peak allocated VRAM (~54–56 GB) is the 0.75 engine pool, not weight-footprint savings. Single-request serving effects were architecture dependent (Qwen 4-bit faster than BF16; Llama 4-bit not).
+4. **Token inflation (full MATH-500 grid, all 5 seeds, ratio of means).** Qwen AWQ-4 **+6.33%**, Qwen GPTQ-4 **+6.88%** (paired token CIs exclude 0). Both-OK clustered CIs exclude 0 for those Qwen 4-bit cells; BF16-only mismatches are thousands of tokens longer; BF16-incorrect traces are themselves long. The old 200-item even-index mean-of-ratios subset is a superseded estimator.
+5. **Selective prediction.** Gold-free unique-mode abstention from recovered MATH-500 answer strings. Strict 5/5 consensus has observed selective error at most 0.27%; Wilson upper bounds on $0/n$ cells remain strictly positive. Llama AWQ-4 reduces 5/5 coverage by **6.0 pp** vs BF16. Not G-Pass@k. Not a safety property. Gold-hit $k/5$ tables (including the old 98.23% “operational safety gate”) are **not** in the manuscript.
+6. **Cost.** Hybrid scenario Cost-of-Pass uses confirmation GPU-seconds over campaign MATH-500 pass@1. Rankings **disagree** across the 65 tok/s proxy, sequential Condition A, and batched Condition B. Qwen GPTQ-4 Condition B is $-45.9\%$ vs BF16 ($95\%$ CI $[-46.4,-45.4]$); Condition A ranks Qwen AWQ-4 first. Qwen FP8 Condition B is five wall-clock repeats (slow ~351 / mid ~456 / fast ~545 tok/s), not a lone $-36.0\%$. Llama GPTQ-4 Condition B mean throughput is within $0.2\%$ of Llama BF16. Peak allocated VRAM (~54–56 GB) is the 0.75 engine pool. The 65 tok/s proxy is appendix-only.
 
 ### Breadth means (sample std over seeds)
 
@@ -71,6 +71,7 @@ python3 scripts/analysis/revision_reanalysis.py --check
 python3 scripts/analysis/modal_agreement_analysis.py --check   # compact-artifact path on MacBook; LightEval 0.8.0 re-extraction is HPC-only
 python3 scripts/analysis/measured_serving_analysis.py --check
 python3 scripts/analysis/measured_serving_confirmation_analysis.py --check
+python3 scripts/analysis/emit_major_revision_tables.py
 python3 scripts/hpc/qrm_parity/validate_measured_serving_confirmation.py
 ```
 
@@ -114,7 +115,7 @@ Do **not** start a new 50k campaign, extra seeds, or a vLLM 0.7 vs 0.8.5 factori
 
 ```bibtex
 @article{nandish2026beyondpass1,
-  title={Beyond Pass@1: Reliability and Token-Cost Effects of Quantized Reasoning Models under a Pinned Serving Stack},
+  title={Beyond Pass@1: Accuracy, Agreement, and Serving-Cost Effects of Public {R}1-Distill Quantization Checkpoints under a Pinned Stack},
   author={Nandish, Manish},
   journal={Working Draft},
   institution={Indian Institute of Technology Patna},

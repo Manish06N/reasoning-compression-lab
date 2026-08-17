@@ -6,6 +6,7 @@
     "token_cap": 32768,
     "near_cap_threshold": 32500,
     "n_boot": 10000,
+    "boot_seed": 0,
     "equiv_margin_pp": 1.0,
     "extracted_answers_available": false,
     "schema_note": "Released JSON has extractive_match, completion_tokens, repetition_flag; no answer strings or finish_reason."
@@ -369,7 +370,10 @@
         "holm_alpha_pass1": 0.016666666666666666,
         "holm_significant_pass1": false,
         "holm_alpha_mcnemar": 0.01,
-        "holm_significant_mcnemar": false
+        "holm_significant_mcnemar": false,
+        "holm_p_global18": 1.0,
+        "holm_alpha_global18": 0.004166666666666667,
+        "holm_significant_global18": false
       },
       {
         "contrast": "Qwen-7B BF16 vs AWQ-4",
@@ -392,7 +396,10 @@
         "holm_alpha_pass1": 0.01,
         "holm_significant_pass1": false,
         "holm_alpha_mcnemar": 0.016666666666666666,
-        "holm_significant_mcnemar": false
+        "holm_significant_mcnemar": false,
+        "holm_p_global18": 1.0,
+        "holm_alpha_global18": 0.0033333333333333335,
+        "holm_significant_global18": false
       },
       {
         "contrast": "Qwen-7B BF16 vs GPTQ-4",
@@ -415,7 +422,10 @@
         "holm_alpha_pass1": 0.0125,
         "holm_significant_pass1": false,
         "holm_alpha_mcnemar": 0.0125,
-        "holm_significant_mcnemar": false
+        "holm_significant_mcnemar": false,
+        "holm_p_global18": 1.0,
+        "holm_alpha_global18": 0.0035714285714285718,
+        "holm_significant_global18": false
       },
       {
         "contrast": "Llama-8B BF16 vs FP8",
@@ -438,7 +448,10 @@
         "holm_alpha_pass1": 0.05,
         "holm_significant_pass1": false,
         "holm_alpha_mcnemar": 0.025,
-        "holm_significant_mcnemar": false
+        "holm_significant_mcnemar": false,
+        "holm_p_global18": 1.0,
+        "holm_alpha_global18": 0.008333333333333333,
+        "holm_significant_global18": false
       },
       {
         "contrast": "Llama-8B BF16 vs AWQ-4",
@@ -461,7 +474,10 @@
         "holm_alpha_pass1": 0.008333333333333333,
         "holm_significant_pass1": true,
         "holm_alpha_mcnemar": 0.008333333333333333,
-        "holm_significant_mcnemar": false
+        "holm_significant_mcnemar": false,
+        "holm_p_global18": 0.0,
+        "holm_alpha_global18": 0.002777777777777778,
+        "holm_significant_global18": true
       },
       {
         "contrast": "Llama-8B BF16 vs GPTQ-4",
@@ -484,7 +500,10 @@
         "holm_alpha_pass1": 0.025,
         "holm_significant_pass1": false,
         "holm_alpha_mcnemar": 0.05,
-        "holm_significant_mcnemar": false
+        "holm_significant_mcnemar": false,
+        "holm_p_global18": 1.0,
+        "holm_alpha_global18": 0.0071428571428571435,
+        "holm_significant_global18": false
       }
     ],
     "token_analysis": {
@@ -509,30 +528,86 @@
             "mean": 50.71397474967349,
             "median": 17.0,
             "p90": 1506.000000000001,
-            "p95": 2441.399999999997
+            "p95": 2441.399999999997,
+            "ci95_lo": -42.3431240165209,
+            "ci95_hi": 144.87811969241457,
+            "excludes_zero": false
           },
           "bf16_only": {
             "n": 53,
             "mean": 5444.301886792453,
             "median": 3820.0,
             "p90": 18205.999999999993,
-            "p95": 26387.399999999998
+            "p95": 26387.399999999998,
+            "ci95_lo": 2922.093261413383,
+            "ci95_hi": 8034.743999999999,
+            "excludes_zero": true
           },
           "quant_only": {
             "n": 63,
             "mean": -6940.126984126984,
             "median": -4351.0,
             "p90": 2233.3999999999974,
-            "p95": 5585.999999999996
+            "p95": 5585.999999999996,
+            "ci95_lo": -9479.490164576802,
+            "ci95_hi": -4344.750882737577,
+            "excludes_zero": true
           },
           "both_wrong": {
             "n": 87,
             "mean": 264.0689655172414,
             "median": -23.0,
             "p90": 12379.400000000001,
-            "p95": 15883.1
+            "p95": 15883.1,
+            "ci95_lo": -1125.7780843653252,
+            "ci95_hi": 1685.340454124189,
+            "excludes_zero": false
           }
         },
+        "bf16_length_when_correct": {
+          "n": 2350,
+          "mean": 3256.1659574468085,
+          "ci95_lo": 3054.410013962307,
+          "ci95_hi": 3463.9804029516295,
+          "excludes_zero": true
+        },
+        "bf16_length_when_incorrect": {
+          "n": 150,
+          "mean": 15842.746666666666,
+          "ci95_lo": 13316.423901004797,
+          "ci95_hi": 18293.31705882353,
+          "excludes_zero": true
+        },
+        "lian_bf16_correct_delta": {
+          "n": 2350,
+          "note": "mean(quant-BF16) on (item, seed) where BF16 is correct (Both-OK \u222a BF16-only)",
+          "mean": 172.35659574468085,
+          "ci95_lo": 62.97705395123389,
+          "ci95_hi": 291.13836225091154,
+          "excludes_zero": true
+        },
+        "mismatch_excess_vs_both_correct": {
+          "note": "D = mean(token_delta | BF16-only) - mean(token_delta | Both-OK). Same problem-clustered resamples; empty-stratum replicates skipped. Not causal.",
+          "mean": 5393.58791204278,
+          "ci95_lo": 2853.396489103662,
+          "ci95_hi": 7992.268724199365,
+          "excludes_zero": true,
+          "p_value": 0.0,
+          "n_boot": 10000,
+          "n_boot_valid": 10000,
+          "n_boot_skipped_empty_stratum": 0,
+          "both_correct": {
+            "n_item_seed": 2297,
+            "n_problems": 482
+          },
+          "bf16_only": {
+            "n_item_seed": 53,
+            "n_problems": 38
+          }
+        },
+        "ratio_of_means_excl_nearcap_pct": 0.4403846655806509,
+        "n_pairs_excl_nearcap": 2473,
+        "n_pairs_total": 2500,
         "old_200_even_seed42": {
           "mean_of_ratios_pct": 11.409588375318357,
           "ratio_of_means_pct": -3.4265025303338636
@@ -559,30 +634,86 @@
             "mean": 166.10519366197184,
             "median": 36.5,
             "p90": 1694.4000000000005,
-            "p95": 3087.5999999999985
+            "p95": 3087.5999999999985,
+            "ci95_lo": 79.64048115434348,
+            "ci95_hi": 254.10948112451672,
+            "excludes_zero": true
           },
           "bf16_only": {
             "n": 78,
             "mean": 6914.51282051282,
             "median": 3901.5,
             "p90": 22435.899999999998,
-            "p95": 27491.850000000006
+            "p95": 27491.850000000006,
+            "ci95_lo": 4534.0224688974695,
+            "ci95_hi": 9345.313815789472,
+            "excludes_zero": true
           },
           "quant_only": {
             "n": 56,
             "mean": -6533.392857142857,
             "median": -3096.5,
             "p90": 2593.5,
-            "p95": 3162.25
+            "p95": 3162.25,
+            "ci95_lo": -8933.084735872237,
+            "ci95_hi": -4254.672742733457,
+            "excludes_zero": true
           },
           "both_wrong": {
             "n": 94,
             "mean": 894.0851063829788,
             "median": 213.5,
             "p90": 10942.400000000001,
-            "p95": 15107.849999999986
+            "p95": 15107.849999999986,
+            "ci95_lo": -620.1456367924528,
+            "ci95_hi": 2420.1071696993663,
+            "excludes_zero": false
           }
         },
+        "bf16_length_when_correct": {
+          "n": 2350,
+          "mean": 3256.1659574468085,
+          "ci95_lo": 3054.410013962307,
+          "ci95_hi": 3463.9804029516295,
+          "excludes_zero": true
+        },
+        "bf16_length_when_incorrect": {
+          "n": 150,
+          "mean": 15842.746666666666,
+          "ci95_lo": 13316.423901004797,
+          "ci95_hi": 18293.31705882353,
+          "excludes_zero": true
+        },
+        "lian_bf16_correct_delta": {
+          "n": 2350,
+          "note": "mean(quant-BF16) on (item, seed) where BF16 is correct (Both-OK \u222a BF16-only)",
+          "mean": 390.0948936170213,
+          "ci95_lo": 261.2203357619421,
+          "ci95_hi": 531.3103125739963,
+          "excludes_zero": true
+        },
+        "mismatch_excess_vs_both_correct": {
+          "note": "D = mean(token_delta | BF16-only) - mean(token_delta | Both-OK). Same problem-clustered resamples; empty-stratum replicates skipped. Not causal.",
+          "mean": 6748.407626850849,
+          "ci95_lo": 4374.581797489518,
+          "ci95_hi": 9184.250495563214,
+          "excludes_zero": true,
+          "p_value": 0.0,
+          "n_boot": 10000,
+          "n_boot_valid": 10000,
+          "n_boot_skipped_empty_stratum": 0,
+          "both_correct": {
+            "n_item_seed": 2272,
+            "n_problems": 482
+          },
+          "bf16_only": {
+            "n_item_seed": 78,
+            "n_problems": 53
+          }
+        },
+        "ratio_of_means_excl_nearcap_pct": 4.607056927987974,
+        "n_pairs_excl_nearcap": 2463,
+        "n_pairs_total": 2500,
         "old_200_even_seed42": {
           "mean_of_ratios_pct": 19.812559523619623,
           "ratio_of_means_pct": 9.318275194314785
@@ -609,30 +740,86 @@
             "mean": 136.36646234676007,
             "median": -12.0,
             "p90": 1507.699999999998,
-            "p95": 2791.9999999999964
+            "p95": 2791.9999999999964,
+            "ci95_lo": 45.112420119439456,
+            "ci95_hi": 239.33908909574464,
+            "excludes_zero": true
           },
           "bf16_only": {
             "n": 66,
             "mean": 6891.772727272727,
             "median": 3407.5,
             "p90": 26215.5,
-            "p95": 27591.25
+            "p95": 27591.25,
+            "ci95_lo": 4090.382440476191,
+            "ci95_hi": 9896.40536402157,
+            "excludes_zero": true
           },
           "quant_only": {
             "n": 53,
             "mean": -4910.0,
             "median": -4586.0,
             "p90": 7787.799999999994,
-            "p95": 11467.999999999996
+            "p95": 11467.999999999996,
+            "ci95_lo": -8180.280824446268,
+            "ci95_hi": -1715.432037617556,
+            "excludes_zero": true
           },
           "both_wrong": {
             "n": 97,
             "mean": 1892.6494845360826,
             "median": 1062.0,
             "p90": 11881.4,
-            "p95": 14662.800000000008
+            "p95": 14662.800000000008,
+            "ci95_lo": 203.8321212121212,
+            "ci95_hi": 3387.680706075533,
+            "excludes_zero": true
           }
         },
+        "bf16_length_when_correct": {
+          "n": 2350,
+          "mean": 3256.1659574468085,
+          "ci95_lo": 3054.410013962307,
+          "ci95_hi": 3463.9804029516295,
+          "excludes_zero": true
+        },
+        "bf16_length_when_incorrect": {
+          "n": 150,
+          "mean": 15842.746666666666,
+          "ci95_lo": 13316.423901004797,
+          "ci95_hi": 18293.31705882353,
+          "excludes_zero": true
+        },
+        "lian_bf16_correct_delta": {
+          "n": 2350,
+          "note": "mean(quant-BF16) on (item, seed) where BF16 is correct (Both-OK \u222a BF16-only)",
+          "mean": 326.09276595744683,
+          "ci95_lo": 197.62640220239388,
+          "ci95_hi": 464.034310079022,
+          "excludes_zero": true
+        },
+        "mismatch_excess_vs_both_correct": {
+          "note": "D = mean(token_delta | BF16-only) - mean(token_delta | Both-OK). Same problem-clustered resamples; empty-stratum replicates skipped. Not causal.",
+          "mean": 6755.406264925967,
+          "ci95_lo": 3938.016076112473,
+          "ci95_hi": 9785.704121147686,
+          "excludes_zero": true,
+          "p_value": 0.0,
+          "n_boot": 10000,
+          "n_boot_valid": 10000,
+          "n_boot_skipped_empty_stratum": 0,
+          "both_correct": {
+            "n_item_seed": 2284,
+            "n_problems": 479
+          },
+          "bf16_only": {
+            "n_item_seed": 66,
+            "n_problems": 49
+          }
+        },
+        "ratio_of_means_excl_nearcap_pct": 5.749363828110088,
+        "n_pairs_excl_nearcap": 2465,
+        "n_pairs_total": 2500,
         "old_200_even_seed42": {
           "mean_of_ratios_pct": 21.137132681072824,
           "ratio_of_means_pct": 9.528890957965185
@@ -659,30 +846,86 @@
             "mean": 37.77133427628477,
             "median": 5.0,
             "p90": 1966.0,
-            "p95": 3532.0
+            "p95": 3532.0,
+            "ci95_lo": -74.18121958575466,
+            "ci95_hi": 152.0870871048558,
+            "excludes_zero": false
           },
           "bf16_only": {
             "n": 110,
             "mean": 2629.2545454545457,
             "median": 556.5,
             "p90": 13028.499999999998,
-            "p95": 16806.699999999997
+            "p95": 16806.699999999997,
+            "ci95_lo": 1098.285388922518,
+            "ci95_hi": 4265.101537653764,
+            "excludes_zero": true
           },
           "quant_only": {
             "n": 117,
             "mean": -4159.290598290599,
             "median": -1179.0,
             "p90": 3677.000000000005,
-            "p95": 4985.8
+            "p95": 4985.8,
+            "ci95_lo": -6040.039188590513,
+            "ci95_hi": -2427.731883440617,
+            "excludes_zero": true
           },
           "both_wrong": {
             "n": 152,
             "mean": -968.3881578947369,
             "median": 0.0,
             "p90": 6821.900000000001,
-            "p95": 10132.34999999999
+            "p95": 10132.34999999999,
+            "ci95_lo": -2252.08352780807,
+            "ci95_hi": 197.92911091549266,
+            "excludes_zero": false
           }
         },
+        "bf16_length_when_correct": {
+          "n": 2231,
+          "mean": 3538.647243388615,
+          "ci95_lo": 3305.1517740326854,
+          "ci95_hi": 3786.799167487887,
+          "excludes_zero": true
+        },
+        "bf16_length_when_incorrect": {
+          "n": 269,
+          "mean": 13928.46096654275,
+          "ci95_lo": 12234.568743297259,
+          "ci95_hi": 15498.239527092639,
+          "excludes_zero": true
+        },
+        "lian_bf16_correct_delta": {
+          "n": 2231,
+          "note": "mean(quant-BF16) on (item, seed) where BF16 is correct (Both-OK \u222a BF16-only)",
+          "mean": 165.54504706409682,
+          "ci95_lo": 33.136235926520285,
+          "ci95_hi": 302.0831722043836,
+          "excludes_zero": true
+        },
+        "mismatch_excess_vs_both_correct": {
+          "note": "D = mean(token_delta | BF16-only) - mean(token_delta | Both-OK). Same problem-clustered resamples; empty-stratum replicates skipped. Not causal.",
+          "mean": 2591.4832111782607,
+          "ci95_lo": 1047.4538252972861,
+          "ci95_hi": 4243.80115780849,
+          "excludes_zero": true,
+          "p_value": 0.0014,
+          "n_boot": 10000,
+          "n_boot_valid": 10000,
+          "n_boot_skipped_empty_stratum": 0,
+          "both_correct": {
+            "n_item_seed": 2121,
+            "n_problems": 470
+          },
+          "bf16_only": {
+            "n_item_seed": 110,
+            "n_problems": 87
+          }
+        },
+        "ratio_of_means_excl_nearcap_pct": -0.08971666763927244,
+        "n_pairs_excl_nearcap": 2473,
+        "n_pairs_total": 2500,
         "old_200_even_seed42": {
           "mean_of_ratios_pct": 10.205490581272292,
           "ratio_of_means_pct": -6.481245973809258
@@ -709,30 +952,86 @@
             "mean": 91.39961013645224,
             "median": 25.5,
             "p90": 2151.100000000001,
-            "p95": 4115.150000000001
+            "p95": 4115.150000000001,
+            "ci95_lo": -24.97431253556432,
+            "ci95_hi": 210.22018377040501,
+            "excludes_zero": false
           },
           "bf16_only": {
             "n": 179,
             "mean": 3090.0335195530724,
             "median": 1088.0,
             "p90": 12598.599999999997,
-            "p95": 17272.699999999993
+            "p95": 17272.699999999993,
+            "ci95_lo": 1995.005625,
+            "ci95_hi": 4286.116575801366,
+            "excludes_zero": true
           },
           "quant_only": {
             "n": 110,
             "mean": -4477.272727272727,
             "median": -2227.5,
             "p90": 3252.4999999999964,
-            "p95": 6741.849999999998
+            "p95": 6741.849999999998,
+            "ci95_lo": -6502.8373947330865,
+            "ci95_hi": -2588.2497370049514,
+            "excludes_zero": true
           },
           "both_wrong": {
             "n": 159,
             "mean": -305.0503144654088,
             "median": -480.0,
             "p90": 7733.79999999999,
-            "p95": 13187.299999999992
+            "p95": 13187.299999999992,
+            "ci95_lo": -1520.4559548978152,
+            "ci95_hi": 907.3738866162396,
+            "excludes_zero": false
           }
         },
+        "bf16_length_when_correct": {
+          "n": 2231,
+          "mean": 3538.647243388615,
+          "ci95_lo": 3305.1517740326854,
+          "ci95_hi": 3786.799167487887,
+          "excludes_zero": true
+        },
+        "bf16_length_when_incorrect": {
+          "n": 269,
+          "mean": 13928.46096654275,
+          "ci95_lo": 12234.568743297259,
+          "ci95_hi": 15498.239527092639,
+          "excludes_zero": true
+        },
+        "lian_bf16_correct_delta": {
+          "n": 2231,
+          "note": "mean(quant-BF16) on (item, seed) where BF16 is correct (Both-OK \u222a BF16-only)",
+          "mean": 331.989242492156,
+          "ci95_lo": 182.30045790332716,
+          "ci95_hi": 489.57430105906514,
+          "excludes_zero": true
+        },
+        "mismatch_excess_vs_both_correct": {
+          "note": "D = mean(token_delta | BF16-only) - mean(token_delta | Both-OK). Same problem-clustered resamples; empty-stratum replicates skipped. Not causal.",
+          "mean": 2998.63390941662,
+          "ci95_lo": 1897.5535670474326,
+          "ci95_hi": 4187.246429255458,
+          "excludes_zero": true,
+          "p_value": 0.0,
+          "n_boot": 10000,
+          "n_boot_valid": 10000,
+          "n_boot_skipped_empty_stratum": 0,
+          "both_correct": {
+            "n_item_seed": 2052,
+            "n_problems": 468
+          },
+          "bf16_only": {
+            "n_item_seed": 179,
+            "n_problems": 121
+          }
+        },
+        "ratio_of_means_excl_nearcap_pct": 2.797512768874766,
+        "n_pairs_excl_nearcap": 2471,
+        "n_pairs_total": 2500,
         "old_200_even_seed42": {
           "mean_of_ratios_pct": 29.76661795462283,
           "ratio_of_means_pct": 11.077224418386301
@@ -759,30 +1058,86 @@
             "mean": 65.79589890319504,
             "median": 0.0,
             "p90": 2060.4,
-            "p95": 3772.8
+            "p95": 3772.8,
+            "ci95_lo": -43.33203206939827,
+            "ci95_hi": 181.3736543987621,
+            "excludes_zero": false
           },
           "bf16_only": {
             "n": 134,
             "mean": 5914.895522388059,
             "median": 3274.5,
             "p90": 20369.300000000007,
-            "p95": 24027.599999999995
+            "p95": 24027.599999999995,
+            "ci95_lo": 4334.590401785715,
+            "ci95_hi": 7604.761005089058,
+            "excludes_zero": true
           },
           "quant_only": {
             "n": 126,
             "mean": -4327.3650793650795,
             "median": -1931.0,
             "p90": 4415.5,
-            "p95": 7088.75
+            "p95": 7088.75,
+            "ci95_lo": -6137.871679069767,
+            "ci95_hi": -2561.3914448027604,
+            "excludes_zero": true
           },
           "both_wrong": {
             "n": 143,
             "mean": 520.6783216783217,
             "median": 437.0,
             "p90": 9787.999999999998,
-            "p95": 14062.600000000008
+            "p95": 14062.600000000008,
+            "ci95_lo": -506.2834582790091,
+            "ci95_hi": 1584.8613741232928,
+            "excludes_zero": false
           }
         },
+        "bf16_length_when_correct": {
+          "n": 2231,
+          "mean": 3538.647243388615,
+          "ci95_lo": 3305.1517740326854,
+          "ci95_hi": 3786.799167487887,
+          "excludes_zero": true
+        },
+        "bf16_length_when_incorrect": {
+          "n": 269,
+          "mean": 13928.46096654275,
+          "ci95_lo": 12234.568743297259,
+          "ci95_hi": 15498.239527092639,
+          "excludes_zero": true
+        },
+        "lian_bf16_correct_delta": {
+          "n": 2231,
+          "note": "mean(quant-BF16) on (item, seed) where BF16 is correct (Both-OK \u222a BF16-only)",
+          "mean": 417.1089197669207,
+          "ci95_lo": 261.3924393734036,
+          "ci95_hi": 582.5657511333509,
+          "excludes_zero": true
+        },
+        "mismatch_excess_vs_both_correct": {
+          "note": "D = mean(token_delta | BF16-only) - mean(token_delta | Both-OK). Same problem-clustered resamples; empty-stratum replicates skipped. Not causal.",
+          "mean": 5849.099623484864,
+          "ci95_lo": 4257.73065676293,
+          "ci95_hi": 7553.31732327391,
+          "excludes_zero": true,
+          "p_value": 0.0,
+          "n_boot": 10000,
+          "n_boot_valid": 10000,
+          "n_boot_skipped_empty_stratum": 0,
+          "both_correct": {
+            "n_item_seed": 2097,
+            "n_problems": 473
+          },
+          "bf16_only": {
+            "n_item_seed": 134,
+            "n_problems": 99
+          }
+        },
+        "ratio_of_means_excl_nearcap_pct": 3.444394890659752,
+        "n_pairs_excl_nearcap": 2461,
+        "n_pairs_total": 2500,
         "old_200_even_seed42": {
           "mean_of_ratios_pct": 28.446619697255837,
           "ratio_of_means_pct": 9.611631561056665
@@ -1537,7 +1892,10 @@
         "excludes_zero": false,
         "tost_equiv_1pp": true,
         "holm_alpha_pass1": 0.05,
-        "holm_significant_pass1": false
+        "holm_significant_pass1": false,
+        "holm_p_global18": 1.0,
+        "holm_alpha_global18": 0.05,
+        "holm_significant_global18": false
       },
       {
         "contrast": "Qwen-7B BF16 vs AWQ-4",
@@ -1553,7 +1911,10 @@
         "excludes_zero": false,
         "tost_equiv_1pp": true,
         "holm_alpha_pass1": 0.0125,
-        "holm_significant_pass1": false
+        "holm_significant_pass1": false,
+        "holm_p_global18": 1.0,
+        "holm_alpha_global18": 0.00625,
+        "holm_significant_global18": false
       },
       {
         "contrast": "Qwen-7B BF16 vs GPTQ-4",
@@ -1569,7 +1930,10 @@
         "excludes_zero": false,
         "tost_equiv_1pp": true,
         "holm_alpha_pass1": 0.016666666666666666,
-        "holm_significant_pass1": false
+        "holm_significant_pass1": false,
+        "holm_p_global18": 1.0,
+        "holm_alpha_global18": 0.016666666666666666,
+        "holm_significant_global18": false
       },
       {
         "contrast": "Llama-8B BF16 vs FP8",
@@ -1585,7 +1949,10 @@
         "excludes_zero": false,
         "tost_equiv_1pp": true,
         "holm_alpha_pass1": 0.025,
-        "holm_significant_pass1": false
+        "holm_significant_pass1": false,
+        "holm_p_global18": 1.0,
+        "holm_alpha_global18": 0.025,
+        "holm_significant_global18": false
       },
       {
         "contrast": "Llama-8B BF16 vs AWQ-4",
@@ -1601,7 +1968,10 @@
         "excludes_zero": true,
         "tost_equiv_1pp": false,
         "holm_alpha_pass1": 0.008333333333333333,
-        "holm_significant_pass1": true
+        "holm_significant_pass1": true,
+        "holm_p_global18": 0.0306,
+        "holm_alpha_global18": 0.0029411764705882353,
+        "holm_significant_global18": true
       },
       {
         "contrast": "Llama-8B BF16 vs GPTQ-4",
@@ -1617,7 +1987,10 @@
         "excludes_zero": false,
         "tost_equiv_1pp": true,
         "holm_alpha_pass1": 0.01,
-        "holm_significant_pass1": false
+        "holm_significant_pass1": false,
+        "holm_p_global18": 1.0,
+        "holm_alpha_global18": 0.005,
+        "holm_significant_global18": false
       }
     ],
     "token_analysis": {
@@ -1642,30 +2015,86 @@
             "mean": -6.933673469387755,
             "median": 0.0,
             "p90": 730.2000000000007,
-            "p95": 1173.0
+            "p95": 1173.0,
+            "ci95_lo": -56.562525818301,
+            "ci95_hi": 41.75071253307643,
+            "excludes_zero": false
           },
           "bf16_only": {
             "n": 83,
             "mean": 2549.421686746988,
             "median": 857.0,
             "p90": 7919.799999999993,
-            "p95": 26477.900000000092
+            "p95": 26477.900000000092,
+            "ci95_lo": 834.9607542819499,
+            "ci95_hi": 4424.169843527738,
+            "excludes_zero": true
           },
           "quant_only": {
             "n": 86,
             "mean": -1784.139534883721,
             "median": -242.5,
             "p90": 2295.5,
-            "p95": 2988.5
+            "p95": 2988.5,
+            "ci95_lo": -3195.9672198172198,
+            "ci95_hi": -613.1398731435647,
+            "excludes_zero": true
           },
           "both_wrong": {
             "n": 260,
             "mean": -107.39615384615385,
             "median": -10.5,
             "p90": 2150.4999999999995,
-            "p95": 3015.9000000000024
+            "p95": 3015.9000000000024,
+            "ci95_lo": -597.139733909209,
+            "ci95_hi": 344.98181923236314,
+            "excludes_zero": false
           }
-        }
+        },
+        "bf16_length_when_correct": {
+          "n": 3611,
+          "mean": 1509.189975076156,
+          "ci95_lo": 1453.785773384639,
+          "ci95_hi": 1567.9894514330065,
+          "excludes_zero": true
+        },
+        "bf16_length_when_incorrect": {
+          "n": 346,
+          "mean": 3644.4710982658958,
+          "ci95_lo": 3100.033249938497,
+          "ci95_hi": 4248.014428571429,
+          "excludes_zero": true
+        },
+        "lian_bf16_correct_delta": {
+          "n": 3611,
+          "note": "mean(quant-BF16) on (item, seed) where BF16 is correct (Both-OK \u222a BF16-only)",
+          "mean": 51.82497923013016,
+          "ci95_lo": -11.146681761134944,
+          "ci95_hi": 120.45408495910506,
+          "excludes_zero": false
+        },
+        "mismatch_excess_vs_both_correct": {
+          "note": "D = mean(token_delta | BF16-only) - mean(token_delta | Both-OK). Same problem-clustered resamples; empty-stratum replicates skipped. Not causal.",
+          "mean": 2556.355360216376,
+          "ci95_lo": 835.1030221277862,
+          "ci95_hi": 4431.807160324559,
+          "excludes_zero": true,
+          "p_value": 0.0018,
+          "n_boot": 10000,
+          "n_boot_valid": 10000,
+          "n_boot_skipped_empty_stratum": 0,
+          "both_correct": {
+            "n_item_seed": 3528,
+            "n_problems": 1228
+          },
+          "bf16_only": {
+            "n_item_seed": 83,
+            "n_problems": 72
+          }
+        },
+        "ratio_of_means_excl_nearcap_pct": -0.12675267860394746,
+        "n_pairs_excl_nearcap": 3940,
+        "n_pairs_total": 3957
       },
       "Qwen-7B_AWQ-4": {
         "ratio_of_means_pct": -0.5957525565248978,
@@ -1688,30 +2117,86 @@
             "mean": -13.312892184826012,
             "median": -33.5,
             "p90": 807.5,
-            "p95": 1375.0
+            "p95": 1375.0,
+            "ci95_lo": -66.10717681382384,
+            "ci95_hi": 39.312593069306935,
+            "excludes_zero": false
           },
           "bf16_only": {
             "n": 105,
             "mean": 1245.1619047619047,
             "median": 330.0,
             "p90": 6220.599999999995,
-            "p95": 7256.399999999999
+            "p95": 7256.399999999999,
+            "ci95_lo": 332.8363510678871,
+            "ci95_hi": 2230.7739753320675,
+            "excludes_zero": true
           },
           "quant_only": {
             "n": 97,
             "mean": -1871.041237113402,
             "median": -425.0,
             "p90": 3091.000000000001,
-            "p95": 4307.600000000001
+            "p95": 4307.600000000001,
+            "ci95_lo": -3337.758275510204,
+            "ci95_hi": -635.2380030049652,
+            "excludes_zero": true
           },
           "both_wrong": {
             "n": 249,
             "mean": 230.70281124497993,
             "median": 36.0,
             "p90": 2900.999999999998,
-            "p95": 4000.999999999999
+            "p95": 4000.999999999999,
+            "ci95_lo": -184.42859648468112,
+            "ci95_hi": 652.0847633744856,
+            "excludes_zero": false
           }
-        }
+        },
+        "bf16_length_when_correct": {
+          "n": 3611,
+          "mean": 1509.189975076156,
+          "ci95_lo": 1453.785773384639,
+          "ci95_hi": 1567.9894514330065,
+          "excludes_zero": true
+        },
+        "bf16_length_when_incorrect": {
+          "n": 346,
+          "mean": 3644.4710982658958,
+          "ci95_lo": 3100.033249938497,
+          "ci95_hi": 4248.014428571429,
+          "excludes_zero": true
+        },
+        "lian_bf16_correct_delta": {
+          "n": 3611,
+          "note": "mean(quant-BF16) on (item, seed) where BF16 is correct (Both-OK \u222a BF16-only)",
+          "mean": 23.280808640265853,
+          "ci95_lo": -36.86115927655182,
+          "ci95_hi": 83.38543120404825,
+          "excludes_zero": false
+        },
+        "mismatch_excess_vs_both_correct": {
+          "note": "D = mean(token_delta | BF16-only) - mean(token_delta | Both-OK). Same problem-clustered resamples; empty-stratum replicates skipped. Not causal.",
+          "mean": 1258.4747969467307,
+          "ci95_lo": 354.36871058673427,
+          "ci95_hi": 2245.445006794214,
+          "excludes_zero": true,
+          "p_value": 0.0092,
+          "n_boot": 10000,
+          "n_boot_valid": 10000,
+          "n_boot_skipped_empty_stratum": 0,
+          "both_correct": {
+            "n_item_seed": 3506,
+            "n_problems": 1218
+          },
+          "bf16_only": {
+            "n_item_seed": 105,
+            "n_problems": 90
+          }
+        },
+        "ratio_of_means_excl_nearcap_pct": 0.6828624974840158,
+        "n_pairs_excl_nearcap": 3942,
+        "n_pairs_total": 3957
       },
       "Qwen-7B_GPTQ-4": {
         "ratio_of_means_pct": 0.592638114334898,
@@ -1734,30 +2219,86 @@
             "mean": -37.13116623895067,
             "median": -32.0,
             "p90": 751.0,
-            "p95": 1312.5999999999985
+            "p95": 1312.5999999999985,
+            "ci95_lo": -90.77714333982986,
+            "ci95_hi": 15.905329586969446,
+            "excludes_zero": false
           },
           "bf16_only": {
             "n": 104,
             "mean": 3303.596153846154,
             "median": 788.0,
             "p90": 8449.1,
-            "p95": 29526.449999999993
+            "p95": 29526.449999999993,
+            "ci95_lo": 1646.5725603154965,
+            "ci95_hi": 5035.595866016535,
+            "excludes_zero": true
           },
           "quant_only": {
             "n": 99,
             "mean": -1737.6363636363637,
             "median": -173.0,
             "p90": 2451.6,
-            "p95": 2777.4999999999977
+            "p95": 2777.4999999999977,
+            "ci95_lo": -3046.1552631578948,
+            "ci95_hi": -639.6910466382361,
+            "excludes_zero": true
           },
           "both_wrong": {
             "n": 247,
             "mean": -6.3117408906882595,
             "median": 2.0,
             "p90": 2549.0,
-            "p95": 3902.4999999999995
+            "p95": 3902.4999999999995,
+            "ci95_lo": -538.8011573270877,
+            "ci95_hi": 477.3132507365717,
+            "excludes_zero": false
           }
-        }
+        },
+        "bf16_length_when_correct": {
+          "n": 3611,
+          "mean": 1509.189975076156,
+          "ci95_lo": 1453.785773384639,
+          "ci95_hi": 1567.9894514330065,
+          "excludes_zero": true
+        },
+        "bf16_length_when_incorrect": {
+          "n": 346,
+          "mean": 3644.4710982658958,
+          "ci95_lo": 3100.033249938497,
+          "ci95_hi": 4248.014428571429,
+          "excludes_zero": true
+        },
+        "lian_bf16_correct_delta": {
+          "n": 3611,
+          "note": "mean(quant-BF16) on (item, seed) where BF16 is correct (Both-OK \u222a BF16-only)",
+          "mean": 59.08474106895597,
+          "ci95_lo": -13.176649852876961,
+          "ci95_hi": 133.95692619248015,
+          "excludes_zero": false
+        },
+        "mismatch_excess_vs_both_correct": {
+          "note": "D = mean(token_delta | BF16-only) - mean(token_delta | Both-OK). Same problem-clustered resamples; empty-stratum replicates skipped. Not causal.",
+          "mean": 3340.7273200851046,
+          "ci95_lo": 1680.0652774550163,
+          "ci95_hi": 5069.976420592439,
+          "excludes_zero": true,
+          "p_value": 0.0,
+          "n_boot": 10000,
+          "n_boot_valid": 10000,
+          "n_boot_skipped_empty_stratum": 0,
+          "both_correct": {
+            "n_item_seed": 3507,
+            "n_problems": 1224
+          },
+          "bf16_only": {
+            "n_item_seed": 104,
+            "n_problems": 87
+          }
+        },
+        "ratio_of_means_excl_nearcap_pct": -0.9744599007162402,
+        "n_pairs_excl_nearcap": 3937,
+        "n_pairs_total": 3957
       },
       "Llama-8B_FP8": {
         "ratio_of_means_pct": -2.5934794353168256,
@@ -1780,30 +2321,86 @@
             "mean": -51.58190419869899,
             "median": -35.5,
             "p90": 873.6000000000004,
-            "p95": 1474.3999999999978
+            "p95": 1474.3999999999978,
+            "ci95_lo": -96.84715975774249,
+            "ci95_hi": -6.629003530878796,
+            "excludes_zero": true
           },
           "bf16_only": {
             "n": 127,
             "mean": 680.0787401574803,
             "median": 147.0,
             "p90": 4245.600000000001,
-            "p95": 5955.800000000002
+            "p95": 5955.800000000002,
+            "ci95_lo": 117.52622386465826,
+            "ci95_hi": 1227.4940917661847,
+            "excludes_zero": true
           },
           "quant_only": {
             "n": 132,
             "mean": -1326.310606060606,
             "median": -384.0,
             "p90": 2803.5,
-            "p95": 3284.3
+            "p95": 3284.3,
+            "ci95_lo": -2122.0441749585407,
+            "ci95_hi": -606.935985797828,
+            "excludes_zero": true
           },
           "both_wrong": {
             "n": 316,
             "mean": 258.0632911392405,
             "median": 100.5,
             "p90": 3118.0,
-            "p95": 5292.5
+            "p95": 5292.5,
+            "ci95_lo": -140.09895050324883,
+            "ci95_hi": 637.919982942546,
+            "excludes_zero": false
           }
-        }
+        },
+        "bf16_length_when_correct": {
+          "n": 3509,
+          "mean": 1547.7566258193217,
+          "ci95_lo": 1495.1180348347614,
+          "ci95_hi": 1603.4024241989741,
+          "excludes_zero": true
+        },
+        "bf16_length_when_incorrect": {
+          "n": 448,
+          "mean": 3507.3459821428573,
+          "ci95_lo": 3095.969510997992,
+          "ci95_hi": 3948.1196434009303,
+          "excludes_zero": true
+        },
+        "lian_bf16_correct_delta": {
+          "n": 3509,
+          "note": "mean(quant-BF16) on (item, seed) where BF16 is correct (Both-OK \u222a BF16-only)",
+          "mean": -25.101168424052435,
+          "ci95_lo": -71.94010405852559,
+          "ci95_hi": 21.688545668164977,
+          "excludes_zero": false
+        },
+        "mismatch_excess_vs_both_correct": {
+          "note": "D = mean(token_delta | BF16-only) - mean(token_delta | Both-OK). Same problem-clustered resamples; empty-stratum replicates skipped. Not causal.",
+          "mean": 731.6606443561793,
+          "ci95_lo": 166.30776755289108,
+          "ci95_hi": 1286.9065847219947,
+          "excludes_zero": true,
+          "p_value": 0.0086,
+          "n_boot": 10000,
+          "n_boot_valid": 10000,
+          "n_boot_skipped_empty_stratum": 0,
+          "both_correct": {
+            "n_item_seed": 3382,
+            "n_problems": 1205
+          },
+          "bf16_only": {
+            "n_item_seed": 127,
+            "n_problems": 113
+          }
+        },
+        "ratio_of_means_excl_nearcap_pct": -2.73248761794459,
+        "n_pairs_excl_nearcap": 3953,
+        "n_pairs_total": 3957
       },
       "Llama-8B_AWQ-4": {
         "ratio_of_means_pct": -0.9213167715097614,
@@ -1826,30 +2423,86 @@
             "mean": -71.29356405585914,
             "median": -59.0,
             "p90": 911.6999999999998,
-            "p95": 1538.1499999999992
+            "p95": 1538.1499999999992,
+            "ci95_lo": -114.40076165092904,
+            "ci95_hi": -29.022100891022554,
+            "excludes_zero": true
           },
           "bf16_only": {
             "n": 215,
             "mean": 1326.413953488372,
             "median": 351.0,
             "p90": 5006.999999999999,
-            "p95": 6925.2000000000035
+            "p95": 6925.2000000000035,
+            "ci95_lo": 671.2764801094647,
+            "ci95_hi": 2098.4700950502147,
+            "excludes_zero": true
           },
           "quant_only": {
             "n": 153,
             "mean": -608.4705882352941,
             "median": -175.0,
             "p90": 2834.0,
-            "p95": 4214.800000000001
+            "p95": 4214.800000000001,
+            "ci95_lo": -1114.423077864239,
+            "ci95_hi": -101.780382193528,
+            "excludes_zero": true
           },
           "both_wrong": {
             "n": 295,
             "mean": -73.74915254237288,
             "median": -59.0,
             "p90": 3150.000000000001,
-            "p95": 5612.100000000003
+            "p95": 5612.100000000003,
+            "ci95_lo": -554.5460298836744,
+            "ci95_hi": 446.0861554054052,
+            "excludes_zero": false
           }
-        }
+        },
+        "bf16_length_when_correct": {
+          "n": 3509,
+          "mean": 1547.7566258193217,
+          "ci95_lo": 1495.1180348347614,
+          "ci95_hi": 1603.4024241989741,
+          "excludes_zero": true
+        },
+        "bf16_length_when_incorrect": {
+          "n": 448,
+          "mean": 3507.3459821428573,
+          "ci95_lo": 3095.969510997992,
+          "ci95_hi": 3948.1196434009303,
+          "excludes_zero": true
+        },
+        "lian_bf16_correct_delta": {
+          "n": 3509,
+          "note": "mean(quant-BF16) on (item, seed) where BF16 is correct (Both-OK \u222a BF16-only)",
+          "mean": 14.345397549159305,
+          "ci95_lo": -46.442258083281075,
+          "ci95_hi": 77.46797411384485,
+          "excludes_zero": false
+        },
+        "mismatch_excess_vs_both_correct": {
+          "note": "D = mean(token_delta | BF16-only) - mean(token_delta | Both-OK). Same problem-clustered resamples; empty-stratum replicates skipped. Not causal.",
+          "mean": 1397.7075175442312,
+          "ci95_lo": 740.4080157625425,
+          "ci95_hi": 2169.1501677789165,
+          "excludes_zero": true,
+          "p_value": 0.0,
+          "n_boot": 10000,
+          "n_boot_valid": 10000,
+          "n_boot_skipped_empty_stratum": 0,
+          "both_correct": {
+            "n_item_seed": 3294,
+            "n_problems": 1186
+          },
+          "bf16_only": {
+            "n_item_seed": 215,
+            "n_problems": 166
+          }
+        },
+        "ratio_of_means_excl_nearcap_pct": -3.4464153605086034,
+        "n_pairs_excl_nearcap": 3948,
+        "n_pairs_total": 3957
       },
       "Llama-8B_GPTQ-4": {
         "ratio_of_means_pct": 4.06118272259004,
@@ -1872,30 +2525,86 @@
             "mean": 20.503112955825674,
             "median": -14.0,
             "p90": 986.6000000000004,
-            "p95": 1846.4
+            "p95": 1846.4,
+            "ci95_lo": -34.635792252267635,
+            "ci95_hi": 78.38599695423777,
+            "excludes_zero": false
           },
           "bf16_only": {
             "n": 136,
             "mean": 1729.1764705882354,
             "median": 466.0,
             "p90": 5658.5,
-            "p95": 7061.25
+            "p95": 7061.25,
+            "ci95_lo": 935.2527135113696,
+            "ci95_hi": 2681.813030311045,
+            "excludes_zero": true
           },
           "quant_only": {
             "n": 147,
             "mean": -896.4081632653061,
             "median": -252.0,
             "p90": 2940.200000000001,
-            "p95": 4839.3999999999905
+            "p95": 4839.3999999999905,
+            "ci95_lo": -1509.2572962751533,
+            "ci95_hi": -291.7315436241614,
+            "excludes_zero": true
           },
           "both_wrong": {
             "n": 301,
             "mean": 371.51495016611295,
             "median": -1.0,
             "p90": 4440.0,
-            "p95": 5918.0
+            "p95": 5918.0,
+            "ci95_lo": -143.5186100048407,
+            "ci95_hi": 890.8397088991454,
+            "excludes_zero": false
           }
-        }
+        },
+        "bf16_length_when_correct": {
+          "n": 3509,
+          "mean": 1547.7566258193217,
+          "ci95_lo": 1495.1180348347614,
+          "ci95_hi": 1603.4024241989741,
+          "excludes_zero": true
+        },
+        "bf16_length_when_incorrect": {
+          "n": 448,
+          "mean": 3507.3459821428573,
+          "ci95_lo": 3095.969510997992,
+          "ci95_hi": 3948.1196434009303,
+          "excludes_zero": true
+        },
+        "lian_bf16_correct_delta": {
+          "n": 3509,
+          "note": "mean(quant-BF16) on (item, seed) where BF16 is correct (Both-OK \u222a BF16-only)",
+          "mean": 86.72698774579652,
+          "ci95_lo": 24.16246954561791,
+          "ci95_hi": 153.87758335486214,
+          "excludes_zero": true
+        },
+        "mismatch_excess_vs_both_correct": {
+          "note": "D = mean(token_delta | BF16-only) - mean(token_delta | Both-OK). Same problem-clustered resamples; empty-stratum replicates skipped. Not causal.",
+          "mean": 1708.6733576324098,
+          "ci95_lo": 912.1921028810291,
+          "ci95_hi": 2666.247287153007,
+          "excludes_zero": true,
+          "p_value": 0.0,
+          "n_boot": 10000,
+          "n_boot_valid": 10000,
+          "n_boot_skipped_empty_stratum": 0,
+          "both_correct": {
+            "n_item_seed": 3373,
+            "n_problems": 1203
+          },
+          "bf16_only": {
+            "n_item_seed": 136,
+            "n_problems": 119
+          }
+        },
+        "ratio_of_means_excl_nearcap_pct": 1.4664163928479912,
+        "n_pairs_excl_nearcap": 3946,
+        "n_pairs_total": 3957
       }
     },
     "deployment_economics": {
@@ -2306,7 +3015,10 @@
         "excludes_zero": false,
         "tost_equiv_1pp": false,
         "holm_alpha_pass1": 0.025,
-        "holm_significant_pass1": false
+        "holm_significant_pass1": false,
+        "holm_p_global18": 1.0,
+        "holm_alpha_global18": 0.01,
+        "holm_significant_global18": false
       },
       {
         "contrast": "Qwen-7B BF16 vs AWQ-4",
@@ -2322,7 +3034,10 @@
         "excludes_zero": true,
         "tost_equiv_1pp": false,
         "holm_alpha_pass1": 0.008333333333333333,
-        "holm_significant_pass1": true
+        "holm_significant_pass1": true,
+        "holm_p_global18": 0.1088,
+        "holm_alpha_global18": 0.003125,
+        "holm_significant_global18": false
       },
       {
         "contrast": "Qwen-7B BF16 vs GPTQ-4",
@@ -2338,7 +3053,10 @@
         "excludes_zero": false,
         "tost_equiv_1pp": false,
         "holm_alpha_pass1": 0.01,
-        "holm_significant_pass1": false
+        "holm_significant_pass1": false,
+        "holm_p_global18": 1.0,
+        "holm_alpha_global18": 0.0038461538461538464,
+        "holm_significant_global18": false
       },
       {
         "contrast": "Llama-8B BF16 vs FP8",
@@ -2354,7 +3072,10 @@
         "excludes_zero": false,
         "tost_equiv_1pp": false,
         "holm_alpha_pass1": 0.0125,
-        "holm_significant_pass1": false
+        "holm_significant_pass1": false,
+        "holm_p_global18": 1.0,
+        "holm_alpha_global18": 0.004545454545454546,
+        "holm_significant_global18": false
       },
       {
         "contrast": "Llama-8B BF16 vs AWQ-4",
@@ -2370,7 +3091,10 @@
         "excludes_zero": false,
         "tost_equiv_1pp": false,
         "holm_alpha_pass1": 0.05,
-        "holm_significant_pass1": false
+        "holm_significant_pass1": false,
+        "holm_p_global18": 1.0,
+        "holm_alpha_global18": 0.0125,
+        "holm_significant_global18": false
       },
       {
         "contrast": "Llama-8B BF16 vs GPTQ-4",
@@ -2386,7 +3110,10 @@
         "excludes_zero": false,
         "tost_equiv_1pp": false,
         "holm_alpha_pass1": 0.016666666666666666,
-        "holm_significant_pass1": false
+        "holm_significant_pass1": false,
+        "holm_p_global18": 1.0,
+        "holm_alpha_global18": 0.005555555555555556,
+        "holm_significant_global18": false
       }
     ],
     "token_analysis": {
@@ -2411,30 +3138,86 @@
             "mean": 3.309417040358744,
             "median": 45.0,
             "p90": 3549.400000000005,
-            "p95": 4820.5
+            "p95": 4820.5,
+            "ci95_lo": -468.72820062632024,
+            "ci95_hi": 449.0816754932502,
+            "excludes_zero": false
           },
           "bf16_only": {
             "n": 76,
             "mean": 156.18421052631578,
             "median": -150.5,
             "p90": 4131.5,
-            "p95": 7833.5
+            "p95": 7833.5,
+            "ci95_lo": -858.5425199847734,
+            "ci95_hi": 1165.46375,
+            "excludes_zero": false
           },
           "quant_only": {
             "n": 71,
             "mean": -1963.9014084507041,
             "median": -992.0,
             "p90": 3384.0,
-            "p95": 4154.5
+            "p95": 4154.5,
+            "ci95_lo": -3155.5603898128898,
+            "ci95_hi": -843.3049596379649,
+            "excludes_zero": true
           },
           "both_wrong": {
             "n": 224,
             "mean": -714.03125,
             "median": -237.0,
             "p90": 2367.3999999999996,
-            "p95": 3403.649999999999
+            "p95": 3403.649999999999,
+            "ci95_lo": -1188.363247814082,
+            "ci95_hi": -290.7382647357725,
+            "excludes_zero": true
           }
-        }
+        },
+        "bf16_length_when_correct": {
+          "n": 299,
+          "mean": 7028.200668896321,
+          "ci95_lo": 6312.325315993905,
+          "ci95_hi": 7791.738649138443,
+          "excludes_zero": true
+        },
+        "bf16_length_when_incorrect": {
+          "n": 295,
+          "mean": 10050.945762711865,
+          "ci95_lo": 9300.123491638657,
+          "ci95_hi": 10789.301543864967,
+          "excludes_zero": true
+        },
+        "lian_bf16_correct_delta": {
+          "n": 299,
+          "note": "mean(quant-BF16) on (item, seed) where BF16 is correct (Both-OK \u222a BF16-only)",
+          "mean": 42.16722408026756,
+          "ci95_lo": -392.7661877909058,
+          "ci95_hi": 458.5503479586426,
+          "excludes_zero": false
+        },
+        "mismatch_excess_vs_both_correct": {
+          "note": "D = mean(token_delta | BF16-only) - mean(token_delta | Both-OK). Same problem-clustered resamples; empty-stratum replicates skipped. Not causal.",
+          "mean": 152.87479348595704,
+          "ci95_lo": -938.9536033971182,
+          "ci95_hi": 1303.1045570500926,
+          "excludes_zero": false,
+          "p_value": 0.777,
+          "n_boot": 10000,
+          "n_boot_valid": 10000,
+          "n_boot_skipped_empty_stratum": 0,
+          "both_correct": {
+            "n_item_seed": 223,
+            "n_problems": 104
+          },
+          "bf16_only": {
+            "n_item_seed": 76,
+            "n_problems": 61
+          }
+        },
+        "ratio_of_means_excl_nearcap_pct": -3.9068073167060846,
+        "n_pairs_excl_nearcap": 589,
+        "n_pairs_total": 594
       },
       "Qwen-7B_AWQ-4": {
         "ratio_of_means_pct": -0.41869462727534,
@@ -2457,30 +3240,86 @@
             "mean": 97.23383084577114,
             "median": 49.0,
             "p90": 4049.0,
-            "p95": 5268.0
+            "p95": 5268.0,
+            "ci95_lo": -442.44997561018874,
+            "ci95_hi": 641.9251642205217,
+            "excludes_zero": false
           },
           "bf16_only": {
             "n": 98,
             "mean": 1022.1938775510204,
             "median": 593.5,
             "p90": 5780.999999999999,
-            "p95": 7577.950000000001
+            "p95": 7577.950000000001,
+            "ci95_lo": 16.213928709802403,
+            "ci95_hi": 2088.4494740099008,
+            "excludes_zero": true
           },
           "quant_only": {
             "n": 65,
             "mean": -2085.769230769231,
             "median": -821.0,
             "p90": 3163.6000000000004,
-            "p95": 3770.199999999999
+            "p95": 3770.199999999999,
+            "ci95_lo": -3503.114248511905,
+            "ci95_hi": -785.2652777777778,
+            "excludes_zero": true
           },
           "both_wrong": {
             "n": 230,
             "mean": -23.291304347826088,
             "median": -175.5,
             "p90": 3134.2,
-            "p95": 5078.450000000001
+            "p95": 5078.450000000001,
+            "ci95_lo": -569.1536367857533,
+            "ci95_hi": 535.0447826086955,
+            "excludes_zero": false
           }
-        }
+        },
+        "bf16_length_when_correct": {
+          "n": 299,
+          "mean": 7028.200668896321,
+          "ci95_lo": 6312.325315993905,
+          "ci95_hi": 7791.738649138443,
+          "excludes_zero": true
+        },
+        "bf16_length_when_incorrect": {
+          "n": 295,
+          "mean": 10050.945762711865,
+          "ci95_lo": 9300.123491638657,
+          "ci95_hi": 10789.301543864967,
+          "excludes_zero": true
+        },
+        "lian_bf16_correct_delta": {
+          "n": 299,
+          "note": "mean(quant-BF16) on (item, seed) where BF16 is correct (Both-OK \u222a BF16-only)",
+          "mean": 400.39799331103677,
+          "ci95_lo": -83.04526530543141,
+          "ci95_hi": 905.0281239980269,
+          "excludes_zero": false
+        },
+        "mismatch_excess_vs_both_correct": {
+          "note": "D = mean(token_delta | BF16-only) - mean(token_delta | Both-OK). Same problem-clustered resamples; empty-stratum replicates skipped. Not causal.",
+          "mean": 924.9600467052492,
+          "ci95_lo": -236.95809515549706,
+          "ci95_hi": 2128.3896841341366,
+          "excludes_zero": false,
+          "p_value": 0.1272,
+          "n_boot": 10000,
+          "n_boot_valid": 10000,
+          "n_boot_skipped_empty_stratum": 0,
+          "both_correct": {
+            "n_item_seed": 201,
+            "n_problems": 97
+          },
+          "bf16_only": {
+            "n_item_seed": 98,
+            "n_problems": 75
+          }
+        },
+        "ratio_of_means_excl_nearcap_pct": 1.1191288748409356,
+        "n_pairs_excl_nearcap": 588,
+        "n_pairs_total": 594
       },
       "Qwen-7B_GPTQ-4": {
         "ratio_of_means_pct": 7.022002143113304,
@@ -2503,30 +3342,86 @@
             "mean": 441.54716981132077,
             "median": 60.5,
             "p90": 4278.500000000001,
-            "p95": 5745.099999999998
+            "p95": 5745.099999999998,
+            "ci95_lo": -110.2148987206823,
+            "ci95_hi": 1041.001045042798,
+            "excludes_zero": false
           },
           "bf16_only": {
             "n": 87,
             "mean": 2146.103448275862,
             "median": 783.0,
             "p90": 10329.800000000001,
-            "p95": 13680.400000000007
+            "p95": 13680.400000000007,
+            "ci95_lo": 864.6521144994246,
+            "ci95_hi": 3537.5504018847005,
+            "excludes_zero": true
           },
           "quant_only": {
             "n": 73,
             "mean": -289.0,
             "median": 0.0,
             "p90": 3927.0,
-            "p95": 6782.6
+            "p95": 6782.6,
+            "ci95_lo": -1633.1177188802858,
+            "ci95_hi": 980.647826086955,
+            "excludes_zero": false
           },
           "both_wrong": {
             "n": 222,
             "mean": 434.8873873873874,
             "median": 434.0,
             "p90": 3809.3,
-            "p95": 5341.299999999999
+            "p95": 5341.299999999999,
+            "ci95_lo": -61.6749800876145,
+            "ci95_hi": 901.4167681274,
+            "excludes_zero": false
           }
-        }
+        },
+        "bf16_length_when_correct": {
+          "n": 299,
+          "mean": 7028.200668896321,
+          "ci95_lo": 6312.325315993905,
+          "ci95_hi": 7791.738649138443,
+          "excludes_zero": true
+        },
+        "bf16_length_when_incorrect": {
+          "n": 295,
+          "mean": 10050.945762711865,
+          "ci95_lo": 9300.123491638657,
+          "ci95_hi": 10789.301543864967,
+          "excludes_zero": true
+        },
+        "lian_bf16_correct_delta": {
+          "n": 299,
+          "note": "mean(quant-BF16) on (item, seed) where BF16 is correct (Both-OK \u222a BF16-only)",
+          "mean": 937.5217391304348,
+          "ci95_lo": 389.1835707939672,
+          "ci95_hi": 1534.9232124676046,
+          "excludes_zero": true
+        },
+        "mismatch_excess_vs_both_correct": {
+          "note": "D = mean(token_delta | BF16-only) - mean(token_delta | Both-OK). Same problem-clustered resamples; empty-stratum replicates skipped. Not causal.",
+          "mean": 1704.556278464541,
+          "ci95_lo": 304.955030687469,
+          "ci95_hi": 3184.1325265063824,
+          "excludes_zero": true,
+          "p_value": 0.0166,
+          "n_boot": 10000,
+          "n_boot_valid": 10000,
+          "n_boot_skipped_empty_stratum": 0,
+          "both_correct": {
+            "n_item_seed": 212,
+            "n_problems": 98
+          },
+          "bf16_only": {
+            "n_item_seed": 87,
+            "n_problems": 68
+          }
+        },
+        "ratio_of_means_excl_nearcap_pct": 7.969419224059449,
+        "n_pairs_excl_nearcap": 586,
+        "n_pairs_total": 594
       },
       "Llama-8B_FP8": {
         "ratio_of_means_pct": 0.6430335120995334,
@@ -2549,30 +3444,86 @@
             "mean": 134.18407960199005,
             "median": 102.0,
             "p90": 3822.0,
-            "p95": 5459.0
+            "p95": 5459.0,
+            "ci95_lo": -283.1256907894737,
+            "ci95_hi": 544.3166680927003,
+            "excludes_zero": false
           },
           "bf16_only": {
             "n": 73,
             "mean": 1409.4657534246576,
             "median": 191.0,
             "p90": 7449.599999999998,
-            "p95": 9786.600000000002
+            "p95": 9786.600000000002,
+            "ci95_lo": 281.7928853046595,
+            "ci95_hi": 2651.2351655973644,
+            "excludes_zero": true
           },
           "quant_only": {
             "n": 83,
             "mean": -1201.2048192771085,
             "median": -131.0,
             "p90": 2190.6,
-            "p95": 4142.300000000004
+            "p95": 4142.300000000004,
+            "ci95_lo": -2277.5213932164884,
+            "ci95_hi": -181.7590563165907,
+            "excludes_zero": true
           },
           "both_wrong": {
             "n": 237,
             "mean": 12.341772151898734,
             "median": -201.0,
             "p90": 2994.6000000000013,
-            "p95": 3660.9999999999986
+            "p95": 3660.9999999999986,
+            "ci95_lo": -368.58112947658407,
+            "ci95_hi": 418.3412844036696,
+            "excludes_zero": false
           }
-        }
+        },
+        "bf16_length_when_correct": {
+          "n": 274,
+          "mean": 7614.014598540146,
+          "ci95_lo": 6936.525493021844,
+          "ci95_hi": 8336.420517450806,
+          "excludes_zero": true
+        },
+        "bf16_length_when_incorrect": {
+          "n": 320,
+          "mean": 9560.046875,
+          "ci95_lo": 8915.745242594485,
+          "ci95_hi": 10218.448679335675,
+          "excludes_zero": true
+        },
+        "lian_bf16_correct_delta": {
+          "n": 274,
+          "note": "mean(quant-BF16) on (item, seed) where BF16 is correct (Both-OK \u222a BF16-only)",
+          "mean": 473.94890510948903,
+          "ci95_lo": 28.286049420646066,
+          "ci95_hi": 936.4831300813005,
+          "excludes_zero": true
+        },
+        "mismatch_excess_vs_both_correct": {
+          "note": "D = mean(token_delta | BF16-only) - mean(token_delta | Both-OK). Same problem-clustered resamples; empty-stratum replicates skipped. Not causal.",
+          "mean": 1275.2816738226675,
+          "ci95_lo": 90.30254721564185,
+          "ci95_hi": 2566.2274842037095,
+          "excludes_zero": true,
+          "p_value": 0.0324,
+          "n_boot": 10000,
+          "n_boot_valid": 10000,
+          "n_boot_skipped_empty_stratum": 0,
+          "both_correct": {
+            "n_item_seed": 201,
+            "n_problems": 102
+          },
+          "bf16_only": {
+            "n_item_seed": 73,
+            "n_problems": 65
+          }
+        },
+        "ratio_of_means_excl_nearcap_pct": 0.6430335120995334,
+        "n_pairs_excl_nearcap": 594,
+        "n_pairs_total": 594
       },
       "Llama-8B_AWQ-4": {
         "ratio_of_means_pct": 2.6182718535095573,
@@ -2595,30 +3546,86 @@
             "mean": 637.0641711229947,
             "median": 112.0,
             "p90": 6068.000000000002,
-            "p95": 8110.499999999996
+            "p95": 8110.499999999996,
+            "ci95_lo": 53.19979375922656,
+            "ci95_hi": 1246.4951832151298,
+            "excludes_zero": true
           },
           "bf16_only": {
             "n": 87,
             "mean": 1371.7011494252874,
             "median": 422.0,
             "p90": 6537.2,
-            "p95": 9836.400000000003
+            "p95": 9836.400000000003,
+            "ci95_lo": 326.6597514554411,
+            "ci95_hi": 2508.6448059429954,
+            "excludes_zero": true
           },
           "quant_only": {
             "n": 92,
             "mean": -983.75,
             "median": -675.0,
             "p90": 3002.3000000000025,
-            "p95": 5985.350000000003
+            "p95": 5985.350000000003,
+            "ci95_lo": -1941.1633979885057,
+            "ci95_hi": -34.740287162162204,
+            "excludes_zero": true
           },
           "both_wrong": {
             "n": 228,
             "mean": -58.078947368421055,
             "median": -238.5,
             "p90": 3661.3,
-            "p95": 4908.950000000001
+            "p95": 4908.950000000001,
+            "ci95_lo": -614.3534485070624,
+            "ci95_hi": 505.3069610961585,
+            "excludes_zero": false
           }
-        }
+        },
+        "bf16_length_when_correct": {
+          "n": 274,
+          "mean": 7614.014598540146,
+          "ci95_lo": 6936.525493021844,
+          "ci95_hi": 8336.420517450806,
+          "excludes_zero": true
+        },
+        "bf16_length_when_incorrect": {
+          "n": 320,
+          "mean": 9560.046875,
+          "ci95_lo": 8915.745242594485,
+          "ci95_hi": 10218.448679335675,
+          "excludes_zero": true
+        },
+        "lian_bf16_correct_delta": {
+          "n": 274,
+          "note": "mean(quant-BF16) on (item, seed) where BF16 is correct (Both-OK \u222a BF16-only)",
+          "mean": 870.3248175182482,
+          "ci95_lo": 327.3521155056051,
+          "ci95_hi": 1431.3594578567127,
+          "excludes_zero": true
+        },
+        "mismatch_excess_vs_both_correct": {
+          "note": "D = mean(token_delta | BF16-only) - mean(token_delta | Both-OK). Same problem-clustered resamples; empty-stratum replicates skipped. Not causal.",
+          "mean": 734.6369783022927,
+          "ci95_lo": -446.8161588136663,
+          "ci95_hi": 2013.5402969824286,
+          "excludes_zero": false,
+          "p_value": 0.2418,
+          "n_boot": 10000,
+          "n_boot_valid": 10000,
+          "n_boot_skipped_empty_stratum": 0,
+          "both_correct": {
+            "n_item_seed": 187,
+            "n_problems": 97
+          },
+          "bf16_only": {
+            "n_item_seed": 87,
+            "n_problems": 74
+          }
+        },
+        "ratio_of_means_excl_nearcap_pct": 2.1555761087070024,
+        "n_pairs_excl_nearcap": 593,
+        "n_pairs_total": 594
       },
       "Llama-8B_GPTQ-4": {
         "ratio_of_means_pct": 6.758352759862851,
@@ -2641,30 +3648,86 @@
             "mean": 684.0,
             "median": 422.0,
             "p90": 5558.2000000000035,
-            "p95": 7417.0
+            "p95": 7417.0,
+            "ci95_lo": 103.16390693404887,
+            "ci95_hi": 1309.1050568597645,
+            "excludes_zero": true
           },
           "bf16_only": {
             "n": 91,
             "mean": 1507.5384615384614,
             "median": 1383.0,
             "p90": 6267.0,
-            "p95": 7685.0
+            "p95": 7685.0,
+            "ci95_lo": 712.1348398728762,
+            "ci95_hi": 2358.9116114603476,
+            "excludes_zero": true
           },
           "quant_only": {
             "n": 84,
             "mean": 218.71428571428572,
             "median": 92.0,
             "p90": 4542.2,
-            "p95": 5246.25
+            "p95": 5246.25,
+            "ci95_lo": -647.01296875,
+            "ci95_hi": 1146.7979359405658,
+            "excludes_zero": false
           },
           "both_wrong": {
             "n": 236,
             "mean": 283.97457627118644,
             "median": 249.0,
             "p90": 3769.0,
-            "p95": 5082.25
+            "p95": 5082.25,
+            "ci95_lo": -129.4139328063241,
+            "ci95_hi": 693.863961038961,
+            "excludes_zero": false
           }
-        }
+        },
+        "bf16_length_when_correct": {
+          "n": 274,
+          "mean": 7614.014598540146,
+          "ci95_lo": 6936.525493021844,
+          "ci95_hi": 8336.420517450806,
+          "excludes_zero": true
+        },
+        "bf16_length_when_incorrect": {
+          "n": 320,
+          "mean": 9560.046875,
+          "ci95_lo": 8915.745242594485,
+          "ci95_hi": 10218.448679335675,
+          "excludes_zero": true
+        },
+        "lian_bf16_correct_delta": {
+          "n": 274,
+          "note": "mean(quant-BF16) on (item, seed) where BF16 is correct (Both-OK \u222a BF16-only)",
+          "mean": 957.5109489051094,
+          "ci95_lo": 471.07685048613826,
+          "ci95_hi": 1462.5491192612917,
+          "excludes_zero": true
+        },
+        "mismatch_excess_vs_both_correct": {
+          "note": "D = mean(token_delta | BF16-only) - mean(token_delta | Both-OK). Same problem-clustered resamples; empty-stratum replicates skipped. Not causal.",
+          "mean": 823.5384615384614,
+          "ci95_lo": -177.1314865036924,
+          "ci95_hi": 1849.179128999765,
+          "excludes_zero": false,
+          "p_value": 0.1088,
+          "n_boot": 10000,
+          "n_boot_valid": 10000,
+          "n_boot_skipped_empty_stratum": 0,
+          "both_correct": {
+            "n_item_seed": 183,
+            "n_problems": 92
+          },
+          "bf16_only": {
+            "n_item_seed": 91,
+            "n_problems": 72
+          }
+        },
+        "ratio_of_means_excl_nearcap_pct": 6.4847051977717785,
+        "n_pairs_excl_nearcap": 593,
+        "n_pairs_total": 594
       }
     },
     "deployment_economics": {
@@ -2851,6 +3914,169 @@
     "total_loops": 12,
     "total_near_cap": 12,
     "total_token_limit_hits": 0
+  },
+  "holm18_sensitivity": {
+    "note": "Secondary sensitivity only. Primary inference remains Holm\u2013Bonferroni within each benchmark's six prespecified format contrasts.",
+    "n_contrasts": 18,
+    "alpha": 0.05,
+    "contrasts": [
+      {
+        "benchmark": "MATH-500",
+        "contrast": "Qwen-7B BF16 vs FP8",
+        "p_value": 0.3828,
+        "holm_significant_within_benchmark": false,
+        "holm_p_global18": 1.0,
+        "holm_significant_global18": false
+      },
+      {
+        "benchmark": "MATH-500",
+        "contrast": "Qwen-7B BF16 vs AWQ-4",
+        "p_value": 0.069,
+        "holm_significant_within_benchmark": false,
+        "holm_p_global18": 1.0,
+        "holm_significant_global18": false
+      },
+      {
+        "benchmark": "MATH-500",
+        "contrast": "Qwen-7B BF16 vs GPTQ-4",
+        "p_value": 0.2454,
+        "holm_significant_within_benchmark": false,
+        "holm_p_global18": 1.0,
+        "holm_significant_global18": false
+      },
+      {
+        "benchmark": "MATH-500",
+        "contrast": "Llama-8B BF16 vs FP8",
+        "p_value": 0.6474,
+        "holm_significant_within_benchmark": false,
+        "holm_p_global18": 1.0,
+        "holm_significant_global18": false
+      },
+      {
+        "benchmark": "MATH-500",
+        "contrast": "Llama-8B BF16 vs AWQ-4",
+        "p_value": 0.0,
+        "holm_significant_within_benchmark": true,
+        "holm_p_global18": 0.0,
+        "holm_significant_global18": true
+      },
+      {
+        "benchmark": "MATH-500",
+        "contrast": "Llama-8B BF16 vs GPTQ-4",
+        "p_value": 0.6188,
+        "holm_significant_within_benchmark": false,
+        "holm_p_global18": 1.0,
+        "holm_significant_global18": false
+      },
+      {
+        "benchmark": "GSM8K",
+        "contrast": "Qwen-7B BF16 vs FP8",
+        "p_value": 0.827,
+        "holm_significant_within_benchmark": false,
+        "holm_p_global18": 1.0,
+        "holm_significant_global18": false
+      },
+      {
+        "benchmark": "GSM8K",
+        "contrast": "Qwen-7B BF16 vs AWQ-4",
+        "p_value": 0.5788,
+        "holm_significant_within_benchmark": false,
+        "holm_p_global18": 1.0,
+        "holm_significant_global18": false
+      },
+      {
+        "benchmark": "GSM8K",
+        "contrast": "Qwen-7B BF16 vs GPTQ-4",
+        "p_value": 0.7294,
+        "holm_significant_within_benchmark": false,
+        "holm_p_global18": 1.0,
+        "holm_significant_global18": false
+      },
+      {
+        "benchmark": "GSM8K",
+        "contrast": "Llama-8B BF16 vs FP8",
+        "p_value": 0.7612,
+        "holm_significant_within_benchmark": false,
+        "holm_p_global18": 1.0,
+        "holm_significant_global18": false
+      },
+      {
+        "benchmark": "GSM8K",
+        "contrast": "Llama-8B BF16 vs AWQ-4",
+        "p_value": 0.0018,
+        "holm_significant_within_benchmark": true,
+        "holm_p_global18": 0.0306,
+        "holm_significant_global18": true
+      },
+      {
+        "benchmark": "GSM8K",
+        "contrast": "Llama-8B BF16 vs GPTQ-4",
+        "p_value": 0.5106,
+        "holm_significant_within_benchmark": false,
+        "holm_p_global18": 1.0,
+        "holm_significant_global18": false
+      },
+      {
+        "benchmark": "GPQA-Diamond",
+        "contrast": "Qwen-7B BF16 vs FP8",
+        "p_value": 0.6902,
+        "holm_significant_within_benchmark": false,
+        "holm_p_global18": 1.0,
+        "holm_significant_global18": false
+      },
+      {
+        "benchmark": "GPQA-Diamond",
+        "contrast": "Qwen-7B BF16 vs AWQ-4",
+        "p_value": 0.0068,
+        "holm_significant_within_benchmark": true,
+        "holm_p_global18": 0.1088,
+        "holm_significant_global18": false,
+        "status_change": "within-benchmark significant \u2192 global-18 not significant"
+      },
+      {
+        "benchmark": "GPQA-Diamond",
+        "contrast": "Qwen-7B BF16 vs GPTQ-4",
+        "p_value": 0.2878,
+        "holm_significant_within_benchmark": false,
+        "holm_p_global18": 1.0,
+        "holm_significant_global18": false
+      },
+      {
+        "benchmark": "GPQA-Diamond",
+        "contrast": "Llama-8B BF16 vs FP8",
+        "p_value": 0.4032,
+        "holm_significant_within_benchmark": false,
+        "holm_p_global18": 1.0,
+        "holm_significant_global18": false
+      },
+      {
+        "benchmark": "GPQA-Diamond",
+        "contrast": "Llama-8B BF16 vs AWQ-4",
+        "p_value": 0.7114,
+        "holm_significant_within_benchmark": false,
+        "holm_p_global18": 1.0,
+        "holm_significant_global18": false
+      },
+      {
+        "benchmark": "GPQA-Diamond",
+        "contrast": "Llama-8B BF16 vs GPTQ-4",
+        "p_value": 0.573,
+        "holm_significant_within_benchmark": false,
+        "holm_p_global18": 1.0,
+        "holm_significant_global18": false
+      }
+    ],
+    "status_changes": [
+      {
+        "benchmark": "GPQA-Diamond",
+        "contrast": "Qwen-7B BF16 vs AWQ-4",
+        "p_value": 0.0068,
+        "holm_significant_within_benchmark": true,
+        "holm_p_global18": 0.1088,
+        "holm_significant_global18": false,
+        "status_change": "within-benchmark significant \u2192 global-18 not significant"
+      }
+    ]
   },
   "grid_totals": {
     "loops": 25,
