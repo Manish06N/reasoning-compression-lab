@@ -40,7 +40,7 @@ This paper **pins** one stack. It does not run a factorial vLLM 0.7.0 vs 0.8.5 e
 | Qwen AWQ-4 | Tested checkpoint: −5.56 pp GPQA-Diamond pass@1; Holm-significant within the primary six GPQA contrasts, not under Holm-18 |
 | Qwen 4-bit tokens | $+6.3$–$6.9\%$ RoM vs BF16; Both-OK CIs exclude 0; mismatch-conditioned $D$ is a diagnostic (not causal); BF16-correct conditional $\Delta$, following Lian et al., positive |
 | 200-item subset | Superseded estimator (Appendix); not a result |
-| Modal-answer selective prediction | Secondary gold-free unique-mode abstention; 5/5 observed risk $\le 0.27\%$; Wilson upper bounds on $0/n$ cells $0.82$–$1.08\%$. Not G-Pass@k. Not a safety property. |
+| Modal-answer selective prediction | Secondary gold-free unique-mode abstention; 5/5 observed risk $\le 0.27\%$; Wilson upper bounds on $0/n$ cells 0.82%–1.08%. Not G-Pass@k. Not a safety property. |
 | Cost | Aggregate hybrid Cost-of-Pass proxy $\widetilde{C}_{\mathrm{pass}}^{\mathrm{hyb}}$: confirmation GPU-sec / campaign MATH pass@1. Rankings disagree across 65 tok/s proxy, Condition A, and Condition B (serving-condition sensitivity, not isolated batching). Qwen FP8 B: five-rep listing, not a lone $-36.0\%$. |
 | FP8 vs BF16 | 95% CIs include 0; TOST $\pm 1$ pp **fails**; not claimed equivalent |
 
