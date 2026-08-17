@@ -6,7 +6,7 @@
 **Recompute:** `python3 scripts/analysis/revision_reanalysis.py`
 **Drift check:** `python3 scripts/analysis/revision_reanalysis.py --check`
 
-This directory holds the released per-cell records for the **pinned vLLM 0.7.0 eager** campaign (88 cells, 56,408 completions). Do not cite older “0 truncations / 0 loops”, “98.23% operational safety gate”, “FP8 matches BF16”, “FP8 Pareto-optimal”, or “200-item stratified/mixed-correctness” claims. Those are retracted.
+This directory holds the released per-cell records for the **pinned vLLM 0.7.0 eager** campaign (88 checkpoint×benchmark×seed runs, 56,408 completions). Do not cite older “0 truncations / 0 loops”, “98.23% operational safety gate”, “FP8 matches BF16”, “FP8 Pareto-optimal”, or “200-item stratified/mixed-correctness” claims. Those are retracted.
 
 ---
 
@@ -55,7 +55,7 @@ Llama AWQ-4 vs BF16: **−1.57 pp** ($p=0.0018$).
 | Llama-8B | AWQ-4 | 46.97% | 44.95% | 48.99% | **46.97% ± 2.02%** |
 | Llama-8B | GPTQ-4 | 44.44% | 40.91% | 49.49% | **44.95% ± 4.32%** |
 
-Qwen AWQ-4 vs BF16: **−5.56 pp** (95% CI $[−9.60,−1.52]$, $p=0.0068$). Holm-significant within the prespecified six GPQA contrasts; **not** significant under the exploratory Holm-18 correction across all 18 benchmark contrasts (adjusted $p=0.1088$). Do not shorten this to “Qwen AWQ-4 is Holm-significant on GPQA.”
+Qwen AWQ-4 vs BF16: **−5.56 pp** (95% CI $[−9.60,−1.52]$, $p=0.0068$). Holm-significant within the primary six GPQA contrasts; **not** significant under the exploratory Holm-18 correction across all 18 benchmark contrasts (adjusted $p=0.1088$). Do not shorten this to “Qwen AWQ-4 is Holm-significant on GPQA.”
 
 ---
 
@@ -90,9 +90,9 @@ Full MATH-500 grid, all 5 seeds, **ratio of means** vs BF16:
 | Llama AWQ-4 | +1.72% |
 | Llama GPTQ-4 | +3.95% |
 
-Clustered mismatch excess \(D = \overline{\Delta}_{\text{BF16-only}} - \overline{\Delta}_{\text{Both-OK}}\) (same problem-clustered bootstrap, \(B=10{,}000\), seed 0) excludes 0 in all six MATH contrasts. Not causal. JSON key: `mismatch_excess_vs_both_correct`. Table: `results/reports/major_revision_tables.md`.
+Clustered mismatch excess \(D = \overline{\Delta}_{\text{BF16-only}} - \overline{\Delta}_{\text{Both-OK}}\) (same problem-clustered bootstrap, \(B=10{,}000\), seed 0) excludes 0 in all six MATH contrasts. Diagnostic of correctness-conditioned mismatch asymmetry; not causal. JSON key: `mismatch_excess_vs_both_correct`. Table: `results/reports/major_revision_tables.md`.
 
-Cost-of-Pass in the paper has two layers: (1) **primary** hybrid scenario $C_{\mathrm{pass}}$ from confirmation GPU-sec/query on balanced MATH-500 subsets with `max_num_seqs=8` (`results/measured_serving_confirmation/`, report `reports/measured_serving_confirmation/measured_serving_confirmation_report.json`) over campaign MATH-500 pass@1 at a $\$1.50$/A100-h scenario, with Monte Carlo 95% intervals; (2) **historical** shared-$65$ tok/s token proxy (appendix). Rankings disagree across those estimators. Frozen paper tables: [`reports/major_revision_tables.md`](reports/major_revision_tables.md). The earlier unconstrained timing (`results/measured_serving/`) is provenance only. Do not average the two serving runs.
+Cost-of-Pass in the paper has two layers: (1) **primary** aggregate hybrid Cost-of-Pass proxy \(\widetilde{C}_{\mathrm{pass}}^{\mathrm{hyb}}\) from confirmation GPU-sec/query on balanced MATH-500 subsets with `max_num_seqs=8` (`results/measured_serving_confirmation/`, report `reports/measured_serving_confirmation/measured_serving_confirmation_report.json`) over campaign MATH-500 pass@1 at a $\$1.50$/A100-h scenario; (2) **historical** shared-$65$ tok/s token proxy (appendix). Rankings disagree across those estimators (serving-condition sensitivity, not isolated batching). Frozen paper tables: [`reports/major_revision_tables.md`](reports/major_revision_tables.md). The earlier unconstrained timing (`results/measured_serving/`) is provenance only. Do not average the two serving runs.
 
 Confirmation Condition B (100-prompt `llm.generate`, `max_num_seqs=8` pinned, CV-governed $R$; campaign MATH-500 pass@1). Reported $\pm$ is **sample SD**:
 
