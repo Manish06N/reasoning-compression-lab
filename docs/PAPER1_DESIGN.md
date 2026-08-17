@@ -1,10 +1,10 @@
 # Paper 1 Design — controlled revision
 
-> **Superseding note (2026-08-16):** Canonical title is *…under a Pinned Serving Stack* (`paper/main.tex`). This file's “Serving-Stack Shift” title is historical.
+> **Freeze (2026-08-17):** Canonical title is *Beyond Pass@1: Accuracy, Agreement, and Serving-Cost Effects of Public R1-Distill Quantization Checkpoints under a Pinned Stack* (`paper/main.tex`, 20-page PDF). Branch `paper-major-revision` @ `d707e44`. This file’s “Serving-Stack Shift” title and 2026-08-14 “Needs revision” status are historical. GPU work is closed.
 
-**Status (2026-08-14): Needs revision; design is not frozen for submission.**
+**Status (2026-08-14 — historical): Needs revision; design was not frozen for submission.**
 
-**Evidence:** [PUBLICATION_READINESS.md](PUBLICATION_READINESS.md) · **Execution:** [plans/2026-08-14-publication-recovery.md](plans/2026-08-14-publication-recovery.md)
+**Evidence:** [PUBLICATION_READINESS.md](PUBLICATION_READINESS.md) · **Historical execution:** [plans/2026-08-14-publication-recovery.md](plans/2026-08-14-publication-recovery.md)
 
 **Full thesis roadmap:** [PHD_ROADMAP.md](PHD_ROADMAP.md)
 

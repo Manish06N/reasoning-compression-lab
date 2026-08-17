@@ -8,8 +8,8 @@ Quick navigation for `reasoning-compression-lab`. For the full high-level overvi
 
 | I want to… | Open |
 |------------|------|
-| See whether the result is publishable | [PUBLICATION_READINESS.md](PUBLICATION_READINESS.md) |
-| Execute the current scientific plan | [plans/2026-08-14-publication-recovery.md](plans/2026-08-14-publication-recovery.md) |
+| See whether the result is publishable | [PUBLICATION_READINESS.md](PUBLICATION_READINESS.md) (2026-08-17 freeze) |
+| Read the historical recovery plan | [plans/2026-08-14-publication-recovery.md](plans/2026-08-14-publication-recovery.md) (not current execution) |
 | Understand the whole codebase | [CODEBASE_OVERVIEW.md](CODEBASE_OVERVIEW.md) |
 | Run on HPC | [BEGINNER_HPC_GUIDE.md](BEGINNER_HPC_GUIDE.md) |
 | See current status | [PROGRESS.md](PROGRESS.md) |

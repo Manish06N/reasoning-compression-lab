@@ -55,7 +55,7 @@ Llama AWQ-4 vs BF16: **−1.57 pp** ($p=0.0018$).
 | Llama-8B | AWQ-4 | 46.97% | 44.95% | 48.99% | **46.97% ± 2.02%** |
 | Llama-8B | GPTQ-4 | 44.44% | 40.91% | 49.49% | **44.95% ± 4.32%** |
 
-Qwen AWQ-4 vs BF16: **−5.56 pp** (95% CI $[−9.60,−1.52]$, $p=0.0068$).
+Qwen AWQ-4 vs BF16: **−5.56 pp** (95% CI $[−9.60,−1.52]$, $p=0.0068$). Holm-significant within the prespecified six GPQA contrasts; **not** significant under the exploratory Holm-18 correction across all 18 benchmark contrasts (adjusted $p=0.1088$). Do not shorten this to “Qwen AWQ-4 is Holm-significant on GPQA.”
 
 ---
 
@@ -89,6 +89,8 @@ Full MATH-500 grid, all 5 seeds, **ratio of means** vs BF16:
 | Llama FP8 | −2.27% |
 | Llama AWQ-4 | +1.72% |
 | Llama GPTQ-4 | +3.95% |
+
+Clustered mismatch excess \(D = \overline{\Delta}_{\text{BF16-only}} - \overline{\Delta}_{\text{Both-OK}}\) (same problem-clustered bootstrap, \(B=10{,}000\), seed 0) excludes 0 in all six MATH contrasts. Not causal. JSON key: `mismatch_excess_vs_both_correct`. Table: `results/reports/major_revision_tables.md`.
 
 Cost-of-Pass in the paper has two layers: (1) **primary** hybrid scenario $C_{\mathrm{pass}}$ from confirmation GPU-sec/query on balanced MATH-500 subsets with `max_num_seqs=8` (`results/measured_serving_confirmation/`, report `reports/measured_serving_confirmation/measured_serving_confirmation_report.json`) over campaign MATH-500 pass@1 at a $\$1.50$/A100-h scenario, with Monte Carlo 95% intervals; (2) **historical** shared-$65$ tok/s token proxy (appendix). Rankings disagree across those estimators. Frozen paper tables: [`reports/major_revision_tables.md`](reports/major_revision_tables.md). The earlier unconstrained timing (`results/measured_serving/`) is provenance only. Do not average the two serving runs.
 
@@ -155,6 +157,7 @@ results/
 ├── gpqa/         # 24 breadth records
 ├── reports/
 │   ├── revision_reanalysis_report.json   # CANONICAL pass@1 / pathology / tokens
+│   ├── major_revision_tables.md          # frozen paper-ready tables (incl. D, Holm-18)
 │   ├── modal_agreement_report.json       # gold-free MATH-500 modal agreement
 │   ├── measured_serving/                 # first unconstrained timing (provenance)
 │   ├── measured_serving_confirmation/    # preferred tok/s, latency, scenario C_pass

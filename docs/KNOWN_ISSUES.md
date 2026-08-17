@@ -1,12 +1,14 @@
 # Known issues and limitations
 
-Last updated: 2026-08-14
+Last updated: 2026-08-17
 
 Operational issues that can break paper results if ignored, plus known software limitations.
 
+> **Freeze (2026-08-17):** Paper 1 GPU work is closed. Canonical science: `paper/main.tex` / `d707e44`. The 2026-08-14 “Needs revision / recovery Phase 0” table below is historical. Remaining manuscript limitations (no `finish_reason`, no native W8A8, hybrid \(C_{\mathrm{pass}}\) identifiability) are stated in the paper.
+
 ---
 
-## Current campaign status (2026-08-14)
+## Current campaign status (2026-08-14 — historical)
 
 | Item | Status |
 |------|--------|
@@ -16,8 +18,8 @@ Operational issues that can break paper results if ignored, plus known software 
 | **Official QRM parity** | **COMPLETED** - job **87302**, Qwen-7B BF16 n=10, **10/10 correct**, **0 truncation** in `qrm-official` |
 | **FP8 exact-stack gate** | **COMPLETED** - jobs **96093/96094**, both models 10/10 correct/boxed, no token-cap or repetition flags |
 | **Completed full correctness** | 96100 Qwen: 472/500 (94.4%); 96101 Llama: 445/500 (89.0%); both n=500, seed 42 |
-| **Publication verdict** | **Needs revision**; replication/control evidence only |
-| **Next gate** | Recovery Phase 0; no b03/b04 or broad-grid submission |
+| **Publication verdict** | **Needs revision**; replication/control evidence only *(historical 2026-08-14)* |
+| **Next gate** | Recovery Phase 0; no b03/b04 or broad-grid submission *(historical; grid later completed)* |
 | **qreason stack gap** | Confirmed by Path C: Qwen **10%/90% trunc**, Llama **15%/75% trunc** on n=20 strict protocol |
 | **b01 July archive** | Gate failed on `qreason`; useful as BF16 deployment-stack evidence, not as QRM reproduction |
 | **Calibration/systems** | `--skip-calibration` supports diagnostic correctness/trace scoring only; no valid calibration or controlled cost/performance claim |

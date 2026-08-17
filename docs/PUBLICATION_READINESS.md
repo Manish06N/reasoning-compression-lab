@@ -1,10 +1,16 @@
 # Publication Readiness
 
-**Superseding decision (2026-08-16):** The matched 88-cell grid is complete (**56,408** completions: MATH-500 40 + GSM8K 24 + GPQA-Diamond 24). Canonical manuscript: [`paper/main.tex`](../paper/main.tex) compiled to [`paper/main.pdf`](../paper/main.pdf) (currently 14 pages; do not squeeze science to force a page count). Scoreboard: [`results/README.md`](../results/README.md). ArXiv zip: [`paper/arxiv_source.zip`](../paper/arxiv_source.zip).
+**Superseding decision (2026-08-17):** Major scientific revision is **frozen** on `paper-major-revision` (`d707e44`, pushed). The matched 88-cell grid is complete (**56,408** completions). Canonical manuscript: [`paper/main.tex`](../paper/main.tex) compiled to [`paper/main.pdf`](../paper/main.pdf) (**20 pages**; do not squeeze science to force a page count). Scoreboard: [`results/README.md`](../results/README.md). Frozen tables: [`results/reports/major_revision_tables.md`](../results/reports/major_revision_tables.md). ArXiv zip: [`paper/arxiv_source.zip`](../paper/arxiv_source.zip) (current `main.tex` + `references.bib` + `main.bbl`). **Experimental GPU work is closed.** Next: visual PDF QA, then independent referee review. Do not merge to `main`.
 
-The 2026-08-14 audit below is **historical**. It correctly blocked publishing the two-job FP8-only package. It does **not** describe the current evidence. The recovery-plan GPU freeze (no b03/b04 / no broad grid) is **lifted** because Phases 0–6 and both breadth grids finished. Do not launch new GPU jobs unless the user asks.
+The 2026-08-16 and 2026-08-14 banners below are **historical**. They do **not** describe the current evidence.
 
-**Current label:** P0-corrected preprint plus gold-free MATH-500 modal agreement plus measured serving on branch `paper-measured-serving`. Canonical numbers: `results/reports/revision_reanalysis_report.json`, `results/reports/modal_agreement_report.json`, `results/reports/measured_serving/measured_serving_report.json`. Do not cite 0/0 pathologies, the 98.23% gold-hit gate, “true Pareto optimum,” or FP8 “parity.” Next candidate HPC work is a small `finish_reason` validation — not submitted.
+**Current label:** P0-corrected preprint plus gold-free MATH-500 modal agreement plus controlled serving confirmation plus major-revision CPU analyses (mismatch excess $D$, bootstrap tail-area $p$, Holm-18 sensitivity, hybrid $C_{\mathrm{pass}}$). Canonical numbers: `results/reports/revision_reanalysis_report.json`, `results/reports/modal_agreement_report.json`, `results/reports/measured_serving_confirmation/measured_serving_confirmation_report.json`. Do not cite 0/0 pathologies, the 98.23% gold-hit gate, “true Pareto optimum,” FP8 “parity,” or unqualified “Qwen AWQ-4 is Holm-significant on GPQA.”
+
+---
+
+# Publication Readiness (2026-08-16 banner — historical)
+
+**Historical superseding decision (2026-08-16):** The matched 88-cell grid is complete (**56,408** completions: MATH-500 40 + GSM8K 24 + GPQA-Diamond 24). Then-current PDF was ~14 pages. That banner is kept for chronology.
 
 ---
 
@@ -16,7 +22,7 @@ The 2026-08-14 audit below is **historical**. It correctly blocked publishing th
 
 **Canonical execution plan (historical):** [plans/2026-08-14-publication-recovery.md](plans/2026-08-14-publication-recovery.md)
 
-This 2026-08-14 audit was the controlling scientific interpretation *until the matched 88-cell grid finished*. Keep it as chronological evidence. Any statement that jobs 96100/96101 are running, that seed 0 alone is a publishable core, or that the two-job FP8 result establishes a quantization effect remains superseded — first by this audit, and now by the 2026-08-16 banner at the top of this file.
+This 2026-08-14 audit was the controlling scientific interpretation *until the matched 88-cell grid finished*. Keep it as chronological evidence. Any statement that jobs 96100/96101 are running, that seed 0 alone is a publishable core, or that the two-job FP8 result establishes a quantization effect remains superseded — first by this audit, then by the 2026-08-16 banner, and now by the 2026-08-17 freeze at the top of this file.
 
 ---
 

@@ -1,9 +1,9 @@
 # Experimental Parameters, Output Audit, and Observability Matrix
 
 **Project:** Reasoning Compression Lab (`reasoning-compression-lab`)  
-**Date:** 2026-08-14  
+**Date:** 2026-08-14 (historical census) · **Freeze:** 2026-08-17 — do not treat this audit as current execution authority. Canonical numbers: `results/reports/revision_reanalysis_report.json`.
 **Target:** Paper 1 Publication Readiness (Reliability, Cost, and Quantization Frontier for Reasoning Models)  
-**Related Documents:** [docs/PUBLICATION_READINESS.md](PUBLICATION_READINESS.md) · [docs/plans/2026-08-14-publication-recovery.md](plans/2026-08-14-publication-recovery.md) · [TODO_LIST.md](../TODO_LIST.md)
+**Related Documents:** [docs/PUBLICATION_READINESS.md](PUBLICATION_READINESS.md) · [TODO_LIST.md](../TODO_LIST.md)
 
 ---
 

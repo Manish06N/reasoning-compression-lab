@@ -1,6 +1,6 @@
 # Measured Serving Systems Benchmark Protocol
 
-**Status:** Frozen on 2026-08-16 *before* executing systems benchmark measurements.  
+**Status:** Historical first-run protocol (unconstrained Condition B). **Superseded** by [MEASURED_SERVING_CONFIRMATION_PROTOCOL.md](MEASURED_SERVING_CONFIRMATION_PROTOCOL.md). First-run JSON is provenance only; do not mix with confirmation numbers. GPU work is closed.  
 **Objective:** Empirically measure the real serving throughput (tok/s, req/s), latency distribution (mean, median, P90, P95), peak VRAM, and GPU-seconds per query across 8 precision configurations on NVIDIA A100 GPUs, isolating whether compression efficiency overcomes reasoning token inflation.
 
 ---

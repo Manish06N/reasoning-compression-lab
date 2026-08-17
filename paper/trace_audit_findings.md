@@ -1,5 +1,7 @@
 # Structured Trace Audit Report ($\ge 200$ Stratified Samples)
 
+> **Do not cite this file for paper numbers.** It is a 200-item even-index diagnostic. Canonical length estimator is the full MATH-500 ratio of means in `results/reports/revision_reanalysis_report.json`. Pathology is 25 loops / 0 exact cap hits / 209 near-cap over 56,408 completions — not “0 degenerations.”
+
 **Audit Scope:** 200 stratified mathematical reasoning problems across MATH-500 difficulty levels.
 **Evaluated Checkpoints:** `Qwen-7B` and `Llama-8B` across BF16, FP8, AWQ-4, and GPTQ-4.
 

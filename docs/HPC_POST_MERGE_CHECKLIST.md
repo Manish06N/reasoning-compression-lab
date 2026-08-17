@@ -1,6 +1,6 @@
 # HPC post-merge checklist (manual steps)
 
-> **Historical checklist — superseded 2026-08-14.** Do not execute the old b01 seed-0 flow for new paper results. The current order is [plans/2026-08-14-publication-recovery.md](plans/2026-08-14-publication-recovery.md): reproducibility/observability Phase 0, tiny smoke, matched BF16/FP8, then a reviewed three-seed pilot.
+> **Historical checklist — superseded 2026-08-14, GPU closed 2026-08-17.** Do not execute the old b01 seed-0 flow. Do not re-open recovery Phase 0. Paper 1 is frozen at `d707e44` on `paper-major-revision`.
 
 The commands below are retained for incident provenance and may contain useful mechanics only.
 

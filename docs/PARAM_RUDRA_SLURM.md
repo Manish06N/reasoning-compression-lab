@@ -9,7 +9,7 @@ Last updated: 2026-08-14
 | `MaxTRESPerUser` (gpu QOS) | **`gres/gpu=2`** |
 | ragpu node layout | **2× A100 80GB** per node (`Gres=gpu:2`) |
 
-You can run **two parallel 1-GPU inference jobs**. Completed exact-stack jobs **96100/96101** validated this non-exclusive `--gres=gpu:1` pattern on `ragpu008` and `ragpu004`. The next scientific jobs remain blocked by recovery Phase 0; queue capacity is not authorization to submit.
+You can run **two parallel 1-GPU inference jobs**. Completed exact-stack jobs **96100/96101** validated this non-exclusive `--gres=gpu:1` pattern on `ragpu008` and `ragpu004`. Paper 1 GPU work is **closed** (2026-08-17); quota capacity is not authorization to submit new J1 jobs.
 
 ## The `--exclusive` trap (do not repeat)
 

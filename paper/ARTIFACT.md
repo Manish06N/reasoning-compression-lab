@@ -1,8 +1,8 @@
 # Paper 1 artifacts
 
 **Preprint source:** `paper/main.tex` + `paper/references.bib` (figures are TikZ/pgfplots in the tex)  
-**Compiled PDF:** `paper/main.pdf`  
-**ArXiv upload zip:** `paper/arxiv_source.zip`
+**Compiled PDF:** `paper/main.pdf` (20 pages, xelatex)  
+**ArXiv upload zip:** `paper/arxiv_source.zip` — rebuilt 2026-08-18 from current `main.tex` (69,265 B) + `references.bib` (7,650 B) + `main.bbl` (6,613 B) at the editorial freeze. Do not upload a zip from before this rebuild.
 
 ## What to upload to arXiv
 
@@ -10,8 +10,9 @@ Unzip `arxiv_source.zip` and upload:
 
 - `main.tex`
 - `references.bib`
+- `main.bbl`
 
-Compile with `xelatex` → `bibtex` → `xelatex` → `xelatex` (fallback: `pdflatex` if xelatex is unavailable). Figures are drawn by `pgfplots`; no separate PDFs are required.
+Compile with `xelatex` → `bibtex` → `xelatex` → `xelatex` (fallback: `pdflatex` if xelatex is unavailable). Figures are drawn by `pgfplots`; no separate PDFs are required. `main.bbl` is the frozen bibliography from the MacBook compile and should be uploaded with the source.
 
 ## Result records (in the git repo)
 
@@ -37,13 +38,13 @@ Compile with `xelatex` → `bibtex` → `xelatex` → `xelatex` (fallback: `pdfl
 
 ## How numbers were computed (read before citing)
 
-- **Pass@1** is extractive match, averaged over seeds. Primary test: problem-clustered bootstrap of quantized − BF16. McNemar on maj@5 is secondary.
+- **Pass@1** is extractive match, averaged over seeds. Primary test: problem-clustered bootstrap of quantized − BF16 (two-sided bootstrap tail-area \(p\); percentile 95% CI). Primary multiplicity is Holm-6 within each benchmark; Holm-18 is a secondary sensitivity. McNemar on maj@5 is secondary.
 - **Loops** read `repetition_rows` (threshold: 20 consecutive identical words). **Cap hits** read `token_limit_hits`. **Near-cap** counts `completion_tokens >= 32500`.
 - Compact per-cell JSON has **no** traces, token IDs, or `finish_reason`. Recovered MATH-500 answers are in `results/recovered/math500_modal_inputs.jsonl`. Do not report the old gold-hit 98.23% gate.
 - Modal agreement uses unique-mode clustering with gold scoring only after the serve/abstain decision. Five-sample token-cost proxy $T_5$ sums all five seeds before abstention.
 - Campaign/extraction evaluator: **LightEval 0.8.0**. A throwaway MacBook LightEval 0.8.1 install was not used for paper numbers.
 - **Cost-of-Pass (primary):** confirmation GPU-sec/query on `results/measured_serving_confirmation/` at $\$1.50$/A100-h (scenario) and campaign MATH-500 pass@1. Report: `results/reports/measured_serving_confirmation/measured_serving_confirmation_report.json`. The first unconstrained timing in `results/measured_serving/` is provenance only. The old shared $65$ tok/s token ranking is a sensitivity only.
-- **Token inflation:** full-grid ratio of means over all seeds. The old 200-item mean-of-ratios subset is an estimator artifact and is not used in the paper.
+- **Token inflation:** full-grid ratio of means over all seeds. Clustered mismatch excess \(D\) (BF16-only mean \(\Delta\) minus Both-OK mean \(\Delta\)) is reported for MATH-500; it is not causal. The old 200-item mean-of-ratios subset is an estimator artifact and is not used in the paper.
 
 ## Reproduce the corrected tables
 
@@ -51,6 +52,7 @@ From a clean checkout (stdlib only; no `/scratch` or `outputs-hpc-*`):
 
 ```bash
 python3 scripts/analysis/revision_reanalysis.py --check
+python3 scripts/analysis/emit_major_revision_tables.py
 python3 scripts/analysis/modal_agreement_analysis.py --check
 python3 scripts/analysis/measured_serving_analysis.py --check
 python3 scripts/analysis/measured_serving_confirmation_analysis.py --check

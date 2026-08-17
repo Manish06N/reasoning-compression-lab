@@ -4,7 +4,7 @@ Central reference for environment variables used by `reasoning-compression-lab`.
 
 **Set on:** MacBook via `.env` + `source scripts/local/env.sh`; HPC via `source scripts/hpc/param_rudra_env.sh` and block launchers.
 
-**Publication warning (2026-08-14):** environment variables do not define scientific comparability by themselves. New runs require a frozen Protocol P1-2026-08 config hash and the complete provenance/finish/timing/telemetry schema in [the recovery plan](plans/2026-08-14-publication-recovery.md). Historical seed-0 defaults must not silently control new pilot cells.
+**Publication warning (2026-08-14, still true as a hygiene note):** environment variables do not define scientific comparability by themselves. Paper 1 GPU work is closed (2026-08-17). Historical seed-0 defaults must not silently control any future cells.
 
 ---
 

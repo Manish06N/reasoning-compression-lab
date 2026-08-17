@@ -1,8 +1,8 @@
 # TODO List & Experiment Roadmap — Publication Readiness
 **Project:** Reasoning Compression Lab (`reasoning-compression-lab`)  
 **Target:** Paper 1 Publication Readiness (Quantization, Reliability, and Cost Frontier for Reasoning Models)  
-**Status:** **88-cell campaign complete. Modal agreement complete on `paper-modal-agreement`. Measured serving benchmark active on `paper-measured-serving`.**  
-**Controlling Reference:** [docs/PUBLICATION_READINESS.md](docs/PUBLICATION_READINESS.md) · [docs/MEASURED_SERVING_PROTOCOL.md](docs/MEASURED_SERVING_PROTOCOL.md) · [AGENTS.md](AGENTS.md)
+**Status:** **Major revision frozen** on `paper-major-revision` (`d707e44`, pushed). 88-cell campaign, modal agreement, serving confirmation, and CPU P0 analyses are complete. GPU work is closed.  
+**Controlling Reference:** [docs/PUBLICATION_READINESS.md](docs/PUBLICATION_READINESS.md) · [AGENTS.md](AGENTS.md) · [results/reports/major_revision_tables.md](results/reports/major_revision_tables.md)
 
 ---
 
@@ -12,8 +12,9 @@
 * **Breadth Benchmark 1 — GSM8K ($n=1,319$, Seeds 42–44, 24 Cells):** ✅ 100% Completed, validated, and backed up.
 * **Breadth Benchmark 2 — GPQA-Diamond ($n=198$, Seeds 42–44, 24 Cells):** ✅ 100% Completed, validated, and backed up.
 * **Gold-Free Modal Agreement Analysis:** ✅ 100% Completed, validated, and pushed on branch `paper-modal-agreement` (HEAD `845d879`).
-* **Measured Serving Systems Benchmark:** ✅ **Complete** on branch `paper-measured-serving` (48 task-realistic + 8 microbenchmark JSON files; manuscript integrated).
-* **Manuscript Status:** Canonical source [`paper/main.tex`](paper/main.tex) compiled to [`paper/main.pdf`](paper/main.pdf).
+* **Measured Serving Confirmation:** ✅ **Complete** (52 task-realistic + 8 microbenchmark JSON files; `max_num_seqs=8` pinned). Integrated on `paper-serving-confirmation` then into `paper-major-revision`.
+* **Major revision (CPU):** ✅ Frozen at `d707e44` — mismatch excess $D$, bootstrap $p$ formula, Holm-18 sensitivity, hybrid $C_{\mathrm{pass}}$ intervals.
+* **Manuscript Status:** Canonical source [`paper/main.tex`](paper/main.tex) compiled to [`paper/main.pdf`](paper/main.pdf) (20 pages). ArXiv zip: [`paper/arxiv_source.zip`](paper/arxiv_source.zip).
 
 ---
 
@@ -86,23 +87,10 @@ Pathology on the **full 88-cell grid**: **25 loops**, **0 exact cap hits**, **20
 * [x] Activated detached 30-minute Telegram heartbeat & milestone daemon (`telegram_30min_heartbeat.py`).
 * [x] Completed all 60 confirmation runs across all 8 configurations with 0 OOMs, 0 crashes, and $\text{CV} \le 3.0\%$.
 
-### [/] 4. Post-Confirmation Sequence & Paper 1 (J1) Submission Protocol
-* [x] **Step 1: Automated Audit & Cost Remodeling (HPC):**
-  * Executed `validate_measured_serving_confirmation.py` (asserted 60 runs, 0 OOMs, single-node physical invariance, 0 integrity errors).
-  * Executed `measured_serving_confirmation_analysis.py` (computed measured Cost-of-Pass $C_{\text{pass}}^{\text{meas}}$ and generated JSON + Markdown reports).
-  * Sent completion alerts to Telegram bot (`@ManMan06`).
-* [ ] **Step 2: Commit & GitHub Push (HPC):**
-  * Stage all confirmation artifacts, reports, and code to branch `paper-serving-confirmation` and push to GitHub.
-* [ ] **Step 3: MacBook Manuscript Sync & PDF Compilation:**
-  * Pull confirmation results to MacBook via `scripts/macbook/rsync_from_hpc.sh`.
-  * Update Tables in `paper/main.tex` and `paper/main.md` with verified confirmation values.
-  * Recompile camera-ready `paper/main.pdf` (7 pages).
-* [ ] **Step 3: `finish_reason` & Truncation Metrology Diagnostic (HPC):**
-  * Evaluate generation termination dynamics (`stop` token vs `length` truncation) across 4k, 8k, 16k, 32k token budgets.
-* [ ] **Step 4: Official Journal Submission (Paper 1):**
-  * Target venue: *Future Generation Computer Systems (FGCS)* / *Journal of Systems and Software (JSS)* (Scopus/SJR Q1).
-  * Package reproduction bundle (`paper/arxiv_source.zip` + Zenodo schema).
-  * Prepare 2-page monthly supervisor briefing document.
-* [ ] **Step 5: PhD Thesis Pivot — Paper 2 (J2): Reasoning Speculative Decoding:**
-  * Train and benchmark small draft models (0.5B–1.5B) for speculative reasoning acceleration on HPC 2× A100.
+### [x] 4. Post-Confirmation Sequence & Paper 1 (J1) Submission Protocol
+* [x] **Confirmation audit, manuscript rewrite, freeze:** `paper-major-revision` commit `d707e44` pushed. Canonical `--check` passed. `paper/arxiv_source.zip` rebuilt from current tex/bib/bbl.
+* [ ] **Visual PDF QA:** inspect the 20-page `paper/main.pdf` (serving tables, 2×2 length, Related Work, Holm-18, paths/URLs). Do not chase zero overfull-box warnings.
+* [ ] **Independent referee review** of the revised paper. No new analysis unless a finding requires it.
+* [ ] **Official journal / arXiv upload when asked.** Do not merge to `main` until asked.
+* [ ] **PhD Thesis Pivot — Paper 2 (J2):** not started. GPU remains closed for Paper 1.
 

@@ -1,6 +1,8 @@
 # PARAM Rudra (IIT Patna) — Cluster Notes
 
-> **Current science gate (2026-08-14):** jobs 96100/96101 are complete. Do not submit the historical broad grid. Follow [PUBLICATION_READINESS.md](PUBLICATION_READINESS.md) and [the publication-recovery plan](plans/2026-08-14-publication-recovery.md); the next GPU action is a tiny smoke only after Phase 0 code/instrumentation work passes.
+> **Freeze (2026-08-17):** Paper 1 GPU work is closed. Cluster mechanics below remain valid. Do not submit the historical broad grid or a recovery-plan smoke.
+
+> **Historical science gate (2026-08-14):** jobs 96100/96101 are complete. Follow [PUBLICATION_READINESS.md](PUBLICATION_READINESS.md); that audit's "tiny smoke" next-action is obsolete.
 
 **Login:** `manishn_iitp@paramrudra.iitp.ac.in`  
 **Port:** `4422` (external) or `22` (on-campus IITP)  

@@ -1,10 +1,10 @@
 # Model Scope Decision — Paper 1 (J1)
 
-**Status:** Model-family scope remains frozen; experimental protocol revised 2026-08-14
+**Status:** Model-family scope remains frozen; experimental protocol revised 2026-08-14; GPU closed 2026-08-17
 **Roadmap:** PhD V8.2 §6, scale gate §6.9  
 **Companion:** [MODEL_ROSTER.md](MODEL_ROSTER.md) (HF IDs, paths, env vars)
 
-**Current authority:** [PUBLICATION_READINESS.md](PUBLICATION_READINESS.md) and [plans/2026-08-14-publication-recovery.md](plans/2026-08-14-publication-recovery.md). The old seed-0 expansion order is superseded.
+**Current authority:** [PUBLICATION_READINESS.md](PUBLICATION_READINESS.md) (2026-08-17 freeze). The [2026-08-14 recovery plan](plans/2026-08-14-publication-recovery.md) is historical. The old seed-0 expansion order is superseded.
 
 This document records **what models are in scope, out of scope, and gated for later** for Paper 1. It exists to prevent scope creep from model-inventory research (6×5 quant matrices, Qwen3, base Llama, 70B BF16 grids, etc.).
 

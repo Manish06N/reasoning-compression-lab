@@ -1,8 +1,10 @@
 # J1 validation runbook — prove the pipeline before expanding
 
-**Status (2026-08-14):** jobs **96100/96101 completed** at 94.4% Qwen and 89.0% Llama; publication verdict is **Needs revision**.
+**Status (2026-08-17 freeze):** 88-cell campaign, modal agreement, and serving confirmation are complete. Branch `paper-major-revision` @ `d707e44`. GPU work is closed. Do not re-run validation GPU jobs for Paper 1.
 
-**Current authority:** [PUBLICATION_READINESS.md](PUBLICATION_READINESS.md) and [plans/2026-08-14-publication-recovery.md](plans/2026-08-14-publication-recovery.md). The historical procedures below remain useful, but any instruction to launch b03/b04 or treat seed 0 as publishable is superseded. The next permitted GPU work is a tiny recovery-Phase-0 smoke after reproducibility and instrumentation repairs.
+**Status (2026-08-14 — historical):** jobs **96100/96101 completed** at 94.4% Qwen and 89.0% Llama; publication verdict was **Needs revision**.
+
+**Current authority:** [PUBLICATION_READINESS.md](PUBLICATION_READINESS.md) (2026-08-17 freeze). The [2026-08-14 recovery plan](plans/2026-08-14-publication-recovery.md) is historical. The procedures below remain useful as provenance; any instruction to launch b03/b04 or treat seed 0 as publishable is superseded.
 
 **Stopped b02:** Jobs 96086/96087 were canceled. Qwen's first 10 rows were 2/10 correct with 8/10 truncations and repetition loops. A V0-only probe (96091/96092) was also unhealthy.
 
@@ -18,7 +20,7 @@ First b02 attempt jobs **96084/96085** failed before raw rows with the vLLM FP8 
 
 **Experiments A-D:** [notes.md sections 31-33](../notes.md) . [QRM_STACK_PARITY_AUDIT.md](QRM_STACK_PARITY_AUDIT.md)
 
-**Quant grid rule:** do **not** submit b03/b04 or the broad b01–b09 grid. First complete recovery Phase 0, then four matched BF16/FP8 seed-42 cells, then review before the 24-cell three-seed pilot. Deployment telemetry requires a separately validated controlled path.
+**Quant grid rule (historical 2026-08-14):** do **not** submit b03/b04 or the broad b01–b09 grid. That recovery order later completed. **Do not submit new J1 GPU jobs.**
 
 **Repository:** baseline `4796614` is pushed; the 2026-08-14 audit/plan/docs are uncommitted on HPC and must be preserved for sync; leave `.qrm_official_env_ready` untracked.
 
@@ -293,8 +295,8 @@ Never copy GPQA/AIME bands onto MATH-500.
 
 | Stage | Label |
 |-------|--------|
-| Now | **Needs revision; valid FP8 replication, publication recovery Phase 0 pending** |
-| After recovery P0 | **Clean reproducibility and observability gate passed** |
+| Now | **Major revision frozen (`d707e44`); GPU closed; visual PDF QA next** |
+| After recovery P0 | **Clean reproducibility and observability gate passed** *(done)* |
 | After matched P1 | **Matched BF16/FP8 seed-42 reconstruction complete** |
 | After Phase 3 pass | **Reproduction gate passed (BF16)** |
 | After Phase 4–5 | **Extraction gate passed; GPTQ repro validated** |

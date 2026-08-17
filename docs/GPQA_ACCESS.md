@@ -2,7 +2,7 @@
 
 GPQA is required for Level B/C runs on `configs/tasks/gpqa_diamond.json` but is **gated** on Hugging Face.
 
-**Scientific gate (2026-08-14):** obtaining access is allowed, but do not launch GPQA publication cells until the MATH-500 three-seed pilot selects a contribution. Seed-0 commands below are historical wiring examples.
+**Scientific gate (2026-08-14, now obsolete):** obtaining access is allowed. GPQA-Diamond 24-cell breadth later completed. **Do not launch new GPQA GPU cells** (2026-08-17 freeze). Seed-0 commands below are historical wiring examples.
 
 ## Steps
 

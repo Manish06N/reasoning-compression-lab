@@ -10,4 +10,4 @@ These files are kept for provenance. They are **not** the Paper 1 pipeline.
 | `consolidate_multitask_results.py` | Pre-correction aggregator |
 | `stratified_difficulty_analysis.py` | Needs an untracked local MATH-500 dataset |
 
-Canonical entry point: `../revision_reanalysis.py`.
+Canonical entry points: `../revision_reanalysis.py` and `../emit_major_revision_tables.py`.

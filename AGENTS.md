@@ -3,9 +3,9 @@
 **Cluster:** PARAM Rudra HPC (C-DAC / NSM), NVIDIA A100 80GB GPUs  
 **Repository:** `/scratch/manishn_iitp/reasoning-compression-lab`  
 **GitHub:** [https://github.com/Manish06N/reasoning-compression-lab](https://github.com/Manish06N/reasoning-compression-lab)  
-**Last Updated:** 2026-08-17 (P0 closure on `paper-major-revision`; GPU frozen)
+**Last Updated:** 2026-08-18 (editorial freeze on `paper-major-revision`; science frozen at `d707e44`; GPU frozen)
 
-**Superseding scientific claims (use these, not the 2026-08-15 blocks below):** Title is *Beyond Pass@1: Accuracy, Agreement, and Serving-Cost Effects of Public R1-Distill Quantization Checkpoints under a Pinned Stack*. Distinctive result: **estimand disagreement** (pass@1 vs maj@5, length estimators, token-proxy vs sequential vs batched GPU-second cost). Pathology: **25 loops / 0 exact cap hits / 209 near-cap completions**. Checkpoint language only (tested `jakiAJK` Llama AWQ-4; tested Qwen AWQ-4 on GPQA). FP8–BF16 clustered CIs include 0; TOST $\pm 1$ pp fails. Length: clustered mismatch excess $D$ excludes 0 in all six MATH contrasts. Cost: **hybrid scenario** $C_{\mathrm{pass}}$ with Monte Carlo intervals; rankings disagree across proxy / Cond A / Cond B; Qwen FP8 Cond B is five-rep bimodal, not a lone $-36.0\%$. Do not cite architecture-dependent, statistically tied, unique cheapest, “true Pareto,” or first-run $+18.7\%$ / $-19.8\%$. Frozen tables: `results/reports/major_revision_tables.md`. Campaign evaluator: LightEval **0.8.0**. **Experimental GPU work is closed. No further GPU jobs are required for the current manuscript.** Do not merge to `main`. Do not commit/push until asked.
+**Superseding scientific claims (use these, not the 2026-08-15 blocks below):** Title is *Beyond Pass@1: Accuracy, Agreement, and Serving-Cost Effects of Public R1-Distill Quantization Checkpoints under a Pinned Stack*. Distinctive result: **estimand disagreement** (pass@1 vs maj@5, length estimators, token-proxy vs sequential vs batched GPU-second cost). Pathology: **25 loops / 0 exact cap hits / 209 near-cap completions**. Checkpoint language only (tested `jakiAJK` Llama AWQ-4; tested Qwen AWQ-4 on GPQA). FP8–BF16 clustered CIs include 0; TOST $\pm 1$ pp fails. Length: clustered mismatch excess $D$ excludes 0 in all six MATH contrasts. Cost: **hybrid scenario** $C_{\mathrm{pass}}$ with Monte Carlo intervals; rankings disagree across proxy / Cond A / Cond B; Qwen FP8 Cond B is five-rep bimodal, not a lone $-36.0\%$. Qwen AWQ-4 GPQA is Holm-significant within the six GPQA contrasts, not under Holm-18. Do not cite architecture-dependent, statistically tied, unique cheapest, “true Pareto,” or first-run $+18.7\%$ / $-19.8\%$. Frozen tables: `results/reports/major_revision_tables.md`. ArXiv source: `paper/arxiv_source.zip` (rebuilt from current `main.tex` / `references.bib` / `main.bbl`). Campaign evaluator: LightEval **0.8.0**. **Experimental GPU work is closed.** Do not merge to `main`.
 
 ---
 
@@ -31,7 +31,7 @@ graph TD
 
 | Output | Type | Title / Focus | Target Venues (Verify Q1) | Hardware / Stack | Status / Target Date |
 |---|---|---|---|---|---|
-| **J1** | Main Journal | *Beyond Pass@1: Accuracy, Agreement, and Serving-Cost Effects of Public R1-Distill Quantization Checkpoints under a Pinned Stack* | *Future Generation Computer Systems (FGCS)*, *Journal of Systems and Software (JSS)*, *Neurocomputing* | HPC 2× A100, `qrm-official` (vLLM 0.7.0 eager) | **88/88 cells + serving confirmation + major-revision CPU analysis**; do not merge to `main` until asked |
+| **J1** | Main Journal | *Beyond Pass@1: Accuracy, Agreement, and Serving-Cost Effects of Public R1-Distill Quantization Checkpoints under a Pinned Stack* | *Future Generation Computer Systems (FGCS)*, *Journal of Systems and Software (JSS)*, *Neurocomputing* | HPC 2× A100, `qrm-official` (vLLM 0.7.0 eager) | **Editorial freeze** on `paper-major-revision` (science `d707e44`); do not merge to `main` until asked |
 | **C1** | Conference / Workshop | *Trace-Level Evaluation Metrology for Compressed Reasoning Models* | NeurIPS/ICLR/ACL Workshops (Eval4NLP, Efficient Natural Language, MLPerf) | HPC A100 | Submission Month 6–12 (Post-J1 pilot packaging) |
 | **J2** | Journal 2 | *Reasoning-Aware Speculative Decoding: Acceptance Dynamics and Serving Acceleration* | *JSS*, *Engineering Applications of AI (EAAI)*, *FGCS* | HPC 2× A100 | Year 2 (Methods & draft model training) |
 | **C2** | Conference / Workshop | *High-Throughput Speculative Serving of Compressed Reasoning LLMs* | MLSys / EuroSys / ACL Demo Track | HPC A100 | Year 2 |
@@ -112,7 +112,7 @@ Llama-8B GPTQ-4          88.0%     89.6%     86.8%     89.4%     90.8%    88.92%
 ```
 
 ### Key Empirical Findings
-**Superseded 2026-08-15 bullets (do not cite):** “FP8 parity,” “0 truncations / 0 loops,” “Pareto-optimal FP8.” Current findings are in `README.md` and `paper/main.tex`: clustered pass@1 (Llama AWQ-4 MATH $-2.76$ pp); 25 loops / 0 cap hits / 209 near-cap; Qwen 4-bit MATH token inflation $+6.3$–$6.9\%$; gold-free modal agreement; confirmation batched Qwen GPTQ-4 $-45.9\%$ scenario $C_{\mathrm{pass}}$ vs BF16.
+**Superseded 2026-08-15 bullets (do not cite):** “FP8 parity,” “0 truncations / 0 loops,” “Pareto-optimal FP8.” Current findings are in `README.md` and `paper/main.tex`: clustered pass@1 (Llama AWQ-4 MATH $-2.76$ pp); Qwen AWQ-4 GPQA Holm-6 yes / Holm-18 no; 25 loops / 0 cap hits / 209 near-cap; Qwen 4-bit MATH token inflation $+6.3$–$6.9\%$; mismatch excess $D$ excludes 0 in all six MATH contrasts; gold-free modal agreement; confirmation batched Qwen GPTQ-4 $-45.9\%$ hybrid scenario $C_{\mathrm{pass}}$ vs BF16.
 
 ---
 
@@ -139,20 +139,21 @@ gantt
 - All 40 MATH-500 cells (2 models $\times$ 4 formats $\times$ 5 seeds) executed, verified, and backed up in `outputs-hpc-campaign-2026-08-14/`.
 
 #### [x] Phase 5: Frozen Statistical Analysis & Calibration (COMPLETED)
-1. **Paired Statistical Testing:** Paired McNemar tests confirm exact statistical parity between BF16 and quantized formats under Holm-Bonferroni correction ($p > 0.05$).
-2. **Sample-Consistency Calibration:** `maj@5` evaluated; ECE $\le 0.034$ (Qwen) / $\le 0.072$ (Llama); Brier score $< 0.022$; AURC $\le 0.0054$.
+> Historical Phase 5 bullets 1, 2, and 4 below are **retracted as paper claims**. Cite `paper/main.tex`: clustered bootstrap (not McNemar parity); 25 loops / 0 cap / 209 near-cap (not 0 degenerations); gold-free modal agreement (not gold-hit ECE). Bullet 3 (confirmation \(C_{\mathrm{pass}}\)) remains current.
+1. **Paired Statistical Testing (historical):** Paired McNemar tests confirm exact statistical parity between BF16 and quantized formats under Holm-Bonferroni correction ($p > 0.05$).
+2. **Sample-Consistency Calibration (historical):** `maj@5` evaluated; ECE $\le 0.034$ (Qwen) / $\le 0.072$ (Llama); Brier score $< 0.022$; AURC $\le 0.0054$.
 3. **Systems & Economics:** Primary Cost-of-Pass uses confirmation GPU-seconds (balanced MATH-500 subsets, `max_num_seqs=8`) at a $\$1.50$/A100-h scenario. The old shared-$65$ tok/s proxy is historical. The first unconstrained serving run is provenance only. Do not cite a unique Pareto optimum.
-4. **Structured Trace Audit:** 200-sample stratified audit documented in `results/trace_audit_report.json` with 0 degenerations.
+4. **Structured Trace Audit (historical):** 200-sample stratified audit documented in `results/trace_audit_report.json` with 0 degenerations.
 
 #### [x] Phase 4 Extension: Breadth Benchmark Evaluation (COMPLETED)
 - **GSM8K ($n=1,319$):** ✅ **100% COMPLETED** (24 cells, seeds 42–44). Qwen: BF16 91.26%, FP8 91.33%, AWQ-4 91.05%, GPTQ-4 91.13%; Llama: BF16 88.68%, FP8 88.80%, AWQ-4 87.11%, GPTQ-4 88.96%.
 - **GPQA-Diamond ($n=198$):** ✅ **100% COMPLETED** (24 cells, seeds 42–44). Qwen: BF16 50.34%, FP8 49.49%, AWQ-4 44.78%, GPTQ-4 47.98%; Llama: BF16 46.13%, FP8 47.81%, AWQ-4 46.97%, GPTQ-4 44.95%.
 
 #### [x] Phase 6: Manuscript Completion & Submission Packaging (COMPLETED)
-- Full manuscript in [`paper/main.md`](paper/main.md) and [`paper/main.tex`](paper/main.tex) with all 8 tables and formal formulas.
-- Camera-ready PDF compiled cleanly into [`paper/main.pdf`](paper/main.pdf) (7 pages).
+- Canonical manuscript: [`paper/main.tex`](paper/main.tex) compiled to [`paper/main.pdf`](paper/main.pdf) (**20 pages**). Markdown mirror: [`paper/main.md`](paper/main.md) (do not cite for numbers).
+- ArXiv zip: [`paper/arxiv_source.zip`](paper/arxiv_source.zip) rebuilt from current `main.tex` + `references.bib` + `main.bbl`.
 - Target venue: *Future Generation Computer Systems (FGCS)* / *Journal of Systems and Software (JSS)* (Q1).
-- All 88 validation JSON files across MATH-500, GSM8K, and GPQA backed up into `results/` and synced with GitHub.
+- All 88 validation JSON files across MATH-500, GSM8K, and GPQA are in `results/` on `paper-major-revision` (`d707e44`). Next: visual PDF QA, then referee review. Do not merge to `main`.
 
 ---
 

@@ -4,6 +4,7 @@
 **Target Venue:** *Future Generation Computer Systems (FGCS)* / *Journal of Systems and Software (JSS)*  
 **Repository:** `/scratch/manishn_iitp/reasoning-compression-lab`  
 **Date:** 2026-08-17 (Pre-Rerun Frozen Protocol)  
+**Status:** **Executed and frozen.** Preferred serving numbers are in `results/reports/measured_serving_confirmation/`. Do not re-run. GPU work is closed.  
 **Execution Mode:** Confirmatory Verification Grid under Strict Apples-to-Apples Controls  
 
 ---

@@ -7,7 +7,7 @@ Evaluation harness and artifacts for **Paper 1**: quantized reasoning models und
 * **GitHub:** [https://github.com/Manish06N/reasoning-compression-lab](https://github.com/Manish06N/reasoning-compression-lab)
 * **Paper 1 (J1):** *Beyond Pass@1: Accuracy, Agreement, and Serving-Cost Effects of Public R1-Distill Quantization Checkpoints under a Pinned Stack*
 
-Canonical manuscript: [`paper/main.tex`](paper/main.tex) → [`paper/main.pdf`](paper/main.pdf). Scoreboard: [`results/README.md`](results/README.md). Canonical numbers: [`results/reports/revision_reanalysis_report.json`](results/reports/revision_reanalysis_report.json). Modal agreement: [`results/reports/modal_agreement_report.json`](results/reports/modal_agreement_report.json).
+Canonical manuscript: [`paper/main.tex`](paper/main.tex) → [`paper/main.pdf`](paper/main.pdf) (20 pages). Scoreboard: [`results/README.md`](results/README.md). Canonical numbers: [`results/reports/revision_reanalysis_report.json`](results/reports/revision_reanalysis_report.json). Frozen tables: [`results/reports/major_revision_tables.md`](results/reports/major_revision_tables.md). Modal agreement: [`results/reports/modal_agreement_report.json`](results/reports/modal_agreement_report.json). ArXiv source: [`paper/arxiv_source.zip`](paper/arxiv_source.zip). Branch: `paper-major-revision` (`d707e44`).
 
 ---
 
@@ -42,8 +42,8 @@ Files under `configs/models/` are **not** the campaign launcher. They contain di
 
 1. **Pinned serving stack.** Weight format is the experimental factor. This paper does **not** claim a Serving-Stack Shift result.
 2. **Pathology (full 56,408-row grid).** **25** identical-word loop flags (threshold = 20 consecutive identical words). **0** exact $32{,}768$ cap hits after re-encoding. **209** near-cap generations (`completion_tokens >= 32{,}500`). `finish_reason` is not in the compact JSON.
-3. **Pass@1 (problem-clustered bootstrap vs BF16).** Llama AWQ-4: **−2.76 pp** on MATH-500 (95% CI $[−4.16,−1.44]$, $p<0.001$) and **−1.57 pp** on GSM8K. Qwen AWQ-4: **−5.56 pp** on GPQA-Diamond (95% CI $[−9.60,−1.52]$, $p=0.007$). FP8–BF16 95% intervals include 0; MATH $\pm 1$ pp TOST is **not** passed. maj@5 McNemar is secondary and non-significant.
-4. **Token inflation (full MATH-500 grid, all 5 seeds, ratio of means).** Qwen AWQ-4 **+6.33%**, Qwen GPTQ-4 **+6.88%** (paired token CIs exclude 0). Both-OK clustered CIs exclude 0 for those Qwen 4-bit cells; BF16-only mismatches are thousands of tokens longer; BF16-incorrect traces are themselves long. The old 200-item even-index mean-of-ratios subset is a superseded estimator.
+3. **Pass@1 (problem-clustered bootstrap vs BF16).** Llama AWQ-4: **−2.76 pp** on MATH-500 (95% CI $[−4.16,−1.44]$, $p<0.001$) and **−1.57 pp** on GSM8K. Qwen AWQ-4: **−5.56 pp** on GPQA-Diamond (95% CI $[−9.60,−1.52]$, $p=0.007$); Holm-significant within the six GPQA contrasts, **not** under the exploratory 18-contrast Holm correction. FP8–BF16 95% intervals include 0; MATH $\pm 1$ pp TOST is **not** passed. maj@5 McNemar is secondary and non-significant.
+4. **Token inflation (full MATH-500 grid, all 5 seeds, ratio of means).** Qwen AWQ-4 **+6.33%**, Qwen GPTQ-4 **+6.88%** (paired token CIs exclude 0). Both-OK clustered CIs exclude 0 for those Qwen 4-bit cells. Clustered mismatch excess $D$ (BF16-only mean $\Delta$ minus Both-OK mean $\Delta$) excludes 0 in all six MATH contrasts. BF16-incorrect traces are themselves long. The old 200-item even-index mean-of-ratios subset is a superseded estimator.
 5. **Selective prediction.** Gold-free unique-mode abstention from recovered MATH-500 answer strings. Strict 5/5 consensus has observed selective error at most 0.27%; Wilson upper bounds on $0/n$ cells remain strictly positive. Llama AWQ-4 reduces 5/5 coverage by **6.0 pp** vs BF16. Not G-Pass@k. Not a safety property. Gold-hit $k/5$ tables (including the old 98.23% “operational safety gate”) are **not** in the manuscript.
 6. **Cost.** Hybrid scenario Cost-of-Pass uses confirmation GPU-seconds over campaign MATH-500 pass@1. Rankings **disagree** across the 65 tok/s proxy, sequential Condition A, and batched Condition B. Qwen GPTQ-4 Condition B is $-45.9\%$ vs BF16 ($95\%$ CI $[-46.4,-45.4]$); Condition A ranks Qwen AWQ-4 first. Qwen FP8 Condition B is five wall-clock repeats (slow ~351 / mid ~456 / fast ~545 tok/s), not a lone $-36.0\%$. Llama GPTQ-4 Condition B mean throughput is within $0.2\%$ of Llama BF16. Peak allocated VRAM (~54–56 GB) is the 0.75 engine pool. The 65 tok/s proxy is appendix-only.
 
@@ -87,9 +87,9 @@ Answer-string recovery used the frozen policy in [`docs/ANSWER_NORMALIZATION.md`
 reasoning-compression-lab/
 ├── configs/               # Cell lists; configs/models/*.json are NOT the 56k launcher
 ├── docs/                  # Roadmap, literature, supervisor notes
-├── paper/                 # Canonical LaTeX (main.tex → main.pdf)
+├── paper/                 # Canonical LaTeX (main.tex → main.pdf); arxiv_source.zip
 ├── results/               # Per-cell JSON + canonical reports
-├── scripts/analysis/      # revision_reanalysis.py (canonical)
+├── scripts/analysis/      # revision_reanalysis.py + emit_major_revision_tables.py
 │   └── legacy/            # Deprecated analysis (wrong keys / gold-hit gate)
 ├── scripts/hpc/           # SLURM + qrm-official launchers
 ├── requirements-qrm-paper-vllm070.lock   # 56k campaign environment

@@ -1,10 +1,10 @@
 # Paper 1 Publication-Recovery Plan — 2026-08-14
 
-**Status:** active plan; Phase 0 not yet implemented.
+**Status:** **Historical / completed.** The recovery campaign finished. Major revision is frozen on `paper-major-revision` (`d707e44`, 2026-08-17). GPU work is closed. Do not execute this plan.
 
-**Scientific decision:** [Publication Readiness Audit](../PUBLICATION_READINESS.md)
+**Scientific decision:** [Publication Readiness Audit](../PUBLICATION_READINESS.md) (read the 2026-08-17 freeze banner first)
 
-**Goal:** turn the valid FP8 replication into a matched, reproducible, statistically defensible contribution without spending GPU time on a confounded broad grid.
+**Goal (then):** turn the valid FP8 replication into a matched, reproducible, statistically defensible contribution without spending GPU time on a confounded broad grid.
 
 ---
 

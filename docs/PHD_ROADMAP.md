@@ -1,6 +1,6 @@
 # PhD Roadmap Master Report
 
-> **Superseding note (2026-08-16):** Paper 1 title and findings are in [`../README.md`](../README.md) and [`../paper/main.tex`](../paper/main.tex). This roadmap's older “Serving-Stack Shift” title and 2026-08-14 “Needs revision” banner are historical. Canonical numbers: `results/reports/revision_reanalysis_report.json`.
+> **Freeze (2026-08-17):** Paper 1 title and findings are in [`../README.md`](../README.md) and [`../paper/main.tex`](../paper/main.tex) (20-page PDF; `d707e44` on `paper-major-revision`). This roadmap's older “Serving-Stack Shift” title and 2026-08-14 “Needs revision” banner are historical. Canonical numbers: `results/reports/revision_reanalysis_report.json`. GPU work is closed.
 
 **From Beginner-Level Understanding to A100 Execution**
 
@@ -11,7 +11,7 @@
 **Repo:** [reasoning-compression-lab](https://github.com/Manish06N/reasoning-compression-lab)  
 **Live execution log:** [progress.md](../progress.md) (what actually ran on HPC — read alongside this doc)
 
-> **Controlling amendment (2026-08-14):** Paper 1 is **Needs revision**. Completed FP8 jobs 96100/96101 are valid replication/control evidence, not a publishable core. [PUBLICATION_READINESS.md](PUBLICATION_READINESS.md) controls scientific interpretation and [plans/2026-08-14-publication-recovery.md](plans/2026-08-14-publication-recovery.md) controls execution. Any older instruction to expand the seed-0 b01–b09 grid is superseded.
+> **Controlling amendment (2026-08-14 — historical):** Paper 1 was **Needs revision** at the FP8-only package. Completed FP8 jobs 96100/96101 are valid replication/control evidence, not a publishable core by themselves. [PUBLICATION_READINESS.md](PUBLICATION_READINESS.md) now has a 2026-08-17 freeze. The recovery plan is complete. Any older instruction to expand the seed-0 b01–b09 grid remains superseded.
 
 ---
 
@@ -579,11 +579,11 @@ V6 = evidence base. **V7 = controlling priority layer** — same topic, reweight
 | Decision | Status |
 |----------|--------|
 | Spine | Frozen |
-| Paper 1 | Needs revision; matched reliability/stack contribution gate |
+| Paper 1 | Frozen major revision (`d707e44`); visual PDF QA next |
 | Paper 2 | Industry-heavy acceleration |
 | Paper 3 | Indic economics |
 | Job strategy | Artifact-first |
-| Next | Recovery Phase 0, then four matched BF16/FP8 cells |
+| Next | Visual PDF QA / referee review. GPU closed. |
 
 **Do not change:** spine (unless supervisor vetoes), no RLVR/agents as spine, no Paper 4 before P1 submit, no custom framework before repro cell.
 

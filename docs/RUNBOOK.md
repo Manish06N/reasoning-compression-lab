@@ -1,9 +1,12 @@
 # Runbook - MacBook <-> HPC
 
-## Current project state (2026-08-14)
+## Current project state (2026-08-17 freeze)
 
-- Canonical scientific verdict: **Needs revision** — [PUBLICATION_READINESS.md](PUBLICATION_READINESS.md).
-- Canonical next actions: [plans/2026-08-14-publication-recovery.md](plans/2026-08-14-publication-recovery.md). No b03/b04 or broad-grid launch before recovery Phase 0 passes.
+- Canonical scientific freeze: `paper-major-revision` @ `d707e44` — [PUBLICATION_READINESS.md](PUBLICATION_READINESS.md).
+- Next: visual PDF QA of the 20-page `paper/main.pdf`, then referee review. GPU work is closed. Do not merge to `main`.
+- The 2026-08-14 “Needs revision” bullets below are historical (FP8-only package). Do not re-open recovery Phase 0.
+
+## Current project state (2026-08-14 — historical)
 
 - GitHub/HPC baseline is `4796614`; current audit/plan/docs are uncommitted on HPC and must be preserved for sync; `.qrm_official_env_ready` should remain untracked.
 - Modern-stack b02 jobs **96086/96087** were canceled after unhealthy generated output; retain `outputs-hpc-2a100-main-2026-08-13` as evidence.

@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-08-18 — Editorial freeze
+
+Copyedits only on `paper-major-revision` (no number or analysis changes): TOST grammar; single definition of mismatch-excess $D$; 0/0 key-mismatch provenance moved from Results to Appendix. Prior uncommitted editorial closure (shorter abstract, RQ2 length alignment, Lian wording, journal tone, author block) is included. `paper/arxiv_source.zip` rebuilt from current `main.tex` (69,265 B) + `references.bib` + `main.bbl`. PDF remains 20 pages. Next: visual PDF QA, then independent referee review. GPU closed. Do not merge to `main`.
+
+## 2026-08-17 — Rebuild arXiv source zip; sync project markdown
+
+`paper/arxiv_source.zip` rebuilt from current `main.tex` (69,363 bytes), `references.bib`, and `main.bbl`. Previous zip still had the 21:56 pre-revision tex. Live project markdown synced to freeze `d707e44` on `paper-major-revision` (AGENTS, README, progress, TODO, PUBLICATION_READINESS, PROGRESS, paper/main.md, ARTIFACT, results/README, analysis README, and operational docs with freeze banners). Historical archives, literature extracts, and generated report tables were not rewritten. Next: visual PDF QA. Do not merge to `main`.
+
 ## 2026-08-17 — P0 closure: mismatch excess, p-value formula, Holm-18 sensitivity
 
 Branch `paper-major-revision`. No GPU jobs. Added clustered mismatch excess $D=\overline{\Delta}_{\mathrm{BF16-only}}-\overline{\Delta}_{\mathrm{Both-OK}}$ (same item resamples; all six MATH CIs exclude 0). Documented two-sided bootstrap tail-area $p$-value ($B=10{,}000$, seed 0, items, seeds fixed). Holm-18 is secondary; only Qwen AWQ-4 GPQA loses significance vs Holm-6. Stale `results/README.md` architecture-dependent / $1.7\times$ wording removed. Condition B natural-mix reweighting stated as unidentifiable. Frozen: `revision_reanalysis_report.json`, `major_revision_tables.md`, `major_revision_validation.md`. Do not merge to `main`.
