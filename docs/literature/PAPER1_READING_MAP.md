@@ -1,6 +1,8 @@
 Core Paper 1 literature groups:
 
-**Updated 2026-08-14:** the local merged bundle is incomplete for the current novelty decision. Add the primary sources below to the supervisor/manuscript review even if they are not yet present in `ALL_PAPERS_MERGED.md`.
+**Updated 2026-08-17:** manuscript Related Work is frozen in `paper/main.tex` (QRM, Lian, Lotfi, Kurtic, Erol, Hochlehnert, G-Pass@k). This reading map remains a working list; the local merged bundle is still an incomplete snapshot.
+
+**Updated 2026-08-14 (historical):** the local merged bundle is incomplete for the then-current novelty decision.
 
 1. Quantized reasoning baseline
 - Quantization Hurts Reasoning?

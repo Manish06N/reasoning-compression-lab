@@ -2,6 +2,8 @@
 
 Optional per-cell notes. **Master log:** [progress.md](../progress.md) and [CHANGELOG.md](../CHANGELOG.md).
 
+> **Freeze (2026-08-17):** Paper 1 GPU cells are complete. Do not add new J1 cells. Canonical numbers live in `results/reports/`, not in this optional log.
+
 Chronological record of runs. One section per experiment cell.
 
 ---

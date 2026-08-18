@@ -5,6 +5,11 @@ __pycache__/
 .venv/
 .env
 .qrm_official_env_ready
+*.egg-info/
+
+# Local dump files (never commit)
+FULL_CODE_BACKUP.md
+FULL_PROJECT_BACKUP.md
 
 # LaTeX build intermediates
 *.aux
@@ -21,8 +26,6 @@ runs/
 logs/
 outputs-win5080-*/
 outputs-hpc-*/
-paper_figures/*.png
-paper_figures/*.pdf
 
 # Literature PDFs over GitHub 100 MB limit (text .md extract is tracked instead)
 docs/literature/paper1/ALL_PAPERS_MERGED.pdf
@@ -50,5 +53,6 @@ wandb/
 .github-token
 *.pem
 
-# Mac
-.DS_Store
+# Stale matplotlib exports (submitted PDF uses TikZ in paper/main.tex)
+paper_figures/*.png
+paper_figures/*.pdf

@@ -1,0 +1,83 @@
+======================================================================
+CAMPAIGN SCHEMA INSPECTION REPORT
+======================================================================
+
+File: MATH-500.jsonl | Dir: DeepSeek-R1-Distill-Qwen-7B-seed42
+  Total records: 500
+  Top-level keys: ['full_prompt', 'generated_text', 'gold', 'metrics']
+    full_prompt (str len): 167 (sample: '<｜begin▁of▁sentence｜><｜User｜>Simplify $\\')
+    generated_text (str len): 22357 (sample: 'Okay, so I need to simplify the expressi')
+    gold (list len): 1
+    metrics (dict keys): ['extractive_match']
+
+File: MATH-500.jsonl | Dir: DeepSeek-R1-Distill-Qwen-7B-FP8-seed42
+  Total records: 500
+  Top-level keys: ['full_prompt', 'generated_text', 'gold', 'metrics']
+    full_prompt (str len): 167 (sample: '<｜begin▁of▁sentence｜><｜User｜>Simplify $\\')
+    generated_text (str len): 24428 (sample: 'Okay, so I need to simplify the expressi')
+    gold (list len): 1
+    metrics (dict keys): ['extractive_match']
+
+File: MATH-500.jsonl | Dir: DeepSeek-R1-Distill-Qwen-7B-AWQ-4-seed42
+  Total records: 500
+  Top-level keys: ['full_prompt', 'generated_text', 'gold', 'metrics']
+    full_prompt (str len): 159 (sample: '<｜begin▁of▁sentence｜><｜User｜>Simplify $\\')
+    generated_text (str len): 17600 (sample: '<think>\nOkay, so I need to simplify the ')
+    gold (list len): 1
+    metrics (dict keys): ['extractive_match']
+
+File: MATH-500.jsonl | Dir: DeepSeek-R1-Distill-Qwen-7B-GPTQ-4-seed42
+  Total records: 500
+  Top-level keys: ['full_prompt', 'generated_text', 'gold', 'metrics']
+    full_prompt (str len): 167 (sample: '<｜begin▁of▁sentence｜><｜User｜>Simplify $\\')
+    generated_text (str len): 21523 (sample: 'Okay, so I need to simplify the expressi')
+    gold (list len): 1
+    metrics (dict keys): ['extractive_match']
+
+File: MATH-500.jsonl | Dir: DeepSeek-R1-Distill-Llama-8B-seed42
+  Total records: 500
+  Top-level keys: ['full_prompt', 'generated_text', 'gold', 'metrics']
+    full_prompt (str len): 167 (sample: '<｜begin▁of▁sentence｜><｜User｜>Simplify $\\')
+    generated_text (str len): 19156 (sample: 'Okay, so I need to simplify the expressi')
+    gold (list len): 1
+    metrics (dict keys): ['extractive_match']
+
+File: MATH-500.jsonl | Dir: DeepSeek-R1-Distill-Llama-8B-FP8-seed42
+  Total records: 500
+  Top-level keys: ['full_prompt', 'generated_text', 'gold', 'metrics']
+    full_prompt (str len): 167 (sample: '<｜begin▁of▁sentence｜><｜User｜>Simplify $\\')
+    generated_text (str len): 22043 (sample: 'Okay, so I need to simplify the expressi')
+    gold (list len): 1
+    metrics (dict keys): ['extractive_match']
+
+File: MATH-500.jsonl | Dir: DeepSeek-R1-Distill-Llama-8B-AWQ-4-seed42
+  Total records: 500
+  Top-level keys: ['full_prompt', 'generated_text', 'gold', 'metrics']
+    full_prompt (str len): 159 (sample: '<｜begin▁of▁sentence｜><｜User｜>Simplify $\\')
+    generated_text (str len): 31100 (sample: '<think>\nAlright, so I have this problem ')
+    gold (list len): 1
+    metrics (dict keys): ['extractive_match']
+
+File: MATH-500.jsonl | Dir: DeepSeek-R1-Distill-Llama-8B-GPTQ-4-seed42
+  Total records: 500
+  Top-level keys: ['full_prompt', 'generated_text', 'gold', 'metrics']
+    full_prompt (str len): 167 (sample: '<｜begin▁of▁sentence｜><｜User｜>Simplify $\\')
+    generated_text (str len): 19119 (sample: 'Okay, so I have this expression to simpl')
+    gold (list len): 1
+    metrics (dict keys): ['extractive_match']
+
+File: GSM8K.jsonl | Dir: DeepSeek-R1-Distill-Qwen-7B-seed42
+  Total records: 1319
+  Top-level keys: ['full_prompt', 'generated_text', 'gold', 'metrics']
+    full_prompt (str len): 415 (sample: '<｜begin▁of▁sentence｜><｜User｜>Jared is tr')
+    generated_text (str len): 4651 (sample: 'Okay, so Jared wants to increase his typ')
+    gold (list len): 1
+    metrics (dict keys): ['extractive_match']
+
+File: GPQA-Diamond.jsonl | Dir: DeepSeek-R1-Distill-Qwen-7B-seed42
+  Total records: 198
+  Top-level keys: ['full_prompt', 'generated_text', 'gold', 'metrics']
+    full_prompt (str len): 931 (sample: '<｜begin▁of▁sentence｜><｜User｜>Answer the ')
+    generated_text (str len): 41230 (sample: "Okay, so I've got this organic chemistry")
+    gold (list len): 1
+    metrics (dict keys): ['extractive_match']

@@ -1,12 +1,14 @@
 # Codebase Overview — reasoning-compression-lab
 
-**Version:** 1.1 · **Architecture date:** 1 July 2026 · **science status:** 14 August 2026
+**Version:** 1.1 · **Architecture date:** 1 July 2026 · **science status:** 17 August 2026 (frozen)
 **Roadmap alignment:** PhD Roadmap V8.2 (Evidence-Based Execution Plan)  
 **Repository:** https://github.com/Manish06N/reasoning-compression-lab
 
 This document is the canonical high-level map of the entire codebase: what it does, how pieces connect, what is implemented today, and how the three-paper thesis plan maps onto directories and scripts. For day-to-day HPC operations, start with [BEGINNER_HPC_GUIDE.md](BEGINNER_HPC_GUIDE.md). For live execution status, see [PROGRESS.md](PROGRESS.md).
 
-**J1 status (2026-08-14):** exact-stack FP8 jobs 96100/96101 completed at 94.4% Qwen and 89.0% Llama. The [publication audit](PUBLICATION_READINESS.md) rates the package **Needs revision**: it is valid replication evidence without a matched quantization comparison. Follow [the recovery plan](plans/2026-08-14-publication-recovery.md), not the historical broad-grid order.
+> **Freeze (2026-08-17):** J1 science is frozen on `paper-major-revision` (`d707e44`). Canonical paper: [`../paper/main.tex`](../paper/main.tex) / 21-page PDF. GPU work is closed. Do not merge to `main`. The 2026-08-14 “Needs revision” paragraph below is historical (FP8-only package before the matched 88-cell grid).
+
+**J1 status (2026-08-14 — historical):** exact-stack FP8 jobs 96100/96101 completed at 94.4% Qwen and 89.0% Llama. That [publication audit](PUBLICATION_READINESS.md) rated the then-current two-job package **Needs revision**. The recovery plan later completed; do not re-open it.
 
 ---
 

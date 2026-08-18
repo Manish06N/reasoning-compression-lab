@@ -1,12 +1,30 @@
-# Publication Readiness Audit — 2026-08-14
+# Publication Readiness
 
-**Decision:** **Needs revision — do not submit the current two-result package as a paper.**
+**Superseding decision (2026-08-18):** Canonical submission manuscript is on `paper-major-revision`. Science is frozen at `d707e44`. The matched 88-run grid is complete (**56,408** completions). Canonical manuscript: [`paper/main.tex`](../paper/main.tex) compiled to [`paper/main.pdf`](../paper/main.pdf). Scoreboard: [`results/README.md`](../results/README.md). Frozen tables: [`results/reports/major_revision_tables.md`](../results/reports/major_revision_tables.md). ArXiv zip: [`paper/arxiv_source.zip`](../paper/arxiv_source.zip) (current `main.tex` + `references.bib` + `main.bbl`). **Experimental GPU work is closed.** Immutable snapshot tag: `paper-v1.0-submission`.
 
-**Current evidence label:** validated single-seed FP8 replication/control evidence.
+The 2026-08-17, 2026-08-16 and 2026-08-14 banners below are **historical**. They do **not** describe the current evidence.
 
-**Canonical execution plan:** [plans/2026-08-14-publication-recovery.md](plans/2026-08-14-publication-recovery.md)
+The 2026-08-16 and 2026-08-14 banners below are **historical**. They do **not** describe the current evidence.
 
-This document is the controlling scientific interpretation for Paper 1. Older status notes remain useful as chronological evidence, but any statement that jobs 96100/96101 are running, that seed 0 alone is a publishable core, or that the current FP8 result establishes a quantization effect is superseded by this audit.
+**Current label:** P0-corrected preprint plus gold-free MATH-500 modal agreement plus controlled serving confirmation plus major-revision CPU analyses (mismatch excess $D$, bootstrap tail-area $p$, Holm-18 sensitivity, hybrid $C_{\mathrm{pass}}$). Canonical numbers: `results/reports/revision_reanalysis_report.json`, `results/reports/modal_agreement_report.json`, `results/reports/measured_serving_confirmation/measured_serving_confirmation_report.json`. Do not cite 0/0 pathologies, the 98.23% gold-hit gate, “true Pareto optimum,” FP8 “parity,” or unqualified “Qwen AWQ-4 is Holm-significant on GPQA.”
+
+---
+
+# Publication Readiness (2026-08-16 banner — historical)
+
+**Historical superseding decision (2026-08-16):** The matched 88-cell grid is complete (**56,408** completions: MATH-500 40 + GSM8K 24 + GPQA-Diamond 24). Then-current PDF was ~14 pages. That banner is kept for chronology.
+
+---
+
+# Publication Readiness Audit — 2026-08-14 (historical)
+
+**Historical decision:** **Needs revision — do not submit the (then) two-result package as a paper.**
+
+**Then-current evidence label:** validated single-seed FP8 replication/control evidence.
+
+**Canonical execution plan (historical):** [plans/2026-08-14-publication-recovery.md](plans/2026-08-14-publication-recovery.md)
+
+This 2026-08-14 audit was the controlling scientific interpretation *until the matched 88-cell grid finished*. Keep it as chronological evidence. Any statement that jobs 96100/96101 are running, that seed 0 alone is a publishable core, or that the two-job FP8 result establishes a quantization effect remains superseded — first by this audit, then by the 2026-08-16 banner, and now by the 2026-08-17 freeze at the top of this file.
 
 ---
 

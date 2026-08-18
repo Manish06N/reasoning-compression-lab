@@ -1,5 +1,80 @@
 # Changelog
 
+## 2026-08-18 — Editorial freeze
+
+Copyedits only on `paper-major-revision` (no number or analysis changes): TOST grammar; single definition of mismatch-excess $D$; 0/0 key-mismatch provenance moved from Results to Appendix. Prior uncommitted editorial closure (shorter abstract, RQ2 length alignment, Lian wording, journal tone, author block) is included. `paper/arxiv_source.zip` rebuilt from current `main.tex` (69,265 B) + `references.bib` + `main.bbl`. PDF remains 20 pages. Next: visual PDF QA, then independent referee review. GPU closed. Do not merge to `main`.
+
+## 2026-08-17 — Rebuild arXiv source zip; sync project markdown
+
+`paper/arxiv_source.zip` rebuilt from current `main.tex` (69,363 bytes), `references.bib`, and `main.bbl`. Previous zip still had the 21:56 pre-revision tex. Live project markdown synced to freeze `d707e44` on `paper-major-revision` (AGENTS, README, progress, TODO, PUBLICATION_READINESS, PROGRESS, paper/main.md, ARTIFACT, results/README, analysis README, and operational docs with freeze banners). Historical archives, literature extracts, and generated report tables were not rewritten. Next: visual PDF QA. Do not merge to `main`.
+
+## 2026-08-17 — P0 closure: mismatch excess, p-value formula, Holm-18 sensitivity
+
+Branch `paper-major-revision`. No GPU jobs. Added clustered mismatch excess $D=\overline{\Delta}_{\mathrm{BF16-only}}-\overline{\Delta}_{\mathrm{Both-OK}}$ (same item resamples; all six MATH CIs exclude 0). Documented two-sided bootstrap tail-area $p$-value ($B=10{,}000$, seed 0, items, seeds fixed). Holm-18 is secondary; only Qwen AWQ-4 GPQA loses significance vs Holm-6. Stale `results/README.md` architecture-dependent / $1.7\times$ wording removed. Condition B natural-mix reweighting stated as unidentifiable. Frozen: `revision_reanalysis_report.json`, `major_revision_tables.md`, `major_revision_validation.md`. Do not merge to `main`.
+
+## 2026-08-17 — Major revision: analysis first, then rewrite
+
+Branch `paper-major-revision` from `paper-serving-confirmation` (`a987b7a`). No new GPU jobs. Extended CPU analyses: 2×2 length clustered CIs, BF16 failure control, Lian BF16-correct estimand, GSM8K/GPQA clustered+TOST tables, hybrid $C_{\mathrm{pass}}$ Monte Carlo, Condition A/B ranking disagreement, Qwen FP8 five-rep regimes, Wilson/Clopper–Pearson modal risk intervals. Frozen tables: `results/reports/major_revision_tables.md`. Manuscript retitled *Beyond Pass@1: Accuracy, Agreement, and Serving-Cost Effects of Public R1-Distill Quantization Checkpoints under a Pinned Stack*. Claims narrowed to checkpoint language; RQ4 is ranking agreement across cost estimators; Related Work includes a comparison table (QRM, Lian, Lotfi, Kurtic, Erol, Hochlehnert, G-Pass@k). Canonical `--check` plus `emit_major_revision_tables.py`. Do not merge to `main`.
+
+## 2026-08-17 — Integrate controlled serving confirmation
+
+Branch `paper-serving-confirmation` (HPC commit `76ebc3d` plus MacBook manuscript integration). Independent audit of 52 task-realistic + 8 microbenchmark confirmation JSON files. Primary Cost-of-Pass is now confirmation GPU-sec/query at a $\$1.50$/A100-h scenario with `max_num_seqs=8` pinned and balanced 20/100 MATH-500 subsets. Qwen GPTQ-4 is $-45.9\%$ scenario $C_{\mathrm{pass}}$ vs BF16; Qwen FP8 is $-36.0\%$ with sample SD $97.5$ tok/s on Condition B ($R=5$, identical token counts). Llama AWQ/GPTQ raise $C_{\mathrm{pass}}$. Overturned the first-run claim that all 4-bit cells are slower than BF16 in single-stream (false for Qwen). First unconstrained serving run retained as provenance only. Canonical checks: `revision_reanalysis.py --check`, `modal_agreement_analysis.py --check`, `measured_serving_analysis.py --check`, `measured_serving_confirmation_analysis.py --check`, confirmation validator. Experimental GPU work is closed for the current manuscript.
+
+## 2026-08-17 — Integrate measured serving results
+
+Branch `paper-measured-serving` (HPC commit `6612999` plus MacBook manuscript integration). Independent audit of 48 task-realistic + 8 microbenchmark JSON files. Primary Cost-of-Pass is now measured GPU-sec/query at a $\$1.50$/A100-h scenario (campaign MATH-500 pass@1). Batched Qwen-7B FP8 is $+18.7\%$ tok/s and $-19.8\%$ $C_{\mathrm{pass}}$ vs BF16. Rejected hardcoded “Pareto Optimal” / “true Pareto optimum”; Qwen-7B FP8 is nondominated on (pass@1, measured $C_{\mathrm{pass}}$) in the eight-point batched set. Protocol caveats documented (Condition B `max_num_seqs` not pinned to 8; Condition A first-20 not 4-per-level; VRAM is the 0.75 pool; mixed-node Llama AWQ-4/GPTQ-4). Canonical checks: `revision_reanalysis.py --check`, `modal_agreement_analysis.py --check`, `measured_serving_analysis.py --check`.
+
+## 2026-08-16 (late night) — Finalize observable modal-agreement paper integration
+
+Tighten wording on branch `paper-modal-agreement`: five-sample token-cost proxy (not dollars); no FP8 “parity”; LightEval **0.8.0** is the campaign evaluator and a throwaway MacBook LightEval 0.8.1 install is documented as unused; limitations list finish_reason, five-generation cost, and MATH-500-only five-seed coverage.
+
+## 2026-08-16 (late night) — Integrate observable modal-agreement analysis
+
+Branch `paper-modal-agreement`. MacBook audit of HPC commit `631d843`:
+
+- Compact artifact SHA256 `23e9ead021111959cf047323572889c95be0496e9475d6870b06c8b2c9a6149b` (20,000 rows, ~3.8 MB; no CoT / problem text).
+- `revision_reanalysis.py --check` still passes; P0 56k JSON is unchanged vs `3076573`.
+- Gold is insulated until after unique-mode clustering. Ties = 116. Symmetry/transitivity violations = 0.
+- Full LightEval re-extraction `--check` still requires campaign JSONLs (HPC). MacBook `--check` validates the compact artifact, T5 accounting, and report internals.
+- Manuscript: new observable modal table (not the old gold-hit Table 8), discrete 3-point risk–coverage figure, paired AWQ coverage CIs, five-sample $T_5$ cost. No “FP8 parity,” “safety,” or “reliable uncertainty estimator” wording.
+- Placement: **main paper**, because the signal is now gold-free, agreement separates low-risk subsets, AWQ-4 reduces strict-consensus coverage with CIs excluding zero, and the 5× token cost is explicit.
+
+## 2026-08-16 (late night) — Phase 1 repo hygiene (one version of the truth)
+
+Branch `paper-p0-reanalysis`. After the P0 manuscript checkpoint (`07b5f9d`):
+
+- Synced `README.md`, `results/README.md`, and `paper/main.md` to `paper/main.tex` (pinned stack; 25 loops / 0 cap hits / 209 near-cap; no safety gate / Pareto / 200-item subset).
+- Moved unsafe analysis scripts to `scripts/analysis/legacy/` with DEPRECATED banners.
+- Canonical path is `revision_reanalysis.py` → `revision_reanalysis_report.json`. Added `--check` and a CI job that fails on JSON drift. TOST flags in the report now match the paper (MATH all false).
+- Labeled environments: `requirements-qrm-paper-vllm070.lock` (published 56k / vLLM 0.7.0) vs `requirements-hpc-legacy-vllm085.txt` (qreason 0.8.5).
+- Added `results/reports/runtime_manifest.json` (launcher-effective settings, not `configs/models/` defaults).
+- Frozen answer-normalization policy in `docs/ANSWER_NORMALIZATION.md`. HPC JSONL check: `scripts/hpc/qrm_parity/check_campaign_jsonls.sh` (cluster only).
+
+## 2026-08-16 (night) — P0 analysis correction + manuscript rewrite
+
+Addressed the six-review consensus without new GPU jobs:
+
+- Fixed pathology JSON-key mismatch (`token_limit_hits` / `repetition_rows`). Grid totals: **25 loops**, **0 exact cap hits**, **209 near-cap** (`>= 32500` tokens).
+- Primary stats are now problem-clustered bootstrap of pass@1 (Llama AWQ-4 MATH −2.76 pp, p<0.001; Qwen AWQ-4 GPQA −5.56 pp, p=0.007). maj@5 McNemar is secondary.
+- Replaced the 200-item even-index mean-of-ratios “stratified” analysis with full-grid paired token deltas stratified by correctness.
+- Dropped gold-hit “safety gate” / circular ECE from headlines. Compact JSON has no extracted answers.
+- Retitled to *Pinned Serving Stack*. Token-implied Cpass is no longer called Pareto-optimal.
+- Canonical report: `results/reports/revision_reanalysis_report.json`. Recompute with `python3 scripts/analysis/revision_reanalysis.py`.
+
+## 2026-08-16 (evening) — Manuscript verification pass
+
+Checked every table in `paper/main.tex` against `results/reports/*.json` and `results/README.md` (88 JSON files; 56,408 completions). Numbers match. Fixes from this pass:
+
+- Bibliography authors/titles: Lian et al. (arXiv:2606.25519), Alimaskina et al. (arXiv:2606.02011), Zollo/Wang/Zemel (arXiv:2604.19444). In-text cites no longer say Zhang/Zhao.
+- `\FloatBarrier` so figures no longer interleave with References (PDF is now 12 pages).
+- `paper/main.md` now has full Tables 7–8.
+- Stale overclaims and scrambled GPQA seed rows corrected in `README.md`, `TODO_LIST.md`, `AGENTS.md`, `progress.md`. `docs/PUBLICATION_READINESS.md` has a 2026-08-16 superseding banner (the 2026-08-14 audit is historical).
+- `setup_official_qrm_repo.sh` now applies `patches/qrm_hpc_compat.patch` and `patches/lighteval_local_dataset.patch`.
+
+## 2026-08-16 (evening) — ArXiv manuscript package
+
+Honest methods pass on `paper/main.tex`: sample-consistency ECE matches the analysis code; $C_{\mathrm{pass}}$ labeled as modeled at $1.50/h and 65 tok/s; truncation/loops labeled as heuristics; token inflation scoped (full-grid vs 200-item audit); McNemar scoped to maj@5. Related Work, Discussion, Tables 5–8, four figures, and corrected bibliography (Liu arXiv:2504.04823; Erol et al. Cost-of-Pass; DeepSeek-R1). Compiled `paper/main.pdf` (11 pages). Upload zip: `paper/arxiv_source.zip`. See `paper/ARTIFACT.md`.
+
 ## 2026-08-16 - Completed Phase 4 (40-Cell Headline Grid) & Phase 5 (Statistical Metrology & Trace Audit), Manuscript Updated
 
 ### 1. Headline Confirmatory Results (MATH-500, n=500, Seeds 42–46, 20,000 Completions)

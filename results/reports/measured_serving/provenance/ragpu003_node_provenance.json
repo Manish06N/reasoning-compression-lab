@@ -1,0 +1,15 @@
+{
+  "hostname": "ragpu003",
+  "timestamp": "2026-08-17T04:33:48.334714+00:00",
+  "torch_version": "2.5.1+cu124",
+  "cuda_version": "12.4",
+  "gpu_count": 1,
+  "gpu_devices": [
+    {
+      "device_id": 0,
+      "name": "NVIDIA A100 80GB PCIe",
+      "total_memory_gb": 79.138427734375
+    }
+  ],
+  "nvidia_smi": "550.54.14, NVIDIA A100 80GB PCIe, GPU-9e786307-74d0-0a18-9005-adb801a6a870, 81920 MiB\n550.54.14, NVIDIA A100 80GB PCIe, GPU-5e419cfe-ebc0-d692-b225-d704099a3af1, 81920 MiB"
+}

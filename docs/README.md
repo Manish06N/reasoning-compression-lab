@@ -6,7 +6,7 @@
 
 **Live status:** [PROGRESS.md](PROGRESS.md) (short) · [../progress.md](../progress.md) (full history) · [../CHANGELOG.md](../CHANGELOG.md) (ops detail)
 
-**Scientific decision:** [PUBLICATION_READINESS.md](PUBLICATION_READINESS.md) · **execution plan:** [plans/2026-08-14-publication-recovery.md](plans/2026-08-14-publication-recovery.md)
+**Scientific decision:** [PUBLICATION_READINESS.md](PUBLICATION_READINESS.md) (2026-08-17 freeze). The [2026-08-14 recovery plan](plans/2026-08-14-publication-recovery.md) is **historical** — GPU work is closed.
 
 ---
 
@@ -14,10 +14,10 @@
 
 | Doc | Purpose |
 |-----|---------|
-| [PUBLICATION_READINESS.md](PUBLICATION_READINESS.md) | **Controlling 2026-08-14 verdict** — exact parameters, audited results, claims boundary, blockers, and novelty decision |
-| [plans/2026-08-14-publication-recovery.md](plans/2026-08-14-publication-recovery.md) | **Current execution authority** — Phase 0 instrumentation through matched pilot, contribution gate, final analysis, and manuscript |
+| [PUBLICATION_READINESS.md](PUBLICATION_READINESS.md) | **Controlling 2026-08-17 freeze** — major revision at `d707e44`; visual PDF QA next; GPU closed |
+| [plans/2026-08-14-publication-recovery.md](plans/2026-08-14-publication-recovery.md) | **Historical** recovery plan (Phase 0 through matched grid). Not current execution authority. |
 | [CODEBASE_OVERVIEW.md](CODEBASE_OVERVIEW.md) | **High-level overview** — thesis alignment, architecture, modules, paper status |
-| [J1_VALIDATION_RUNBOOK.md](J1_VALIDATION_RUNBOOK.md) | Operational validation procedures; broad grid is blocked pending recovery Phase 0 |
+| [J1_VALIDATION_RUNBOOK.md](J1_VALIDATION_RUNBOOK.md) | Historical validation procedures; GPU work is closed |
 | [BEGINNER_HPC_GUIDE.md](BEGINNER_HPC_GUIDE.md) | HPC workflow step-by-step |
 | [HARDWARE_POLICY.md](HARDWARE_POLICY.md) | J1 HPC-only; RTX for J3 transfer |
 | [KNOWN_ISSUES.md](KNOWN_ISSUES.md) | **Critical** — resume trap, bad archive, limitations |

@@ -2,6 +2,10 @@
 
 GitHub Personal Access Tokens must **never** be committed to this repo, pasted in README/CHANGELOG, or shared in chat.
 
+**MacBook (current, 2026-08-17):** PAT file is gitignored `.github-token` (one line, no quotes). Required scopes: `repo` **and** `workflow` (needed to push `.github/workflows/ci.yml`). Push with `bash scripts/macbook/github_push.sh origin paper-major-revision`. HPC never pushes. Do not merge to `main` until asked.
+
+The Windows Credential Manager section below is a historical local-dev note.
+
 ## Where tokens are stored (Windows)
 
 After you run the one-time setup below, your token lives in **Windows Credential Manager**:
@@ -13,7 +17,7 @@ Git for Windows uses **Git Credential Manager** to read it automatically on `git
 
 ## One-time setup (PowerShell)
 
-Replace `YOUR_TOKEN_HERE` with a PAT from https://github.com/settings/tokens (scope: **repo**).
+Replace `YOUR_TOKEN_HERE` with a PAT from https://github.com/settings/tokens (scopes: **repo** + **workflow**).
 
 ```powershell
 @"

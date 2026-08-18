@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
 """
-Selective Prediction & Abstention Analysis (Risk-Coverage Tradeoffs).
-Evaluates operational serving thresholds (agreement thresholds k/5: 1/5, 2/5, 3/5, 4/5, 5/5)
-across BF16, FP8, AWQ-4, GPTQ-4.
-Computes:
-- Coverage Rate (% of questions answered)
-- Effective Selective Accuracy (% correct among answered)
-- Selective Risk (% error among answered)
+DEPRECATED.
+
+This script reproduces an earlier analysis that is not used in the
+revised manuscript.
+
+Known issues:
+- selective prediction used gold-hit counts, not modal-answer agreement
+- compact JSON has no extracted answer strings
+- the old 98.23% figure is not an operational safety gate
+
+Use scripts/analysis/revision_reanalysis.py instead.
 """
 
 import json

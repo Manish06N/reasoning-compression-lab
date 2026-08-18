@@ -1,0 +1,104 @@
+{
+  "campaign": "outputs-hpc-campaign-2026-08-14 plus GSM8K/GPQA breadth on the same launcher",
+  "n_completions": 56408,
+  "n_cells": 88,
+  "note": "These are the effective values passed into official QRM inference.py by scripts/hpc/qrm_parity/run_official_inference.sh after patches/qrm_hpc_compat.patch. They are NOT the defaults sitting in configs/models/*.json (those files use max_model_len 40960 or 131072, gpu_memory_utilization 0.95, and sometimes kv_cache_dtype=fp8_e5m2 / enforce_eager=false). Process logs with per-job nvidia-smi / vLLM dump were not archived for every cell; this manifest is reconstructed from the launcher and patched inference.py, which are the only code path that submitted the 56k jobs.",
+  "shared": {
+    "engine": "qrm-official",
+    "vllm_version": "0.7.0",
+    "python": "3.11",
+    "torch": "2.5.1",
+    "cuda_toolkit": "12.4",
+    "gpu_model": "NVIDIA A100-PCIE-80GB",
+    "enforce_eager": true,
+    "gpu_memory_utilization": 0.75,
+    "max_model_len": 32768,
+    "max_new_tokens": 32768,
+    "temperature": 0.6,
+    "top_p": 0.95,
+    "top_k": null,
+    "repetition_penalty": 1.0,
+    "enable_prefix_caching": false,
+    "enable_chunked_prefill": false,
+    "kv_cache_dtype": "vllm_default_auto",
+    "kv_cache_dtype_note": "inference.py does not pass kv_cache_dtype; vLLM 0.7 default applies. configs/models fp8_e5m2 was not the campaign setting.",
+    "tensor_parallel_size": 1,
+    "prompt": "Please reason step by step, and put your final answer within \\boxed{}.",
+    "sources": [
+      "scripts/hpc/qrm_parity/run_official_inference.sh",
+      "scripts/hpc/queue_manager_daemon.py",
+      "patches/qrm_hpc_compat.patch",
+      "external QRM inference.py GenerationParameters / VLLMModelConfig defaults"
+    ]
+  },
+  "cells": [
+    {
+      "model": "DeepSeek-R1-Distill-Qwen-7B",
+      "hf_id": "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
+      "revision": "916b56a44061fd5cd7d6a8fb632557ed4f724f60",
+      "weight_format": "BF16",
+      "dtype": "bfloat16",
+      "quantization": null
+    },
+    {
+      "model": "DeepSeek-R1-Distill-Qwen-7B-FP8",
+      "hf_id": "RedHatAI/DeepSeek-R1-Distill-Qwen-7B-FP8-dynamic",
+      "revision": "ceb2fcd178d477cd21b92ffb43164c74165a212c",
+      "weight_format": "FP8",
+      "dtype": "bfloat16",
+      "quantization": "compressed-tensors",
+      "a100_execution": "Marlin W8A16 fallback, not native W8A8"
+    },
+    {
+      "model": "DeepSeek-R1-Distill-Qwen-7B-AWQ-4",
+      "hf_id": "jakiAJK/DeepSeek-R1-Distill-Qwen-7B_AWQ",
+      "revision": "1d082b3ded4e7cefbb6b32cd5e07c7d409832816",
+      "weight_format": "AWQ-4",
+      "dtype": "float16",
+      "quantization": "awq",
+      "dtype_note": "QRM_DTYPE=float16 set by queue_manager_daemon.py when the path contains AWQ"
+    },
+    {
+      "model": "DeepSeek-R1-Distill-Qwen-7B-GPTQ-4",
+      "hf_id": "RedHatAI/DeepSeek-R1-Distill-Qwen-7B-quantized.w4a16",
+      "revision": "9559a91ed463eecda64b93a532fe5aa8cc25f2eb",
+      "weight_format": "GPTQ-4",
+      "dtype": "bfloat16",
+      "quantization": "compressed-tensors"
+    },
+    {
+      "model": "DeepSeek-R1-Distill-Llama-8B",
+      "hf_id": "deepseek-ai/DeepSeek-R1-Distill-Llama-8B",
+      "revision": "6a6f4aa4197940add57724a7707d069478df56b1",
+      "weight_format": "BF16",
+      "dtype": "bfloat16",
+      "quantization": null
+    },
+    {
+      "model": "DeepSeek-R1-Distill-Llama-8B-FP8",
+      "hf_id": "RedHatAI/DeepSeek-R1-Distill-Llama-8B-FP8-dynamic",
+      "revision": "5d548d9169c53b7bb7ef0b3bc261509d5da6e3dd",
+      "weight_format": "FP8",
+      "dtype": "bfloat16",
+      "quantization": "compressed-tensors",
+      "a100_execution": "Marlin W8A16 fallback, not native W8A8"
+    },
+    {
+      "model": "DeepSeek-R1-Distill-Llama-8B-AWQ-4",
+      "hf_id": "jakiAJK/DeepSeek-R1-Distill-Llama-8B_AWQ",
+      "revision": "57360e84a0e7278c6b3abb453f2dc812b213badb",
+      "weight_format": "AWQ-4",
+      "dtype": "float16",
+      "quantization": "awq",
+      "dtype_note": "QRM_DTYPE=float16 set by queue_manager_daemon.py when the path contains AWQ"
+    },
+    {
+      "model": "DeepSeek-R1-Distill-Llama-8B-GPTQ-4",
+      "hf_id": "RedHatAI/DeepSeek-R1-Distill-Llama-8B-quantized.w4a16",
+      "revision": "faa06ed0a4a5bdab76c4df12376e0c5228c0bdfe",
+      "weight_format": "GPTQ-4",
+      "dtype": "bfloat16",
+      "quantization": "compressed-tensors"
+    }
+  ]
+}

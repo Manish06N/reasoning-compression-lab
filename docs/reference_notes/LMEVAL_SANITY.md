@@ -6,7 +6,7 @@ One-time validation that our harness pass@1 is in the same ballpark as EleutherA
 
 ## When to run
 
-After recovery Phase 0 and the first matched Qwen-7B BF16 cell on HPC. It remains a sanity cross-check, not a replacement for the frozen publication harness. Do not install it into or mutate the controlled environment without an isolated compatibility test.
+After the first matched Qwen-7B BF16 cell on HPC *(that cell exists; this cross-check was optional and is not required for the frozen paper)*. It remains a sanity cross-check, not a replacement for the frozen publication harness. Do not install it into or mutate the controlled environment. Paper 1 GPU work is closed (2026-08-17).
 
 ## HPC
 

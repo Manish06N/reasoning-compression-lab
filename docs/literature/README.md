@@ -11,7 +11,7 @@ Canonical merged PDF bundles that underpin the PhD papers, plus text extracts fo
 
 **Paper 1 reading guide:** [PAPER1_READING_MAP.md](PAPER1_READING_MAP.md)
 
-> **Coverage warning (2026-08-14):** the merged corpus is a historical local snapshot, not a complete current novelty search. The publication audit found newer 2025–2026 work on quantized calibration, reliability scaling, cost-per-correct, token inflation, and degeneration that must be included before claims are frozen. See [../PUBLICATION_READINESS.md](../PUBLICATION_READINESS.md).
+> **Coverage warning (2026-08-14, still true as a corpus note):** the merged PDF bundle is a historical local snapshot, not a complete current novelty search. The 2026-08-17 manuscript Related Work table covers QRM, Lian, Lotfi, Kurtic, Erol, Hochlehnert, and G-Pass@k. Do not treat this folder as the live literature review.
 
 ## PDF vs Markdown — which to use?
 

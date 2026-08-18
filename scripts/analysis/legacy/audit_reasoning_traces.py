@@ -1,8 +1,16 @@
 #!/usr/bin/env python3
 """
-Structured Qualitative Trace Audit (>= 200 Stratified Problem Samples)
-Analyzes per-problem completions across difficulty levels and formats
-to audit step-by-step reasoning preservation and token inflation mechanisms.
+DEPRECATED.
+
+This script reproduces an earlier analysis that is not used in the
+revised manuscript.
+
+Known issues:
+- 200-item even-index / seed-42 subset used a different estimator than the paper
+- mean-of-ratios on that subset is not the full-grid ratio of means
+- script does not read generated trace text
+
+Use scripts/analysis/revision_reanalysis.py instead.
 """
 
 import json
@@ -11,7 +19,9 @@ import os
 from collections import defaultdict
 
 def main():
-    validation_dir = "outputs-hpc-campaign-2026-08-14/validation"
+    validation_dir = "results/math500"
+    if not glob.glob(os.path.join(validation_dir, "*.json")):
+        validation_dir = "outputs-hpc-campaign-2026-08-14/validation"
     files = sorted(glob.glob(os.path.join(validation_dir, "*.json")))
     print(f"Loading {len(files)} validation files for trace audit...")
 
@@ -136,7 +146,7 @@ def main():
 ---
 
 ## 2. Qualitative Trace & Token Inflation Mechanism
-* **Step Deliberation Drift:** 4-bit quantized traces (AWQ-4 and GPTQ-4) frequently introduce additional intermediate algebraic restatements (e.g. repeated factorization checks) before concluding with the final boxed value.
+* **Note:** This script does not read generated trace text. Qualitative mechanism claims require the HPC JSONLs. Token numbers below are seed-42 even-index subset statistics and are **not** interchangeable with full-grid ratio-of-means; see ``revision_reanalysis.py``.
 * **Token Inflation vs BF16:**
   * `Qwen-7B FP8`: {audit_findings['mean_token_deltas_vs_bf16'].get('Qwen-7B_FP8', 'N/A')}
   * `Qwen-7B AWQ-4`: {audit_findings['mean_token_deltas_vs_bf16'].get('Qwen-7B_AWQ-4', 'N/A')}

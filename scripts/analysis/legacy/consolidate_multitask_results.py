@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 """
-Consolidated Multi-Task Benchmark Aggregator.
-Combines evaluation metrics across:
-1. MATH-500 (Competition Math, n=500, 5 seeds)
-2. GSM8K (Grade School Math, n=1,319, 3 seeds)
-3. GPQA-Diamond (Graduate Scientific Reasoning, n=198, 3 seeds)
-Outputs JSON and Markdown tables for manuscript inclusion.
+DEPRECATED.
+
+This script is not the manuscript pipeline. Pathology keys and
+summary tables must come from scripts/analysis/revision_reanalysis.py.
 """
 
 import json
@@ -26,8 +24,8 @@ def parse_val_file(path):
             acc = sum(1 for r in records if r.get("is_correct", False)) / len(records)
     
     tokens = data.get("completion_tokens_mean", 0)
-    trunc = data.get("truncation_count", data.get("hit_token_limit_count", 0))
-    loops = data.get("repetition_flag_count", 0)
+    trunc = data.get("token_limit_hits", data.get("truncation_count", data.get("hit_token_limit_count", 0)))
+    loops = data.get("repetition_rows", data.get("repetition_flag_count", 0))
     return acc, tokens, trunc, loops
 
 def compute_grid(dir_path, seeds, models, formats):

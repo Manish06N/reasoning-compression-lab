@@ -1,0 +1,41 @@
+# Paper campaign environment — 56,408 completions (qrm-official / vLLM 0.7.0)
+#
+# THIS IS THE ENVIRONMENT FOR THE PUBLISHED GRID.
+# It is not a MacBook-installable pip freeze. Reconstruct on PARAM Rudra with:
+#   bash scripts/hpc/qrm_parity/install_official_qrm_env.sh
+#
+# Do not confuse with:
+#   requirements-hpc-legacy-vllm085.txt   (earlier qreason harness, vLLM 0.8.5)
+#   requirements-hpc.txt                  (same 0.8.5 pins; kept so old scripts still resolve)
+#
+# Provenance (not a process-level nvidia-smi dump from every job):
+#   Python / torch / transformers : Quantized-Reasoning-Models/requirements.txt
+#   vLLM wheel                    : scripts/hpc/qrm_parity/install_official_qrm_env.sh
+#   CUDA toolkit                  : conda cuda-nvcc=12.4 in that installer
+#   LightEval                     : QRM third-party submodule, pip install -e ...[math]
+#   GPU                           : NVIDIA A100-PCIE-80GB (PARAM Rudra gpu partition)
+#   Driver                        : NOT captured in the published artifact
+#                                   (fill from `nvidia-smi` on next HPC login)
+
+# --- interpreter / GPU ---
+# python_version=3.11  (conda create -n qrm-official python=3.11)
+# gpu_model=NVIDIA A100-PCIE-80GB
+# cuda_toolkit=12.4
+# nvidia_driver=UNRECORDED
+
+torch==2.5.1
+transformers==4.47.1
+accelerate==0.27.2
+datasets==3.3.1
+# vLLM 0.7.0 official manylinux wheel used by install_official_qrm_env.sh:
+# https://files.pythonhosted.org/packages/51/70/6fc00dca2e9f53a76b7792d788cb2efbb9d2587ed0ca9a71d5ccf7fc7543/vllm-0.7.0-cp38-abi3-manylinux1_x86_64.whl
+vllm==0.7.0
+
+# LightEval: QRM fork at external/Quantized-Reasoning-Models/third-party/lighteval
+# installed editable with the [math] extra (pulls math-verify).
+# compressed-tensors: transitive via the vLLM 0.7.0 wheel; not independently pinned
+# in QRM requirements.txt. Record the exact wheel extra with `pip freeze` on HPC.
+
+# HPC patches applied at clone time:
+#   patches/qrm_hpc_compat.patch
+#   patches/lighteval_local_dataset.patch

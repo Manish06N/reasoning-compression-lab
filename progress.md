@@ -1,6 +1,6 @@
 # Progress Log — Master Reference
 
-Canonical dated record for **Paper 1: Beyond Accuracy** (`reasoning-compression-lab`).
+Canonical dated record for **Paper 1: Beyond Pass@1** (`reasoning-compression-lab`).
 
 **Purpose:** Future sessions can resume without guessing what was built, where it runs, which gates passed, and what failed. Update this file after every material change on MacBook, Windows/WSL, or HPC.
 
@@ -9,19 +9,19 @@ Canonical dated record for **Paper 1: Beyond Accuracy** (`reasoning-compression-
 
 ---
 
-## Current Status Snapshot (2026-08-16: Phase 4/5 & GSM8K Completed; GPQA Active)
+## Current Status Snapshot (2026-08-17: major revision frozen)
 
 | Area | Status |
 |------|--------|
-| **Publication verdict** | **On Track for Q1 Submission** — Complete 40-cell MATH-500 grid and 24-cell GSM8K grid validated with 0 truncations / 0 loops |
-| **Scientific authority** | [Publication Readiness Audit](docs/PUBLICATION_READINESS.md) · [Working Manuscript](paper/main.md) |
-| **Execution authority** | [2026-08-14 Publication-Recovery Plan](docs/plans/2026-08-14-publication-recovery.md) · [TODO List](TODO_LIST.md) |
+| **Active Branch** | `paper-major-revision` @ `d707e44` (pushed). Do not merge to `main`. |
+| **Gold-Free Modal Agreement** | **Complete.** Compact artifact SHA256 `23e9ead0...`; Wilson/Clopper–Pearson risk intervals attached. |
+| **Measured Serving Systems Benchmark** | **Confirmation preferred (52+8 JSON files).** Hybrid scenario $C_{\mathrm{pass}}$; rankings disagree across proxy / Cond A / Cond B. Qwen FP8 Cond B is five-rep bimodal. First unconstrained run is provenance only. |
+| **Scientific Authority** | [`paper/main.tex`](paper/main.tex) / [`paper/main.pdf`](paper/main.pdf) (21 pages). Canonical JSON: `revision_reanalysis_report.json`, `modal_agreement_report.json`, `measured_serving_confirmation_report.json`. Frozen tables: `results/reports/major_revision_tables.md`. |
+| **ArXiv source** | [`paper/arxiv_source.zip`](paper/arxiv_source.zip) rebuilt from current `main.tex` + `references.bib` + `main.bbl`. |
 | **MATH-500 Confirmatory Grid** | **100% Complete** (40 cells, 20,000 completions, seeds 42–46). Qwen: BF16 94.00%, FP8 94.40%, AWQ4 93.12%, GPTQ4 93.48%; Llama: BF16 89.24%, FP8 89.52%, AWQ4 86.48%, GPTQ4 88.92% |
-| **Phase 5 Statistical Analysis** | **100% Complete** — Paired McNemar exact tests ($p > 0.05$ vs BF16), sample-consistency calibration (ECE $\le 0.034$), Brier score ($<0.022$), AURC ($\le 0.0054$), Cost-of-Pass ($C_{\text{pass}}$) Pareto frontier |
-| **GSM8K Breadth Grid** | **100% Complete** (24 cells, $n=1,319$, seeds 42–44). Qwen: BF16 91.26%, FP8 91.33%, AWQ4 91.05%, GPTQ4 91.13%; Llama: BF16 88.68%, FP8 88.80%, AWQ4 87.11%, GPTQ4 88.96% |
-| **GPQA-Diamond Breadth Grid** | **RUNNING** on HPC (24 cells, $n=198$, seeds 42–44) via autonomous daemon `gpqa_daemon` in tmux |
-| **Hardware Utilization** | Exactly 2 GPUs concurrently (1 Qwen on `ragpu005` + 1 Llama on `ragpu006`), 100% compliant with `QOSMaxGRESPerUser` |
-| **Backups** | Dual verified backups in local project `archive/` and persistent home directory `/home/manishn_iitp/archive/` (MATH-500 565MB, GSM8K 439MB) |
+| **GSM8K Breadth Grid** | **100% Complete** (24 cells, $n=1,319$, seeds 42–44) |
+| **GPQA-Diamond Breadth Grid** | **100% Complete** (24 cells, $n=198$, seeds 42–44). Qwen AWQ-4 −5.56 pp is Holm-6 significant, not Holm-18. |
+| **Next GPU experiment** | **None.** Experimental GPU work is closed. Next: visual PDF QA, then independent referee review. |
 
 ### 2026-08-13 run diagnosis: what worked, what did not, and why
 

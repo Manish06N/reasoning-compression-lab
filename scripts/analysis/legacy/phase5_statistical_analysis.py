@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
 """
-Phase 5 Statistical Analysis & Calibration Engine
-Analyzes all 40 completed validation cells on MATH-500 across 5 seeds (42, 43, 44, 45, 46),
-4 quantization formats (BF16, FP8, AWQ-4, GPTQ-4), and 2 architectures (Qwen-7B, Llama-8B).
+DEPRECATED.
 
-Computes:
-1. Mean ± Std Pass@1 and Wilson 95% Confidence Intervals
-2. Problem-level Paired McNemar Tests with Holm-Bonferroni correction
-3. maj@5 Sample-Consistency Calibration (ECE, Brier Score, AURC)
-4. Token length distribution and Truncation / Repetition pathology verification
-5. Deployment Economics & Cost-of-Pass (C_pass) under explicit A100 GPU pricing ($1.50/GPU-hr)
+This script reproduces an earlier analysis that is not used in the
+revised manuscript.
+
+Known issues:
+- pathology keys did not match validator output (truncation_count vs token_limit_hits)
+- Wilson CIs pooled seeds as independent Bernoulli trials
+- ECE used gold-hit counts (circular with maj@5)
+
+Use scripts/analysis/revision_reanalysis.py instead.
 """
 
 import json
@@ -106,7 +107,9 @@ def compute_aurc(confidences, errors):
     return aurc
 
 def main():
-    validation_dir = "outputs-hpc-campaign-2026-08-14/validation"
+    validation_dir = "results/math500"
+    if not glob.glob(os.path.join(validation_dir, "*.json")):
+        validation_dir = "outputs-hpc-campaign-2026-08-14/validation"
     files = sorted(glob.glob(os.path.join(validation_dir, "*.json")))
     print(f"Loaded {len(files)} validation files from {validation_dir}")
 
@@ -174,8 +177,14 @@ def main():
 
             # Token length
             mean_tokens = sum(cell_seeds[s]["completion_tokens_mean"] for s in seeds) / len(seeds)
-            trunc_count = sum(cell_seeds[s].get("truncation_count", cell_seeds[s].get("hit_token_limit_count", 0)) for s in seeds)
-            loop_count = sum(cell_seeds[s].get("repetition_flag_count", 0) for s in seeds)
+            trunc_count = sum(
+                cell_seeds[s].get("token_limit_hits", cell_seeds[s].get("truncation_count", cell_seeds[s].get("hit_token_limit_count", 0)))
+                for s in seeds
+            )
+            loop_count = sum(
+                cell_seeds[s].get("repetition_rows", cell_seeds[s].get("repetition_flag_count", 0))
+                for s in seeds
+            )
 
             key = f"{m}_{fmt}"
             summary_stats[key] = {
@@ -355,7 +364,7 @@ def main():
         "deployment_economics": economics_results
     }
 
-    out_path = "results/phase5_statistical_analysis_report.json"
+    out_path = "results/reports/phase5_statistical_analysis_report.json"
     os.makedirs(os.path.dirname(out_path), exist_ok=True)
     with open(out_path, "w") as fp:
         json.dump(report, fp, indent=2)

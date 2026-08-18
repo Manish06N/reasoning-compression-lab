@@ -1,8 +1,8 @@
 # GPTQ-4 Preparation Gate
 
-**Publication hold (2026-08-14):** do not run `level_a_gptq4_seed0.json` or any GPTQ4 full cell until recovery Phase 0 and the matched BF16/FP8 Phase 1 pass. The seed-0 command below is retained as a historical wiring example, not the current publication protocol.
+**Publication hold (2026-08-14, now obsolete as a gate):** do not run `level_a_gptq4_seed0.json`. GPTQ-4 campaign cells later completed on the matched 88-cell grid. **Do not submit new J1 GPU jobs** (2026-08-17 freeze).
 
-Current order: [publication-recovery plan](plans/2026-08-14-publication-recovery.md).
+The seed-0 command below is retained as a historical wiring example, not a publication protocol.
 
 ## Correct order
 

@@ -2,11 +2,13 @@
 
 **SLURM limit:** 48 hours max per job  
 **Rule:** Paper 1/J1 publication numbers run on PARAM Rudra HPC. RTX 5080 outputs are historical or J3 local-transfer only.
-**Protocol:** historical b01–b09 used `repro_qrm.yaml`/seed 0. That grid is **not authorized for publication expansion** after the 2026-08-14 audit. Current protocol and seeds are defined in [the recovery plan](plans/2026-08-14-publication-recovery.md).
+**Protocol:** historical b01–b09 used `repro_qrm.yaml`/seed 0. That grid is **not authorized for publication expansion** after the 2026-08-14 audit. The recovery plan later completed; **GPU work is closed** as of 2026-08-17 (`d707e44`).
 
 GitHub: [reasoning-compression-lab](https://github.com/Manish06N/reasoning-compression-lab)
 
-**Current status (2026-08-14):** modern-stack b02 jobs **96086/96087** were canceled for unhealthy output. Exact-stack full jobs **96100/96101 completed** at 94.4% Qwen and 89.0% Llama. The [publication audit](PUBLICATION_READINESS.md) classifies them as replication/control evidence. Do not submit b03/b04 or the broad block grid; recovery Phase 0 is next.
+**Current status (2026-08-17 freeze):** 88-cell campaign complete. Do not submit new GPU jobs.
+
+**Current status (2026-08-14 — historical):** modern-stack b02 jobs **96086/96087** were canceled for unhealthy output. Exact-stack full jobs **96100/96101 completed** at 94.4% Qwen and 89.0% Llama. The [publication audit](PUBLICATION_READINESS.md) classified them as replication/control evidence. Recovery Phase 0 was next at that time.
 
 > The block tables below are retained as historical resource planning. They are not the current scientific execution order.
 
@@ -126,9 +128,9 @@ sbatch slurm/hpc_2a100_b07_gpqa.slurm
 
 ## Publication sufficiency and expansion rule
 
-The b01–b09 seed-0 grid is a historical wiring/resource map, **not** the current publishable core. Do not submit it as a wave.
+The b01–b09 seed-0 grid is a historical wiring/resource map, **not** the publishable core. Do not submit it as a wave. The 2026-08-14 recovery order below **completed**; GPU work is closed (2026-08-17).
 
-Current order:
+Historical recovery order (do not execute):
 
 1. Recovery Phase 0 and tiny smoke.
 2. Four matched BF16/FP8 seed-42 cells.
@@ -167,7 +169,7 @@ bash scripts/hpc/02_download_model.sh   # Qwen-7B + quants
 # Llama-8B BF16 if missing:
 # huggingface-cli download deepseek-ai/DeepSeek-R1-Distill-Llama-8B ...
 
-# Current order: recovery Phase 0, tiny smoke, then matched P1 only
+# Current order: GPU closed (2026-08-17). Do not submit recovery Phase 0.
 ```
 
 ---

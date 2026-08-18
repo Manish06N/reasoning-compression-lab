@@ -1,8 +1,10 @@
 # Hardware policy — J1 / J2 / J3
 
-**Frozen machine roles:** 2026-07-01 · **measurement amendment:** 2026-08-14
+**Frozen machine roles:** 2026-07-01 · **measurement amendment:** 2026-08-14 · **GPU freeze:** 2026-08-17
 
 One page so docs do not contradict each other.
+
+> **Freeze (2026-08-17):** Paper 1 publication numbers are complete on HPC A100. Do not submit new J1 GPU jobs.
 
 ---
 

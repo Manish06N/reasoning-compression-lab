@@ -1,10 +1,10 @@
 # QRM Stack Parity Audit (updated 2026-08-14)
 
-**Purpose:** Explain why Path C strict QRM protocol reproduces the *failure mode* but not QRM Table 1 numbers, what we verified, what we fixed, and what experiments come next.
+**Purpose:** Explain why Path C strict QRM protocol reproduces the *failure mode* but not QRM Table 1 numbers, what we verified, and what we fixed. Historical “what comes next” language is obsolete.
 
 **Paper 1 is not a QRM reproduction paper.** QRM (Liu et al., COLM 2025) is a **sanity baseline**. This audit documents an honest reproduction attempt and isolates the stack gap.
 
-**Final full-run decision:** jobs 96100/96101 completed at 94.4% Qwen and 89.0% Llama. These values validate the checkpoints/official path and reproduce existing FP8 references. They do not establish a quantization effect or a causal stack effect. See [PUBLICATION_READINESS.md](PUBLICATION_READINESS.md).
+**Final full-run decision:** jobs 96100/96101 completed at 94.4% Qwen and 89.0% Llama. These values validate the checkpoints/official path and reproduce existing FP8 references. They do not by themselves establish a quantization effect. The matched 88-cell grid later completed; see [PUBLICATION_READINESS.md](PUBLICATION_READINESS.md) (2026-08-17 freeze).
 
 ---
 

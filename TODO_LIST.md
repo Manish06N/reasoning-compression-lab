@@ -1,8 +1,8 @@
 # TODO List & Experiment Roadmap — Publication Readiness
 **Project:** Reasoning Compression Lab (`reasoning-compression-lab`)  
 **Target:** Paper 1 Publication Readiness (Quantization, Reliability, and Cost Frontier for Reasoning Models)  
-**Status:** **ALL CAMPAIGNS 100% COMPLETED — 88 Cells (MATH-500, GSM8K, GPQA-Diamond) Backed Up & Manuscript Compiled**  
-**Controlling Reference:** [docs/PUBLICATION_READINESS.md](docs/PUBLICATION_READINESS.md) · [docs/plans/2026-08-14-publication-recovery.md](docs/plans/2026-08-14-publication-recovery.md) · [AGENTS.md](AGENTS.md)
+**Status:** **Major revision frozen** on `paper-major-revision` (`d707e44`, pushed). 88-cell campaign, modal agreement, serving confirmation, and CPU P0 analyses are complete. GPU work is closed.  
+**Controlling Reference:** [docs/PUBLICATION_READINESS.md](docs/PUBLICATION_READINESS.md) · [AGENTS.md](AGENTS.md) · [results/reports/major_revision_tables.md](results/reports/major_revision_tables.md)
 
 ---
 
@@ -11,11 +11,16 @@
 * **Headline MATH-500 ($n=500$, Seeds 42–46, 40 Cells):** ✅ 100% Completed, validated, and backed up.
 * **Breadth Benchmark 1 — GSM8K ($n=1,319$, Seeds 42–44, 24 Cells):** ✅ 100% Completed, validated, and backed up.
 * **Breadth Benchmark 2 — GPQA-Diamond ($n=198$, Seeds 42–44, 24 Cells):** ✅ 100% Completed, validated, and backed up.
-* **Manuscript Status:** [`paper/main.md`](paper/main.md), [`paper/main.tex`](paper/main.tex), and camera-ready [`paper/main.pdf`](paper/main.pdf) fully drafted and compiled with all 8 tables and formal equations.
+* **Gold-Free Modal Agreement Analysis:** ✅ 100% Completed, validated, and pushed on branch `paper-modal-agreement` (HEAD `845d879`).
+* **Measured Serving Confirmation:** ✅ **Complete** (52 task-realistic + 8 microbenchmark JSON files; `max_num_seqs=8` pinned). Integrated on `paper-serving-confirmation` then into `paper-major-revision`.
+* **Major revision (CPU):** ✅ Frozen at `d707e44` — mismatch excess $D$, bootstrap $p$ formula, Holm-18 sensitivity, hybrid $C_{\mathrm{pass}}$ intervals.
+* **Manuscript Status:** Canonical source [`paper/main.tex`](paper/main.tex) compiled to [`paper/main.pdf`](paper/main.pdf) (21 pages). ArXiv zip: [`paper/arxiv_source.zip`](paper/arxiv_source.zip).
 
 ---
 
 ## 2. Completed Experiments & Verified Campaign Matrices
+
+Pathology on the **full 88-cell grid**: **25 loops**, **0 exact cap hits**, **209 near-cap**. See `results/README.md`.
 
 ### A. MATH-500 Headline Confirmatory Matrix ($n=500$, 5 Seeds)
 | Model | Quant Format | Seed 42 | Seed 43 | Seed 44 | Seed 45 | Seed 46 | Mean ± Std | Truncations | Repetition Loops | Status |
@@ -44,48 +49,48 @@
 ### C. GPQA-Diamond Breadth Matrix ($n=198$, 3 Seeds: 42, 43, 44)
 | Model | Quant Format | Seed 42 | Seed 43 | Seed 44 | Mean ± Std | Mean Tokens | Truncations | Repetition Loops | Status |
 |---|---|---|---|---|---|---|---|---|---|
-| **Qwen-7B** | **BF16** | 53.0% | 51.0% | 47.0% | **50.34% ± 2.96%** | 8153.2 | 0 | 0 | ✅ COMPLETED |
-| **Qwen-7B** | **FP8** | 48.0% | 51.0% | 49.5% | **49.49% ± 1.52%** | 7877.9 | 0 | 0 | ✅ COMPLETED |
-| **Qwen-7B** | **AWQ-4** | 44.4% | 48.0% | 41.9% | **44.78% ± 3.04%** | 8326.6 | 0 | 0 | ✅ COMPLETED |
-| **Qwen-7B** | **GPTQ-4** | 46.5% | 47.5% | 50.0% | **47.98% ± 1.75%** | 8196.4 | 0 | 0 | ✅ COMPLETED |
-| **Llama-8B** | **BF16** | 48.0% | 46.5% | 43.9% | **46.13% ± 1.91%** | 8780.2 | 0 | 0 | ✅ COMPLETED |
-| **Llama-8B** | **FP8** | 48.0% | 47.5% | 48.0% | **47.81% ± 0.29%** | 8632.7 | 0 | 0 | ✅ COMPLETED |
-| **Llama-8B** | **AWQ-4** | 46.5% | 49.2% | 45.2% | **46.97% ± 2.02%** | 8774.2 | 0 | 0 | ✅ COMPLETED |
-| **Llama-8B** | **GPTQ-4** | 40.4% | 44.9% | 49.5% | **44.95% ± 4.32%** | 8916.1 | 0 | 0 | ✅ COMPLETED |
+| **Qwen-7B** | **BF16** | 51.52% | 46.97% | 52.53% | **50.34% ± 2.96%** | 8529.4 | 0 | 0 | ✅ COMPLETED |
+| **Qwen-7B** | **FP8** | 49.49% | 51.01% | 47.98% | **49.49% ± 1.52%** | 8046.6 | 0 | 0 | ✅ COMPLETED |
+| **Qwen-7B** | **AWQ-4** | 44.44% | 41.92% | 47.98% | **44.78% ± 3.04%** | 8493.7 | 0 | 0 | ✅ COMPLETED |
+| **Qwen-7B** | **GPTQ-4** | 46.97% | 50.00% | 46.97% | **47.98% ± 1.75%** | 9128.3 | 0 | 0 | ✅ COMPLETED |
+| **Llama-8B** | **BF16** | 43.94% | 46.97% | 47.47% | **46.13% ± 1.91%** | 8662.4 | 0 | 0 | ✅ COMPLETED |
+| **Llama-8B** | **FP8** | 47.47% | 47.98% | 47.98% | **47.81% ± 0.29%** | 8718.1 | 0 | 0 | ✅ COMPLETED |
+| **Llama-8B** | **AWQ-4** | 46.97% | 44.95% | 48.99% | **46.97% ± 2.02%** | 8889.2 | 0 | 0 | ✅ COMPLETED |
+| **Llama-8B** | **GPTQ-4** | 44.44% | 40.91% | 49.49% | **44.95% ± 4.32%** | 9247.8 | 0 | 0 | ✅ COMPLETED |
 
 ---
 
-## 3. Master TODO List
+## 3. Master TODO List & Immediate Next Steps
 
-### [x] Phase 0–4: Completed Foundation & Confirmatory 40-Cell Grid (MATH-500)
-* [x] **Phase 0–4:** All 40 cells on MATH-500 completed with 0 truncations and 0 loops.
+### [x] 1. Gold-Free Modal Agreement Analysis (COMPLETED)
+* [x] Checked out `paper-modal-agreement` from commit `3076573`.
+* [x] Built canonical `scripts/analysis/modal_agreement_analysis.py` with 100% campaign score reproduction (20,000 / 20,000).
+* [x] Solved transitivity check with primary parsed prediction (0 symmetry violations, 0 transitivity violations across 4,000 groups).
+* [x] Computed risk-coverage frontier across $\ge 3/5$, $\ge 4/5$, and $5/5$ thresholds with 10,000 bootstrap replicates and paired CIs vs BF16.
+* [x] Generated `results/recovered/math500_modal_inputs.jsonl` (3.8 MB, SHA256 `23e9ead021111959cf047323572889c95be0496e9475d6870b06c8b2c9a6149b`).
+* [x] Committed and pushed branch `paper-modal-agreement` to GitHub (HEAD `845d879`).
 
-### [x] Phase 5: Frozen Statistical Analysis & Calibration
-* [x] **P5.1 Statistical Hypothesis Testing:** Paired McNemar tests ($p > 0.05$).
-* [x] **P5.2 Sample-Consistency Calibration:** ECE, Brier score, AURC computed.
-* [x] **P5.3 Systems Telemetry & Cost-of-Pass:** Empirical $C_{\text{pass}}$ frontier established.
-* [x] **P5.4 Structured Trace Audit:** 200-sample audit completed.
+### [x] 2. Measured Serving Systems Initial Benchmark (COMPLETED & AUDITED)
+* [x] Created experiment branch `paper-measured-serving`.
+* [x] Completed initial 56 benchmark runs across 8 configurations on A100.
+* [x] Audited benchmark protocol; identified Condition A level balance, Condition B `max_num_seqs=8` pinning, sidecar provenance alignment, and single-node physical control for confirmation.
 
-### [x] Phase 4 Extension: Breadth Benchmark Evaluation
-* [x] **P4.Ext.2 GSM8K:** $n=1,319$ grade-school math (4 formats $\times$ 3 seeds) — **100% COMPLETED**.
-* [x] **P4.Ext.1 GPQA-Diamond:** $n=198$ expert science (4 formats $\times$ 3 seeds) — **100% COMPLETED**.
+### [x] 3. Measured Serving Systems Confirmation Benchmark (COMPLETED & 100% VALIDATED)
+* [x] Created and verified dedicated branch [`paper-serving-confirmation`](file:///scratch/manishn_iitp/reasoning-compression-lab).
+* [x] Authored pre-execution frozen protocol [`docs/MEASURED_SERVING_CONFIRMATION_PROTOCOL.md`](docs/MEASURED_SERVING_CONFIRMATION_PROTOCOL.md) (SHA256 `5f665911...`).
+* [x] Generated balanced Condition A subset (20 items, exactly 4 per level 1–5, seed 20260817).
+* [x] Generated balanced Condition B subset (100 items, exactly 20 per level 1–5, seed 20260817).
+* [x] Verified 100% bijective problem/full_prompt provenance alignment on all 120 subset records.
+* [x] Implemented `benchmark_serving_confirmation.py` with explicit `max_num_seqs=8` runtime assertion and $\text{CV} \le 3.0\%$ expansion logic.
+* [x] Launched dual-GPU parallel execution on PARAM Rudra HPC (Job `96766` on `ragpu003` for Qwen-7B; Job `96768` on `ragpu004` for Llama-8B).
+* [x] Verified zero intra-architecture node mixing (100% single-node physical control per model family: Qwen on `ragpu003`, Llama on `ragpu004`).
+* [x] Activated detached 30-minute Telegram heartbeat & milestone daemon (`telegram_30min_heartbeat.py`).
+* [x] Completed all 60 confirmation runs across all 8 configurations with 0 OOMs, 0 crashes, and $\text{CV} \le 3.0\%$.
 
-### [x] Phase 6: Manuscript Completion & Submission Packaging
-* [x] Populate [`paper/main.md`](paper/main.md) with finalized tables, figures, and statistical tests.
-* [x] Add comprehensive **Limitations Section**.
-* [x] Integrate GSM8K and GPQA-Diamond breadth tables into manuscript.
-* [x] Compile publication LaTeX manuscript into [`paper/main.pdf`](paper/main.pdf).
-* [x] Journal submission packaging for target Q1 venue (*Future Generation Computer Systems* or *Journal of Systems and Software*).
-
----
-
-## 4. Summary Progress Tracker
-
-| Stage | Milestone | Status | Blockers / Next Steps |
-|---|---|---|---|
-| **Phase 0–4** | Confirmatory 40-cell grid (MATH-500, seeds 42–46) | ✅ COMPLETED | Validated & backed up |
-| **Phase 5** | Frozen statistical analysis, calibration & cost | ✅ COMPLETED | Reports & figures generated |
-| **Phase 4 Ext (GSM8K)** | GSM8K breadth evaluation ($n=1,319$, 24 cells) | ✅ COMPLETED | Validated & backed up |
-| **Phase 4 Ext (GPQA)** | GPQA-Diamond breadth evaluation ($n=198$, 24 cells) | ✅ COMPLETED | Validated & backed up |
-| **Phase 6** | Final manuscript draft (`paper/main.md`, `paper/main.pdf`) | ✅ COMPLETED | Manuscript compiled & ready for submission |
+### [x] 4. Post-Confirmation Sequence & Paper 1 (J1) Submission Protocol
+* [x] **Confirmation audit, manuscript rewrite, freeze:** `paper-major-revision` commit `d707e44` pushed. Canonical `--check` passed. `paper/arxiv_source.zip` rebuilt from current tex/bib/bbl.
+* [ ] **Visual PDF QA:** inspect the 21-page `paper/main.pdf` (serving tables, 2×2 length, Related Work, Holm-18, paths/URLs). Do not chase zero overfull-box warnings.
+* [ ] **Independent referee review** of the revised paper. No new analysis unless a finding requires it.
+* [ ] **Official journal / arXiv upload when asked.** Do not merge to `main` until asked.
+* [ ] **PhD Thesis Pivot — Paper 2 (J2):** not started. GPU remains closed for Paper 1.
 

@@ -1,0 +1,25 @@
+{
+  "benchmark_type": "fixed_token_microbenchmark",
+  "model": "Llama-8B",
+  "format": "AWQ-4",
+  "n_requests": 10,
+  "fixed_tokens_per_request": 512,
+  "total_tokens": 5120,
+  "elapsed_seconds": 11.700585931539536,
+  "raw_decode_tokens_per_second": 437.58492352069095,
+  "gpu_metadata": {
+    "hostname": "ragpu003",
+    "timestamp": "2026-08-17T04:33:48.334714+00:00",
+    "torch_version": "2.5.1+cu124",
+    "cuda_version": "12.4",
+    "gpu_count": 1,
+    "gpu_devices": [
+      {
+        "device_id": 0,
+        "name": "NVIDIA A100 80GB PCIe",
+        "total_memory_gb": 79.138427734375
+      }
+    ],
+    "nvidia_smi": "550.54.14, NVIDIA A100 80GB PCIe, GPU-9e786307-74d0-0a18-9005-adb801a6a870, 81920 MiB\n550.54.14, NVIDIA A100 80GB PCIe, GPU-5e419cfe-ebc0-d692-b225-d704099a3af1, 81920 MiB"
+  }
+}

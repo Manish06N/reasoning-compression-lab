@@ -2,7 +2,7 @@
 
 This repo contains **adapted logic only**. Full external repos stay in `../external_repos/` as read-only reference.
 
-**2026-08-14 reproducibility amendment:** the HPC `external/Quantized-Reasoning-Models` checkout used by jobs 96100/96101 contains required uncommitted edits for GPU-memory control, Python 3.11 syntax, and local dataset loading. Recovery Phase 0 must convert these into tracked patch files or maintained code and prove application from a clean pinned clone. Until then, “adapted logic only” is not a complete reconstruction recipe.
+**2026-08-14 reproducibility amendment (historical):** the HPC `external/Quantized-Reasoning-Models` checkout used by jobs 96100/96101 contained required uncommitted edits. Tracked patches later landed (`patches/qrm_hpc_compat.patch`, `patches/lighteval_local_dataset.patch`). Do not re-open recovery Phase 0 from this checklist. Paper 1 GPU work is closed (2026-08-17).
 
 ## What was adapted
 

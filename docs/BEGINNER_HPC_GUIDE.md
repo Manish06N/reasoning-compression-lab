@@ -1,12 +1,14 @@
 # Paper 1 — Beginner's Guide to `reasoning-compression-lab` on PARAM Rudra
 
+> **Freeze (2026-08-17):** Current title/findings are in [`../README.md`](../README.md) and [`../paper/main.tex`](../paper/main.tex). GPU work for Paper 1 is **closed**. Do not cite 0/0 pathologies or a Serving-Stack Shift result from older sections below. Do not launch recovery-plan GPU jobs.
+
 **Audience:** Someone new to the project who will run all experiments on **HPC only** (no personal GPU).  
 **Cluster:** PARAM Rudra, IIT Patna (`paramrudra.iitp.ac.in`)  
 **Repo:** https://github.com/Manish06N/reasoning-compression-lab  
 **Support:** `rudrasupport@iitp.ac.in` · ticket portal: https://paramrudra.iitp.ac.in/support  
 **Operational base last verified:** 2026-06-28 · **publication-gate amendment:** 2026-08-14
 
-> **Read before running anything:** the completed FP8 jobs are replication/control evidence and the paper is **Needs revision**. The current authority is [PUBLICATION_READINESS.md](PUBLICATION_READINESS.md) plus [plans/2026-08-14-publication-recovery.md](plans/2026-08-14-publication-recovery.md). Do not follow old seed-0/b01–b09 expansion instructions; recovery Phase 0 must pass first.
+> **Read before running anything:** Paper 1 GPU work is closed. Current authority is the 2026-08-17 freeze in [PUBLICATION_READINESS.md](PUBLICATION_READINESS.md). The 2026-08-14 “Needs revision” line and recovery plan below are historical. Do not follow old seed-0/b01–b09 expansion instructions.
 
 ---
 

@@ -4,7 +4,9 @@ PhD Roadmap V8.2 (1 July 2026) — complete codebase layout.
 
 **Full overview:** [CODEBASE_OVERVIEW.md](CODEBASE_OVERVIEW.md) — thesis alignment, pipeline diagrams, paper status, and script reference.
 
-**2026-08-14 science amendment:** architecture presence does not mean publication validation. Recovery Phase 0 must verify clean dependency recreation, output finish/token/timing fields, pathology validation, and controlled telemetry before new cells. See [PUBLICATION_READINESS.md](PUBLICATION_READINESS.md) and [the recovery plan](plans/2026-08-14-publication-recovery.md).
+**2026-08-17 freeze:** architecture presence does not authorize new GPU jobs. Paper 1 science is frozen at `d707e44`. See [PUBLICATION_READINESS.md](PUBLICATION_READINESS.md). The 2026-08-14 recovery-Phase-0 sentence below is historical.
+
+**2026-08-14 science amendment (historical):** architecture presence does not mean publication validation. Recovery Phase 0 had to verify clean dependency recreation, output finish/token/timing fields, pathology validation, and controlled telemetry before new cells.
 
 ## Python packages (`src/`)
 
