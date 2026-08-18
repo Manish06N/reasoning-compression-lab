@@ -1,6 +1,8 @@
 # Publication Readiness
 
-**Superseding decision (2026-08-17):** Major scientific revision is **frozen** on `paper-major-revision` (`d707e44`, pushed). The matched 88-cell grid is complete (**56,408** completions). Canonical manuscript: [`paper/main.tex`](../paper/main.tex) compiled to [`paper/main.pdf`](../paper/main.pdf) (**21 pages**; do not squeeze science to force a page count). Scoreboard: [`results/README.md`](../results/README.md). Frozen tables: [`results/reports/major_revision_tables.md`](../results/reports/major_revision_tables.md). ArXiv zip: [`paper/arxiv_source.zip`](../paper/arxiv_source.zip) (current `main.tex` + `references.bib` + `main.bbl`). **Experimental GPU work is closed.** Next: visual PDF QA, then independent referee review. Do not merge to `main`.
+**Superseding decision (2026-08-18):** Canonical submission manuscript is on `paper-major-revision`. Science is frozen at `d707e44`. The matched 88-run grid is complete (**56,408** completions). Canonical manuscript: [`paper/main.tex`](../paper/main.tex) compiled to [`paper/main.pdf`](../paper/main.pdf). Scoreboard: [`results/README.md`](../results/README.md). Frozen tables: [`results/reports/major_revision_tables.md`](../results/reports/major_revision_tables.md). ArXiv zip: [`paper/arxiv_source.zip`](../paper/arxiv_source.zip) (current `main.tex` + `references.bib` + `main.bbl`). **Experimental GPU work is closed.** Immutable snapshot tag: `paper-v1.0-submission`.
+
+The 2026-08-17, 2026-08-16 and 2026-08-14 banners below are **historical**. They do **not** describe the current evidence.
 
 The 2026-08-16 and 2026-08-14 banners below are **historical**. They do **not** describe the current evidence.
 

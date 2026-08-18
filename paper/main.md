@@ -1,4 +1,4 @@
-# One Stack, Many Rankings: Evaluating Quantized Reasoning Beyond Accuracy
+# One Stack, Many Rankings: Evaluating Quantized Reasoning Checkpoints Beyond Accuracy
 
 **Manish Nandish**<sup>1,2</sup>, **Rajiv Misra**<sup>1</sup>, and **Midhunchakkaravarthy Janarthanan**<sup>2</sup>
 
@@ -18,7 +18,7 @@ Email: Midhunchakkaravarthy@lincoln.edu.my
 
 Post-training quantization is a common serving default for reasoning language models, but a single pass@1 or token count is not a complete evaluation. We evaluate public R1-Distill checkpoints under one pinned serving stack—vLLM 0.7.0 eager execution on an NVIDIA A100-80GB, with FP8 checkpoints executed as Marlin W8A16 rather than native W8A8—and vary only the public weight checkpoint among BF16, FP8, AWQ-4, and GPTQ-4 for DeepSeek-R1-Distill-Qwen-7B and DeepSeek-R1-Distill-Llama-8B. The evaluation comprises 88 checkpoint×benchmark×seed runs and 56,408 completions on MATH-500 (5 seeds), GSM8K (3 seeds), and GPQA-Diamond (3 seeds).
 
-Under this pin, estimands disagree. On MATH-500, FP8–BF16 pass@1 differences are $+0.40$ and $+0.28$ percentage points (pp); problem-clustered 95% intervals include zero, and a $\pm 1$ pp equivalence test is not passed. The tested Qwen AWQ-4 checkpoint loses $5.56$ pp on GPQA-Diamond (Holm-significant within the primary six GPQA contrasts, not under a joint 18-contrast Holm sensitivity). Mean MATH-500 length rises $6.3$–$6.9\%$ for the tested Qwen 4-bit checkpoints, including detectable lengthening among jointly correct Qwen AWQ-4/GPTQ-4 pairs; much larger conditional differences occur in mismatch cases, where failure traces are themselves long. Strict five-sample unique-mode agreement yields low observed selective risk, trading off coverage and requiring five generations. The historical token proxy, sequential Condition A, and batched Condition B produce different rankings: the proxy ranks Qwen FP8 first among Qwen cells, Condition A ranks Qwen AWQ-4 first, and Condition B ranks Qwen GPTQ-4 first. Effects and rankings are checkpoint-, task-, workload-, estimand-, and serving-condition-specific under this pinned stack.
+Under this pinned stack, different evaluation targets rank checkpoints differently. On MATH-500, FP8–BF16 pass@1 differences are $+0.40$ and $+0.28$ percentage points (pp); problem-clustered 95% intervals include zero, and a $\pm 1$ pp equivalence test is not passed. The tested Qwen AWQ-4 checkpoint loses $5.56$ pp on GPQA-Diamond (Holm-significant within the primary six GPQA contrasts, not under a joint 18-contrast Holm sensitivity). Mean MATH-500 length rises $6.3$–$6.9\%$ for the tested Qwen 4-bit checkpoints, including detectable lengthening among jointly correct Qwen AWQ-4/GPTQ-4 pairs; much larger conditional differences occur in mismatch cases, where failure traces are themselves long. Strict five-sample unique-mode agreement yields low observed selective risk, trading off coverage and requiring five generations. The historical token proxy, sequential Condition A, and batched Condition B produce different rankings: the proxy ranks Qwen FP8 first among Qwen cells, Condition A ranks Qwen AWQ-4 first, and Condition B ranks Qwen GPTQ-4 first. Effects and rankings are checkpoint-, task-, workload-, estimand-, and serving-condition-specific under this pinned stack.
 
 ---
 
@@ -26,7 +26,7 @@ Under this pin, estimands disagree. On MATH-500, FP8–BF16 pass@1 differences a
 
 1. **RQ1.** Does quantization change *pass@1* relative to matched BF16, with problem-clustered uncertainty?
 2. **RQ2.** How do completion length and correctness-conditioned length differ across the evaluated checkpoints, and what do identical-word loops and near-cap completions reveal about the long-tail behavior?
-3. **RQ3.** What can be said about multi-sample reliability without gold labels at serve time?
+3. **RQ3.** What can observable multi-sample agreement say about selective abstention without gold labels at serve time?
 4. **RQ4.** Do checkpoint rankings agree across the historical token proxy, sequential Condition A, and batched Condition B aggregate serving-cost proxies?
 
 This paper **pins** one stack. It does not run a factorial vLLM 0.7.0 vs 0.8.5 experiment.
