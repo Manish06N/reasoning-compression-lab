@@ -2,10 +2,10 @@
 
 Evaluation harness and artifacts for **Paper 1**: quantized reasoning models under **one pinned serving stack**.
 
-* **PhD Scholar:** Manish Nandish (IIT Patna)
+* **Authors:** Manish Nandish (IIT Patna; Lincoln University College), Rajiv Misra (IIT Patna), Midhunchakkaravarthy Janarthanan (Lincoln University College)
 * **Cluster:** PARAM Rudra HPC (C-DAC / NSM), NVIDIA A100-PCIE-80GB
 * **GitHub:** [https://github.com/Manish06N/reasoning-compression-lab](https://github.com/Manish06N/reasoning-compression-lab)
-* **Paper 1 (J1):** *Beyond Pass@1: Accuracy, Agreement, and Serving-Cost Effects of Public R1-Distill Quantization Checkpoints under a Pinned Stack*
+* **Paper 1 (J1):** *One Stack, Many Rankings: Evaluating Quantized Reasoning Beyond Accuracy*
 
 Canonical manuscript: [`paper/main.tex`](paper/main.tex) → [`paper/main.pdf`](paper/main.pdf) (21 pages). Scoreboard: [`results/README.md`](results/README.md). Canonical numbers: [`results/reports/revision_reanalysis_report.json`](results/reports/revision_reanalysis_report.json). Frozen tables: [`results/reports/major_revision_tables.md`](results/reports/major_revision_tables.md). Modal agreement: [`results/reports/modal_agreement_report.json`](results/reports/modal_agreement_report.json). Serving confirmation: [`results/reports/measured_serving_confirmation/`](results/reports/measured_serving_confirmation/). ArXiv source: [`paper/arxiv_source.zip`](paper/arxiv_source.zip). Packaging: [`paper/ARTIFACT.md`](paper/ARTIFACT.md). Branch: `paper-major-revision` (science frozen at `d707e44`).
 
@@ -114,11 +114,10 @@ Do **not** start a new 50k campaign, extra seeds, or a vLLM 0.7 vs 0.8.5 factori
 ## 5. Citation
 
 ```bibtex
-@article{nandish2026beyondpass1,
-  title={Beyond Pass@1: Accuracy, Agreement, and Serving-Cost Effects of Public {R}1-Distill Quantization Checkpoints under a Pinned Stack},
-  author={Nandish, Manish},
+@article{nandish2026onestack,
+  title={One Stack, Many Rankings: Evaluating Quantized Reasoning Beyond Accuracy},
+  author={Nandish, Manish and Misra, Rajiv and Janarthanan, Midhunchakkaravarthy},
   journal={Working Draft},
-  institution={Indian Institute of Technology Patna},
   year={2026}
 }
 ```

@@ -1,9 +1,12 @@
-# Beyond Pass@1: Accuracy, Agreement, and Serving-Cost Effects of Public R1-Distill Quantization Checkpoints under a Pinned Stack
+# One Stack, Many Rankings: Evaluating Quantized Reasoning Beyond Accuracy
 
-**Manish Nandish**
-Department of Computer Science & Engineering
-Indian Institute of Technology Patna, India
-Email: manishn_iitp@iitp.ac.in
+**Manish Nandish**<sup>1,2</sup>, **Rajiv Misra**<sup>1</sup>, and **Midhunchakkaravarthy Janarthanan**<sup>2</sup>
+
+<sup>1</sup> Department of Computer Science and Engineering, Indian Institute of Technology Patna, Patna, Bihar, India
+Email: {manish_25s21res58, rajivm}@iitp.ac.in
+
+<sup>2</sup> Lincoln University College, Malaysia
+Email: Midhunchakkaravarthy@lincoln.edu.my
 
 **Do not cite this markdown file for numbers.** The canonical manuscript is [`main.tex`](main.tex) compiled to [`main.pdf`](main.pdf). This file exists only so repository markdown matches the LaTeX story.
 
