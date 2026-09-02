@@ -29,7 +29,7 @@ Observed under this pinned stack, the tested checkpoints change rank across eval
 3. **RQ3.** What can observable multi-sample agreement say about selective abstention without gold labels at serve time?
 4. **RQ4.** Do checkpoint rankings agree across the historical token proxy, sequential Condition A, and batched Condition B aggregate serving-cost proxies?
 
-This paper **pins** one stack. It does not run a factorial vLLM 0.7.0 vs 0.8.5 experiment. Contributions in `main.tex` are (C1) pinned protocol, (C2) ranking instability, (C3) checkpoint-not-method (tested community AWQ artifacts only).
+This paper **pins** one stack. It does not run a factorial vLLM 0.7.0 vs 0.8.5 experiment. Contributions in `main.tex` are (C1) pinned protocol, (C2) empirical characterization of ranking instability across deployment estimands, (C3) checkpoint-not-method (tested community AWQ artifacts only).
 
 ---
 

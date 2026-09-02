@@ -7,7 +7,7 @@ Evaluation harness and artifacts for **Paper 1**: quantized reasoning models und
 * **GitHub:** [https://github.com/Manish06N/reasoning-compression-lab](https://github.com/Manish06N/reasoning-compression-lab)
 * **Paper 1 (J1):** *One Stack, Many Rankings: Evaluating Quantized Reasoning Checkpoints Beyond Accuracy*
 
-Canonical manuscript: [`paper/main.tex`](paper/main.tex) → [`paper/main.pdf`](paper/main.pdf). Scoreboard: [`results/README.md`](results/README.md). Canonical numbers: [`results/reports/revision_reanalysis_report.json`](results/reports/revision_reanalysis_report.json). Frozen tables: [`results/reports/major_revision_tables.md`](results/reports/major_revision_tables.md). Modal agreement: [`results/reports/modal_agreement_report.json`](results/reports/modal_agreement_report.json). Serving confirmation: [`results/reports/measured_serving_confirmation/`](results/reports/measured_serving_confirmation/). ArXiv source: [`paper/arxiv_source.zip`](paper/arxiv_source.zip). Packaging: [`paper/ARTIFACT.md`](paper/ARTIFACT.md). Canonical branch: `paper-major-revision` (science frozen at `d707e44`). Immutable snapshot tag after this release: `paper-v1.0-submission`.
+Canonical manuscript: [`paper/main.tex`](paper/main.tex) → [`paper/main.pdf`](paper/main.pdf). Scoreboard: [`results/README.md`](results/README.md). Canonical numbers: [`results/reports/revision_reanalysis_report.json`](results/reports/revision_reanalysis_report.json). Frozen tables: [`results/reports/major_revision_tables.md`](results/reports/major_revision_tables.md). Modal agreement: [`results/reports/modal_agreement_report.json`](results/reports/modal_agreement_report.json). Serving confirmation: [`results/reports/measured_serving_confirmation/`](results/reports/measured_serving_confirmation/). ArXiv source: [`paper/arxiv_source.zip`](paper/arxiv_source.zip). Packaging: [`paper/ARTIFACT.md`](paper/ARTIFACT.md). Reproduce tables: [`REPRODUCE.md`](REPRODUCE.md). Publication-readiness report: [`SUBMISSION_REVIEW.md`](SUBMISSION_REVIEW.md). Live git branch for the frozen science is **`main`**. Branch `paper-major-revision` is historical and behind `main`. Immutable snapshot tag (when cut): `paper-v1.0-submission`.
 
 **Superseded analyses are provenance only** (200-item length subset, unconstrained serving timing, vLLM 0.8.5 pathology autopsy, gold-hit $k/5$ “safety gate”). Do not mix them with the canonical 56,408-completion reports.
 
@@ -75,6 +75,8 @@ python3 scripts/analysis/measured_serving_confirmation_analysis.py --check
 python3 scripts/hpc/qrm_parity/benchmark_serving_confirmation.py --check
 python3 scripts/analysis/emit_major_revision_tables.py --check
 python3 scripts/analysis/item_level_descriptive_analysis.py --check
+python3 scripts/analysis/validate_runtime_manifest.py --check
+python3 scripts/analysis/check_manuscript_numbers.py --check
 python3 scripts/hpc/qrm_parity/validate_measured_serving_confirmation.py
 ```
 
@@ -88,9 +90,10 @@ Answer-string recovery used the frozen policy in [`docs/ANSWER_NORMALIZATION.md`
 
 ```
 reasoning-compression-lab/
-├── configs/               # Cell lists; configs/models/ is NOT the 56k launcher
+├── configs/               # See configs/README.md: publication/ vs historical
+│   ├── publication/       # pointers to frozen campaign (not a launcher)
 │   ├── models/README.md   # warning only
-│   └── legacy_models/     # historical harness JSON (wrong max_model_len / KV defaults)
+│   └── legacy_models/     # historical harness JSON
 ├── docs/                  # Roadmap, literature, supervisor notes
 ├── paper/                 # Canonical LaTeX (main.tex → main.pdf); arxiv_source.zip
 ├── results/               # Per-cell JSON + canonical reports

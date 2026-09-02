@@ -27,6 +27,12 @@ jobs:
         run: python scripts/hpc/qrm_parity/benchmark_serving_confirmation.py --check
       - name: Item-level descriptive analysis
         run: python scripts/analysis/item_level_descriptive_analysis.py --check
+      - name: Validate runtime manifest
+        run: python scripts/analysis/validate_runtime_manifest.py --check
+      - name: Manuscript TeX tables vs frozen numbers
+        run: python scripts/check_tex_tables.py --check
+      - name: Manuscript frozen-number needles
+        run: python scripts/analysis/check_manuscript_numbers.py --check
       - name: Required frozen artifacts exist
         run: |
           python - <<'PY'
@@ -44,6 +50,9 @@ jobs:
               "paper/references.bib",
               "REPRODUCE.md",
               "FINAL_PUBLICATION_AUDIT.md",
+              "SUBMISSION_REVIEW.md",
+              "configs/publication/INDEX.json",
+              "docs/VENUE.md",
           ]
           missing = [p for p in required if not Path(p).is_file()]
           if missing:
@@ -94,7 +103,7 @@ jobs:
         run: python -m pytest tests/ -q
 
       - name: Ruff check (publication Python)
-        run: ruff check src tests scripts/analysis/revision_reanalysis.py scripts/analysis/emit_major_revision_tables.py scripts/analysis/item_level_descriptive_analysis.py scripts/pin_hf_revisions.py
+        run: ruff check src tests scripts/analysis/revision_reanalysis.py scripts/analysis/emit_major_revision_tables.py scripts/analysis/item_level_descriptive_analysis.py scripts/analysis/validate_runtime_manifest.py scripts/analysis/check_manuscript_numbers.py scripts/check_tex_tables.py scripts/pin_hf_revisions.py
 
       - name: Verify revision pins
         run: python scripts/pin_hf_revisions.py --verify

@@ -20,7 +20,7 @@ The repository now communicates: *we provide a stack-pinned measurement protocol
 | `07_preflight_publication.py --ci` | pass (venv) |
 | Frozen MATH-500 / GSM8K / GPQA / serving numbers | unchanged vs prior frozen JSON |
 
-PDF / `arxiv_source.zip` rebuilt 2026-09-02 (`main.pdf` 22 pages; zip SHA256 `420d62c599c03bd7c313c1b2ebb89b2953c7d3c3a98cd2f7f07842b21643d346`).
+PDF / `arxiv_source.zip` rebuilt 2026-09-02 after the submission-review pass (`main.pdf` 22 pages; zip SHA256 `9ef0185da05e73e44f000b1963ec0bc0590e1ac12168362213dddca285af8097`).
 
 ## Files modified (reason)
 

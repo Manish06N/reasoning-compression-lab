@@ -18,6 +18,9 @@ FULL_PROJECT_BACKUP.md
 *.log
 *.out
 *.synctex.gz
+*.fdb_latexmk
+*.fls
+*.xdv
 
 # Experiments
 runs/

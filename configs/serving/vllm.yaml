@@ -1,3 +1,10 @@
+# HISTORICAL CONFIGURATION
+# NOT USED FOR PAPER RESULTS
+# Publication campaign used:
+#   vLLM==0.7.0
+#   eager execution
+#   NVIDIA A100-PCIE-80GB
+# See configs/publication/ and results/reports/runtime_manifest.json
 backend: vllm
 version_pin: "0.8.5"
 enforce_eager: true

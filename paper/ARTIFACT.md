@@ -2,7 +2,7 @@
 
 **Preprint source:** `paper/main.tex` + `paper/references.bib` (figures are TikZ/pgfplots in the tex)  
 **Compiled PDF:** `paper/main.pdf` (22 pages, xelatex)
-**ArXiv upload zip:** `paper/arxiv_source.zip` — rebuilt 2026-09-02 from current `main.tex` (80,846 B) + `references.bib` (7,942 B) + `main.bbl` (7,103 B). SHA256 `420d62c599c03bd7c313c1b2ebb89b2953c7d3c3a98cd2f7f07842b21643d346`. Do not upload a zip from before this rebuild.
+**ArXiv upload zip:** `paper/arxiv_source.zip` — rebuilt 2026-09-02 from current `main.tex` (81,418 B) + `references.bib` (7,942 B) + `main.bbl` (7,103 B). SHA256 `880dd510622b66b1ec8186e123a9a5a86d7aed3c9409478e293e097560131b3c`. Do not upload a zip from before this rebuild.
 **Submission tag:** `paper-v1.0-submission` (immutable snapshot of the canonical manuscript and analysis artifacts).
 
 ## What to upload to arXiv
@@ -58,6 +58,9 @@ python3 scripts/analysis/emit_major_revision_tables.py --check
 python3 scripts/analysis/measured_serving_confirmation_analysis.py --check
 python3 scripts/analysis/modal_agreement_analysis.py --check-artifact
 python3 scripts/analysis/item_level_descriptive_analysis.py --check
+python3 scripts/analysis/validate_runtime_manifest.py --check
+python3 scripts/analysis/check_manuscript_numbers.py --check
+python3 scripts/check_tex_tables.py --check
 ```
 
 Expected PASS lines are listed in [`../REPRODUCE.md`](../REPRODUCE.md). `--check` fails on artifact drift and does not rewrite campaign results.

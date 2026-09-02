@@ -1,5 +1,24 @@
 # Changelog
 
+## 2026-09-02 — TeX table checker, publication config pointers, CRediT (no GPU)
+
+Artifact-integrity pass on `main`. **GPU campaign not reopened.** Frozen numeric tables unchanged.
+
+- `scripts/check_tex_tables.py --check`: 527 transcribed TeX cells vs frozen JSON/markdown (pass@1, CIs, Holm, length, serving, modal, pathology).
+- `configs/publication/` pointers + INDEX.json (vLLM 0.7.0); `configs/serving/vllm.yaml` labeled HISTORICAL / not used for paper results.
+- CRediT restated by role (Conceptualization includes Rajiv Misra; Resources remain Rajiv). Venue decision: JSS first (`docs/VENUE.md`).
+- ArXiv zip SHA256 `880dd510622b66b1ec8186e123a9a5a86d7aed3c9409478e293e097560131b3c`. PDF 22 pages.
+
+## 2026-09-02 — Submission-readiness review (no GPU)
+
+Technical-editor pass on `main`. **GPU campaign not reopened.** Frozen pass@1 / serving numbers unchanged.
+
+- Manuscript: C2 is empirical characterization of ranking instability; GPQA Qwen AWQ drop described as distributed (75/198 any-seed flips); manifest path uses `\path`.
+- Repro: `validate_runtime_manifest.py --check`; `check_manuscript_numbers.py --check` (15 needles); REPRODUCE splits table checks vs GPU replay; NVIDIA driver recorded as UNRECORDED.
+- Config hygiene: READMEs for `configs/`, `configs/serving/`, `configs/cells/`; `vllm.yaml` header states it is not the publication stack.
+- Review: `SUBMISSION_REVIEW.md` (recommendation B, 78/100).
+- ArXiv zip rebuilt: SHA256 `9ef0185da05e73e44f000b1963ec0bc0590e1ac12168362213dddca285af8097` (`main.tex` 81,188 B). PDF 22 pages.
+
 ## 2026-09-02 — Rebuild arXiv source zip
 
 `paper/arxiv_source.zip` rebuilt from current `main.tex` (80,846 B) + `references.bib` (7,942 B) + `main.bbl` (7,103 B). SHA256 `420d62c599c03bd7c313c1b2ebb89b2953c7d3c3a98cd2f7f07842b21643d346`. Compiled `paper/main.pdf` is 22 pages (xelatex). GPU closed.

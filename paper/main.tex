@@ -64,7 +64,7 @@ We ask four questions under that pin:
 
 \noindent\textbf{Contributions.}
 (C1)~\textbf{Pinned evaluation protocol.} NVIDIA A100-80GB; vLLM~0.7.0 eager; public DeepSeek-R1-Distill checkpoints; BF16; FP8 executed as Marlin W8A16; AWQ-4; GPTQ-4; problem-clustered bootstrap; TOST $\pm 1$\,pp; and an explicit pass@1 versus maj@5 distinction.
-(C2)~\textbf{Ranking instability.} The same checkpoints receive different rankings depending on accuracy, maj@5, correctness-conditioned length, the historical token proxy, sequential GPU-seconds, and batched GPU-seconds.
+(C2)~\textbf{Empirical characterization of ranking instability across deployment estimands.} Under this pinned stack, the same public checkpoints receive different rankings depending on accuracy, maj@5, correctness-conditioned length, the historical token proxy, sequential GPU-seconds, and batched GPU-seconds.
 (C3)~\textbf{Checkpoint-not-method result.} The tested community AWQ artifact showed degradation under this evaluation. That finding applies to the tested artifact; it does not establish a universal property of AWQ. The released grid and analysis artifacts support reproducibility of these contributions.
 
 \section{Related Work}
@@ -105,7 +105,7 @@ We evaluate DeepSeek-R1-Distill-Qwen-7B and DeepSeek-R1-Distill-Llama-8B~\cite{g
 MATH-500~\cite{hendrycks2021math,lightman2023lets} ($n=500$, seeds $42$--$46$): 20{,}000 completions. GSM8K~\cite{cobbe2021gsm8k} ($n=1{,}319$, seeds $42$--$44$) and GPQA-Diamond~\cite{rein2023gpqa} ($n=198$, seeds $42$--$44$): breadth. Decoding: zero-shot \texttt{<think>} prefix (appendix), $T=0.6$, top-$p=0.95$, repetition penalty $1.0$ (deliberately not used to hide loops), max new tokens $32{,}768$. Total: $56{,}408$ completions in 88 checkpoint$\times$benchmark$\times$seed runs. Throughout, a \emph{run} denotes one checkpoint$\times$benchmark$\times$seed evaluation; a \emph{cell} denotes one checkpoint$\times$benchmark aggregated over its evaluated seeds; a \emph{format contrast} compares a quantized checkpoint with its matched BF16 checkpoint within the same model family and benchmark. MATH and GSM8K are widely used; a paired within-item design reduces but does not eliminate contamination interaction with format.
 
 \subsection{Hardware and serving stack}
-PARAM Rudra HPC (IIT Patna / NSM), NVIDIA A100-PCIE-80GB. Publication runs use the official QRM \texttt{inference.py} path~\cite{liu2025qrm} with \texttt{gpu\_memory\_utilization=0.75}. Engine pin: \texttt{vLLM==0.7.0}, eager execution. Files under \texttt{configs/models/} and \texttt{configs/legacy\_models/} are \emph{not} the frozen publication launcher; they differ in \texttt{max\_model\_len} and KV-cache defaults and are not the effective campaign stack. Effective launch settings are recorded in \texttt{results/reports/runtime\_manifest.json}.
+PARAM Rudra HPC (IIT Patna / NSM), NVIDIA A100-PCIE-80GB. Publication runs use the official QRM \texttt{inference.py} path~\cite{liu2025qrm} with \texttt{gpu\_memory\_utilization=0.75}. Engine pin: \texttt{vLLM==0.7.0}, eager execution. Files under \texttt{configs/models/} and \texttt{configs/legacy\_models/} are \emph{not} the frozen publication launcher; they differ in \texttt{max\_model\_len} and KV-cache defaults and are not the effective campaign stack. Effective launch settings are recorded in \path{results/reports/runtime_manifest.json}.
 
 \subsection{Measured serving}
 \label{sec:measured-serving}
@@ -199,7 +199,7 @@ Llama FP8    & $+0.28$ & $[-0.92,+1.48]$ & $0.647$ & n.s. & $[-0.72,+1.28]$ & fa
 \end{table}
 
 \subsection{GSM8K and GPQA-Diamond}
-Table~\ref{tab:multitask} gives cell means; Tables~\ref{tab:gsm-contrasts} and~\ref{tab:gpqa-contrasts} are the clustered tests. FP8 stays within about one point of BF16 on all three tasks; several GSM8K Qwen (and Llama FP8/GPTQ) contrasts pass TOST at $\pm 1$\,pp. The tested community Qwen AWQ-4 artifact showed $5.56$\,pp lower GPQA-Diamond pass@1 ($95\%$ CI $[-9.60,-1.52]$, $p=0.007$; 3 seeds, $n=198$). The Qwen AWQ GPQA result is significant within the primary Holm-6 family, but not under the Holm-18 joint sensitivity analysis (Appendix Table~\ref{tab:holm18}). The tested Llama AWQ-4 checkpoint also showed a GSM8K drop ($-1.57$\,pp, $95\%$ CI $[-2.55,-0.58]$, $p=0.002$). GPQA intervals are otherwise wide; we treat non-AWQ GPQA contrasts as exploratory.
+Table~\ref{tab:multitask} gives cell means; Tables~\ref{tab:gsm-contrasts} and~\ref{tab:gpqa-contrasts} are the clustered tests. FP8 stays within about one point of BF16 on all three tasks; several GSM8K Qwen (and Llama FP8/GPTQ) contrasts pass TOST at $\pm 1$\,pp. The tested community Qwen AWQ-4 artifact showed $5.56$\,pp lower GPQA-Diamond pass@1 ($95\%$ CI $[-9.60,-1.52]$, $p=0.007$; 3 seeds, $n=198$). The Qwen AWQ GPQA result is significant within the primary Holm-6 family, but not under the Holm-18 joint sensitivity analysis (Appendix Table~\ref{tab:holm18}). Compact-JSON item counts show that drop is distributed across items rather than concentrated in a few problems: 75 of 198 GPQA items flip on at least one seed for the tested Qwen AWQ-4 artifact, and no item is BF16-correct / AWQ-wrong on all three seeds. The tested Llama AWQ-4 checkpoint also showed a GSM8K drop ($-1.57$\,pp, $95\%$ CI $[-2.55,-0.58]$, $p=0.002$). GPQA intervals are otherwise wide; we treat non-AWQ GPQA contrasts as exploratory.
 
 \begin{table}[t]
 \centering
@@ -652,9 +652,17 @@ First unconstrained timing (provenance only): \path{results/measured_serving/}. 
 PARAM Rudra HPC at IIT Patna (National Supercomputing Mission, C-DAC) provided compute.
 
 \section*{CRediT authorship contribution statement}
-\textbf{Manish Nandish:} Conceptualization, Methodology, Software, Investigation, Data curation, Formal analysis, Visualization, Writing -- original draft.
-\textbf{Rajiv Misra:} Supervision, Resources, Writing -- review \& editing.
-\textbf{Midhunchakkaravarthy Janarthanan:} Supervision, Writing -- review \& editing.
+\textbf{Conceptualization:} Manish Nandish, Rajiv Misra.
+\textbf{Methodology:} Manish Nandish.
+\textbf{Software:} Manish Nandish.
+\textbf{Investigation:} Manish Nandish.
+\textbf{Data curation:} Manish Nandish.
+\textbf{Formal analysis:} Manish Nandish.
+\textbf{Visualization:} Manish Nandish.
+\textbf{Writing -- original draft:} Manish Nandish.
+\textbf{Writing -- review \& editing:} Manish Nandish, Rajiv Misra, Midhunchakkaravarthy Janarthanan.
+\textbf{Supervision:} Rajiv Misra, Midhunchakkaravarthy Janarthanan.
+\textbf{Resources:} Rajiv Misra.
 
 \appendix
 \section{Prompt}
