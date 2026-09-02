@@ -1,6 +1,6 @@
 # Configs: historical harness vs publication campaign
 
-Do **not** treat this tree as a single serving stack. Most JSON/YAML here is the superseded local harness.
+Do **not** treat this tree as a single serving stack. Most JSON/YAML here is the superseded local harness. **DO NOT USE** `models/`, `legacy_models/`, or `serving/` **FOR PAPER REPRODUCTION.**
 
 ```
 configs/models/          historical only (warning README; no launcher JSON)

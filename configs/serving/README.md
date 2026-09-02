@@ -1,5 +1,7 @@
 # `configs/serving/` is not the frozen publication stack
 
+**DO NOT USE FOR PAPER REPRODUCTION.**
+
 These YAML files (`vllm.yaml`, `sglang.yaml`, `llamacpp.yaml`) belong to the **historical local harness**. `vllm.yaml` still says `version_pin: "0.8.5"`. That is **not** the 88-run campaign.
 
 Publication serving:

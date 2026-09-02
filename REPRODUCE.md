@@ -15,6 +15,8 @@ The contribution is: under a fixed serving stack, public quantized reasoning che
 
 Do not overclaim: **tables are reproducible; the GPU campaign is inspectable, not expected to be rerun.**
 
+The released artifact enables verification of reported analyses; reproducing the complete GPU campaign requires equivalent hardware and checkpoint availability.
+
 ---
 
 ## CPU environment (table checks)
@@ -60,7 +62,7 @@ Do **not** use `configs/serving/vllm.yaml` (it still says vLLM 0.8.5) or `config
 | vLLM | **0.7.0** eager |
 | LightEval | **0.8.0** (QRM third-party; campaign evaluator) |
 | GPU | NVIDIA A100-PCIE-80GB |
-| NVIDIA driver | **UNRECORDED** in the published artifact |
+| NVIDIA driver | **UNRECORDED** — driver version was unavailable in the archived environment; per-job `nvidia-smi` logs were not retained |
 | FP8 execution | Marlin **W8A16**, not native W8A8 |
 | Manifest | `results/reports/runtime_manifest.json` |
 

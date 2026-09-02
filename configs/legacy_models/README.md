@@ -1,5 +1,7 @@
 # Legacy harness model configs (not the publication launcher)
 
+**DO NOT USE FOR PAPER REPRODUCTION.**
+
 These JSON files document Hugging Face IDs and revisions used by the **old local/HPC harness** (`configs/cells/*.json` → `scripts/run_inference.py`). They are **not** the frozen 56k QRM `inference.py` campaign.
 
 Known mismatches versus the publication stack:
@@ -10,4 +12,4 @@ Known mismatches versus the publication stack:
 - `enforce_eager=false` in some files (campaign: eager)
 
 Publication runtime: [`../../results/reports/runtime_manifest.json`](../../results/reports/runtime_manifest.json).
-See also [`../models/README.md`](../models/README.md).
+See also [`../models/README.md`](../models/README.md) and [`../publication/`](../publication/).

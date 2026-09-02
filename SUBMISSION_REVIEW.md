@@ -1,6 +1,8 @@
 # Submission review (2026-09-02)
 
-Final technical-editor / reproducibility review of *One Stack, Many Rankings: Evaluating Quantized Reasoning Checkpoints Beyond Accuracy*.
+**Title update (same day, later pass):** the manuscript title is now *One Stack, Many Rankings: Measuring Evaluation-Target Instability in Quantized Reasoning Checkpoints*. “Beyond Accuracy” was dropped because it reads like a new evaluation framework. Frozen numbers were not changed. See `SCIENTIFIC_AUDIT.md`.
+
+Final technical-editor / reproducibility review of the stack-pinned measurement study.
 
 **GPU campaign was not reopened.** Frozen numeric tables were not rewritten.
 
@@ -123,7 +125,7 @@ No frozen-table mismatch requiring a number change.
 ## Phase 4 — Manuscript
 
 - **C2** is a measurement contribution, not a slogan.
-- **Title kept.** “Beyond Accuracy” is generic; “One Stack, Many Rankings” carries the claim. Changing the title now without a venue constraint would churn citations and GitHub naming for little gain.
+- **Title updated (later same-day pass).** “Beyond Accuracy” dropped; current title is *Measuring Evaluation-Target Instability in Quantized Reasoning Checkpoints*. See `SCIENTIFIC_AUDIT.md`.
   - Optional later: *One Stack, Many Rankings: Deployment Rankings of Quantized Reasoning Checkpoints Depend on the Estimand*.
 - **Abstract** does not claim AWQ fails, FP8 wins, cost is guaranteed, or causal token inflation.
 - **Limitations** already list the requested scope cuts.

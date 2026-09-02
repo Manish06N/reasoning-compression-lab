@@ -51,6 +51,7 @@
     "kv_cache_dtype": "vllm_default_auto",
     "kv_cache_dtype_note": "inference.py does not pass kv_cache_dtype; vLLM 0.7 default applies. configs/legacy_models fp8_e5m2 was not the campaign setting.",
     "nvidia_driver": "UNRECORDED",
+    "nvidia_driver_note": "Driver version was unavailable in the archived environment. Process logs with per-job nvidia-smi were not retained; this field is not a measured campaign value.",
     "campaign_lockfile": "requirements-qrm-paper-vllm070.lock",
     "torch_note": "torch 2.5.1 with CUDA 12.4 toolkit in conda env qrm-official; not a native Hopper W8A8 stack",
     "tensor_parallel_size": 1,

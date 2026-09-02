@@ -2,7 +2,7 @@
 
 **Preprint source:** `paper/main.tex` + `paper/references.bib` (figures are TikZ/pgfplots in the tex)  
 **Compiled PDF:** `paper/main.pdf` (22 pages, xelatex)
-**ArXiv upload zip:** `paper/arxiv_source.zip` — rebuilt 2026-09-02 from current `main.tex` (81,418 B) + `references.bib` (7,942 B) + `main.bbl` (7,103 B). SHA256 `880dd510622b66b1ec8186e123a9a5a86d7aed3c9409478e293e097560131b3c`. Do not upload a zip from before this rebuild.
+**ArXiv upload zip:** `paper/arxiv_source.zip` — rebuilt 2026-09-02 from current `main.tex` + `references.bib` + `main.bbl`. SHA256 `fe24e1229417484175d78d1fc77625d28a7989f6d1845786a98209f604f13818`. Do not upload a zip from before this rebuild.
 **Submission tag:** `paper-v1.0-submission` (immutable snapshot of the canonical manuscript and analysis artifacts).
 
 ## What to upload to arXiv
@@ -44,6 +44,8 @@ Compile with `xelatex` → `bibtex` → `xelatex` → `xelatex` (fallback: `pdfl
 - Compact per-cell JSON has **no** traces, token IDs, or `finish_reason`. Recovered MATH-500 answers are in `results/recovered/math500_modal_inputs.jsonl`. Do not report the old gold-hit 98.23% gate.
 - Modal agreement uses unique-mode clustering with gold scoring only after the serve/abstain decision. Five-sample token-cost proxy $T_5$ sums all five seeds before abstention.
 - Campaign/extraction evaluator: **LightEval 0.8.0**. A throwaway MacBook LightEval 0.8.1 install was not used for paper numbers.
+- NVIDIA driver: recorded as **UNRECORDED** because the driver version was unavailable in the archived environment (`nvidia_driver_note` in `runtime_manifest.json`).
+- Table consistency: `scripts/check_tex_tables.py --check` compares transcribed TeX cells to frozen JSON/markdown. The LaTeX source remains manually formatted for layout.
 - **Aggregate hybrid Cost-of-Pass proxy (primary):** confirmation GPU-sec/query on `results/measured_serving_confirmation/` at $\$1.50$/A100-h (scenario) over campaign MATH-500 pass@1. Inspired by Erol et al., not their per-problem estimator. Report: `results/reports/measured_serving_confirmation/measured_serving_confirmation_report.json`. The first unconstrained timing in `results/measured_serving/` is provenance only. The old shared $65$ tok/s token ranking is a sensitivity only.
 - **Token inflation:** full-grid ratio of means over all seeds. Clustered mismatch excess \(D\) (BF16-only mean \(\Delta\) minus Both-OK mean \(\Delta\)) is a diagnostic of correctness-conditioned mismatch asymmetry; it is not causal. The old 200-item mean-of-ratios subset is an estimator artifact and is not used in the paper.
 

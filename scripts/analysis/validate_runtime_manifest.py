@@ -54,6 +54,20 @@ def main() -> int:
         fail("shared.torch must be 2.5.1")
     if shared.get("cuda_toolkit") != "12.4":
         fail("shared.cuda_toolkit must be 12.4")
+    if "nvidia_driver" not in shared:
+        fail("shared.nvidia_driver must be present (UNRECORDED is allowed)")
+    if shared.get("nvidia_driver") == "UNRECORDED":
+        note = shared.get("nvidia_driver_note") or ""
+        if "unavailable" not in note.lower():
+            fail(
+                "UNRECORDED nvidia_driver requires nvidia_driver_note "
+                "explaining that the driver version was unavailable"
+            )
+    required_cell_keys = {"hf_id", "revision", "weight_format"}
+    for c in man.get("cells") or []:
+        missing = required_cell_keys - set(c)
+        if missing:
+            fail(f"cell missing {sorted(missing)}: {c.get('hf_id')}")
 
     datasets = man.get("datasets") or {}
     for name, task_path in TASKS.items():

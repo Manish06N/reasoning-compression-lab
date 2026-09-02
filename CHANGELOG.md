@@ -1,5 +1,30 @@
 # Changelog
 
+## 2026-09-02 — JSS submission polish (no GPU)
+
+Last 5% before tagging. **GPU campaign not reopened.** Frozen numeric tables unchanged.
+
+- Novelty-defense paragraph in related work (ranking stability vs another quantizer).
+- CRediT restated per author; Author 3 is Supervision + review only; dual-affiliation sentence.
+- NVIDIA driver UNRECORDED now has an explicit “unavailable in the archived environment” note (manifest + manuscript + REPRODUCE).
+- TeX tables: automatic consistency check vs frozen values; LaTeX remains manually formatted.
+- Venue locked: **JSS**. This 22-page `article` PDF is the initial-submission form. Do not send it to TMLR/FGCS unchanged (`docs/VENUE.md`).
+- ArXiv zip SHA256 `fe24e1229417484175d78d1fc77625d28a7989f6d1845786a98209f604f13818`. PDF 22 pages.
+
+## 2026-09-02 — Evaluation-target instability title and claim hygiene (no GPU)
+
+Reviewer-resistance pass on `main`. **GPU campaign not reopened.** Frozen numeric tables unchanged.
+
+- Title: *Measuring Evaluation-Target Instability in Quantized Reasoning Checkpoints* (dropped “Beyond Accuracy”).
+- Exactly three contributions: pinned protocol (incl. Holm); ranking instability; checkpoint-not-method (“tested community AWQ artifacts showed task-specific degradation”).
+- Abstract structured as problem / gap / method / results; GPQA is not a headline; closing ranking sentence is stack-bound.
+- Related-work comparison table moved to appendix; remaining-question sentence added.
+- Named section *Reproducibility and Artifact Availability*.
+- CPU item-level descriptive subsection (existing compact-JSON analysis only).
+- Config banners: **DO NOT USE FOR PAPER REPRODUCTION** on `configs/models/`, `legacy_models/`, `serving/`.
+- Audit: `SCIENTIFIC_AUDIT.md`.
+- ArXiv zip SHA256 `5f449d478285162cfc129155a8c496639ed260e8d8a1e3c1a49272faad37cd02`. PDF 22 pages.
+
 ## 2026-09-02 — TeX table checker, publication config pointers, CRediT (no GPU)
 
 Artifact-integrity pass on `main`. **GPU campaign not reopened.** Frozen numeric tables unchanged.

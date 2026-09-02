@@ -23,7 +23,7 @@
     urlcolor=blue
 }
 
-\title{\textbf{One Stack, Many Rankings: Evaluating Quantized Reasoning Checkpoints Beyond Accuracy}}
+\title{\textbf{One Stack, Many Rankings: Measuring Evaluation-Target Instability in Quantized Reasoning Checkpoints}}
 
 \author[1,2]{Manish Nandish}
 \author[1]{Rajiv Misra}
@@ -41,16 +41,18 @@
 \maketitle
 
 \begin{abstract}
-Public quantized reasoning checkpoints do not receive a single deployment ranking: under one pinned serving stack, rank order depends on the checkpoint, task, evaluation target, estimand, and serving condition. We evaluate public DeepSeek-R1-Distill checkpoints on an NVIDIA A100-80GB with vLLM~0.7.0~\cite{kwon2023vllm} eager execution, varying only the public weight checkpoint among BF16, FP8 executed as Marlin W8A16~\cite{frantar2024marlin} rather than native W8A8, AWQ-4, and GPTQ-4 for DeepSeek-R1-Distill-Qwen-7B and DeepSeek-R1-Distill-Llama-8B. The evaluation comprises 88 checkpoint$\times$benchmark$\times$seed runs and 56{,}408 completions on MATH-500~\cite{hendrycks2021math,lightman2023lets} (5 seeds), GSM8K~\cite{cobbe2021gsm8k} (3 seeds), and GPQA-Diamond~\cite{rein2023gpqa} (3 seeds).
+Practitioners often select a public quantized reasoning checkpoint using one published metric, typically pass@1. Prior measurement studies examine individual dimensions---accuracy~\cite{liu2025qrm}, serving throughput~\cite{kurtic2025give}, token length~\cite{lian2026quantinflates}, or calibration---but do not ask whether checkpoint rankings remain stable when the serving stack is frozen and the evaluation target changes.
 
-Observed under this pinned stack, the tested checkpoints change rank across evaluation targets. On MATH-500, FP8--BF16 pass@1 differences are $+0.40$ and $+0.28$ percentage points (pp); problem-clustered 95\% intervals include zero, and a $\pm 1$\,pp equivalence test is not passed. The tested community Qwen AWQ-4 artifact showed $5.56$\,pp lower pass@1 on GPQA-Diamond. The Qwen AWQ GPQA result is significant within the primary Holm-6 family, but not under the Holm-18 joint sensitivity analysis. The tested Qwen 4-bit checkpoints showed $6.3$--$6.9\%$ higher mean MATH-500 completion length, including a detectable association among jointly correct Qwen AWQ-4/GPTQ-4 pairs; much larger conditional differences occur in mismatch cases, where failure traces are themselves long. Strict five-sample unique-mode agreement yields low observed selective risk, trading off coverage and requiring five generations. The historical token proxy, sequential GPU-seconds (Condition~A), and batched GPU-seconds (Condition~B) produce different rankings among the tested Qwen cells. The deployment ranking of a quantized reasoning checkpoint is not a property of bit-width alone.
+We pin one stack and vary only the public weight checkpoint. Eight DeepSeek-R1-Distill checkpoints (BF16; FP8 executed as Marlin W8A16~\cite{frantar2024marlin} rather than native W8A8; AWQ-4; GPTQ-4; Qwen-7B and Llama-8B) are evaluated on an NVIDIA A100-80GB with vLLM~0.7.0~\cite{kwon2023vllm} eager execution. The campaign comprises 88 checkpoint$\times$benchmark$\times$seed runs and 56{,}408 completions on MATH-500~\cite{hendrycks2021math,lightman2023lets} (5 seeds), GSM8K~\cite{cobbe2021gsm8k} (3 seeds), and GPQA-Diamond~\cite{rein2023gpqa} (3 seeds).
+
+Under this pin, rankings disagree across estimands. On MATH-500, FP8--BF16 pass@1 differences are $+0.40$ and $+0.28$ percentage points (pp); problem-clustered 95\% intervals include zero, and a $\pm 1$\,pp equivalence test is not passed. The tested community AWQ artifacts showed task-specific degradation. The tested Qwen AWQ artifact exhibited a $5.56$\,pp GPQA-Diamond difference under the primary Holm-6 family; this contrast does not remain significant under the Holm-18 joint sensitivity analysis. The tested Qwen 4-bit checkpoints showed $6.3$--$6.9\%$ higher mean MATH-500 completion length, including among jointly correct pairs. Historical token-implied cost, sequential GPU-seconds (Condition~A), and batched GPU-seconds (Condition~B) rank the tested Qwen cells differently. The deployment ranking of a quantized reasoning checkpoint depends on the checkpoint, task, estimand, and serving condition under the evaluated stack.
 \end{abstract}
 
 \vspace{0.6em}
 \noindent\textbf{Keywords:} Reasoning language models, public quantization checkpoints, pinned serving stack, estimand disagreement, Cost-of-Pass.
 
 \section{Introduction}
-Reasoning models such as DeepSeek-R1~\cite{guo2025deepseekr1} emit long traces before a final answer. Post-training quantization (FP8, AWQ-4~\cite{lin2023awq}, GPTQ-4~\cite{frantar2022gptq}) is therefore a common serving choice. Isolated pass@1 numbers hide whether compression also changes trace length~\cite{lian2026quantinflates,liu2025qrm,lotfi2026overthinking}, termination, or the cost of a correct answer~\cite{erol2025costofpass,kurtic2025give}. Serving-stack details---engine version, decoding flags, CUDA graphs---can materially move reasoning scores~\cite{hochlehnert2025sober}. This paper \emph{pins} one stack rather than shifting it: we do not run a factorial vLLM $0.7.0$ vs.\ $0.8.5$ experiment. The title names multiple rankings under one stack; ``beyond accuracy'' is a measurement checklist (length, agreement, GPU-seconds), not a claim of a new evaluation method.
+Reasoning models such as DeepSeek-R1~\cite{guo2025deepseekr1} emit long traces before a final answer. Post-training quantization (FP8, AWQ-4~\cite{lin2023awq}, GPTQ-4~\cite{frantar2022gptq}) is a common serving choice, and practitioners often pick a public checkpoint from a single published pass@1. Isolated pass@1 numbers hide whether the same checkpoint also changes trace length~\cite{lian2026quantinflates,liu2025qrm,lotfi2026overthinking}, termination, or the cost of a correct answer~\cite{erol2025costofpass,kurtic2025give}. Serving-stack details---engine version, decoding flags, CUDA graphs---can materially move reasoning scores~\cite{hochlehnert2025sober}. This paper \emph{pins} one stack rather than shifting it: we do not run a factorial vLLM $0.7.0$ vs.\ $0.8.5$ experiment. The unit of analysis is the public checkpoint $\times$ pinned serving stack $\times$ evaluation target.
 
 The deployment ranking of a quantized reasoning checkpoint is not a property of bit-width alone.
 
@@ -63,39 +65,14 @@ We ask four questions under that pin:
 \end{itemize}
 
 \noindent\textbf{Contributions.}
-(C1)~\textbf{Pinned evaluation protocol.} NVIDIA A100-80GB; vLLM~0.7.0 eager; public DeepSeek-R1-Distill checkpoints; BF16; FP8 executed as Marlin W8A16; AWQ-4; GPTQ-4; problem-clustered bootstrap; TOST $\pm 1$\,pp; and an explicit pass@1 versus maj@5 distinction.
-(C2)~\textbf{Empirical characterization of ranking instability across deployment estimands.} Under this pinned stack, the same public checkpoints receive different rankings depending on accuracy, maj@5, correctness-conditioned length, the historical token proxy, sequential GPU-seconds, and batched GPU-seconds.
-(C3)~\textbf{Checkpoint-not-method result.} The tested community AWQ artifact showed degradation under this evaluation. That finding applies to the tested artifact; it does not establish a universal property of AWQ. The released grid and analysis artifacts support reproducibility of these contributions.
+(C1)~\textbf{Pinned evaluation protocol.} NVIDIA A100-80GB; vLLM~0.7.0 eager; public DeepSeek-R1-Distill checkpoints; BF16; FP8 executed as Marlin W8A16; AWQ-4; GPTQ-4; problem-clustered bootstrap; Holm correction; TOST $\pm 1$\,pp; and an explicit pass@1 versus maj@5 distinction.
+(C2)~\textbf{Ranking instability.} Under the same pinned stack, checkpoint rankings disagree across pass@1, maj@5, correctness-conditioned length, the historical token proxy, sequential GPU-seconds, and batched GPU-seconds.
+(C3)~\textbf{Checkpoint-not-method result.} The tested community AWQ artifacts showed task-specific degradation. That finding applies to the tested public artifacts; it does not establish a universal property of AWQ. The released grid and analysis artifacts support reproducibility of these contributions.
 
 \section{Related Work}
-GPTQ~\cite{frantar2022gptq} and AWQ~\cite{lin2023awq} were originally validated mainly on short-form benchmarks.\linebreak SmoothQuant~\cite{xiao2023smoothquant} addresses activation quantization, which we do not run. Liu et al.\ (QRM; COLM 2025)~\cite{liu2025qrm} evaluate DeepSeek-R1 distillations across weight, activation, and KV quantization. QRM reports that \emph{minor-drop} W8/W4A16 settings do not systematically lengthen outputs, whereas more aggressive low-bit settings can. Numerically, QRM reports Qwen-7B MATH BF16 $94.60$ / AWQ $91.00$ and GPQA AWQ $50.00$; this pinned grid is $93.12$ / $44.78$ for the tested Qwen AWQ-4 checkpoint. We therefore interpret the cross-study discrepancy as evidence of checkpoint- and stack-sensitive measurement rather than as a superiority claim. The FP8 and GPTQ-4 cells are public RedHatAI compressed-tensors artifacts released for vLLM serving; we evaluate those checkpoints on A100 Marlin W8A16 and do not treat the measurements as Red Hat production-deployment claims. Lian et al.~\cite{lian2026quantinflates} isolate a BF16-correct length estimand: low-bit PTQ can inflate chain-of-thought even when the uncompressed run is right. Lotfi et al.~\cite{lotfi2026overthinking} attribute much of the extra length to overthinking---abandoned intermediate answers rather than missing competence. Li et al.~\cite{li2025quantmeets} localize 4-bit math failures to early process errors. Alimaskina et al.~\cite{alimaskina2026extremelowbit} study loops and delayed commitment under extreme low-bit inference. Kurtic et al.~\cite{kurtic2025give} provide a broad accuracy--performance quantization study in vLLM, including Llama-3.1 and DeepSeek-R1-Distill reasoning evaluations and synchronous versus continuous-batching serving regimes. Helcig et al.~\cite{helcig2026slq} formalize statistically lossless quantization---task-level versus distribution-level fidelity---and examine reasoning/token and serving behavior under a proposed quantizer. Our object of study is different: we do not propose a quantizer or a fidelity criterion, but ask whether deployment conclusions remain stable across evaluation targets for the same public checkpoints on one frozen A100/vLLM~0.7.0 stack.
+GPTQ~\cite{frantar2022gptq} and AWQ~\cite{lin2023awq} were originally validated mainly on short-form benchmarks. Liu et al.\ (QRM; COLM 2025)~\cite{liu2025qrm} evaluate DeepSeek-R1 distillations across weight, activation, and KV quantization, reporting accuracy and mean length. Kurtic et al.~\cite{kurtic2025give} study vLLM serving efficiency across formats and batching regimes. Lian et al.~\cite{lian2026quantinflates} isolate token inflation on BF16-correct traces. Hochlehnert et al.~\cite{hochlehnert2025sober} show that seeds, prompts, decoding, and software move reasoning scores. Erol et al.~\cite{erol2025costofpass} define Cost-of-Pass as expected monetary cost per correct solution.
 
-Hochlehnert et al.~\cite{hochlehnert2025sober} show that seeds, prompts, decoding, and software move reasoning scores; we freeze those factors. Zhong et al.~\cite{zhong2025quantized} study uncertainty calibration of quantized LLMs using model probabilities---a quantity we do not log. Ayadi et al.~\cite{ayadi2026reliability} study reliability of quantized LLMs via uncertainty, calibration, and input-perturbation robustness; that suite is complementary to, and distinct from, our gold-free unique-mode abstention on five MATH-500 seeds. Self-consistency~\cite{wang2022selfconsistency} and G-Pass@$k$~\cite{liu2025gpass} are gold-using repeated-sampling neighbors; our modal rule is a gold-free unique-mode abstention on five MATH seeds, not a new estimator. Selective classification~\cite{geifman2017selective} supplies the risk--coverage language. Erol et al.~\cite{erol2025costofpass} define Cost-of-Pass as expected monetary cost per correct solution. We report a historical shared-$65$ tok/s token-implied aggregate cost proxy and an aggregate hybrid Cost-of-Pass proxy whose numerator is confirmation GPU cost per query and whose denominator is campaign MATH-500 pass@1; neither is Erol et al.'s per-problem estimator.
-
-Table~\ref{tab:related} places this measurement against those studies. The distinctive result here is estimand disagreement under a pinned stack, not a new compressor. The unit of comparison in this study is the public checkpoint $\times$ pinned stack $\times$ evaluation target, rather than a quantization method in isolation.
-
-\begin{table*}[t]
-\centering
-\caption{Neighboring measurement studies. ``Engine pinned'' means one named serving stack is frozen while checkpoints vary. Length estimands and serving columns are what each paper reports as primary evidence, not an exhaustive inventory.}
-\label{tab:related}
-\small
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{lcccccccc}
-\toprule
-\textbf{Study} & \textbf{Models} & \textbf{Bits} & \textbf{Engine pinned} & \textbf{Seeds} & \textbf{Length estimand} & \textbf{Correctness split} & \textbf{Serving / cost} & \textbf{Statistics} \\
-\midrule
-This paper & 2 R1 distill (7B/8B) & BF16, FP8, AWQ-4, GPTQ-4 & vLLM 0.7.0 eager, A100 & 5 MATH; 3 GSM/GPQA & RoM, paired $\Delta$, BF16-correct $\Delta$ & $2\times 2$ + BF16 failure control & token proxy; seq.\ \& batched GPU-s; $\widetilde{C}_{\mathrm{pass}}^{\mathrm{hyb}}$ & clustered bootstrap, Holm, TOST \\
-QRM~\cite{liu2025qrm} & R1 distill family & W/A/KV incl.\ W4A16 & QRM harness (multi-config) & typically 1 & mean tokens & not $2\times 2$ & limited & per-cell means \\
-Lian et al.~\cite{lian2026quantinflates} & reasoning PTQ & low-bit PTQ & paper stack & paper-specific & BF16-correct $\Delta$ & BF16-correct vs rest & token cost & paired length \\
-Lotfi et al.~\cite{lotfi2026overthinking} & 1.5B--32B reasoning & aggressive PTQ & paper stack & paper-specific & CoT length; overthinking & abandoned intermediates & logit-penalty Pareto & error-type counts \\
-Kurtic et al.~\cite{kurtic2025give} & Llama-3.1 + R1-distill & FP8/INT8/INT4 & vLLM, several GPUs & large evals & not CoT-primary & N/A & sync vs continuous batching & accuracy + tok/s \\
-Helcig et al.~\cite{helcig2026slq} & Llama/Qwen (SLQ) & 3.3--6 bpp & vLLM kernels & 3 (GSM) & thinking tokens & TL vs DL fidelity & vLLM throughput & EAR, Wilcoxon \\
-Erol et al.~\cite{erol2025costofpass} & general LMs & N/A & N/A & N/A & N/A & N/A & $C_{\mathrm{pass}}$ definition & economic \\
-Hochlehnert et al.~\cite{hochlehnert2025sober} & reasoning LMs & N/A & deliberately \emph{un}pinned & many & N/A & N/A & N/A & reproducibility \\
-\bottomrule
-\end{tabular}%
-}
-\end{table*}
+Existing studies evaluate quantization accuracy, throughput, or individual reasoning behaviors. Our question is different: after fixing the serving stack, do practitioners receive the same checkpoint recommendation when the evaluation target changes? We study ranking stability rather than proposing another quantization method. Appendix Table~\ref{tab:related} places this measurement against those studies. The unit of comparison is the public checkpoint $\times$ pinned stack $\times$ evaluation target, not a quantization method in isolation. Numerically, QRM reports Qwen-7B MATH BF16 $94.60$ / AWQ $91.00$ and GPQA AWQ $50.00$; this pinned grid is $93.12$ / $44.78$ for the tested Qwen AWQ-4 checkpoint. We interpret that discrepancy as checkpoint- and stack-sensitive measurement, not as a superiority claim. The FP8 and GPTQ-4 cells are public RedHatAI compressed-tensors artifacts evaluated on A100 Marlin W8A16; we do not treat the measurements as Red Hat production-deployment claims. Complementary objects we do not claim to replace include SmoothQuant~\cite{xiao2023smoothquant} (not run), Lotfi et al.~\cite{lotfi2026overthinking}, Li et al.~\cite{li2025quantmeets}, Helcig et al.~\cite{helcig2026slq}, Zhong et al.~\cite{zhong2025quantized}, Ayadi et al.~\cite{ayadi2026reliability}, self-consistency~\cite{wang2022selfconsistency}, and G-Pass@$k$~\cite{liu2025gpass}. We report a historical shared-$65$ tok/s token-implied aggregate cost proxy and an aggregate hybrid Cost-of-Pass proxy; neither is Erol et al.'s per-problem estimator.
 
 \section{Experimental Methodology}
 \subsection{Models and precision formats}
@@ -199,7 +176,7 @@ Llama FP8    & $+0.28$ & $[-0.92,+1.48]$ & $0.647$ & n.s. & $[-0.72,+1.28]$ & fa
 \end{table}
 
 \subsection{GSM8K and GPQA-Diamond}
-Table~\ref{tab:multitask} gives cell means; Tables~\ref{tab:gsm-contrasts} and~\ref{tab:gpqa-contrasts} are the clustered tests. FP8 stays within about one point of BF16 on all three tasks; several GSM8K Qwen (and Llama FP8/GPTQ) contrasts pass TOST at $\pm 1$\,pp. The tested community Qwen AWQ-4 artifact showed $5.56$\,pp lower GPQA-Diamond pass@1 ($95\%$ CI $[-9.60,-1.52]$, $p=0.007$; 3 seeds, $n=198$). The Qwen AWQ GPQA result is significant within the primary Holm-6 family, but not under the Holm-18 joint sensitivity analysis (Appendix Table~\ref{tab:holm18}). Compact-JSON item counts show that drop is distributed across items rather than concentrated in a few problems: 75 of 198 GPQA items flip on at least one seed for the tested Qwen AWQ-4 artifact, and no item is BF16-correct / AWQ-wrong on all three seeds. The tested Llama AWQ-4 checkpoint also showed a GSM8K drop ($-1.57$\,pp, $95\%$ CI $[-2.55,-0.58]$, $p=0.002$). GPQA intervals are otherwise wide; we treat non-AWQ GPQA contrasts as exploratory.
+Table~\ref{tab:multitask} gives cell means; Tables~\ref{tab:gsm-contrasts} and~\ref{tab:gpqa-contrasts} are the clustered tests. FP8 stays within about one point of BF16 on all three tasks; several GSM8K Qwen (and Llama FP8/GPTQ) contrasts pass TOST at $\pm 1$\,pp. The tested Llama AWQ-4 checkpoint also showed a GSM8K drop ($-1.57$\,pp, $95\%$ CI $[-2.55,-0.58]$, $p=0.002$). The tested Qwen AWQ artifact exhibited a $5.56$ percentage point GPQA-Diamond difference under the primary Holm-6 family; this contrast does not remain significant under the Holm-18 joint sensitivity analysis (Appendix Table~\ref{tab:holm18}; $95\%$ CI $[-9.60,-1.52]$, $p=0.007$; 3 seeds, $n=198$). Compact-JSON item counts show that GPQA difference is distributed across items rather than concentrated in a few problems: 75 of 198 GPQA items flip on at least one seed for the tested Qwen AWQ-4 artifact, and no item is BF16-correct / AWQ-wrong on all three seeds. GPQA intervals are otherwise wide; we treat non-AWQ GPQA contrasts as exploratory. This GPQA contrast is not a headline result of the study.
 
 \begin{table}[t]
 \centering
@@ -222,7 +199,7 @@ Llama FP8    & $+0.13$ & $[-0.66,+0.94]$ & $0.761$ & n.s. & $[-0.53,+0.81]$ & pa
 
 \begin{table}[t]
 \centering
-\caption{GPQA-Diamond clustered pass@1 versus matched BF16 ($n=198$, 3 seeds). Holm over six contrasts. sig.: Holm-significant at $\alpha=0.05$; n.s.: not significant. The tested Qwen AWQ-4 row is the largest accuracy effect in this table; that Holm-6 result is not significant under the Holm-18 joint sensitivity (Appendix Table~\ref{tab:holm18}).}
+\caption{GPQA-Diamond clustered pass@1 versus matched BF16 ($n=198$, 3 seeds). Holm over six contrasts. sig.: Holm-significant at $\alpha=0.05$; n.s.: not significant. The tested Qwen AWQ-4 row is reported with Holm-6 and Holm-18 joint sensitivity caveats (Appendix Table~\ref{tab:holm18}); it is not a headline claim.}
 \label{tab:gpqa-contrasts}
 \small
 \begin{tabular}{lcccccc}
@@ -342,7 +319,10 @@ Llama GPTQ-4 & $88.92\pm1.55$ & $88.96\pm0.70$ & $44.95\pm4.32$ & 3 / 31 \\
 \end{table*}
 
 \subsection{Difficulty labels}
-Table~\ref{tab:difficulty}: Level~1 is easy for every format in this sample. Among the evaluated Llama cells, the tested Llama AWQ-4 checkpoint showed the lowest pass@1 on Levels 2--4. MATH level labels are not a monotone difficulty axis here (Level~2 Qwen BF16 $89.11\%$ vs Level~5 $92.69\%$).
+Table~\ref{tab:difficulty}: Level~1 is easy for every format in this sample. Among the evaluated Llama cells, the tested Llama AWQ-4 checkpoint showed the lowest pass@1 on Levels 2--4. MATH level labels are not a monotone difficulty axis here (Level~2 Qwen BF16 $89.11\%$ vs Level~5 $92.69\%$). These level splits are descriptive associations, not a causal difficulty mechanism.
+
+\subsection{Item-level descriptive checks}
+CPU-only reanalysis of the released compact JSON (\path{results/reports/item_level_descriptive_report.md}) is descriptive, not causal. MATH-500 has no item that is BF16-correct and quantized-wrong on all five seeds for any tested format. Incorrect MATH traces are longer than correct traces in every cell (for example, Qwen BF16 mean tokens $3{,}256$ when correct vs.\ $15{,}843$ when incorrect). GPQA-Diamond Qwen AWQ flips remain distributed (75 of 198 items flip on at least one seed; 0 items flip on all three seeds). These counts do not identify a small set of items that would explain the GPQA contrast.
 
 \subsection{Observable modal agreement on MATH-500}
 \label{sec:modal}
@@ -609,7 +589,7 @@ Llama-8B & GPTQ-4 & $63.49\pm 0.41$ & 86.95 & \$0.0407 [0.0398, 0.0418] & $366.1
 \FloatBarrier
 
 \section{Discussion}
-Under this pinned A100 W8A16 stack, evaluating these eight public checkpoints requires more than a single pass@1 or token count. FP8--BF16 MATH intervals include zero, but TOST at $\pm 1$\,pp fails, so we do not treat FP8 as a statistically equivalent accuracy default. Four-bit behavior is checkpoint- and task-specific: the tested Qwen AWQ-4 checkpoint keeps MATH-500 and GSM8K near BF16 while showing $5.56$\,pp lower pass@1 on GPQA-Diamond. The Qwen AWQ GPQA result is significant within the primary Holm-6 family, but not under the Holm-18 joint sensitivity analysis. The tested Llama AWQ-4 checkpoint shows the largest MATH-500 and GSM8K pass@1 drops among the evaluated Llama cells. The tested Qwen 4-bit checkpoints showed $6.3$--$6.9\%$ higher mean MATH-500 length. Both-OK CIs exclude zero for those Qwen 4-bit cells, so jointly-correct traces were still longer. Mismatch-conditioned differences are much larger because failure traces are themselves long; $D$ is a diagnostic of that asymmetry, not a causal compression effect.
+Under this pinned A100 W8A16 stack, evaluating these eight public checkpoints requires more than a single pass@1 or token count. Rank order among the tested checkpoints depends on the evaluation target. MATH-500 FP8--BF16 intervals include zero, but TOST at $\pm 1$\,pp fails, so we do not treat the tested FP8 checkpoints as a statistically equivalent accuracy default. Observed 4-bit behavior is checkpoint- and task-specific: the tested Qwen AWQ-4 checkpoint keeps MATH-500 and GSM8K near BF16, while the tested Llama AWQ-4 checkpoint shows the largest MATH-500 and GSM8K pass@1 drops among the evaluated Llama cells. The tested Qwen AWQ artifact exhibited a $5.56$ percentage point GPQA-Diamond difference under the primary Holm-6 family; this contrast does not remain significant under the Holm-18 joint sensitivity analysis and is not treated as a headline result. The tested Qwen 4-bit checkpoints showed $6.3$--$6.9\%$ higher mean MATH-500 length. Both-OK CIs exclude zero for those Qwen 4-bit cells, so jointly-correct traces were still longer. Mismatch-conditioned differences are much larger because failure traces are themselves long; $D$ is a diagnostic of that asymmetry, not a causal compression effect.
 
 Pass@1 and maj@5 are different estimands. The tested Llama AWQ-4 artifact's lower pass@1 appears in both mean accuracy and 5/5 consensus coverage. The tested Qwen 4-bit checkpoints retain relatively strong MATH-500 pass@1 while emitting more tokens. No clear FP8--BF16 difference was detected in modal-agreement coverage or selective risk under these configurations; paired intervals that include zero do not establish equivalence. Repeated sampling is associated with lower selective risk on MATH-500 but costs about five generations per attempted item. Wilson intervals on $0/n$ cells remain strictly positive. The construction is a gold-free unique-mode abstention rule on five MATH seeds, not G-Pass@$k$ and not a safety property.
 
@@ -617,7 +597,7 @@ A 200-item even-index length estimator, an unconstrained serving timing, and a v
 
 Cost estimators disagree. The historical $65$ tok/s token proxy, sequential Condition~A, and batched Condition~B rank the four Qwen (resp.\ Llama) cells differently. Qwen GPTQ-4 Condition~B $\widetilde{C}_{\mathrm{pass}}^{\mathrm{hyb}}$ is $-45.9\%$ vs.\ BF16, but Condition~A ranks Qwen AWQ-4 first, and Qwen FP8 Condition~B is a five-rep mixture of slow and fast wall-clock regimes whose cause was not identified. That A/B disagreement is serving-condition sensitivity (workload and serving regime jointly), not an isolated batching effect. Llama GPTQ-4 Condition~B mean throughput is about $0.2\%$ lower than Llama BF16. Peak allocated VRAM did not separate formats under the $0.75$ utilization cap and reflects the engine allocation pool rather than isolated weight-footprint compression.
 
-The deployment implication is not that one quantization format is universally preferable. Public checkpoints should be evaluated on the target task and intended serving condition: token-based proxies can mis-rank measured GPU-seconds, different serving conditions produced different rankings, and the tested community quantization artifacts can show task-specific accuracy losses. Deployment decisions should therefore combine checkpoint-specific accuracy with direct measurements from the intended serving configuration. The contribution is a stack-pinned measurement protocol showing that public quantized reasoning checkpoints can change rank depending on what is measured.
+The deployment implication is not that one quantization format is universally preferable. Public checkpoints should be evaluated on the target task and intended serving condition: token-based proxies can mis-rank measured GPU-seconds, different serving conditions produced different rankings, and the tested community quantization artifacts can show task-specific accuracy losses. Deployment decisions should therefore combine checkpoint-specific accuracy with direct measurements from the intended serving configuration. The contribution is a stack-pinned measurement protocol showing that public quantized reasoning checkpoints can change rank depending on what is measured. The deployment ranking of a quantized reasoning checkpoint depends on the checkpoint, task, estimand, and serving condition under the evaluated stack.
 
 \section{Limitations}
 \begin{enumerate}
@@ -628,7 +608,7 @@ The deployment implication is not that one quantization format is universally pr
     \item \textbf{Checkpoint provenance.} AWQ-4 is a community quantization of unknown calibration set and quantizer revision. Accuracy losses on the tested community AWQ artifacts are properties of those artifacts, not a proof about AWQ as a method. GPTQ-4/FP8 are RedHatAI artifacts (appendix).
     \item \textbf{Scope.} Two 7--8B DeepSeek-R1 distillations, English math/science, one pinned serving stack, one prompt. GSM8K/GPQA use three seeds.
     \item \textbf{Not evaluated.} This study does not evaluate AIME, LiveCodeBench, 32B models, Hopper native W8A8 FP8, energy measurements, production continuous batching, or probability calibration.
-    \item \textbf{Reproducibility surface.} Compact per-cell JSON, recovered MATH-500 answer strings, confirmation timing JSON, and analysis reports are released. Full GPU traces (chain-of-thought text) are not publicly released. Compact campaign JSON also omits \texttt{finish\_reason} and output token IDs. Tables are reproducible from the released compact artifacts via the documented \texttt{--check} commands. Replaying the complete GPU campaign requires the original A100 hardware, checkpoint weights, and dataset revisions; the protocol is inspectable and is not expected to be rerun by every reviewer.
+    \item \textbf{Reproducibility surface.} Compact per-cell JSON, recovered MATH-500 answer strings, confirmation timing JSON, and analysis reports are released. Full GPU traces (chain-of-thought text) are not publicly released. Compact campaign JSON also omits \texttt{finish\_reason} and output token IDs. Table consistency is verified automatically against frozen expected values; the \LaTeX\ source remains manually formatted for publication layout. Replaying the complete GPU campaign requires the original A100 hardware, checkpoint weights, and dataset revisions; the protocol is inspectable and is not expected to be rerun by every reviewer. The NVIDIA driver version was unavailable in the archived environment and is recorded as UNRECORDED in \texttt{runtime\_manifest.json}.
     \item \textbf{Contamination.} MATH and GSM8K overlap public pretraining corpora. A paired within-item design reduces but does not eliminate contamination interaction with checkpoint.
     \item \textbf{Source configs vs.\ launcher.} Files in \texttt{configs/legacy\_models/} are historical harness configs and are not the QRM \texttt{inference.py} campaign. Effective KV-cache dtype is not stored per cell. Launcher flags such as \texttt{max\_model\_len=32768} are code/launcher-confirmed, not per-job runtime telemetry.
 \end{enumerate}
@@ -637,9 +617,14 @@ The deployment implication is not that one quantization format is universally pr
 Construct: pass@1, maj@5, token length, GPU-seconds, and the aggregate hybrid Cost-of-Pass proxy are distinct estimands; the hybrid proxy is not Erol et al.'s per-problem Cost-of-Pass, and identical-word loops are not \texttt{finish\_reason}. Internal: Conditions~A and~B are complete serving-condition contrasts (subset and regime jointly), not a pure batching ablation; Qwen and Llama confirmation jobs used different hosts; the $\$1.50$/A100-hour figure is a pricing scenario. External: two 7--8B public R1-distill families, one A100 / vLLM~0.7.0 eager stack, and three English math/science benchmarks; results do not transfer to Hopper native W8A8, 32B models, AIME, LiveCodeBench, energy, or production continuous batching.
 
 \section{Conclusion}
-Under a pinned A100 / vLLM~0.7.0 stack, these eight public R1-distill checkpoints are not ranked by a single pass@1 or token count. Clustered pass@1, maj@5, Both-OK versus BF16-correct conditional length, and the historical token proxy versus sequential versus batched $\widetilde{C}_{\mathrm{pass}}^{\mathrm{hyb}}$ can disagree. The tested Llama AWQ-4 checkpoint shows the largest MATH-500 and GSM8K pass@1 drops among the evaluated Llama cells; the tested community Qwen AWQ-4 artifact showed the largest GPQA-Diamond drop among the evaluated Qwen cells. The Qwen AWQ GPQA result is significant within the primary Holm-6 family, but not under the Holm-18 joint sensitivity analysis. FP8--BF16 MATH intervals include zero but fail $\pm 1$\,pp TOST. The tested Qwen 4-bit checkpoints showed $6.3$--$6.9\%$ higher MATH-500 mean length, with Both-OK CIs excluding zero; mismatch-conditioned differences are much larger because failure traces are themselves long. Identical-word repetition flags are rare under our detector ($25/56{,}408$); near-cap completions are more common for Qwen 4-bit ($25$/$24$ vs.\ $14$). Gold-free 5/5 unique-mode abstention has low observed selective risk and strictly positive Wilson upper bounds on $0/n$ cells. Cost-estimator rankings disagree across the $65$ tok/s proxy, Condition~A, and Condition~B; Qwen FP8 Condition~B is a five-rep wall-clock mixture, not a lone $-36.0\%$. We provide a stack-pinned measurement protocol showing that public quantized reasoning checkpoints can change rank depending on what is measured. The deployment ranking of a quantized reasoning checkpoint is not a property of bit-width alone.
+Under a pinned A100 / vLLM~0.7.0 stack, these eight public R1-distill checkpoints are not ranked by a single pass@1 or token count. Clustered pass@1, maj@5, Both-OK versus BF16-correct conditional length, and the historical token proxy versus sequential versus batched $\widetilde{C}_{\mathrm{pass}}^{\mathrm{hyb}}$ can disagree. The tested Llama AWQ-4 checkpoint shows the largest MATH-500 and GSM8K pass@1 drops among the evaluated Llama cells. MATH-500 FP8--BF16 intervals include zero but fail $\pm 1$\,pp TOST. The tested Qwen 4-bit checkpoints showed $6.3$--$6.9\%$ higher MATH-500 mean length, with Both-OK CIs excluding zero; mismatch-conditioned differences are much larger because failure traces are themselves long. The tested Qwen AWQ artifact exhibited a $5.56$ percentage point GPQA-Diamond difference under the primary Holm-6 family; this contrast does not remain significant under the Holm-18 joint sensitivity analysis. Identical-word repetition flags are rare under our detector ($25/56{,}408$); near-cap completions are more common for the tested Qwen 4-bit checkpoints ($25$/$24$ vs.\ $14$). Gold-free 5/5 unique-mode abstention has low observed selective risk and strictly positive Wilson upper bounds on $0/n$ cells. Cost-estimator rankings disagree across the $65$ tok/s proxy, Condition~A, and Condition~B; Qwen FP8 Condition~B is a five-rep wall-clock mixture, not a lone $-36.0\%$. We provide a stack-pinned measurement protocol showing that public quantized reasoning checkpoints can change rank depending on what is measured. The deployment ranking of a quantized reasoning checkpoint depends on the checkpoint, task, estimand, and serving condition under the evaluated stack.
 
-\section*{Artifacts}
+\section*{Reproducibility and Artifact Availability}
+The released artifact enables verification of reported analyses; reproducing the complete GPU campaign requires equivalent hardware and checkpoint availability.
+
+CPU-reproducible from compact JSON: tables, analysis scripts, statistical checks,
+and serving-confirmation analysis (see \path{REPRODUCE.md}). Table consistency is verified automatically against frozen expected values; the \LaTeX\ source remains manually formatted for publication layout. Replay of the 88-run campaign requires an NVIDIA A100-80GB GPU, the listed model weights, and an HPC-class environment matching \path{results/reports/runtime_manifest.json}. The NVIDIA driver version was unavailable in the archived environment. Full chain-of-thought traces are not released.
+
 Code, patches, validation JSON, and analysis reports:
 \href{https://github.com/Manish06N/reasoning-compression-lab}{\nolinkurl{Manish06N/reasoning-compression-lab}}.
 Per-cell records: \texttt{results/math500/}, \texttt{results/gsm8k/}, \texttt{results/gpqa/}.
@@ -652,17 +637,11 @@ First unconstrained timing (provenance only): \path{results/measured_serving/}. 
 PARAM Rudra HPC at IIT Patna (National Supercomputing Mission, C-DAC) provided compute.
 
 \section*{CRediT authorship contribution statement}
-\textbf{Conceptualization:} Manish Nandish, Rajiv Misra.
-\textbf{Methodology:} Manish Nandish.
-\textbf{Software:} Manish Nandish.
-\textbf{Investigation:} Manish Nandish.
-\textbf{Data curation:} Manish Nandish.
-\textbf{Formal analysis:} Manish Nandish.
-\textbf{Visualization:} Manish Nandish.
-\textbf{Writing -- original draft:} Manish Nandish.
-\textbf{Writing -- review \& editing:} Manish Nandish, Rajiv Misra, Midhunchakkaravarthy Janarthanan.
-\textbf{Supervision:} Rajiv Misra, Midhunchakkaravarthy Janarthanan.
-\textbf{Resources:} Rajiv Misra.
+\textbf{Manish Nandish:} Conceptualization, Methodology, Software, Investigation, Data curation, Formal analysis, Visualization, Writing -- original draft, Writing -- review \& editing.
+\textbf{Rajiv Misra:} Conceptualization, Resources, Supervision, Writing -- review \& editing.
+\textbf{Midhunchakkaravarthy Janarthanan:} Supervision, Writing -- review \& editing.
+
+The first author's dual affiliation (IIT Patna and Lincoln University College) reflects a joint doctoral arrangement. Computational experiments, software, and formal analysis were performed by Manish Nandish. No experimental or software roles are claimed for Midhunchakkaravarthy Janarthanan.
 
 \appendix
 \section{Prompt}
@@ -824,9 +803,36 @@ Llama GPTQ-4 & 4{,}840.5 & \$0.03103 & \$0.03490 \\
 \end{tabular}
 \end{table}
 
+\section{Neighboring measurement studies}
+\label{app:related}
+Table~\ref{tab:related} is a compact comparison. It is not a claim that this paper replaces those studies.
+
+\begin{table*}[t]
+\centering
+\caption{Neighboring measurement studies. ``Engine pinned'' means one named serving stack is frozen while checkpoints vary. Length estimands and serving columns are what each paper reports as primary evidence, not an exhaustive inventory.}
+\label{tab:related}
+\small
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lcccccccc}
+\toprule
+\textbf{Study} & \textbf{Models} & \textbf{Bits} & \textbf{Engine pinned} & \textbf{Seeds} & \textbf{Length estimand} & \textbf{Correctness split} & \textbf{Serving / cost} & \textbf{Statistics} \\
+\midrule
+This paper & 2 R1 distill (7B/8B) & BF16, FP8, AWQ-4, GPTQ-4 & vLLM 0.7.0 eager, A100 & 5 MATH; 3 GSM/GPQA & RoM, paired $\Delta$, BF16-correct $\Delta$ & $2\times 2$ + BF16 failure control & token proxy; seq.\ \& batched GPU-s; $\widetilde{C}_{\mathrm{pass}}^{\mathrm{hyb}}$ & clustered bootstrap, Holm, TOST \\
+QRM~\cite{liu2025qrm} & R1 distill family & W/A/KV incl.\ W4A16 & QRM harness (multi-config) & typically 1 & mean tokens & not $2\times 2$ & limited & per-cell means \\
+Lian et al.~\cite{lian2026quantinflates} & reasoning PTQ & low-bit PTQ & paper stack & paper-specific & BF16-correct $\Delta$ & BF16-correct vs rest & token cost & paired length \\
+Lotfi et al.~\cite{lotfi2026overthinking} & 1.5B--32B reasoning & aggressive PTQ & paper stack & paper-specific & CoT length; overthinking & abandoned intermediates & logit-penalty Pareto & error-type counts \\
+Kurtic et al.~\cite{kurtic2025give} & Llama-3.1 + R1-distill & FP8/INT8/INT4 & vLLM, several GPUs & large evals & not CoT-primary & N/A & sync vs continuous batching & accuracy + tok/s \\
+Helcig et al.~\cite{helcig2026slq} & Llama/Qwen (SLQ) & 3.3--6 bpp & vLLM kernels & 3 (GSM) & thinking tokens & TL vs DL fidelity & vLLM throughput & EAR, Wilcoxon \\
+Erol et al.~\cite{erol2025costofpass} & general LMs & N/A & N/A & N/A & N/A & N/A & $C_{\mathrm{pass}}$ definition & economic \\
+Hochlehnert et al.~\cite{hochlehnert2025sober} & reasoning LMs & N/A & deliberately \emph{un}pinned & many & N/A & N/A & N/A & reproducibility \\
+\bottomrule
+\end{tabular}%
+}
+\end{table*}
+
 \section{Holm-18 sensitivity}
 \label{app:holm18}
-Primary multiplicity control is Holm--Bonferroni within each benchmark's six format contrasts. Table~\ref{tab:holm18} applies Holm jointly to all 18 contrasts as a stricter sensitivity. Llama MATH AWQ-4 and Llama GSM8K AWQ-4 remain significant. The tested community Qwen AWQ-4 artifact showed $5.56$\,pp lower GPQA-Diamond pass@1. The Qwen AWQ GPQA result is significant within the primary Holm-6 family, but not under the Holm-18 joint sensitivity analysis (Holm-adjusted $p=0.109$). That does not change the primary within-benchmark inference.
+Primary multiplicity control is Holm--Bonferroni within each benchmark's six format contrasts. Table~\ref{tab:holm18} applies Holm jointly to all 18 contrasts as a stricter sensitivity. Llama MATH AWQ-4 and Llama GSM8K AWQ-4 remain significant. The tested Qwen AWQ artifact exhibited a $5.56$ percentage point GPQA-Diamond difference under the primary Holm-6 family; this contrast does not remain significant under the Holm-18 joint sensitivity analysis (Holm-adjusted $p=0.109$). That does not change the primary within-benchmark inference.
 
 \begin{table}[t]
 \centering

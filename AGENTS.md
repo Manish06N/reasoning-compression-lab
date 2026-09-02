@@ -3,9 +3,9 @@
 **Cluster:** PARAM Rudra HPC (C-DAC / NSM), NVIDIA A100 80GB GPUs  
 **Repository:** `/scratch/manishn_iitp/reasoning-compression-lab`  
 **GitHub:** [https://github.com/Manish06N/reasoning-compression-lab](https://github.com/Manish06N/reasoning-compression-lab)  
-**Last Updated:** 2026-09-02 (submission-review pass; science numbers frozen; GPU frozen)
+**Last Updated:** 2026-09-02 (evaluation-target-instability title; science numbers frozen; GPU frozen)
 
-**Superseding scientific claims (use these, not the 2026-08-15 blocks below):** Title is *One Stack, Many Rankings: Evaluating Quantized Reasoning Checkpoints Beyond Accuracy*. This is a **stack-pinned measurement study**: public quantized reasoning checkpoints can change rank depending on what is measured. The deployment ranking of a quantized reasoning checkpoint is **not** a property of bit-width alone. Three contributions: pinned protocol; empirical characterization of ranking instability across deployment estimands; checkpoint-not-method (tested community AWQ artifacts only). Pathology: **25 loops / 0 exact cap hits / 209 near-cap completions**. FP8–BF16 clustered CIs include 0; TOST $\pm 1$ pp fails. FP8 executed as Marlin **W8A16** on A100, not native W8A8. Cost: **aggregate hybrid Cost-of-Pass proxy** from GPU-seconds; rankings disagree across proxy / Cond A / Cond B. The Qwen AWQ GPQA result is significant within the primary Holm-6 family, but not under the Holm-18 joint sensitivity analysis. Do not cite architecture-dependent, statistically tied, unique cheapest, “true Pareto,” or first-run $+18.7\%$ / $-19.8\%$. Frozen tables: `results/reports/major_revision_tables.md`. Reproduce: `REPRODUCE.md`. Review: `SUBMISSION_REVIEW.md`. Campaign evaluator: LightEval **0.8.0**. Full GPU traces are not publicly released. **Experimental GPU work is closed.** Live git branch is `main`. Do not rewrite frozen numbers.
+**Superseding scientific claims (use these, not the 2026-08-15 blocks below):** Title is *One Stack, Many Rankings: Measuring Evaluation-Target Instability in Quantized Reasoning Checkpoints*. This is a **stack-pinned measurement study**: under a frozen serving stack, quantized reasoning checkpoint rankings change depending on the evaluation target, estimand, and serving-cost measurement. The deployment ranking of a quantized reasoning checkpoint depends on the checkpoint, task, estimand, and serving condition under the evaluated stack; it is **not** a property of bit-width alone. Three contributions: (C1) pinned evaluation protocol; (C2) ranking instability; (C3) checkpoint-not-method — the tested community AWQ artifacts showed task-specific degradation. Pathology: **25 loops / 0 exact cap hits / 209 near-cap completions**. FP8–BF16 clustered CIs include 0; TOST $\pm 1$ pp fails. FP8 executed as Marlin **W8A16** on A100, not native W8A8. Cost: **aggregate hybrid Cost-of-Pass proxy** from GPU-seconds; rankings disagree across proxy / Cond A / Cond B. The tested Qwen AWQ artifact exhibited a 5.56 pp GPQA-Diamond difference under the primary Holm-6 family; this contrast does not remain significant under the Holm-18 joint sensitivity analysis and is **not** a headline. Do not cite architecture-dependent, statistically tied, unique cheapest, “true Pareto,” or first-run $+18.7\%$ / $-19.8\%$. Frozen tables: `results/reports/major_revision_tables.md`. Reproduce: `REPRODUCE.md`. Scientific audit: `SCIENTIFIC_AUDIT.md`. Campaign evaluator: LightEval **0.8.0**. Full GPU traces are not publicly released. **Experimental GPU work is closed.** Live git branch is `main`. Do not rewrite frozen numbers.
 
 ---
 
@@ -31,7 +31,7 @@ graph TD
 
 | Output | Type | Title / Focus | Target Venues (Verify Q1) | Hardware / Stack | Status / Target Date |
 |---|---|---|---|---|---|
-| **J1** | Main Journal | *One Stack, Many Rankings: Evaluating Quantized Reasoning Checkpoints Beyond Accuracy* | *Future Generation Computer Systems (FGCS)*, *Journal of Systems and Software (JSS)*, *Neurocomputing* | HPC 2× A100, `qrm-official` (vLLM 0.7.0 eager) | Frozen science on `main`; submission after CRediT/venue; GPU closed |
+| **J1** | Main Journal | *One Stack, Many Rankings: Measuring Evaluation-Target Instability in Quantized Reasoning Checkpoints* | *Journal of Systems and Software (JSS)* first; FGCS/TMLR would need a different PDF | HPC 2× A100, `qrm-official` (vLLM 0.7.0 eager) | Frozen science on `main`; JSS initial-submission PDF; GPU closed |
 | **C1** | Conference / Workshop | *Trace-Level Evaluation Metrology for Compressed Reasoning Models* | NeurIPS/ICLR/ACL Workshops (Eval4NLP, Efficient Natural Language, MLPerf) | HPC A100 | Submission Month 6–12 (Post-J1 pilot packaging) |
 | **J2** | Journal 2 | *Reasoning-Aware Speculative Decoding: Acceptance Dynamics and Serving Acceleration* | *JSS*, *Engineering Applications of AI (EAAI)*, *FGCS* | HPC 2× A100 | Year 2 (Methods & draft model training) |
 | **C2** | Conference / Workshop | *High-Throughput Speculative Serving of Compressed Reasoning LLMs* | MLSys / EuroSys / ACL Demo Track | HPC A100 | Year 2 |
@@ -83,7 +83,7 @@ ssh -L 8080:<NODE>:8080 -N manishn_iitp@paramrudra.iitp.ac.in -p 4422
 ## 3. Paper 1 (J1): Scientific Positioning & Breakthrough Results
 
 ### Provisional Title
-> **"One Stack, Many Rankings: Evaluating Quantized Reasoning Checkpoints Beyond Accuracy"**
+> **"One Stack, Many Rankings: Measuring Evaluation-Target Instability in Quantized Reasoning Checkpoints"**
 
 ### Novelty Positioning Against Prior Literature
 * **The Literature Gap:** Prior works (QRM 2025, A Sober Look 2025, Quantized LLMs Can Still Be Calibrated 2025, Cost-of-Pass 2025, Quantization Inflates Reasoning 2026, Reliability Scaling Laws 2026) studied accuracy, seed variance, or token count in isolation.
