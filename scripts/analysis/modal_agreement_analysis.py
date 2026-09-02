@@ -632,6 +632,7 @@ def run_full_modal_analysis(
             "bootstrap_replicates": bootstrap_reps,
             "analysis_seed": seed,
             "normalization_policy": "docs/ANSWER_NORMALIZATION.md (LightEval math-verify)",
+            "lighteval_version": "0.8.0",
             "gold_free_modal_selection": True,
         },
         "validation_diagnostics": {
@@ -662,7 +663,7 @@ def generate_markdown_report(report: Dict[str, Any], output_md: Path) -> None:
     lines.append("")
     lines.append("---")
     lines.append("")
-    lines.append("## 1. Primary Risk–Coverage–Cost Frontier Across Thresholds")
+    lines.append("## 1. Coverage, selective risk, and five-sample token proxy across thresholds")
     lines.append("")
     lines.append("| Model & Format | Threshold | Served / 500 | Coverage (95% CI) | Selective Acc (95% CI) | Selective Risk (95% CI) | Mean $T_5$ Tokens | Tokens / Correct Served |")
     lines.append("|---|---|---|---|---|---|---|---|")
@@ -875,6 +876,7 @@ def check_derived_artifact(derived_path: Path, report_path: Path) -> None:
     assert diag["total_ties"] == 116
     assert diag["empty_extraction_fallbacks"] == 0
     assert report["metadata"]["gold_free_modal_selection"] is True
+    assert report["metadata"].get("lighteval_version") == "0.8.0"
 
     for model_family, fmt in CONFIG_NAMES:
         cfg = report["configurations"][f"{model_family}_{fmt}"]

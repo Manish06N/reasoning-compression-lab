@@ -23,6 +23,7 @@
     "bootstrap_replicates": 10000,
     "analysis_seed": 20260816,
     "normalization_policy": "docs/ANSWER_NORMALIZATION.md (LightEval math-verify)",
+    "lighteval_version": "0.8.0",
     "gold_free_modal_selection": true
   },
   "validation_diagnostics": {

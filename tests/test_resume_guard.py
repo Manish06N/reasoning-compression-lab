@@ -56,7 +56,7 @@ def test_blocks_resume_without_repetition_penalty(tmp_path):
     out.write_text(json.dumps(row) + "\n", encoding="utf-8")
     cell = {
         "cell_id": "level_a_qwen7b_bf16_math500_seed0",
-        "model_config": "configs/models/deepseek_r1_qwen_7b.json",
+        "model_config": "configs/legacy_models/deepseek_r1_qwen_7b.json",
         "task_config": "configs/tasks/math500.json",
         "quant_config": "bf16",
         "seed": 0,

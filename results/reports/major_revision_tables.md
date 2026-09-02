@@ -108,7 +108,7 @@ If the $D$ CI is entirely >0, mismatch-associated lengthening is larger than joi
 | Llama-8B AWQ-4 | 70.20 | 89.51 | $0.0431 [0.0415, 0.0450] | 391.11 | 11.63 | $0.0056 [0.0055, 0.0058] | +18.5% [+16.6, +20.5] |
 | Llama-8B GPTQ-4 | 63.49 | 86.95 | $0.0407 [0.0398, 0.0418] | 366.16 | 12.60 | $0.0059 [0.0058, 0.0060] | +24.9% [+23.0, +26.7] |
 
-Rank order (1 = best):
+Rank order (1 = lowest aggregate cost proxy):
 
 - **Qwen-7B:** rankings disagree across token-proxy, Condition A, and Condition B
   - token-proxy $C_{pass}$: FP8 > BF16 > AWQ-4 > GPTQ-4

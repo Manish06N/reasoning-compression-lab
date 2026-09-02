@@ -6,7 +6,7 @@
 
 ---
 
-## 1. Primary Risk–Coverage–Cost Frontier Across Thresholds
+## 1. Coverage, selective risk, and five-sample token proxy across thresholds
 
 | Model & Format | Threshold | Served / 500 | Coverage (95% CI) | Selective Acc (95% CI) | Selective Risk (95% CI) | Mean $T_5$ Tokens | Tokens / Correct Served |
 |---|---|---|---|---|---|---|---|

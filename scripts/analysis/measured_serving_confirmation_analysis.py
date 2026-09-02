@@ -25,24 +25,13 @@ MODELS = ["Qwen-7B", "Llama-8B"]
 FORMATS = ["BF16", "FP8", "AWQ-4", "GPTQ-4"]
 CONDITIONS = ["A_single_stream_c1", "B_batched_throughput_c8"]
 
-# Canonical 40-cell MATH-500 accuracy numbers (from Paper 1 campaign)
-CANONICAL_PASS1 = {
-    ("Qwen-7B", "BF16"): 0.9400,
-    ("Qwen-7B", "FP8"): 0.9440,
-    ("Qwen-7B", "AWQ-4"): 0.9312,
-    ("Qwen-7B", "GPTQ-4"): 0.9348,
-    ("Llama-8B", "BF16"): 0.8924,
-    ("Llama-8B", "FP8"): 0.8952,
-    ("Llama-8B", "AWQ-4"): 0.8648,
-    ("Llama-8B", "GPTQ-4"): 0.8892,
-}
-
 N_BOOT = 10_000
 BOOT_SEED = 0
 GPU_USD_PER_HOUR = 1.50
 GPU_USD_PER_SEC = GPU_USD_PER_HOUR / 3600.0
 FP8_SLOW_TOKS_THRESHOLD = 400.0
 FP8_FAST_TOKS_THRESHOLD = 500.0
+_CANONICAL_PASS1: Dict[Tuple[str, str], float] | None = None
 
 # Old fixed-throughput (65 tok/s) proxy baseline
 OLD_PROXY_COST = {
@@ -55,6 +44,19 @@ OLD_PROXY_COST = {
     ("Llama-8B", "AWQ-4"): {"mean_tokens": 4524.3, "cost_query_dollars": 0.02900, "cost_pass_dollars": 0.03353},
     ("Llama-8B", "GPTQ-4"): {"mean_tokens": 4625.7, "cost_query_dollars": 0.02965, "cost_pass_dollars": 0.03335},
 }
+
+
+def canonical_pass1() -> Dict[Tuple[str, str], float]:
+    """Load MATH-500 pass@1 fractions from the frozen reanalysis report."""
+    global _CANONICAL_PASS1
+    if _CANONICAL_PASS1 is None:
+        analysis_dir = Path(__file__).resolve().parent
+        if str(analysis_dir) not in sys.path:
+            sys.path.insert(0, str(analysis_dir))
+        import revision_reanalysis as rev  # noqa: WPS433 — local sibling module
+
+        _CANONICAL_PASS1 = rev.load_canonical_pass1()
+    return _CANONICAL_PASS1
 
 
 def percentile(xs: List[float], p: float) -> float:
@@ -143,7 +145,7 @@ def analyze_confirmation_data(raw_dir: Path) -> Dict[str, Any]:
             cfg_entry: Dict[str, Any] = {
                 "model": model,
                 "format": fmt,
-                "pass1_canonical": CANONICAL_PASS1.get((model, fmt), 0.0),
+                "pass1_canonical": canonical_pass1().get((model, fmt), 0.0),
                 "conditions": {},
             }
 
@@ -171,7 +173,7 @@ def analyze_confirmation_data(raw_dir: Path) -> Dict[str, Any]:
 
                 # Cost calculations ($1.50/GPU-hr)
                 cost_per_query_dollars = mean_gpu_sec * (1.50 / 3600.0)
-                pass1 = CANONICAL_PASS1.get((model, fmt), 1.0)
+                pass1 = canonical_pass1().get((model, fmt), 1.0)
                 cost_pass_dollars = cost_per_query_dollars / pass1 if pass1 > 0 else 0.0
 
                 cond_dict: Dict[str, Any] = {
@@ -274,7 +276,7 @@ def analyze_confirmation_data(raw_dir: Path) -> Dict[str, Any]:
     attach_hybrid_cpass_uncertainty(report, config_data, item_means, task_runs)
     report["ranking_tables"] = build_ranking_tables(report)
     report["qwen_fp8_condition_b"] = qwen_fp8_condition_b_stats(
-        task_runs, CANONICAL_PASS1[("Qwen-7B", "FP8")]
+        task_runs, canonical_pass1()[("Qwen-7B", "FP8")]
     )
     report["metadata"]["hybrid_cpass_note"] = (
         "Numerator = Condition A or B GPU-sec on the serving subset; "

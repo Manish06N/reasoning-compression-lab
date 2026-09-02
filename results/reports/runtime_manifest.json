@@ -2,7 +2,34 @@
   "campaign": "outputs-hpc-campaign-2026-08-14 plus GSM8K/GPQA breadth on the same launcher",
   "n_completions": 56408,
   "n_cells": 88,
-  "note": "These are the effective values passed into official QRM inference.py by scripts/hpc/qrm_parity/run_official_inference.sh after patches/qrm_hpc_compat.patch. They are NOT the defaults sitting in configs/models/*.json (those files use max_model_len 40960 or 131072, gpu_memory_utilization 0.95, and sometimes kv_cache_dtype=fp8_e5m2 / enforce_eager=false). Process logs with per-job nvidia-smi / vLLM dump were not archived for every cell; this manifest is reconstructed from the launcher and patched inference.py, which are the only code path that submitted the 56k jobs.",
+  "lighteval_version": "0.8.0",
+  "note": "These are the effective values passed into official QRM inference.py by scripts/hpc/qrm_parity/run_official_inference.sh after patches/qrm_hpc_compat.patch. They are NOT the defaults sitting in configs/legacy_models/*.json (those files use max_model_len 40960 or 131072, gpu_memory_utilization 0.95, and sometimes kv_cache_dtype=fp8_e5m2 / enforce_eager=false). configs/models/ is not the frozen publication launcher. Process logs with per-job nvidia-smi / vLLM dump were not archived for every cell; this manifest is reconstructed from the launcher and patched inference.py, which are the only code path that submitted the 56k jobs.",
+  "datasets": {
+    "MATH-500": {
+      "dataset_id": "HuggingFaceH4/MATH-500",
+      "split": "test",
+      "revision": "6e4ed1a2a79af7d8630a6b768ec859cb5af4d3be",
+      "n": 500,
+      "source": "configs/tasks/math500.json"
+    },
+    "GSM8K": {
+      "dataset_id": "openai/gsm8k",
+      "config_name": "main",
+      "split": "test",
+      "revision": "740312add88f781978c0658806c59bc2815b9866",
+      "n": 1319,
+      "source": "configs/tasks/gsm8k.json"
+    },
+    "GPQA-Diamond": {
+      "dataset_id": "Idavidrein/gpqa",
+      "config_name": "gpqa_diamond",
+      "split": "train",
+      "revision": "633f5ee89ab8ad4522a9f850766b73f62147ffdd",
+      "n": 198,
+      "gated": true,
+      "source": "configs/tasks/gpqa_diamond.json"
+    }
+  },
   "shared": {
     "engine": "qrm-official",
     "vllm_version": "0.7.0",
@@ -20,8 +47,9 @@
     "repetition_penalty": 1.0,
     "enable_prefix_caching": false,
     "enable_chunked_prefill": false,
+    "lighteval_version": "0.8.0",
     "kv_cache_dtype": "vllm_default_auto",
-    "kv_cache_dtype_note": "inference.py does not pass kv_cache_dtype; vLLM 0.7 default applies. configs/models fp8_e5m2 was not the campaign setting.",
+    "kv_cache_dtype_note": "inference.py does not pass kv_cache_dtype; vLLM 0.7 default applies. configs/legacy_models fp8_e5m2 was not the campaign setting.",
     "tensor_parallel_size": 1,
     "prompt": "Please reason step by step, and put your final answer within \\boxed{}.",
     "sources": [

@@ -13,20 +13,94 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import platform
 import subprocess
 import sys
 import time
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
-import numpy as np
-import torch
-from vllm import LLM, SamplingParams
+try:
+    import numpy as np
+    import torch
+    from vllm import LLM, SamplingParams
+except ImportError:  # pragma: no cover - CPU --check path
+    np = None  # type: ignore[assignment]
+    torch = None  # type: ignore[assignment]
+    LLM = None  # type: ignore[assignment]
+    SamplingParams = None  # type: ignore[assignment]
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
+REQUIRED_TASK_KEYS = (
+    "benchmark_type",
+    "condition",
+    "model",
+    "format",
+    "repetition",
+    "gpu_seconds_per_query",
+    "output_tokens_per_second",
+    "n_requests",
+)
+EXTRA_REQUIRED = (
+    ("Qwen-7B", "FP8", "B", 4),
+    ("Qwen-7B", "FP8", "B", 5),
+    ("Llama-8B", "AWQ-4", "A", 4),
+    ("Llama-8B", "AWQ-4", "A", 5),
+)
+
+
+def expected_confirmation_raw_files() -> List[Path]:
+    raw_dir = REPO_ROOT / "results" / "measured_serving_confirmation" / "raw"
+    files: List[Path] = []
+    for model in ("Qwen-7B", "Llama-8B"):
+        for fmt in ("BF16", "FP8", "AWQ-4", "GPTQ-4"):
+            files.append(raw_dir / f"{model}_{fmt}_microbenchmark.json")
+            for cond in ("A", "B"):
+                for rep in (1, 2, 3):
+                    files.append(raw_dir / f"{model}_{fmt}_rep{rep}_cond{cond}.json")
+    for model, fmt, cond, rep in EXTRA_REQUIRED:
+        files.append(
+            REPO_ROOT
+            / "results"
+            / "measured_serving_confirmation"
+            / "raw"
+            / f"{model}_{fmt}_rep{rep}_cond{cond}.json"
+        )
+    return files
+
+
+def check_confirmation_artifacts() -> int:
+    """CPU-only: verify frozen confirmation JSON exists and has required keys. No GPU."""
+    missing: List[str] = []
+    bad: List[str] = []
+    for path in expected_confirmation_raw_files():
+        if not path.is_file():
+            missing.append(str(path.relative_to(REPO_ROOT)))
+            continue
+        with path.open(encoding="utf-8") as fp:
+            data = json.load(fp)
+        if path.name.endswith("_microbenchmark.json"):
+            if data.get("benchmark_type") != "fixed_token_microbenchmark_confirmation":
+                bad.append(f"{path.name}: unexpected benchmark_type {data.get('benchmark_type')!r}")
+            continue
+        for key in REQUIRED_TASK_KEYS:
+            if key not in data:
+                bad.append(f"{path.name}: missing {key}")
+        if data.get("benchmark_type") != "task_realistic_confirmation":
+            bad.append(f"{path.name}: unexpected benchmark_type {data.get('benchmark_type')!r}")
+    if missing or bad:
+        print("ERROR: confirmation artifact check failed.", file=sys.stderr)
+        for line in missing[:20]:
+            print(f"  missing {line}", file=sys.stderr)
+        if len(missing) > 20:
+            print(f"  ... {len(missing) - 20} more missing", file=sys.stderr)
+        for line in bad[:20]:
+            print(f"  {line}", file=sys.stderr)
+        return 1
+    n = len(expected_confirmation_raw_files())
+    print(f"OK: confirmation raw artifacts present ({n} required files)")
+    return 0
 
 
 def get_gpu_info() -> Dict[str, Any]:
@@ -316,9 +390,14 @@ def run_fixed_token_microbenchmark(
 
 def main():
     parser = argparse.ArgumentParser(description="Measured serving confirmation benchmark with strict controls.")
-    parser.add_argument("--model-path", type=Path, required=True, help="Path to checkpoint directory.")
-    parser.add_argument("--model-name", type=str, required=True, choices=["Qwen-7B", "Llama-8B"])
-    parser.add_argument("--format", type=str, required=True, choices=["BF16", "FP8", "AWQ-4", "GPTQ-4"])
+    parser.add_argument(
+        "--check",
+        action="store_true",
+        help="CPU-only: verify frozen confirmation raw JSON artifacts. Does not run GPU jobs.",
+    )
+    parser.add_argument("--model-path", type=Path, help="Path to checkpoint directory.")
+    parser.add_argument("--model-name", type=str, choices=["Qwen-7B", "Llama-8B"])
+    parser.add_argument("--format", type=str, choices=["BF16", "FP8", "AWQ-4", "GPTQ-4"])
     parser.add_argument(
         "--cond-a-subset",
         type=Path,
@@ -343,6 +422,10 @@ def main():
     parser.add_argument("--max-model-len", type=int, default=32768)
     parser.add_argument("--gpu-memory-utilization", type=float, default=0.75)
     args = parser.parse_args()
+    if args.check:
+        raise SystemExit(check_confirmation_artifacts())
+    if args.model_path is None or args.model_name is None or args.format is None:
+        parser.error("--model-path, --model-name, and --format are required unless --check")
 
     args.raw_dir.mkdir(parents=True, exist_ok=True)
     args.provenance_dir.mkdir(parents=True, exist_ok=True)

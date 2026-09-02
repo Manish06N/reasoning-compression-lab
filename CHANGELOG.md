@@ -1,6 +1,26 @@
 # Changelog
 
+## 2026-09-02 — Final publication-readiness audit (no GPU)
+
+Integrity pass on `paper-major-revision`. **GPU campaign not reopened.** Frozen pass@1 / serving numbers unchanged.
+
+- Claim language: RQ1 is checkpoint difference, not “quantization causes”; serving discussion uses serving-condition sensitivity; GPQA uses Holm-6 / Holm-18 required sentence; cost “cheaper” → lower aggregate hybrid cost proxy under the pricing scenario.
+- Limitations: full traces not released; tables reproducible; GPU replay not expected of reviewers. JSS threats-to-validity mapping added.
+- Repo hygiene: `configs/models/` remains a warning README; `Rank order (1 = best)` removed from frozen table wording; modal report heading no longer says “frontier”; live AGENTS contribution text no longer claims a cost frontier.
+- Repro: `REPRODUCE.md` states compact-JSON reproducibility vs unreplicable full traces.
+
+## 2026-09-02 — Publication-ready measurement-study freeze (no GPU)
+
+Editorial and repository-hygiene pass on `paper-major-revision`. **GPU campaign not reopened.** Frozen pass@1 / serving numbers unchanged (`revision_reanalysis.py --check`, `measured_serving_confirmation_analysis.py --check`, `emit_major_revision_tables.py --check` all PASS).
+
+- Manuscript: three contributions (pinned protocol; ranking instability; checkpoint-not-method); abstract leads with ranking disagreement; QRM cited as COLM 2025; RedHatAI artifacts distinguished from production claims; unused `zollo2026` removed; Condition B figure is a cost-accuracy scatter (not Pareto); limitations list unevaluated settings; CRediT statement added.
+- Claim language: tested-artifact wording for AWQ; Holm-6 vs joint Holm-18 on GPQA; FP8 = Marlin W8A16 on A100; aggregate hybrid Cost-of-Pass proxy; GPU-seconds primary.
+- Repro: `REPRODUCE.md`; `emit --check` compares generated markdown to frozen tables; confirmation runner `--check` is CPU artifact presence; `CANONICAL_PASS1` loaded from frozen reanalysis JSON; runtime manifest records dataset SHAs and LightEval 0.8.0.
+- Configs: historical harness JSON moved to `configs/legacy_models/`; `configs/models/` is a warning README only.
+- CPU-only descriptive reports: error flips, length vs correctness, GPQA row-index breakdown (`item_level_descriptive_analysis.py`). CI on `paper-major-revision` catches table/artifact drift.
+
 ## 2026-08-18 — Editorial freeze
+
 
 Copyedits only on `paper-major-revision` (no number or analysis changes): TOST grammar; single definition of mismatch-excess $D$; 0/0 key-mismatch provenance moved from Results to Appendix. Prior uncommitted editorial closure (shorter abstract, RQ2 length alignment, Lian wording, journal tone, author block) is included. `paper/arxiv_source.zip` rebuilt from current `main.tex` (69,265 B) + `references.bib` + `main.bbl`. PDF remains 20 pages. Next: visual PDF QA, then independent referee review. GPU closed. Do not merge to `main`.
 

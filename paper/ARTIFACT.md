@@ -31,7 +31,7 @@ Compile with `xelatex` → `bibtex` → `xelatex` → `xelatex` (fallback: `pdfl
 | `results/measured_serving_confirmation/raw/` | 52 task-realistic + 8 microbenchmark confirmation JSON files |
 | `results/reports/measured_serving/measured_serving_report.json` | First unconstrained timing (provenance only; not mixed with confirmation) |
 | `results/measured_serving/raw/` | 48 task-realistic + 8 microbenchmark JSON files (superseded protocol) |
-| `results/reports/runtime_manifest.json` | Effective 56k launch settings (not `configs/models/` defaults) |
+| `results/reports/runtime_manifest.json` | Effective 56k launch settings (not `configs/legacy_models/` defaults; `configs/models/` is not the launcher) |
 | `results/reports/phase5_statistical_analysis_report.json` | Deprecation stub |
 | `results/reports/multitask_benchmark_summary.json` | Deprecation stub |
 | `results/reports/trace_audit_report.json` | Deprecation stub |
@@ -53,17 +53,21 @@ From a clean checkout (stdlib only; no `/scratch` or `outputs-hpc-*`):
 
 ```bash
 python3 scripts/analysis/revision_reanalysis.py --check
-python3 scripts/analysis/emit_major_revision_tables.py
-python3 scripts/analysis/modal_agreement_analysis.py --check
-python3 scripts/analysis/measured_serving_analysis.py --check
+python3 scripts/hpc/qrm_parity/benchmark_serving_confirmation.py --check
+python3 scripts/analysis/emit_major_revision_tables.py --check
 python3 scripts/analysis/measured_serving_confirmation_analysis.py --check
-python3 scripts/hpc/qrm_parity/validate_measured_serving_confirmation.py
+python3 scripts/analysis/modal_agreement_analysis.py --check-artifact
+python3 scripts/analysis/item_level_descriptive_analysis.py --check
 ```
 
-`revision_reanalysis.py --check` must match `results/reports/revision_reanalysis_report.json`. On MacBook, `modal_agreement_analysis.py --check` validates the compact artifact SHA and report internals (LightEval 0.8.0 re-extraction is HPC-only). `measured_serving_confirmation_analysis.py --check` recomputes aggregates from `results/measured_serving_confirmation/raw/`. `measured_serving_analysis.py --check` still recomputes the superseded first-run aggregates.
+Expected PASS lines are listed in [`../REPRODUCE.md`](../REPRODUCE.md). `--check` fails on artifact drift and does not rewrite campaign results.
+
+`revision_reanalysis.py --check` must match `results/reports/revision_reanalysis_report.json`. On MacBook, `modal_agreement_analysis.py --check-artifact` validates the compact artifact SHA and report internals (LightEval 0.8.0 re-extraction is HPC-only). `measured_serving_confirmation_analysis.py --check` recomputes aggregates from `results/measured_serving_confirmation/raw/`. `measured_serving_analysis.py --check` still recomputes the superseded first-run aggregates (provenance only).
+
+Compact per-cell JSON has **no** full traces. Full GPU traces are not publicly released. Tables are reproducible; the complete GPU campaign is inspectable but not expected to be rerun by every reviewer.
 
 ## Stack
 
 Published 56k campaign: `requirements-qrm-paper-vllm070.lock` (`qrm-official`, vLLM 0.7.0, eager, A100-80GB). Effective launch settings: `results/reports/runtime_manifest.json`. The `qreason` file `requirements-hpc.txt` is **vLLM 0.8.5** and is labeled as legacy.
 
-`configs/models/` is **not** the campaign launcher. HPC patches: `patches/qrm_hpc_compat.patch` and `patches/lighteval_local_dataset.patch`.
+`configs/models/` is **not** the campaign launcher (warning README only). Historical harness JSON: `configs/legacy_models/`. HPC patches: `patches/qrm_hpc_compat.patch` and `patches/lighteval_local_dataset.patch`.

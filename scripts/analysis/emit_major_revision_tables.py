@@ -6,10 +6,10 @@ Does not rewrite LaTeX. Stdlib only. Run after the canonical analysis scripts.
 
 from __future__ import annotations
 
+import argparse
 import json
 import math
 import os
-import statistics
 import sys
 from collections import defaultdict
 from typing import Any
@@ -104,16 +104,7 @@ def independent_cpass_points() -> dict[tuple[str, str, str], float]:
             continue
         key = (d["model"], d["format"], d["condition"])
         buckets[key].append(float(d["gpu_seconds_per_query"]))
-    pass1 = {
-        ("Qwen-7B", "BF16"): 0.9400,
-        ("Qwen-7B", "FP8"): 0.9440,
-        ("Qwen-7B", "AWQ-4"): 0.9312,
-        ("Qwen-7B", "GPTQ-4"): 0.9348,
-        ("Llama-8B", "BF16"): 0.8924,
-        ("Llama-8B", "FP8"): 0.8952,
-        ("Llama-8B", "AWQ-4"): 0.8648,
-        ("Llama-8B", "GPTQ-4"): 0.8892,
-    }
+    pass1 = rev.load_canonical_pass1()
     out: dict[tuple[str, str, str], float] = {}
     for (model, fmt, cond), xs in buckets.items():
         gpu = sum(xs) / len(xs)
@@ -364,7 +355,7 @@ def md_serving(serving: dict[str, Any]) -> list[str]:
                 f"${b['hybrid_scenario_cost_pass_dollars']:.4f} [{b_ci[0]:.4f}, {b_ci[1]:.4f}] | {delta} |"
             )
     lines.append("")
-    lines.append("Rank order (1 = best):")
+    lines.append("Rank order (1 = lowest aggregate cost proxy):")
     lines.append("")
     for model in ["Qwen-7B", "Llama-8B"]:
         block = serving["ranking_tables"][model]
@@ -440,25 +431,9 @@ def md_modal(modal_report: dict[str, Any]) -> list[str]:
     return lines
 
 
-def main() -> int:
-    with open(REPORT) as fp:
-        report = json.load(fp)
-    with open(SERVING) as fp:
-        serving = json.load(fp)
-    with open(MODAL) as fp:
-        modal_report = json.load(fp)
-    modal.attach_binomial_risk_intervals_report(modal_report)
-    with open(MODAL, "w") as fp:
-        json.dump(modal_report, fp, indent=2)
-        fp.write("\n")
-
-    errs = verify(report, serving)
-    if errs:
-        print("INDEPENDENT VERIFY FAILED:", file=sys.stderr)
-        for e in errs:
-            print(f"  {e}", file=sys.stderr)
-        return 1
-
+def render_major_revision_markdown(
+    report: dict[str, Any], serving: dict[str, Any], modal_report: dict[str, Any]
+) -> str:
     lines = [
         "# Major revision tables (frozen analysis)",
         "",
@@ -485,8 +460,10 @@ def main() -> int:
             "",
         ]
     )
-    with open(OUT_MD, "w") as fp:
-        fp.write("\n".join(lines) + "\n")
+    return "\n".join(lines) + "\n"
+
+
+def render_validation_markdown(report: dict[str, Any]) -> str:
     changes = report["holm18_sensitivity"]["status_changes"]
     valid = [
         "# Major revision validation",
@@ -503,12 +480,73 @@ def main() -> int:
         "",
     ]
     if changes:
-        valid.extend(f"- {ch['benchmark']} {ch['contrast']}: {ch['status_change']} (p={ch['p_value']:.4f}, holm18_p={ch['holm_p_global18']:.4f})" for ch in changes)
+        valid.extend(
+            f"- {ch['benchmark']} {ch['contrast']}: {ch['status_change']} "
+            f"(p={ch['p_value']:.4f}, holm18_p={ch['holm_p_global18']:.4f})"
+            for ch in changes
+        )
     else:
         valid.append("- none")
     valid.append("")
+    return "\n".join(valid) + "\n"
+
+
+def _read_text(path: str) -> str:
+    with open(path) as fp:
+        return fp.read()
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(
+        description="Independently recompute major-revision tables from raw JSON."
+    )
+    parser.add_argument(
+        "--check",
+        action="store_true",
+        help="Compare generated markdown with frozen tables; fail on drift. Does not write.",
+    )
+    args = parser.parse_args(argv)
+
+    with open(REPORT) as fp:
+        report = json.load(fp)
+    with open(SERVING) as fp:
+        serving = json.load(fp)
+    with open(MODAL) as fp:
+        modal_report = json.load(fp)
+    modal.attach_binomial_risk_intervals_report(modal_report)
+
+    errs = verify(report, serving)
+    if errs:
+        print("INDEPENDENT VERIFY FAILED:", file=sys.stderr)
+        for e in errs:
+            print(f"  {e}", file=sys.stderr)
+        return 1
+
+    tables = render_major_revision_markdown(report, serving, modal_report)
+    valid = render_validation_markdown(report)
+
+    if args.check:
+        missing = [p for p in (OUT_MD, OUT_VALID) if not os.path.isfile(p)]
+        if missing:
+            print("ERROR: missing frozen table file(s): " + ", ".join(missing), file=sys.stderr)
+            return 1
+        diffs: list[str] = []
+        if tables != _read_text(OUT_MD):
+            diffs.append(f"drift vs {OUT_MD}")
+        if valid != _read_text(OUT_VALID):
+            diffs.append(f"drift vs {OUT_VALID}")
+        if diffs:
+            print("ERROR: generated tables do not match frozen files:", file=sys.stderr)
+            for d in diffs:
+                print(f"  {d}", file=sys.stderr)
+            return 1
+        print(f"OK: generated tables match {OUT_MD} and {OUT_VALID}")
+        return 0
+
+    with open(OUT_MD, "w") as fp:
+        fp.write(tables)
     with open(OUT_VALID, "w") as fp:
-        fp.write("\n".join(valid) + "\n")
+        fp.write(valid)
     print(f"OK: independent recompute matches frozen JSON. Wrote {OUT_MD}")
     print(f"Wrote {OUT_VALID}")
     return 0

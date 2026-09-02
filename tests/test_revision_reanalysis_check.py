@@ -22,3 +22,14 @@ def test_json_diff_tost_flag():
 def test_json_diff_missing_key():
     diffs = json_diff({"loops": 25}, {})
     assert any("missing" in d for d in diffs)
+
+
+def test_canonical_pass1_from_frozen_report():
+    from scripts.analysis.revision_reanalysis import load_canonical_pass1
+
+    pass1 = load_canonical_pass1()
+    assert pass1[("Qwen-7B", "BF16")] == 0.94
+    assert pass1[("Qwen-7B", "FP8")] == 0.944
+    assert pass1[("Qwen-7B", "AWQ-4")] == 0.9312
+    assert pass1[("Llama-8B", "AWQ-4")] == 0.8648
+    assert len(pass1) == 8

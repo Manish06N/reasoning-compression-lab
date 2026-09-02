@@ -105,7 +105,7 @@ def check_all_cell_configs() -> None:
 
 def check_revision_pins() -> None:
     print("== revision pins ==")
-    for path in sorted((ROOT / "configs/models").glob("*.json")):
+    for path in sorted((ROOT / "configs/legacy_models").glob("*.json")):
         data = json.loads(path.read_text(encoding="utf-8"))
         require_immutable_revision(data.get("revision"), label=path.name)
     for path in sorted((ROOT / "configs/tasks").glob("*.json")):

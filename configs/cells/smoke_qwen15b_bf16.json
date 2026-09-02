@@ -1,6 +1,6 @@
 {
   "cell_id": "smoke_qwen15b_bf16",
-  "model_config": "configs/models/deepseek_r1_qwen_15b.json",
+  "model_config": "configs/legacy_models/deepseek_r1_qwen_15b.json",
   "task_config": "configs/tasks/math500.json",
   "quant_config": "bf16",
   "decoding_config": "configs/decoding/smoke_debug.yaml",

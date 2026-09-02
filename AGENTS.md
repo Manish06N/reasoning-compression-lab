@@ -3,9 +3,9 @@
 **Cluster:** PARAM Rudra HPC (C-DAC / NSM), NVIDIA A100 80GB GPUs  
 **Repository:** `/scratch/manishn_iitp/reasoning-compression-lab`  
 **GitHub:** [https://github.com/Manish06N/reasoning-compression-lab](https://github.com/Manish06N/reasoning-compression-lab)  
-**Last Updated:** 2026-08-18 (editorial freeze on `paper-major-revision`; science frozen at `d707e44`; GPU frozen)
+**Last Updated:** 2026-09-02 (measurement-study positioning; science numbers frozen; GPU frozen)
 
-**Superseding scientific claims (use these, not the 2026-08-15 blocks below):** Title is *One Stack, Many Rankings: Evaluating Quantized Reasoning Checkpoints Beyond Accuracy*. Distinctive result: **estimand disagreement** (pass@1 vs maj@5, length estimators, token-proxy vs sequential vs batched GPU-second cost). Pathology: **25 loops / 0 exact cap hits / 209 near-cap completions**. Checkpoint language only (tested `jakiAJK` Llama AWQ-4; tested Qwen AWQ-4 on GPQA). FP8–BF16 clustered CIs include 0; TOST $\pm 1$ pp fails. Length: clustered mismatch excess $D$ excludes 0 in all six MATH contrasts. Cost: **hybrid scenario** $C_{\mathrm{pass}}$ with Monte Carlo intervals; rankings disagree across proxy / Cond A / Cond B; Qwen FP8 Cond B is five-rep bimodal, not a lone $-36.0\%$. Qwen AWQ-4 GPQA is Holm-significant within the six GPQA contrasts, not under Holm-18. Do not cite architecture-dependent, statistically tied, unique cheapest, “true Pareto,” or first-run $+18.7\%$ / $-19.8\%$. Frozen tables: `results/reports/major_revision_tables.md`. ArXiv source: `paper/arxiv_source.zip` (rebuilt from current `main.tex` / `references.bib` / `main.bbl`). Campaign evaluator: LightEval **0.8.0**. **Experimental GPU work is closed.** Do not merge to `main`.
+**Superseding scientific claims (use these, not the 2026-08-15 blocks below):** Title is *One Stack, Many Rankings: Evaluating Quantized Reasoning Checkpoints Beyond Accuracy*. This is a **stack-pinned measurement study**: public quantized reasoning checkpoints can change rank depending on what is measured. The deployment ranking of a quantized reasoning checkpoint is **not** a property of bit-width alone. Three contributions: pinned protocol; ranking instability; checkpoint-not-method (tested community AWQ artifacts only). Pathology: **25 loops / 0 exact cap hits / 209 near-cap completions**. FP8–BF16 clustered CIs include 0; TOST $\pm 1$ pp fails. FP8 executed as Marlin **W8A16** on A100, not native W8A8. Cost: **aggregate hybrid Cost-of-Pass proxy** from GPU-seconds; rankings disagree across proxy / Cond A / Cond B. The Qwen AWQ GPQA result is significant within the primary Holm-6 family, but not under the Holm-18 joint sensitivity analysis. Do not cite architecture-dependent, statistically tied, unique cheapest, “true Pareto,” or first-run $+18.7\%$ / $-19.8\%$. Frozen tables: `results/reports/major_revision_tables.md`. Reproduce: `REPRODUCE.md`. Campaign evaluator: LightEval **0.8.0**. Full GPU traces are not publicly released. **Experimental GPU work is closed.** Do not merge to `main`.
 
 ---
 
@@ -23,7 +23,7 @@
 
 ```mermaid
 graph TD
-    J1["Paper 1 (J1): Quantization Reliability & Cost Frontier\n(MATH-500, GSM8K, GPQA; BF16/FP8/AWQ4/GPTQ4; 5 seeds)"] --> C1["Conference 1 (C1): Evaluation Metrology Workshop\n(Packaging calibration & trace pathology protocol)"]
+    J1["Paper 1 (J1): Stack-pinned measurement study\n(MATH-500, GSM8K, GPQA; BF16/FP8/AWQ4/GPTQ4; ranking instability)"] --> C1["Conference 1 (C1): Evaluation Metrology Workshop\n(Packaging calibration & trace pathology protocol)"]
     J1 --> J2["Paper 2 (J2): Reasoning Speculative Decoding\n(0.5B-1.5B draft models, trace acceptance rates, acceleration)"]
     J2 --> C2["Conference 2 (C2): Speculative Serving Demo\n(vLLM / SGLang integration & systems benchmark)"]
     J1 --> J3["Paper 3 (J3): Indic & Multilingual Deployment Economics\n(Token-cost inequity, Indic reasoning, A100 vs RTX 5080 edge transfer)"]
@@ -87,7 +87,7 @@ ssh -L 8080:<NODE>:8080 -N manishn_iitp@paramrudra.iitp.ac.in -p 4422
 
 ### Novelty Positioning Against Prior Literature
 * **The Literature Gap:** Prior works (QRM 2025, A Sober Look 2025, Quantized LLMs Can Still Be Calibrated 2025, Cost-of-Pass 2025, Quantization Inflates Reasoning 2026, Reliability Scaling Laws 2026) studied accuracy, seed variance, or token count in isolation.
-* **Our Core Contribution:** A multi-seed, trace-level empirical study isolating the **joint reliability–calibration–cost frontier** across weight quantization formats (BF16, FP8, AWQ-4, GPTQ-4), proving where compression changes failure modes, selective prediction risk, and dollar-cost-per-correct answer even when raw accuracy appears preserved.
+* **Our Core Contribution:** A stack-pinned measurement study showing that public quantized reasoning checkpoints can change rank depending on checkpoint, task, evaluation target, estimand, and serving condition. The deployment ranking of a quantized reasoning checkpoint is not a property of bit-width alone. Findings are bound to the tested artifacts and this A100 / vLLM 0.7.0 stack.
 
 ### Headline Confirmatory Results (2026-08-15)
 **Dataset:** `HuggingFaceH4/MATH-500` ($n=500$) | **Seeds:** 42, 43, 44, 45, 46 (5 seeds) | **Total Evaluated Completions:** 20,000  
@@ -112,7 +112,7 @@ Llama-8B GPTQ-4          88.0%     89.6%     86.8%     89.4%     90.8%    88.92%
 ```
 
 ### Key Empirical Findings
-**Superseded 2026-08-15 bullets (do not cite):** “FP8 parity,” “0 truncations / 0 loops,” “Pareto-optimal FP8.” Current findings are in `README.md` and `paper/main.tex`: clustered pass@1 (Llama AWQ-4 MATH $-2.76$ pp); Qwen AWQ-4 GPQA Holm-6 yes / Holm-18 no; 25 loops / 0 cap hits / 209 near-cap; Qwen 4-bit MATH token inflation $+6.3$–$6.9\%$; mismatch excess $D$ excludes 0 in all six MATH contrasts; gold-free modal agreement; confirmation batched Qwen GPTQ-4 $-45.9\%$ hybrid scenario $C_{\mathrm{pass}}$ vs BF16.
+**Superseded 2026-08-15 bullets (do not cite):** “FP8 parity,” “0 truncations / 0 loops,” “Pareto-optimal FP8.” Current findings are in `README.md` and `paper/main.tex`: clustered pass@1 (tested Llama AWQ-4 MATH $-2.76$ pp); Qwen AWQ GPQA Holm-6 yes / Holm-18 no; 25 loops / 0 cap hits / 209 near-cap; tested Qwen 4-bit MATH completion length $+6.3$–$6.9\%$; mismatch excess $D$ excludes 0 in all six MATH contrasts; gold-free modal agreement; confirmation batched Qwen GPTQ-4 $-45.9\%$ hybrid scenario $C_{\mathrm{pass}}$ vs BF16.
 
 ---
 

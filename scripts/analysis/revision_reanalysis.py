@@ -804,6 +804,23 @@ DEPRECATED_STUB = {
 }
 
 
+def load_canonical_pass1(report: dict[str, Any] | None = None) -> dict[tuple[str, str], float]:
+    """MATH-500 campaign pass@1 fractions from the frozen reanalysis report.
+
+    Single source of truth for hybrid Cost-of-Pass denominators. Rounded to
+    four decimals to match the published cell means (94.00% → 0.9400).
+    """
+    if report is None:
+        with open(CANONICAL_REPORT) as fp:
+            report = json.load(fp)
+    stats = report["math500"]["summary_statistics"]
+    return {
+        (model, fmt): round(float(stats[f"{model}_{fmt}"]["mean_acc"]) / 100.0, 4)
+        for model in MODELS
+        for fmt in FORMATS
+    }
+
+
 def json_diff(expected: Any, actual: Any, path: str = "$") -> list[str]:
     """Return human-readable mismatches. Floats compared with abs_tol=1e-9."""
     diffs: list[str] = []

@@ -2,14 +2,14 @@ name: CI
 
 on:
   push:
-    branches: [main, paper-p0-reanalysis, paper-serving-confirmation]
+    branches: [main, paper-major-revision, paper-p0-reanalysis, paper-serving-confirmation]
   pull_request:
-    branches: [main]
+    branches: [main, paper-major-revision]
 
 jobs:
   canonical-analysis:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -19,6 +19,37 @@ jobs:
         run: python scripts/analysis/revision_reanalysis.py --check
       - name: Recompute serving confirmation report and fail on drift
         run: python scripts/analysis/measured_serving_confirmation_analysis.py --check
+      - name: Compare generated tables with frozen markdown
+        run: python scripts/analysis/emit_major_revision_tables.py --check
+      - name: Modal compact artifact check
+        run: python scripts/analysis/modal_agreement_analysis.py --check-artifact
+      - name: Confirmation raw artifact presence
+        run: python scripts/hpc/qrm_parity/benchmark_serving_confirmation.py --check
+      - name: Item-level descriptive analysis
+        run: python scripts/analysis/item_level_descriptive_analysis.py --check
+      - name: Required frozen artifacts exist
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          required = [
+              "results/reports/revision_reanalysis_report.json",
+              "results/reports/major_revision_tables.md",
+              "results/reports/major_revision_validation.md",
+              "results/reports/modal_agreement_report.json",
+              "results/recovered/math500_modal_inputs.jsonl",
+              "results/reports/measured_serving_confirmation/measured_serving_confirmation_report.json",
+              "results/reports/runtime_manifest.json",
+              "results/reports/item_level_descriptive_report.json",
+              "paper/main.tex",
+              "paper/references.bib",
+              "REPRODUCE.md",
+              "FINAL_PUBLICATION_AUDIT.md",
+          ]
+          missing = [p for p in required if not Path(p).is_file()]
+          if missing:
+              raise SystemExit("missing files:\n" + "\n".join(missing))
+          print(f"OK: {len(required)} required artifacts present")
+          PY
 
   test:
     runs-on: ubuntu-latest
@@ -62,8 +93,8 @@ jobs:
       - name: Run tests
         run: python -m pytest tests/ -q
 
-      - name: Ruff check
-        run: ruff check src scripts tests
+      - name: Ruff check (publication Python)
+        run: ruff check src tests scripts/analysis/revision_reanalysis.py scripts/analysis/emit_major_revision_tables.py scripts/analysis/item_level_descriptive_analysis.py scripts/pin_hf_revisions.py
 
       - name: Verify revision pins
         run: python scripts/pin_hf_revisions.py --verify

@@ -25,7 +25,7 @@ This directory holds the released per-cell records for the **pinned vLLM 0.7.0 e
 | Llama-8B | AWQ-4 | 84.40% | 84.80% | 89.20% | 87.40% | 86.60% | **86.48% ± 1.96%** |
 | Llama-8B | GPTQ-4 | 88.00% | 89.60% | 86.80% | 89.40% | 90.80% | **88.92% ± 1.55%** |
 
-Clustered bootstrap vs BF16 (primary): Llama AWQ-4 **−2.76 pp** (95% CI $[−4.16,−1.44]$, $p<0.001$). FP8 CIs include 0; MATH $\pm 1$ pp TOST is not passed.
+Clustered bootstrap vs BF16 (primary): the tested Llama AWQ-4 artifact **−2.76 pp** (95% CI $[−4.16,−1.44]$, $p<0.001$). FP8 CIs include 0; MATH $\pm 1$ pp TOST is not passed.
 
 ### GSM8K ($n=1{,}319$, 3 seeds)
 
@@ -40,7 +40,7 @@ Clustered bootstrap vs BF16 (primary): Llama AWQ-4 **−2.76 pp** (95% CI $[−4
 | Llama-8B | AWQ-4 | 87.34% | 86.88% | 87.11% | **87.11% ± 0.23%** |
 | Llama-8B | GPTQ-4 | 88.48% | 88.63% | 89.76% | **88.96% ± 0.70%** |
 
-Llama AWQ-4 vs BF16: **−1.57 pp** ($p=0.0018$).
+The tested Llama AWQ-4 artifact vs BF16: **−1.57 pp** ($p=0.0018$).
 
 ### GPQA-Diamond ($n=198$, 3 seeds)
 
@@ -55,7 +55,7 @@ Llama AWQ-4 vs BF16: **−1.57 pp** ($p=0.0018$).
 | Llama-8B | AWQ-4 | 46.97% | 44.95% | 48.99% | **46.97% ± 2.02%** |
 | Llama-8B | GPTQ-4 | 44.44% | 40.91% | 49.49% | **44.95% ± 4.32%** |
 
-Qwen AWQ-4 vs BF16: **−5.56 pp** (95% CI $[−9.60,−1.52]$, $p=0.0068$). Holm-significant within the primary six GPQA contrasts; **not** significant under the exploratory Holm-18 correction across all 18 benchmark contrasts (adjusted $p=0.1088$). Do not shorten this to “Qwen AWQ-4 is Holm-significant on GPQA.”
+The tested community Qwen AWQ-4 artifact vs BF16: **−5.56 pp** (95% CI $[−9.60,−1.52]$, $p=0.0068$). The Qwen AWQ GPQA result is significant within the primary Holm-6 family, but not under the Holm-18 joint sensitivity analysis (adjusted $p=0.1088$). Do not shorten this to “Qwen AWQ-4 is Holm-significant on GPQA.”
 
 ---
 

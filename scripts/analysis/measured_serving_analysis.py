@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-"""Statistical analysis and cost modeling for measured serving benchmark.
+"""Provenance analysis for the first unconstrained serving timing.
 
-Aggregates:
-- 48 task-realistic benchmark runs (8 configs × 2 conditions × 3 reps)
-- 8 raw-decoding fixed-token microbenchmarks
-- Relative speedup, latency, VRAM, and GPU-sec/query deltas vs BF16
-- Measured Cost-of-Pass ($1.50/GPU-hr scenario) vs old fixed-throughput proxy
+Not the paper's primary Cost-of-Pass evidence. Canonical confirmation
+numbers come from measured_serving_confirmation_analysis.py.
+
+Pass@1 denominators load from the frozen reanalysis report
+(load_canonical_pass1). Do not cite this first-run report as a Pareto
+frontier or as native FP8 speedup.
 """
 
 from __future__ import annotations
@@ -24,16 +25,14 @@ CONDITIONS = ["A_single_stream_c1", "B_batched_throughput_c8"]
 REPETITIONS = [1, 2, 3]
 
 # Canonical 40-cell MATH-500 accuracy numbers (from Paper 1 campaign)
-CANONICAL_PASS1 = {
-    ("Qwen-7B", "BF16"): 0.9400,
-    ("Qwen-7B", "FP8"): 0.9440,
-    ("Qwen-7B", "AWQ-4"): 0.9312,
-    ("Qwen-7B", "GPTQ-4"): 0.9348,
-    ("Llama-8B", "BF16"): 0.8924,
-    ("Llama-8B", "FP8"): 0.8952,
-    ("Llama-8B", "AWQ-4"): 0.8648,
-    ("Llama-8B", "GPTQ-4"): 0.8892,
-}
+def canonical_pass1() -> Dict[Tuple[str, str], float]:
+    analysis_dir = Path(__file__).resolve().parent
+    if str(analysis_dir) not in sys.path:
+        sys.path.insert(0, str(analysis_dir))
+    import revision_reanalysis as rev  # noqa: WPS433
+
+    return rev.load_canonical_pass1()
+
 
 # Old fixed-throughput (65 tok/s) tokens and cost
 OLD_PROXY_COST = {
@@ -89,7 +88,7 @@ def analyze_measured_serving(raw_dir: Path) -> Dict[str, Any]:
                 "format": fmt,
                 "conditions": {},
                 "microbenchmark": {},
-                "canonical_pass1": CANONICAL_PASS1.get((model, fmt), 0.0),
+                "canonical_pass1": canonical_pass1().get((model, fmt), 0.0),
             }
 
             # Microbenchmark
@@ -120,7 +119,7 @@ def analyze_measured_serving(raw_dir: Path) -> Dict[str, Any]:
                 # Cost calculations under $1.50/GPU-hr ($0.00041667/GPU-sec)
                 mean_gpu_sec = float(statistics.mean(gpu_sec_vals))
                 cost_query_dollars = mean_gpu_sec * (1.50 / 3600.0)
-                pass1 = CANONICAL_PASS1.get((model, fmt), 1.0)
+                pass1 = canonical_pass1().get((model, fmt), 1.0)
                 cost_pass_dollars = cost_query_dollars / pass1 if pass1 > 0 else float("nan")
 
                 results["configurations"][cfg_key]["conditions"][cond] = {

@@ -1,6 +1,6 @@
 {
   "cell_id": "level_c_llama8b_gptq4_math500_seed0",
-  "model_config": "configs/models/deepseek_r1_llama_8b_gptq4.json",
+  "model_config": "configs/legacy_models/deepseek_r1_llama_8b_gptq4.json",
   "task_config": "configs/tasks/math500.json",
   "quant_config": "gptq4",
   "decoding_config": "configs/decoding/repro_qrm.yaml",

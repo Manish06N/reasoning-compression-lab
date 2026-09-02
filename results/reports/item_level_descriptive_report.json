@@ -1,0 +1,548 @@
+{
+  "metadata": {
+    "cpu_only": true,
+    "gpu_campaign_reopened": false,
+    "causal_claims": false,
+    "description": "Descriptive item-level associations from frozen compact JSON. Not a new experiment."
+  },
+  "error_flips": {
+    "math500": {
+      "Qwen-7B_FP8": {
+        "n_items": 500,
+        "n_seeds": 5,
+        "n_item_seed_pairs": 2500,
+        "item_seed": {
+          "both_correct": 2297,
+          "bf16_correct_quant_wrong": 53,
+          "bf16_wrong_quant_correct": 63,
+          "both_wrong": 87
+        },
+        "items_with_any_bf16_correct_quant_wrong": 38,
+        "items_with_all_seeds_bf16_correct_quant_wrong": 0,
+        "note": "Counts are descriptive associations under this pinned evaluation. They are not a causal effect of a quantization method."
+      },
+      "Qwen-7B_AWQ-4": {
+        "n_items": 500,
+        "n_seeds": 5,
+        "n_item_seed_pairs": 2500,
+        "item_seed": {
+          "both_correct": 2272,
+          "bf16_correct_quant_wrong": 78,
+          "bf16_wrong_quant_correct": 56,
+          "both_wrong": 94
+        },
+        "items_with_any_bf16_correct_quant_wrong": 53,
+        "items_with_all_seeds_bf16_correct_quant_wrong": 0,
+        "note": "Counts are descriptive associations under this pinned evaluation. They are not a causal effect of a quantization method."
+      },
+      "Qwen-7B_GPTQ-4": {
+        "n_items": 500,
+        "n_seeds": 5,
+        "n_item_seed_pairs": 2500,
+        "item_seed": {
+          "both_correct": 2284,
+          "bf16_correct_quant_wrong": 66,
+          "bf16_wrong_quant_correct": 53,
+          "both_wrong": 97
+        },
+        "items_with_any_bf16_correct_quant_wrong": 49,
+        "items_with_all_seeds_bf16_correct_quant_wrong": 0,
+        "note": "Counts are descriptive associations under this pinned evaluation. They are not a causal effect of a quantization method."
+      },
+      "Llama-8B_FP8": {
+        "n_items": 500,
+        "n_seeds": 5,
+        "n_item_seed_pairs": 2500,
+        "item_seed": {
+          "both_correct": 2121,
+          "bf16_correct_quant_wrong": 110,
+          "bf16_wrong_quant_correct": 117,
+          "both_wrong": 152
+        },
+        "items_with_any_bf16_correct_quant_wrong": 87,
+        "items_with_all_seeds_bf16_correct_quant_wrong": 0,
+        "note": "Counts are descriptive associations under this pinned evaluation. They are not a causal effect of a quantization method."
+      },
+      "Llama-8B_AWQ-4": {
+        "n_items": 500,
+        "n_seeds": 5,
+        "n_item_seed_pairs": 2500,
+        "item_seed": {
+          "both_correct": 2052,
+          "bf16_correct_quant_wrong": 179,
+          "bf16_wrong_quant_correct": 110,
+          "both_wrong": 159
+        },
+        "items_with_any_bf16_correct_quant_wrong": 121,
+        "items_with_all_seeds_bf16_correct_quant_wrong": 0,
+        "note": "Counts are descriptive associations under this pinned evaluation. They are not a causal effect of a quantization method."
+      },
+      "Llama-8B_GPTQ-4": {
+        "n_items": 500,
+        "n_seeds": 5,
+        "n_item_seed_pairs": 2500,
+        "item_seed": {
+          "both_correct": 2097,
+          "bf16_correct_quant_wrong": 134,
+          "bf16_wrong_quant_correct": 126,
+          "both_wrong": 143
+        },
+        "items_with_any_bf16_correct_quant_wrong": 99,
+        "items_with_all_seeds_bf16_correct_quant_wrong": 0,
+        "note": "Counts are descriptive associations under this pinned evaluation. They are not a causal effect of a quantization method."
+      }
+    },
+    "gsm8k": {
+      "Qwen-7B_FP8": {
+        "n_items": 1319,
+        "n_seeds": 3,
+        "n_item_seed_pairs": 3957,
+        "item_seed": {
+          "both_correct": 3528,
+          "bf16_correct_quant_wrong": 83,
+          "bf16_wrong_quant_correct": 86,
+          "both_wrong": 260
+        },
+        "items_with_any_bf16_correct_quant_wrong": 72,
+        "items_with_all_seeds_bf16_correct_quant_wrong": 2,
+        "note": "Counts are descriptive associations under this pinned evaluation. They are not a causal effect of a quantization method."
+      },
+      "Qwen-7B_AWQ-4": {
+        "n_items": 1319,
+        "n_seeds": 3,
+        "n_item_seed_pairs": 3957,
+        "item_seed": {
+          "both_correct": 3506,
+          "bf16_correct_quant_wrong": 105,
+          "bf16_wrong_quant_correct": 97,
+          "both_wrong": 249
+        },
+        "items_with_any_bf16_correct_quant_wrong": 90,
+        "items_with_all_seeds_bf16_correct_quant_wrong": 1,
+        "note": "Counts are descriptive associations under this pinned evaluation. They are not a causal effect of a quantization method."
+      },
+      "Qwen-7B_GPTQ-4": {
+        "n_items": 1319,
+        "n_seeds": 3,
+        "n_item_seed_pairs": 3957,
+        "item_seed": {
+          "both_correct": 3507,
+          "bf16_correct_quant_wrong": 104,
+          "bf16_wrong_quant_correct": 99,
+          "both_wrong": 247
+        },
+        "items_with_any_bf16_correct_quant_wrong": 87,
+        "items_with_all_seeds_bf16_correct_quant_wrong": 2,
+        "note": "Counts are descriptive associations under this pinned evaluation. They are not a causal effect of a quantization method."
+      },
+      "Llama-8B_FP8": {
+        "n_items": 1319,
+        "n_seeds": 3,
+        "n_item_seed_pairs": 3957,
+        "item_seed": {
+          "both_correct": 3382,
+          "bf16_correct_quant_wrong": 127,
+          "bf16_wrong_quant_correct": 132,
+          "both_wrong": 316
+        },
+        "items_with_any_bf16_correct_quant_wrong": 113,
+        "items_with_all_seeds_bf16_correct_quant_wrong": 0,
+        "note": "Counts are descriptive associations under this pinned evaluation. They are not a causal effect of a quantization method."
+      },
+      "Llama-8B_AWQ-4": {
+        "n_items": 1319,
+        "n_seeds": 3,
+        "n_item_seed_pairs": 3957,
+        "item_seed": {
+          "both_correct": 3294,
+          "bf16_correct_quant_wrong": 215,
+          "bf16_wrong_quant_correct": 153,
+          "both_wrong": 295
+        },
+        "items_with_any_bf16_correct_quant_wrong": 166,
+        "items_with_all_seeds_bf16_correct_quant_wrong": 5,
+        "note": "Counts are descriptive associations under this pinned evaluation. They are not a causal effect of a quantization method."
+      },
+      "Llama-8B_GPTQ-4": {
+        "n_items": 1319,
+        "n_seeds": 3,
+        "n_item_seed_pairs": 3957,
+        "item_seed": {
+          "both_correct": 3373,
+          "bf16_correct_quant_wrong": 136,
+          "bf16_wrong_quant_correct": 147,
+          "both_wrong": 301
+        },
+        "items_with_any_bf16_correct_quant_wrong": 119,
+        "items_with_all_seeds_bf16_correct_quant_wrong": 0,
+        "note": "Counts are descriptive associations under this pinned evaluation. They are not a causal effect of a quantization method."
+      }
+    },
+    "gpqa_diamond": {
+      "Qwen-7B_FP8": {
+        "n_items": 198,
+        "n_seeds": 3,
+        "n_item_seed_pairs": 594,
+        "item_seed": {
+          "both_correct": 223,
+          "bf16_correct_quant_wrong": 76,
+          "bf16_wrong_quant_correct": 71,
+          "both_wrong": 224
+        },
+        "items_with_any_bf16_correct_quant_wrong": 61,
+        "items_with_all_seeds_bf16_correct_quant_wrong": 0,
+        "note": "Counts are descriptive associations under this pinned evaluation. They are not a causal effect of a quantization method."
+      },
+      "Qwen-7B_AWQ-4": {
+        "n_items": 198,
+        "n_seeds": 3,
+        "n_item_seed_pairs": 594,
+        "item_seed": {
+          "both_correct": 201,
+          "bf16_correct_quant_wrong": 98,
+          "bf16_wrong_quant_correct": 65,
+          "both_wrong": 230
+        },
+        "items_with_any_bf16_correct_quant_wrong": 75,
+        "items_with_all_seeds_bf16_correct_quant_wrong": 0,
+        "note": "Counts are descriptive associations under this pinned evaluation. They are not a causal effect of a quantization method."
+      },
+      "Qwen-7B_GPTQ-4": {
+        "n_items": 198,
+        "n_seeds": 3,
+        "n_item_seed_pairs": 594,
+        "item_seed": {
+          "both_correct": 212,
+          "bf16_correct_quant_wrong": 87,
+          "bf16_wrong_quant_correct": 73,
+          "both_wrong": 222
+        },
+        "items_with_any_bf16_correct_quant_wrong": 68,
+        "items_with_all_seeds_bf16_correct_quant_wrong": 2,
+        "note": "Counts are descriptive associations under this pinned evaluation. They are not a causal effect of a quantization method."
+      },
+      "Llama-8B_FP8": {
+        "n_items": 198,
+        "n_seeds": 3,
+        "n_item_seed_pairs": 594,
+        "item_seed": {
+          "both_correct": 201,
+          "bf16_correct_quant_wrong": 73,
+          "bf16_wrong_quant_correct": 83,
+          "both_wrong": 237
+        },
+        "items_with_any_bf16_correct_quant_wrong": 65,
+        "items_with_all_seeds_bf16_correct_quant_wrong": 1,
+        "note": "Counts are descriptive associations under this pinned evaluation. They are not a causal effect of a quantization method."
+      },
+      "Llama-8B_AWQ-4": {
+        "n_items": 198,
+        "n_seeds": 3,
+        "n_item_seed_pairs": 594,
+        "item_seed": {
+          "both_correct": 187,
+          "bf16_correct_quant_wrong": 87,
+          "bf16_wrong_quant_correct": 92,
+          "both_wrong": 228
+        },
+        "items_with_any_bf16_correct_quant_wrong": 74,
+        "items_with_all_seeds_bf16_correct_quant_wrong": 0,
+        "note": "Counts are descriptive associations under this pinned evaluation. They are not a causal effect of a quantization method."
+      },
+      "Llama-8B_GPTQ-4": {
+        "n_items": 198,
+        "n_seeds": 3,
+        "n_item_seed_pairs": 594,
+        "item_seed": {
+          "both_correct": 183,
+          "bf16_correct_quant_wrong": 91,
+          "bf16_wrong_quant_correct": 84,
+          "both_wrong": 236
+        },
+        "items_with_any_bf16_correct_quant_wrong": 72,
+        "items_with_all_seeds_bf16_correct_quant_wrong": 1,
+        "note": "Counts are descriptive associations under this pinned evaluation. They are not a causal effect of a quantization method."
+      }
+    }
+  },
+  "length_versus_correctness": {
+    "math500": {
+      "Qwen-7B_BF16": {
+        "n_correct": 2350,
+        "n_incorrect": 150,
+        "mean_tokens_correct": 3256.1659574468085,
+        "mean_tokens_incorrect": 15842.746666666666,
+        "note": "Incorrect traces are longer on average in this grid; this is a descriptive association."
+      },
+      "Qwen-7B_FP8": {
+        "n_correct": 2360,
+        "n_incorrect": 140,
+        "mean_tokens_correct": 3327.7949152542374,
+        "mean_tokens_incorrect": 15468.5,
+        "note": "Incorrect traces are longer on average in this grid; this is a descriptive association."
+      },
+      "Qwen-7B_AWQ-4": {
+        "n_correct": 2328,
+        "n_incorrect": 172,
+        "mean_tokens_correct": 3368.075171821306,
+        "mean_tokens_incorrect": 16409.418604651164,
+        "note": "Incorrect traces are longer on average in this grid; this is a descriptive association."
+      },
+      "Qwen-7B_GPTQ-4": {
+        "n_correct": 2337,
+        "n_incorrect": 163,
+        "mean_tokens_correct": 3392.584082156611,
+        "mean_tokens_incorrect": 17114.159509202455,
+        "note": "Incorrect traces are longer on average in this grid; this is a descriptive association."
+      },
+      "Llama-8B_BF16": {
+        "n_correct": 2231,
+        "n_incorrect": 269,
+        "mean_tokens_correct": 3538.647243388615,
+        "mean_tokens_incorrect": 13928.46096654275,
+        "note": "Incorrect traces are longer on average in this grid; this is a descriptive association."
+      },
+      "Llama-8B_FP8": {
+        "n_correct": 2238,
+        "n_incorrect": 262,
+        "mean_tokens_correct": 3558.576854334227,
+        "mean_tokens_incorrect": 13026.267175572519,
+        "note": "Incorrect traces are longer on average in this grid; this is a descriptive association."
+      },
+      "Llama-8B_AWQ-4": {
+        "n_correct": 2162,
+        "n_incorrect": 338,
+        "mean_tokens_correct": 3564.900555041628,
+        "mean_tokens_incorrect": 12230.260355029586,
+        "note": "Incorrect traces are longer on average in this grid; this is a descriptive association."
+      },
+      "Llama-8B_GPTQ-4": {
+        "n_correct": 2223,
+        "n_incorrect": 277,
+        "mean_tokens_correct": 3568.2748538011697,
+        "mean_tokens_incorrect": 15050.476534296029,
+        "note": "Incorrect traces are longer on average in this grid; this is a descriptive association."
+      }
+    },
+    "gsm8k": {
+      "Qwen-7B_BF16": {
+        "n_correct": 3611,
+        "n_incorrect": 346,
+        "mean_tokens_correct": 1509.189975076156,
+        "mean_tokens_incorrect": 3644.4710982658958,
+        "note": "Incorrect traces are longer on average in this grid; this is a descriptive association."
+      },
+      "Qwen-7B_FP8": {
+        "n_correct": 3614,
+        "n_incorrect": 343,
+        "mean_tokens_correct": 1503.0816270060875,
+        "mean_tokens_incorrect": 3744.3615160349855,
+        "note": "Incorrect traces are longer on average in this grid; this is a descriptive association."
+      },
+      "Qwen-7B_AWQ-4": {
+        "n_correct": 3603,
+        "n_incorrect": 354,
+        "mean_tokens_correct": 1491.8170968637246,
+        "mean_tokens_incorrect": 3660.101694915254,
+        "note": "Incorrect traces are longer on average in this grid; this is a descriptive association."
+      },
+      "Qwen-7B_GPTQ-4": {
+        "n_correct": 3606,
+        "n_incorrect": 351,
+        "mean_tokens_correct": 1473.7914586799777,
+        "mean_tokens_incorrect": 4091.025641025641,
+        "note": "Incorrect traces are longer on average in this grid; this is a descriptive association."
+      },
+      "Llama-8B_BF16": {
+        "n_correct": 3509,
+        "n_incorrect": 448,
+        "mean_tokens_correct": 1547.7566258193217,
+        "mean_tokens_incorrect": 3507.3459821428573,
+        "note": "Incorrect traces are longer on average in this grid; this is a descriptive association."
+      },
+      "Llama-8B_FP8": {
+        "n_correct": 3514,
+        "n_incorrect": 443,
+        "mean_tokens_correct": 1501.348890153671,
+        "mean_tokens_incorrect": 3487.6388261851016,
+        "note": "Incorrect traces are longer on average in this grid; this is a descriptive association."
+      },
+      "Llama-8B_AWQ-4": {
+        "n_correct": 3447,
+        "n_incorrect": 510,
+        "mean_tokens_correct": 1466.2077168552364,
+        "mean_tokens_incorrect": 3693.7980392156865,
+        "note": "Incorrect traces are longer on average in this grid; this is a descriptive association."
+      },
+      "Llama-8B_GPTQ-4": {
+        "n_correct": 3520,
+        "n_incorrect": 437,
+        "mean_tokens_correct": 1577.6625,
+        "mean_tokens_incorrect": 3966.5354691075513,
+        "note": "Incorrect traces are longer on average in this grid; this is a descriptive association."
+      }
+    },
+    "gpqa_diamond": {
+      "Qwen-7B_BF16": {
+        "n_correct": 299,
+        "n_incorrect": 295,
+        "mean_tokens_correct": 7028.200668896321,
+        "mean_tokens_incorrect": 10050.945762711865,
+        "note": "Incorrect traces are longer on average in this grid; this is a descriptive association."
+      },
+      "Qwen-7B_FP8": {
+        "n_correct": 294,
+        "n_incorrect": 300,
+        "mean_tokens_correct": 6795.9047619047615,
+        "mean_tokens_incorrect": 9272.31,
+        "note": "Incorrect traces are longer on average in this grid; this is a descriptive association."
+      },
+      "Qwen-7B_AWQ-4": {
+        "n_correct": 266,
+        "n_incorrect": 328,
+        "mean_tokens_correct": 6939.409774436091,
+        "mean_tokens_incorrect": 9754.161585365853,
+        "note": "Incorrect traces are longer on average in this grid; this is a descriptive association."
+      },
+      "Qwen-7B_GPTQ-4": {
+        "n_correct": 285,
+        "n_incorrect": 309,
+        "mean_tokens_correct": 7573.80350877193,
+        "mean_tokens_incorrect": 10562.116504854368,
+        "note": "Incorrect traces are longer on average in this grid; this is a descriptive association."
+      },
+      "Llama-8B_BF16": {
+        "n_correct": 274,
+        "n_incorrect": 320,
+        "mean_tokens_correct": 7614.014598540146,
+        "mean_tokens_incorrect": 9560.046875,
+        "note": "Incorrect traces are longer on average in this grid; this is a descriptive association."
+      },
+      "Llama-8B_FP8": {
+        "n_correct": 284,
+        "n_incorrect": 310,
+        "mean_tokens_correct": 7744.985915492958,
+        "mean_tokens_incorrect": 9609.567741935483,
+        "note": "Incorrect traces are longer on average in this grid; this is a descriptive association."
+      },
+      "Llama-8B_AWQ-4": {
+        "n_correct": 279,
+        "n_incorrect": 315,
+        "mean_tokens_correct": 8154.336917562724,
+        "mean_tokens_incorrect": 9540.053968253967,
+        "note": "Incorrect traces are longer on average in this grid; this is a descriptive association."
+      },
+      "Llama-8B_GPTQ-4": {
+        "n_correct": 267,
+        "n_incorrect": 327,
+        "mean_tokens_correct": 8354.168539325843,
+        "mean_tokens_incorrect": 9977.492354740061,
+        "note": "Incorrect traces are longer on average in this grid; this is a descriptive association."
+      }
+    }
+  },
+  "gpqa_item_level": {
+    "n_items": 198,
+    "n_seeds": 3,
+    "gated_benchmark": true,
+    "item_text_omitted": true,
+    "qwen_awq_flip_seed_histogram": {
+      "0": 123,
+      "1": 52,
+      "2": 23
+    },
+    "top_qwen_awq_flip_rows": [
+      {
+        "row": 7,
+        "qwen_awq_bf16_correct_quant_wrong_seeds": 2,
+        "qwen_bf16_n_correct_seeds": 2,
+        "qwen_awq_n_correct_seeds": 1
+      },
+      {
+        "row": 10,
+        "qwen_awq_bf16_correct_quant_wrong_seeds": 2,
+        "qwen_bf16_n_correct_seeds": 2,
+        "qwen_awq_n_correct_seeds": 0
+      },
+      {
+        "row": 17,
+        "qwen_awq_bf16_correct_quant_wrong_seeds": 2,
+        "qwen_bf16_n_correct_seeds": 3,
+        "qwen_awq_n_correct_seeds": 1
+      },
+      {
+        "row": 41,
+        "qwen_awq_bf16_correct_quant_wrong_seeds": 2,
+        "qwen_bf16_n_correct_seeds": 2,
+        "qwen_awq_n_correct_seeds": 1
+      },
+      {
+        "row": 49,
+        "qwen_awq_bf16_correct_quant_wrong_seeds": 2,
+        "qwen_bf16_n_correct_seeds": 2,
+        "qwen_awq_n_correct_seeds": 0
+      },
+      {
+        "row": 61,
+        "qwen_awq_bf16_correct_quant_wrong_seeds": 2,
+        "qwen_bf16_n_correct_seeds": 2,
+        "qwen_awq_n_correct_seeds": 1
+      },
+      {
+        "row": 73,
+        "qwen_awq_bf16_correct_quant_wrong_seeds": 2,
+        "qwen_bf16_n_correct_seeds": 3,
+        "qwen_awq_n_correct_seeds": 1
+      },
+      {
+        "row": 79,
+        "qwen_awq_bf16_correct_quant_wrong_seeds": 2,
+        "qwen_bf16_n_correct_seeds": 2,
+        "qwen_awq_n_correct_seeds": 0
+      },
+      {
+        "row": 92,
+        "qwen_awq_bf16_correct_quant_wrong_seeds": 2,
+        "qwen_bf16_n_correct_seeds": 2,
+        "qwen_awq_n_correct_seeds": 0
+      },
+      {
+        "row": 98,
+        "qwen_awq_bf16_correct_quant_wrong_seeds": 2,
+        "qwen_bf16_n_correct_seeds": 3,
+        "qwen_awq_n_correct_seeds": 1
+      },
+      {
+        "row": 105,
+        "qwen_awq_bf16_correct_quant_wrong_seeds": 2,
+        "qwen_bf16_n_correct_seeds": 2,
+        "qwen_awq_n_correct_seeds": 0
+      },
+      {
+        "row": 111,
+        "qwen_awq_bf16_correct_quant_wrong_seeds": 2,
+        "qwen_bf16_n_correct_seeds": 2,
+        "qwen_awq_n_correct_seeds": 0
+      },
+      {
+        "row": 114,
+        "qwen_awq_bf16_correct_quant_wrong_seeds": 2,
+        "qwen_bf16_n_correct_seeds": 2,
+        "qwen_awq_n_correct_seeds": 0
+      },
+      {
+        "row": 120,
+        "qwen_awq_bf16_correct_quant_wrong_seeds": 2,
+        "qwen_bf16_n_correct_seeds": 3,
+        "qwen_awq_n_correct_seeds": 1
+      },
+      {
+        "row": 138,
+        "qwen_awq_bf16_correct_quant_wrong_seeds": 2,
+        "qwen_bf16_n_correct_seeds": 2,
+        "qwen_awq_n_correct_seeds": 0
+      }
+    ],
+    "note": "Row indices are campaign order, not published GPQA prompts. The Qwen AWQ GPQA result is significant within the primary Holm-6 family, but not under the Holm-18 joint sensitivity analysis."
+  }
+}

@@ -50,7 +50,7 @@ def main() -> None:
     parser.add_argument("--verify", action="store_true", help="Fail if any pin is not a SHA")
     args = parser.parse_args()
 
-    paths = sorted((ROOT / "configs/models").glob("*.json")) + sorted(
+    paths = sorted((ROOT / "configs/legacy_models").glob("*.json")) + sorted(
         (ROOT / "configs/tasks").glob("*.json")
     )
     if args.verify:

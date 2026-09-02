@@ -2,7 +2,8 @@
 """Optional matplotlib copies of the pinned-stack figures.
 
 The submitted PDF uses TikZ in paper/main.tex. These PNGs are not the manuscript
-and must not be cited as a Pareto frontier.
+and must not be cited as a Pareto frontier. The Condition B plot in the paper is
+a cost-accuracy scatter with separate serving-condition panels.
 """
 
 import json
@@ -65,12 +66,12 @@ def main():
         ax.plot(costs, accs, linestyle=ls, color="#555555", alpha=0.6, label=f"{m}")
     ax.set_xlabel(r"Token-implied $C_{\mathrm{pass}}$ (cents / correct) at 65 tok/s")
     ax.set_ylabel("MATH-500 mean pass@1 (%)")
-    ax.set_title("Modeled token-cost ranking (throughput held equal)")
+    ax.set_title("Historical token-proxy ranking (throughput held equal)")
     ax.legend(frameon=True, loc="lower right")
     fig.tight_layout()
     for dest in ("paper_figures", "paper"):
-        fig.savefig(os.path.join(dest, "figure1_pareto_frontier.pdf"))
-        fig.savefig(os.path.join(dest, "figure1_pareto_frontier.png"))
+        fig.savefig(os.path.join(dest, "figure1_token_proxy_scatter.pdf"))
+        fig.savefig(os.path.join(dest, "figure1_token_proxy_scatter.png"))
     plt.close()
 
     # Figure 2: mean tokens

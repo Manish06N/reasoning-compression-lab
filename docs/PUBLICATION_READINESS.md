@@ -6,7 +6,7 @@ The 2026-08-17, 2026-08-16 and 2026-08-14 banners below are **historical**. They
 
 The 2026-08-16 and 2026-08-14 banners below are **historical**. They do **not** describe the current evidence.
 
-**Current label:** P0-corrected preprint plus gold-free MATH-500 modal agreement plus controlled serving confirmation plus major-revision CPU analyses (mismatch excess $D$, bootstrap tail-area $p$, Holm-18 sensitivity, hybrid $C_{\mathrm{pass}}$). Canonical numbers: `results/reports/revision_reanalysis_report.json`, `results/reports/modal_agreement_report.json`, `results/reports/measured_serving_confirmation/measured_serving_confirmation_report.json`. Do not cite 0/0 pathologies, the 98.23% gold-hit gate, “true Pareto optimum,” FP8 “parity,” or unqualified “Qwen AWQ-4 is Holm-significant on GPQA.”
+**Current label:** Stack-pinned measurement study on `paper-major-revision`. Canonical numbers: `results/reports/revision_reanalysis_report.json`, `results/reports/modal_agreement_report.json`, `results/reports/measured_serving_confirmation/measured_serving_confirmation_report.json`. Do not cite 0/0 pathologies, the 98.23% gold-hit gate, “true Pareto optimum,” FP8 “parity,” or unqualified “Qwen AWQ-4 is Holm-significant on GPQA.” The Qwen AWQ GPQA result is significant within the primary Holm-6 family, but not under the Holm-18 joint sensitivity analysis.
 
 ---
 
@@ -139,7 +139,7 @@ The broad combination “quantized reasoning + calibration + cost” is no longe
 - [Reliability Scaling Laws for Quantized LLMs](https://arxiv.org/abs/2607.10855) expands the reliability/efficiency landscape across bit widths and methods.
 - [Quantization Inflates Reasoning](https://arxiv.org/abs/2606.25519) directly targets token inflation as a hidden quantization cost.
 
-**Recommended differentiator:** a paired, reasoning-specific **reliability–cost frontier under quantization and controlled serving-stack shift**, with termination/degeneration evidence and released trace-level provenance.
+**Historical recommended differentiator (2026-08-14; superseded):** a paired reliability–cost frontier under quantization and serving-stack shift. **Current differentiator:** a stack-pinned measurement protocol showing that public quantized reasoning checkpoints can change rank depending on what is measured. Do not cite a unique cost frontier or serving-stack factorial; this paper pins one stack.
 
 The project must run the discriminating pilot in the recovery plan before choosing between:
 
