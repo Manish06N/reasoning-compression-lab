@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-09-02 — Rebuild arXiv source zip
+
+`paper/arxiv_source.zip` rebuilt from current `main.tex` (80,846 B) + `references.bib` (7,942 B) + `main.bbl` (7,103 B). SHA256 `420d62c599c03bd7c313c1b2ebb89b2953c7d3c3a98cd2f7f07842b21643d346`. Compiled `paper/main.pdf` is 22 pages (xelatex). GPU closed.
+
 ## 2026-09-02 — Final publication-readiness audit (no GPU)
 
 Integrity pass on `paper-major-revision`. **GPU campaign not reopened.** Frozen pass@1 / serving numbers unchanged.

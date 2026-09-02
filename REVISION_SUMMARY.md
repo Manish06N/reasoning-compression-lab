@@ -20,7 +20,7 @@ The repository now communicates: *we provide a stack-pinned measurement protocol
 | `07_preflight_publication.py --ci` | pass (venv) |
 | Frozen MATH-500 / GSM8K / GPQA / serving numbers | unchanged vs prior frozen JSON |
 
-PDF / `arxiv_source.zip` were **not** rebuilt in this pass (needs local xelatex). Recompile before arXiv upload.
+PDF / `arxiv_source.zip` rebuilt 2026-09-02 (`main.pdf` 22 pages; zip SHA256 `420d62c599c03bd7c313c1b2ebb89b2953c7d3c3a98cd2f7f07842b21643d346`).
 
 ## Files modified (reason)
 

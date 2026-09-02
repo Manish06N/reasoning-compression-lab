@@ -139,7 +139,7 @@ Runtime manifest records:
    - Midhunchakkaravarthy Janarthanan: Supervision, Writing — review & editing.
    Confirm before submission if advisors should also be listed for Validation, methodology guidance, or Project administration.
 2. **Venue.** Primary alignment in this pass is **Journal of Systems and Software** (artifact, pinned protocol, threats to validity). Related-work Table 1 is retained. For **TMLR**, consider moving Table 1 to an appendix. Do not optimize for FGCS unless requested.
-3. **PDF / arXiv zip.** `paper/main.pdf` and `paper/arxiv_source.zip` are stale relative to this tex pass. Recompile (`xelatex` → `bibtex` → `xelatex` ×2) and rebuild the zip after CRediT confirmation.
+3. **PDF / arXiv zip.** Rebuilt 2026-09-02: `paper/main.pdf` (22 pages) and `paper/arxiv_source.zip` SHA256 `420d62c599c03bd7c313c1b2ebb89b2953c7d3c3a98cd2f7f07842b21643d346`. Recompile again only if `main.tex` changes after this zip.
 4. **Remote CI.** Local checks passed; GitHub Actions runs only after push to `paper-major-revision`.
 5. Do **not** merge to `main` until the submission snapshot is tagged.
 
