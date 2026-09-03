@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-09-03 — Third-author contact email (no GPU)
+
+Lincoln contact for Midhunchakkaravarthy Janarthanan is `midhun@lincoln.edu.my`. Frozen numeric tables unchanged.
+
 ## 2026-09-02 — JSS submission polish (no GPU)
 
 Last 5% before tagging. **GPU campaign not reopened.** Frozen numeric tables unchanged.

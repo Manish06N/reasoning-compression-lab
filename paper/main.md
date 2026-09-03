@@ -6,7 +6,7 @@
 Email: {manish_25s21res58, rajivm}@iitp.ac.in
 
 <sup>2</sup> Lincoln University College, Malaysia
-Email: Midhunchakkaravarthy@lincoln.edu.my
+Email: midhun@lincoln.edu.my
 
 **Do not cite this markdown file for numbers.** The canonical manuscript is [`main.tex`](main.tex) compiled to [`main.pdf`](main.pdf). This file exists only so repository markdown matches the LaTeX story.
 
