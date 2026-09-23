@@ -17,14 +17,14 @@ NEEDLES = [
     "$-2.76$",
     "$-5.56$",
     "$-1.57$",
-    "6.3$--$6.9",
-    "Holm-6 family",
-    "Holm-18 joint sensitivity",
+    "+6.33",
+    "Primary inference remains Holm-6",
+    "Holm-18 sensitivity",
     "$-45.9$",
-    "tested community AWQ",
-    "not a property of bit-width alone",
+    "community AWQ-4",
+    "not evidence that bit-width has a stable deployment ranking",
     "75 of 198",
-    "0.109",
+    "0.130",
 ]
 
 
