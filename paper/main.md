@@ -1,4 +1,4 @@
-# One Stack, Many Rankings: Measuring Evaluation-Target Instability in Quantized Reasoning Checkpoints
+# Evaluation-Target Instability in Quantized Reasoning Checkpoints: One Stack, Many Rankings
 
 **Manish Nandish**<sup>1,2</sup>, **Rajiv Misra**<sup>1</sup>, and **Midhunchakkaravarthy Janarthanan**<sup>2</sup>
 
@@ -16,11 +16,9 @@ Email: midhun@lincoln.edu.my
 
 ## Abstract (same claims as `main.tex`)
 
-Practitioners often select a public quantized reasoning checkpoint using one published metric, typically pass@1. Prior measurement studies examine individual dimensions—accuracy, serving throughput, token length, or calibration—but do not ask whether checkpoint rankings remain stable when the serving stack is frozen and the evaluation target changes.
+Practitioners often select a public quantized reasoning checkpoint from a single metric. We pin one A100 stack (vLLM 0.7.0 eager) and evaluate eight DeepSeek-R1-Distill checkpoints on MATH-500, GSM8K, and GPQA-Diamond (88 runs, 56,408 completions).
 
-We pin one stack and vary only the public weight checkpoint. Eight DeepSeek-R1-Distill checkpoints (BF16; FP8 executed as Marlin W8A16 rather than native W8A8; AWQ-4; GPTQ-4; Qwen-7B and Llama-8B) are evaluated on an NVIDIA A100-80GB with vLLM 0.7.0 eager execution. The campaign comprises 88 checkpoint×benchmark×seed runs and 56,408 completions on MATH-500 (5 seeds), GSM8K (3 seeds), and GPQA-Diamond (3 seeds).
-
-Under this pin, rankings disagree across estimands. On MATH-500, FP8–BF16 pass@1 differences are $+0.40$ and $+0.28$ percentage points (pp); problem-clustered 95% intervals include zero, and a $\pm 1$ pp equivalence test is not passed. The tested community AWQ artifacts showed task-specific degradation. The tested Qwen AWQ artifact exhibited a $5.56$ pp GPQA-Diamond difference under the primary Holm-6 family; this contrast does not remain significant under the Holm-18 joint sensitivity analysis. The tested Qwen 4-bit checkpoints showed $6.3$–$6.9\%$ higher mean MATH-500 completion length, including among jointly correct pairs. Historical token-implied cost, sequential GPU-seconds (Condition A), and batched GPU-seconds (Condition B) rank the tested Qwen cells differently. The deployment ranking of a quantized reasoning checkpoint depends on the checkpoint, task, estimand, and serving condition under the evaluated stack.
+MATH-500 FP8–BF16 pass@1 differences are $+0.40$ and $+0.28$ pp; item-level 95% intervals include zero, and the 90% intervals extend to $+1.12$ and $+1.28$ pp. Gold-free 5/5 agreement has selective risk at most $0.27\%$; a one-sample length rule at the same coverage has selective risk of $1.6$–$4.6\%$. Subset GPU-seconds and campaign-length cost do not share a point order. Llama FP8 averages about $7{,}288$ tokens per query on the 20-prompt Condition A draw and $4{,}551$ on the full grid. Timing intervals do not cover that length draw.
 
 ---
 
@@ -31,7 +29,7 @@ Under this pin, rankings disagree across estimands. On MATH-500, FP8–BF16 pass
 3. **RQ3.** What can observable multi-sample agreement say about selective abstention without gold labels at serve time?
 4. **RQ4.** Do checkpoint rankings agree across the historical token proxy, sequential Condition A, and batched Condition B aggregate serving-cost proxies?
 
-This paper **pins** one stack. It does not run a factorial vLLM 0.7.0 vs 0.8.5 experiment. Contributions in `main.tex` are (C1) pinned evaluation protocol, (C2) ranking instability, (C3) checkpoint-not-method (tested community AWQ artifacts showed task-specific degradation).
+This paper **pins** one stack. Contributions in `main.tex` are (C1) pinned protocol with recorded dtype and kernel, (C2) estimator-sensitive point orders, with length variance stated, (C3) AWQ results scoped to the jakiAJK artifacts.
 
 **Novelty defense (same claim as related work in `main.tex`):** Existing studies evaluate quantization accuracy, throughput, or individual reasoning behaviors. Our question is different: after fixing the serving stack, do practitioners receive the same checkpoint recommendation when the evaluation target changes? We study ranking stability rather than proposing another quantization method.
 
@@ -50,7 +48,7 @@ This paper **pins** one stack. It does not run a factorial vLLM 0.7.0 vs 0.8.5 e
 | Qwen 4-bit tokens | $+6.3$–$6.9\%$ RoM vs BF16; Both-OK CIs exclude 0; mismatch-conditioned $D$ is a diagnostic (not causal); BF16-correct conditional $\Delta$, following Lian et al., positive |
 | 200-item subset | Superseded estimator (Appendix); not a result |
 | Modal-answer selective prediction | Secondary gold-free unique-mode abstention; 5/5 observed risk $\le 0.27\%$; Wilson upper bounds on $0/n$ cells 0.82%–1.08%. Not G-Pass@k. Not a safety property. |
-| Cost | Aggregate hybrid Cost-of-Pass proxy $\widetilde{C}_{\mathrm{pass}}^{\mathrm{hyb}}$: confirmation GPU-seconds / campaign MATH pass@1. Rankings disagree across 65 tok/s proxy, Condition A, and Condition B (serving-condition sensitivity, not isolated batching). Qwen FP8 B: five-rep listing, not a lone $-36.0\%$. |
+| Cost | Subset GPU-seconds and a campaign-length sensitivity (tokens / measured tok/s / pass@1) do not share a point order. Timing intervals are wall-clock repeats of one seed. Qwen FP8 B tok/s $449.79$ is a mean of ratios; $8.64$ GPU-s/q implies about $432.5$ tok/s. |
 | FP8 vs BF16 | 95% CIs include 0; TOST $\pm 1$ pp **fails**; not claimed equivalent |
 
 Tables, TikZ figures, limitations, and the appendix live in `main.tex` / `main.pdf`. Frozen analysis tables: `results/reports/major_revision_tables.md`. Reproduce numbers with:

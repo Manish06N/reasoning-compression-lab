@@ -5,8 +5,8 @@ Evaluation harness and artifacts for **Paper 1**: quantized reasoning models und
 * **Authors:** Manish Nandish (IIT Patna; Lincoln University College), Rajiv Misra (IIT Patna), Midhunchakkaravarthy Janarthanan (Lincoln University College)
 * **Cluster:** PARAM Rudra HPC (C-DAC / NSM), NVIDIA A100-PCIE-80GB
 * **GitHub:** [https://github.com/Manish06N/reasoning-compression-lab](https://github.com/Manish06N/reasoning-compression-lab)
-* **Paper 1 (J1):** *One Stack, Many Rankings: Measuring Evaluation-Target Instability in Quantized Reasoning Checkpoints*
-* **Venue:** Journal of Systems and Software (JSS) first. This 22-page PDF is the JSS initial-submission form. See [`docs/VENUE.md`](docs/VENUE.md).
+* **Paper 1 (J1):** *Evaluation-Target Instability in Quantized Reasoning Checkpoints: One Stack, Many Rankings*
+* **Venue:** See [`docs/VENUE.md`](docs/VENUE.md). JSS and FGCS were desk-rejected. Do not have two journals under review at once.
 
 Canonical manuscript: [`paper/main.tex`](paper/main.tex) → [`paper/main.pdf`](paper/main.pdf). Scoreboard: [`results/README.md`](results/README.md). Canonical numbers: [`results/reports/revision_reanalysis_report.json`](results/reports/revision_reanalysis_report.json). Frozen tables: [`results/reports/major_revision_tables.md`](results/reports/major_revision_tables.md). Modal agreement: [`results/reports/modal_agreement_report.json`](results/reports/modal_agreement_report.json). Serving confirmation: [`results/reports/measured_serving_confirmation/`](results/reports/measured_serving_confirmation/). ArXiv source: [`paper/arxiv_source.zip`](paper/arxiv_source.zip). Packaging: [`paper/ARTIFACT.md`](paper/ARTIFACT.md). Reproduce tables: [`REPRODUCE.md`](REPRODUCE.md). Publication-readiness report: [`SUBMISSION_REVIEW.md`](SUBMISSION_REVIEW.md). Scientific claim audit: [`SCIENTIFIC_AUDIT.md`](SCIENTIFIC_AUDIT.md). Live git branch for the frozen science is **`main`**. Branch `paper-major-revision` is historical and behind `main`. Immutable snapshot tag (when cut): `paper-v1.0-submission`.
 
@@ -124,7 +124,7 @@ Do **not** start a new 50k campaign, extra seeds, or a vLLM 0.7 vs 0.8.5 factori
 
 ```bibtex
 @article{nandish2026onestack,
-  title={One Stack, Many Rankings: Measuring Evaluation-Target Instability in Quantized Reasoning Checkpoints},
+  title={Evaluation-Target Instability in Quantized Reasoning Checkpoints: One Stack, Many Rankings},
   author={Nandish, Manish and Misra, Rajiv and Janarthanan, Midhunchakkaravarthy},
   journal={Working Draft},
   year={2026}

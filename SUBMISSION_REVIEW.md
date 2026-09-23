@@ -1,6 +1,6 @@
 # Submission review (2026-09-02)
 
-**Title update (same day, later pass):** the manuscript title is now *One Stack, Many Rankings: Measuring Evaluation-Target Instability in Quantized Reasoning Checkpoints*. “Beyond Accuracy” was dropped because it reads like a new evaluation framework. Frozen numbers were not changed. See `SCIENTIFIC_AUDIT.md`.
+**Title update (2026-09-09):** *Evaluation-Target Instability in Quantized Reasoning Checkpoints: One Stack, Many Rankings*. Supervisor wording used “models” and “systematic study”; those were not used. Frozen numbers were not changed. See `SCIENTIFIC_AUDIT.md`.
 
 Final technical-editor / reproducibility review of the stack-pinned measurement study.
 

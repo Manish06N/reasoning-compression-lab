@@ -1,5 +1,26 @@
 # Changelog
 
+## 2026-09-23 — Manuscript revision from two reviews (no GPU)
+
+Frozen pass@1, token, and serving tables are unchanged. `paper/main.tex` now states what those tables do not support.
+
+- Cost intervals cover wall-clock repeats of one sampling seed. A campaign-length sensitivity (full-grid tokens / measured tok/s / pass@1) is in the manuscript. Llama FP8 Condition A is about 7,288 tokens/query on the 20-prompt draw and 4,550.8 on the full grid.
+- maj@5 accuracies, quant-correct length deltas, one-sample length abstention, dtype/kernel, GPQA prompt limit, cap definition, TOST margins, and rank-1 frequencies are reported. Script: `scripts/analysis/review_response_sensitivity.py`.
+- No new GPU jobs. Qwen was not rerun on the other host. Cap hits were not reclassified, because `finish_reason` and prompt lengths are not in the compact JSON.
+- Local venue packages were regenerated from this manuscript. Those folders are not in this repository.
+
+## 2026-09-21 — FGCS manuscript PDF (no GPU)
+
+FGCS package refreshed to the live title. One-file review PDF: `one-stack-many-rankings-fgcs/submission/manuscript.pdf`. Frozen numeric tables unchanged.
+
+## 2026-09-09 — Title: instability first; keep checkpoints (no GPU)
+
+Journal title is now *Evaluation-Target Instability in Quantized Reasoning Checkpoints: One Stack, Many Rankings*. Supervisor wording used “models” and “systematic study”; those were not taken. Frozen numeric tables unchanged.
+
+## 2026-09-09 — Venue: SCI/JCR Q1 only; JMLR next (no GPU)
+
+Supervisors require Web of Science / JCR Q1. **TMLR parked** (Scopus Q2, not SCIE Q1). Do not submit the OpenReview draft. **Next journal: JMLR.** Backup Q1: ACM TIST. Still do not use JSS/FGCS. Frozen numeric tables unchanged.
+
 ## 2026-09-03 — Third-author contact email (no GPU)
 
 Lincoln contact for Midhunchakkaravarthy Janarthanan is `midhun@lincoln.edu.my`. Frozen numeric tables unchanged.
