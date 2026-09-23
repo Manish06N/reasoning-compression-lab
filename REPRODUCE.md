@@ -36,6 +36,16 @@ No `pip install` is required for:
 - `check_manuscript_numbers.py --check`
 - `check_tex_tables.py --check`
 
+`revision_sensitivities.py --check` is the one CPU check that needs packages. It recomputes the seed placebo (Table 7), the $k$-sample cost curve (Table 11), the GPQA borderline rerun, the near-cap bands, and the item-order diagnostic, then compares them with `results/reports/revision_sensitivities.json`:
+
+```bash
+pip install numpy==2.5.0 scipy==1.18.0 sympy==1.14.0 math-verify==0.9.0 datasets==5.0.1
+python3 scripts/analysis/revision_sensitivities.py --check
+# expected: PASS: results/reports/revision_sensitivities.json reproduces
+```
+
+The item-order diagnostic downloads the public MATH-500 split; offline it is skipped with a note. `check_tex_tables.py` reads that JSON but stays stdlib-only.
+
 `modal_agreement_analysis.py --check-artifact` is also stdlib. It may print `ERROR importing lighteval` on a MacBook without `qrm-official`; that warning is ignorable if the script then prints `OK: compact artifact SHA256...`.
 
 Optional local tests (not needed to recompute tables):
@@ -95,7 +105,7 @@ python3 scripts/analysis/validate_runtime_manifest.py --check
 # expected: OK: runtime_manifest.json matches campaign counts, LightEval 0.8.0, vLLM 0.7.0, task SHAs, and configs/publication/INDEX.json.
 
 python3 scripts/analysis/check_manuscript_numbers.py --check
-# expected: OK: 15 frozen manuscript needles present in paper/main.tex
+# expected: OK: 20 frozen manuscript needles present in paper/main.tex
 
 python3 scripts/check_tex_tables.py --check
 # expected: No manuscript drift detected.

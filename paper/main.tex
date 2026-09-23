@@ -24,6 +24,7 @@
 }
 
 \setlength{\emergencystretch}{2em}
+\newcommand{\vcell}[2]{\begin{tabular}[t]{@{}c@{}}#1\\#2\end{tabular}}
 
 \title{\textbf{Pitfalls of Single-Metric Evaluation for Quantized Reasoning Checkpoints}}
 
@@ -295,12 +296,12 @@ Llama-8B & GPTQ-4 vs BF16 & $+417\ [+261,+583]$ \\
 \toprule
 \textbf{Contrast} & \textbf{RoM} & \textbf{Mean $\Delta$ [95\% CI]} & \textbf{Both OK} & \textbf{BF16 only} & \textbf{Quant only} & \textbf{Both wrong} & \textbf{BF16-correct} & \textbf{Quant-correct} \\
 \midrule
-Qwen FP8     & $-0.1\%$ & $-4\ [-142,+134]$ & $+51\ [-42,+145]$ ($n{=}2297$) & $+5444\ [+2922,+8035]$ ($n{=}53$) & $-6940\ [-9479,-4345]$ ($n{=}63$) & $+264\ [-1126,+1685]$ ($n{=}87$) & $+172\ [+63,+291]$ & $-136\ [-273,-3]$ \\
-Qwen AWQ-4   & $+6.3\%$ & $+254\ [+116,+398]$ & $+166\ [+80,+254]$ ($n{=}2272$) & $+6915\ [+4534,+9345]$ ($n{=}78$) & $-6533\ [-8933,-4255]$ ($n{=}56$) & $+894\ [-620,+2420]$ ($n{=}94$) & $+390\ [+261,+531]$ & $+5\ [-111,+114]$ \\
-Qwen GPTQ-4  & $+6.9\%$ & $+276\ [+121,+431]$ & $+136\ [+45,+239]$ ($n{=}2284$) & $+6892\ [+4090,+9896]$ ($n{=}66$) & $-4910\ [-8180,-1715]$ ($n{=}53$) & $+1893\ [+204,+3388]$ ($n{=}97$) & $+326\ [+198,+464]$ & $+22\ [-99,+151]$ \\
-Llama FP8    & $-2.3\%$ & $-106\ [-284,+65]$ & $+38\ [-74,+152]$ ($n{=}2121$) & $+2629\ [+1098,+4265]$ ($n{=}110$) & $-4159\ [-6040,-2428]$ ($n{=}117$) & $-968\ [-2252,+198]$ ($n{=}152$) & $+166\ [+33,+302]$ & $-182\ [-339,-35]$ \\
-Llama AWQ-4  & $+1.7\%$ & $+80\ [-109,+268]$ & $+91\ [-25,+210]$ ($n{=}2052$) & $+3090\ [+1995,+4286]$ ($n{=}179$) & $-4477\ [-6503,-2588]$ ($n{=}110$) & $-305\ [-1520,+907]$ ($n{=}159$) & $+332\ [+182,+490]$ & $-141\ [-303,+12]$ \\
-Llama GPTQ-4 & $+3.9\%$ & $+184\ [+12,+359]$ & $+66\ [-43,+181]$ ($n{=}2097$) & $+5915\ [+4335,+7605]$ ($n{=}134$) & $-4327\ [-6138,-2561]$ ($n{=}126$) & $+521\ [-506,+1585]$ ($n{=}143$) & $+417\ [+261,+583]$ & $-183\ [-335,-35]$ \\
+Qwen FP8     & $-0.1\%$ & \vcell{$-4$}{$[-142,+134]$} & \vcell{$+51$ ($n{=}2297$)}{$[-42,+145]$} & \vcell{$+5444$ ($n{=}53$)}{$[+2922,+8035]$} & \vcell{$-6940$ ($n{=}63$)}{$[-9479,-4345]$} & \vcell{$+264$ ($n{=}87$)}{$[-1126,+1685]$} & \vcell{$+172$}{$[+63,+291]$} & \vcell{$-136$}{$[-273,-3]$} \\
+Qwen AWQ-4   & $+6.3\%$ & \vcell{$+254$}{$[+116,+398]$} & \vcell{$+166$ ($n{=}2272$)}{$[+80,+254]$} & \vcell{$+6915$ ($n{=}78$)}{$[+4534,+9345]$} & \vcell{$-6533$ ($n{=}56$)}{$[-8933,-4255]$} & \vcell{$+894$ ($n{=}94$)}{$[-620,+2420]$} & \vcell{$+390$}{$[+261,+531]$} & \vcell{$+5$}{$[-111,+114]$} \\
+Qwen GPTQ-4  & $+6.9\%$ & \vcell{$+276$}{$[+121,+431]$} & \vcell{$+136$ ($n{=}2284$)}{$[+45,+239]$} & \vcell{$+6892$ ($n{=}66$)}{$[+4090,+9896]$} & \vcell{$-4910$ ($n{=}53$)}{$[-8180,-1715]$} & \vcell{$+1893$ ($n{=}97$)}{$[+204,+3388]$} & \vcell{$+326$}{$[+198,+464]$} & \vcell{$+22$}{$[-99,+151]$} \\
+Llama FP8    & $-2.3\%$ & \vcell{$-106$}{$[-284,+65]$} & \vcell{$+38$ ($n{=}2121$)}{$[-74,+152]$} & \vcell{$+2629$ ($n{=}110$)}{$[+1098,+4265]$} & \vcell{$-4159$ ($n{=}117$)}{$[-6040,-2428]$} & \vcell{$-968$ ($n{=}152$)}{$[-2252,+198]$} & \vcell{$+166$}{$[+33,+302]$} & \vcell{$-182$}{$[-339,-35]$} \\
+Llama AWQ-4  & $+1.7\%$ & \vcell{$+80$}{$[-109,+268]$} & \vcell{$+91$ ($n{=}2052$)}{$[-25,+210]$} & \vcell{$+3090$ ($n{=}179$)}{$[+1995,+4286]$} & \vcell{$-4477$ ($n{=}110$)}{$[-6503,-2588]$} & \vcell{$-305$ ($n{=}159$)}{$[-1520,+907]$} & \vcell{$+332$}{$[+182,+490]$} & \vcell{$-141$}{$[-303,+12]$} \\
+Llama GPTQ-4 & $+3.9\%$ & \vcell{$+184$}{$[+12,+359]$} & \vcell{$+66$ ($n{=}2097$)}{$[-43,+181]$} & \vcell{$+5915$ ($n{=}134$)}{$[+4335,+7605]$} & \vcell{$-4327$ ($n{=}126$)}{$[-6138,-2561]$} & \vcell{$+521$ ($n{=}143$)}{$[-506,+1585]$} & \vcell{$+417$}{$[+261,+583]$} & \vcell{$-183$}{$[-335,-35]$} \\
 \bottomrule
 \end{tabular}%
 }
@@ -364,11 +365,11 @@ Llama AWQ-4 5/5 coverage is $70.2\%$ versus $76.2\%$ for BF16 ($-6.0$\,pp, $95\%
 
 A one-sample length rule is also gold-free and costs one generation. For each seed we serve the shortest $k$ traces, with $k$ set to the published 5/5 coverage of that cell, and average the selective risk over the five seeds (Table~\ref{tab:length-abstain}). At that matched coverage the length rule's risk is $1.61$--$4.56\%$, against at most $0.27\%$ for 5/5 modal agreement. The five-sample rule still has the lower selective risk. It also spends about five times the tokens ($T_5$ below).
 
-Table~\ref{tab:kcurve} gives the cost curve between those two ends. Unanimity of only two samples serves $82.1$--$92.7\%$ of items at $0.69$--$2.36\%$ risk. The length rule at the same coverage has $2.16$--$5.84\%$ risk, so two samples cut risk by a factor of about $2.2$--$3.1$ for twice the tokens. Three samples reach $0.18$--$1.07\%$. Every $k$ beats the matched length rule in every cell. Most of the gain comes from the second sample, so a deployment that cannot afford five generations keeps most of the benefit at $k=2$ or $3$. These values come from the recovered answer strings, with equivalence recomputed by math-verify on the stored representations. The same code reproduces every 5/5 coverage, 5/5 risk, and length-rule entry in Tables~\ref{tab:modal} and~\ref{tab:length-abstain} exactly.
+Table~\ref{tab:kcurve} gives the cost curve between those two ends. Unanimity of only two samples serves $82.1$--$92.7\%$ of items at $0.69$--$2.36\%$ risk. The length rule at the same coverage has $2.16$--$5.84\%$ risk, so two samples cut risk by a factor of about $2.2$--$3.1$ for twice the tokens. Three samples reach $0.18$--$1.07\%$. Every $k$ beats the matched length rule in every cell. Most of the gain comes from the second sample, so a deployment that cannot afford five generations keeps most of the benefit at $k=2$ or $3$. These values come from the recovered answer strings, with equivalence recomputed by math-verify on the stored representations. The same code reproduces 23 of the 24 corresponding 5/5 coverage, 5/5 risk, and length-rule entries in Tables~\ref{tab:modal} and~\ref{tab:length-abstain} exactly. The exception is Qwen GPTQ-4 5/5 coverage, which is one item lower ($86.6$ vs.\ $86.8\%$) because equivalence is judged here on stored string representations rather than on the original parsed answers. The reconstruction is computed by \path{scripts/analysis/revision_sensitivities.py}.
 
 \begin{table*}[t]
 \centering
-\caption{Cost curve for $k$-sample unanimity on MATH-500. Coverage (Cov.) and selective risk (Risk) are averaged over all $\binom{5}{k}$ seed subsets. Len.: one-sample shortest-trace rule at the same coverage, averaged over five seeds. Tokens per item are $k$ times the mean completion length. The $k=5$ column equals the 5/5 column of Tables~\ref{tab:modal} and~\ref{tab:length-abstain}. All values are percentages except tokens.}
+\caption{Cost curve for $k$-sample unanimity on MATH-500. Coverage (Cov.) and selective risk (Risk) are averaged over all $\binom{5}{k}$ seed subsets. Len.: one-sample shortest-trace rule at the same coverage, averaged over five seeds. Tokens per item are $k$ times the mean completion length. The $k=5$ column reproduces the 5/5 columns of Tables~\ref{tab:modal} and~\ref{tab:length-abstain} except one item in Qwen GPTQ-4 coverage ($86.6$ here, $86.8$ there). All values are percentages except tokens.}
 \label{tab:kcurve}
 \small
 \resizebox{\textwidth}{!}{%
@@ -381,7 +382,7 @@ Table~\ref{tab:kcurve} gives the cost curve between those two ends. Unanimity of
 Qwen-7B & BF16   & 92.5 & 0.89 & 2.20 & 90.7 & 0.44 & 1.94 & 89.4 & 0.27 & 1.83 & 88.4 & 0.23 & 1.67 \\
 Qwen-7B & FP8    & 92.7 & 0.69 & 2.16 & 90.7 & 0.18 & 1.94 & 89.6 & 0.00 & 1.88 & 88.8 & 0.00 & 1.71 \\
 Qwen-7B & AWQ-4  & 91.2 & 1.05 & 2.54 & 88.8 & 0.43 & 2.34 & 87.4 & 0.27 & 2.15 & 86.4 & 0.23 & 1.99 \\
-Qwen-7B & GPTQ-4 & 91.6 & 0.87 & 2.31 & 89.3 & 0.29 & 1.92 & 87.8 & 0.09 & 1.69 & 86.8 & 0.00 & 1.62 \\
+Qwen-7B & GPTQ-4 & 91.6 & 0.87 & 2.31 & 89.3 & 0.29 & 1.92 & 87.8 & 0.09 & 1.69 & 86.6 & 0.00 & 1.62 \\
 \midrule
 Llama-8B & BF16   & 85.8 & 1.86 & 4.06 & 81.5 & 0.71 & 3.34 & 78.5 & 0.36 & 3.16 & 76.2 & 0.26 & 2.83 \\
 Llama-8B & FP8    & 86.9 & 1.91 & 4.47 & 82.9 & 0.63 & 3.82 & 80.3 & 0.20 & 3.39 & 78.2 & 0.00 & 3.17 \\

@@ -2,8 +2,9 @@
 """CPU checks on frozen campaign JSON. No GPU. No new measured table cells.
 
 Prints quant-correct bootstrap intervals, serving-repeat min/max,
-unboxed x near-cap counts, and, when the public MATH-500 split and
-tokenizers are available, a level audit and a prompt-length cap recount.
+unboxed x near-cap counts, and, when the HPC campaign prompt files, the
+public MATH-500 split, and the tokenizers are available, a level audit and a
+prompt-length cap recount joined on prompt text (not row position).
 """
 
 from __future__ import annotations
@@ -174,6 +175,27 @@ def serving_minmax() -> None:
             )
 
 
+CAMPAIGN = ROOT / "outputs-hpc-campaign-2026-08-14"
+
+
+def campaign_prompts(task: str, family_stem: str) -> list[str] | None:
+    """Rendered prompts in compact-JSON row order, from the HPC campaign output.
+
+    Compact JSON rows follow the campaign pipeline order, not the public release
+    order, so per-row metadata must come from these files (matched on prompt
+    text), never from a positional join with the public split.
+    """
+    matches = sorted(CAMPAIGN.glob(f"qrm_official_{family_stem}_{task}*seed42*.json"))
+    if not matches:
+        return None
+    rows = json.loads(matches[0].read_text(encoding="utf-8"))
+    return [row["full_prompt"] for row in rows]
+
+
+def user_text(full_prompt: str) -> str:
+    return full_prompt.split("<\uff5cUser\uff5c>")[-1].split("\n\nPlease reason")[0].strip()
+
+
 def level_and_cap() -> None:
     try:
         from datasets import load_dataset
@@ -181,97 +203,91 @@ def level_and_cap() -> None:
     except ImportError as exc:
         print(f"level/cap skipped: {exc}")
         return
+    stems = {"Qwen-7B": "DeepSeek-R1-Distill-Qwen-7B", "Llama-8B": "DeepSeek-R1-Distill-Llama-8B"}
+    prompts = {
+        task: {fam: campaign_prompts(task, stem) for fam, stem in stems.items()}
+        for task in ("math500", "gsm8k")
+    }
+    if prompts["math500"]["Qwen-7B"] is None:
+        print(
+            f"level/cap skipped: campaign prompt files not found under {CAMPAIGN.name}/. "
+            "Compact JSON rows are in pipeline order, so a positional join with the "
+            "public split would assign the wrong item to most rows."
+        )
+        return
+
     math = load_dataset("HuggingFaceH4/MATH-500", split="test")
-    gsm = load_dataset("openai/gsm8k", "main", split="test")
-    levels = [str(row["level"]) for row in math]
-    print("MATH-500 level counts", {lv: levels.count(lv) for lv in sorted(set(levels))})
-    qwen_tok = AutoTokenizer.from_pretrained(
-        "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B", trust_remote_code=True
-    )
-    llama_tok = AutoTokenizer.from_pretrained(
-        "deepseek-ai/DeepSeek-R1-Distill-Llama-8B", trust_remote_code=True
-    )
+    by_text = {row["problem"].strip(): row for row in math}
 
-    def prompt_len(tokenizer, text: str) -> int:
-        user = (
-            text
-            + "\n\nPlease reason step by step, and put your final answer within \\boxed{}."
-        )
-        rendered = tokenizer.apply_chat_template(
-            [{"role": "user", "content": user}],
-            tokenize=False,
-            add_generation_prompt=True,
-        )
-        return len(tokenizer.encode(rendered, add_special_tokens=False))
+    def hf_item(text: str) -> dict:
+        if text in by_text:
+            return by_text[text]
+        hits = [row for problem, row in by_text.items() if problem in text or text in problem]
+        if len(hits) != 1:
+            raise SystemExit(f"ERROR: {len(hits)} public MATH-500 matches for campaign prompt {text[:60]!r}")
+        return hits[0]
 
-    math_prompt = {
-        "Qwen-7B": [prompt_len(qwen_tok, row["problem"]) for row in math],
-        "Llama-8B": [prompt_len(llama_tok, row["problem"]) for row in math],
+    levels = [str(hf_item(user_text(fp))["level"]) for fp in prompts["math500"]["Qwen-7B"]]
+    print("MATH-500 level counts (campaign order, text-matched)",
+          {lv: levels.count(lv) for lv in sorted(set(levels))})
+
+    tokenizers = {
+        "Qwen-7B": AutoTokenizer.from_pretrained("deepseek-ai/DeepSeek-R1-Distill-Qwen-7B", trust_remote_code=True),
+        "Llama-8B": AutoTokenizer.from_pretrained("deepseek-ai/DeepSeek-R1-Distill-Llama-8B", trust_remote_code=True),
     }
-    gsm_prompt = {
-        "Qwen-7B": [prompt_len(qwen_tok, row["question"]) for row in gsm],
-        "Llama-8B": [prompt_len(llama_tok, row["question"]) for row in gsm],
-    }
-    print(
-        "MATH prompt tokens Qwen",
-        min(math_prompt["Qwen-7B"]),
-        max(math_prompt["Qwen-7B"]),
-    )
-    print(
-        "MATH prompt tokens Llama",
-        min(math_prompt["Llama-8B"]),
-        max(math_prompt["Llama-8B"]),
-    )
 
-    print("level-2 vs level-5 pass@1 and unboxed, Qwen/Llama BF16 seed-mean")
+    def prompt_lengths(task: str, fam: str) -> list[int] | None:
+        rendered = prompts[task][fam]
+        if rendered is None and prompts[task]["Qwen-7B"] is not None:
+            # All eight cells share one row order; re-render the shared text with this family's template.
+            tok = tokenizers[fam]
+            rendered = [
+                tok.apply_chat_template(
+                    [{"role": "user", "content": user_text(fp)
+                      + "\n\nPlease reason step by step, and put your final answer within \\boxed{}."}],
+                    tokenize=False,
+                    add_generation_prompt=True,
+                )
+                for fp in prompts[task]["Qwen-7B"]
+            ]
+        if rendered is None:
+            return None
+        return [len(tokenizers[fam].encode(text, add_special_tokens=False)) for text in rendered]
+
+    print("pass@1 and unboxed by level (seed-pooled)")
     for fam in ("Qwen-7B", "Llama-8B"):
         for fmt in ("BF16", "FP8", "AWQ-4", "GPTQ-4"):
-            by_level: dict[str, list[tuple[int, int]]] = {str(i): [0, 0] for i in range(1, 6)}
-            unboxed_level = {str(i): [0, 0] for i in range(1, 6)}
-            details = load_math()[(fam, fmt)]
-            for rows in details.values():
+            by_level = {str(i): [0, 0, 0] for i in range(1, 6)}
+            for rows in load_math()[(fam, fmt)].values():
                 for i, row in enumerate(rows):
-                    lv = levels[i]
-                    by_level[lv][1] += 1
-                    unboxed_level[lv][1] += 1
-                    if row.get("extractive_match", 0.0) == 1.0:
-                        by_level[lv][0] += 1
-                    if not row.get("boxed", True):
-                        unboxed_level[lv][0] += 1
-            bits = []
-            for lv in ("1", "2", "3", "4", "5"):
-                correct, n = by_level[lv]
-                ub, un = unboxed_level[lv]
-                bits.append(f"L{lv} {100 * correct / n:.2f}% ub {ub}/{un}")
+                    cell = by_level[levels[i]]
+                    cell[1] += 1
+                    cell[0] += row.get("extractive_match", 0.0) == 1.0
+                    cell[2] += not row.get("boxed", True)
+            bits = [f"L{lv} {100 * c / n:.2f}% ub {ub}/{n}" for lv, (c, n, ub) in by_level.items()]
             print(f"  {fam} {fmt}: " + " | ".join(bits))
 
-    print("cap recount: completion_tokens >= 32768 - chat-template prompt tokens")
-    for folder, tag, prompts in (
-        (MATH, "MATH-500", math_prompt),
-        (GSM, "GSM8K", gsm_prompt),
-    ):
+    print("cap recount: completion_tokens >= 32768 - campaign prompt tokens")
+    for folder, task, tag in ((MATH, "math500", "MATH-500"), (GSM, "gsm8k", "GSM8K")):
+        lengths = {fam: prompt_lengths(task, fam) for fam in ("Qwen-7B", "Llama-8B")}
+        if any(v is None for v in lengths.values()):
+            print(f"  {tag}: skipped (campaign prompt file missing)")
+            continue
+        total = 0
         for path in sorted(folder.glob("*.json")):
-            if tag == "MATH-500":
-                stem = path.name.split("_math500_")[0]
-            else:
-                stem = path.name.split("_gsm8k_")[0]
+            stem = path.name.split(f"_{'math500' if task == 'math500' else 'gsm8k'}_")[0]
             fam, fmt = FAMILIES[stem]
-            payload = json.loads(path.read_text())
-            hits = near_and_hit = unboxed_hit = 0
-            for i, row in enumerate(payload["details"]):
-                cap = MODEL_LEN - prompts[fam][i]
+            rows = sorted(json.loads(path.read_text())["details"], key=lambda r: r["row"])
+            hits = near_and_hit = 0
+            for i, row in enumerate(rows):
                 tok = int(row.get("completion_tokens") or 0)
-                if tok >= cap:
+                if tok >= MODEL_LEN - lengths[fam][i]:
                     hits += 1
-                    if tok >= NEAR_CAP:
-                        near_and_hit += 1
-                    if not row.get("boxed", True):
-                        unboxed_hit += 1
+                    near_and_hit += tok >= NEAR_CAP
+            total += hits
             if hits:
-                print(
-                    f"  {tag} {fam} {fmt} {path.name}: hits={hits} "
-                    f"also_near={near_and_hit} unboxed_hits={unboxed_hit}"
-                )
+                print(f"  {tag} {fam} {fmt} {path.name}: hits={hits} also_near={near_and_hit}")
+        print(f"  {tag} TOTAL cap hits: {total}")
 
 
 def main() -> None:

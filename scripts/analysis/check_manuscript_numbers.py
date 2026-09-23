@@ -25,6 +25,11 @@ NEEDLES = [
     "not evidence that bit-width has a stable deployment ranking",
     "75 of 198",
     "0.130",
+    "0.049",
+    "$+138\\ [+75,+207]$",
+    "$+235\\ [+151,+331]$",
+    "550.54.14",
+    "118 of 11{,}382",
 ]
 
 

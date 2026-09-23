@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-09-23 — Length table stacked cells and k-curve correction (no GPU)
+
+`paper/main.tex` stacks each length interval under its point estimate. The k=5 Qwen GPTQ-4 coverage in the unanimity curve is 86.6%, one item below the modal table, because equivalence is recomputed on stored strings. `paper/arxiv_source.zip` SHA256 `49a9b4339c8784d4f97ab0954a55091b16addff9f0927e13c9a8998baa680087`. PDF is 24 pages.
+
 ## 2026-09-23 — Framing realigned to the evidence (no GPU)
 
 Title is now *Pitfalls of Single-Metric Evaluation for Quantized Reasoning Checkpoints*. Research questions and contributions follow the four results the tables support: Llama AWQ-4, the BF16-correct length selection effect, subset cost as one length draw, and five-sample agreement versus a length rule. Frozen pass@1, token, and serving means are unchanged.

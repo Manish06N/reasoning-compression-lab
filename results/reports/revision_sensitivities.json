@@ -1,0 +1,366 @@
+{
+  "gpqa_borderline": {
+    "delta_pp": -5.555555555555555,
+    "p_bootstrap_B1e4_seed_spread": {
+      "min": 0.0056,
+      "median": 0.0078,
+      "max": 0.0104,
+      "holm6_significant_count": 14,
+      "n_seeds": 20
+    },
+    "p_bootstrap_B1e6": 0.00811,
+    "p_signflip_permutation": 0.010955,
+    "p_paired_t": 0.008963204349182088,
+    "holm6_adjusted": {
+      "bootstrap_B1e6": 0.048659999999999995,
+      "permutation": 0.06573,
+      "paired_t": 0.05377922609509253
+    },
+    "holm18_adjusted_bootstrap_B1e6": 0.12976,
+    "label": "borderline"
+  },
+  "seed_placebo": {
+    "Qwen-7B_BF16_placebo": {
+      "reference_correct": 137.77436170212766,
+      "reference_correct_ci95": [
+        75.27517711388022,
+        207.46392664792867
+      ],
+      "other_correct": -137.77436170212766,
+      "other_correct_ci95": [
+        -207.4639266479288,
+        -75.27517711388022
+      ]
+    },
+    "Qwen-7B_FP8": {
+      "reference_correct": 172.35659574468085,
+      "reference_correct_ci95": [
+        61.968408796132536,
+        288.570923776944
+      ],
+      "other_correct": -135.90593220338982,
+      "other_correct_ci95": [
+        -274.3219427153362,
+        -3.318136338223638
+      ],
+      "correctness_agreement_same_seed": 0.9536,
+      "correctness_agreement_cross_seed": 0.9526
+    },
+    "Qwen-7B_AWQ-4": {
+      "reference_correct": 390.0948936170213,
+      "reference_correct_ci95": [
+        259.33785448747676,
+        526.2182594200026
+      ],
+      "other_correct": 4.948883161512027,
+      "other_correct_ci95": [
+        -111.70983078739908,
+        116.35604475978187
+      ],
+      "correctness_agreement_same_seed": 0.9463999999999999,
+      "correctness_agreement_cross_seed": 0.9462000000000002
+    },
+    "Qwen-7B_GPTQ-4": {
+      "reference_correct": 326.09276595744683,
+      "reference_correct_ci95": [
+        197.8340800047979,
+        462.97254639727595
+      ],
+      "other_correct": 21.921694480102694,
+      "other_correct_ci95": [
+        -100.7239232346084,
+        149.6179863338679
+      ],
+      "correctness_agreement_same_seed": 0.9523999999999999,
+      "correctness_agreement_cross_seed": 0.9499999999999998
+    },
+    "Llama-8B_BF16_placebo": {
+      "reference_correct": 235.46896010757507,
+      "reference_correct_ci95": [
+        151.41399241260345,
+        330.9375138719556
+      ],
+      "other_correct": -235.46896010757507,
+      "other_correct_ci95": [
+        -330.9375138719556,
+        -151.41399241260348
+      ]
+    },
+    "Llama-8B_FP8": {
+      "reference_correct": 165.54504706409682,
+      "reference_correct_ci95": [
+        30.865191167237846,
+        304.4486360904193
+      ],
+      "other_correct": -181.64611260053618,
+      "other_correct_ci95": [
+        -338.29643373193824,
+        -31.652033753733985
+      ],
+      "correctness_agreement_same_seed": 0.9092,
+      "correctness_agreement_cross_seed": 0.9072000000000001
+    },
+    "Llama-8B_AWQ-4": {
+      "reference_correct": 331.989242492156,
+      "reference_correct_ci95": [
+        179.80988397667392,
+        490.3085098496992
+      ],
+      "other_correct": -141.04902867715077,
+      "other_correct_ci95": [
+        -305.5255641552219,
+        13.172215541846727
+      ],
+      "correctness_agreement_same_seed": 0.8844,
+      "correctness_agreement_cross_seed": 0.884
+    },
+    "Llama-8B_GPTQ-4": {
+      "reference_correct": 417.1089197669207,
+      "reference_correct_ci95": [
+        260.25748107102027,
+        579.16792690045
+      ],
+      "other_correct": -183.20917678812415,
+      "other_correct_ci95": [
+        -333.64944466480307,
+        -36.42323508853682
+      ],
+      "correctness_agreement_same_seed": 0.8960000000000001,
+      "correctness_agreement_cross_seed": 0.8978000000000002
+    }
+  },
+  "near_cap": {
+    "math500": {
+      "ge_32500": 140,
+      "band_32600_32739": 121,
+      "band_31957_32499": 24,
+      "max": 32737
+    },
+    "gsm8k": {
+      "ge_32500": 57,
+      "band_32600_32739": 55,
+      "band_31957_32499": 0,
+      "max": 32719
+    },
+    "gpqa": {
+      "ge_32500": 12,
+      "band_32600_32739": 6,
+      "band_31957_32499": 11,
+      "max": 32647
+    }
+  },
+  "item_order": {
+    "correct_integer_gold_rows": 11382,
+    "pred_equals_public_gold_same_position": 118
+  },
+  "k_curve": {
+    "Qwen-7B_BF16": {
+      "2": {
+        "coverage_pct": 92.54,
+        "risk_pct": 0.885461440089912,
+        "length_rule_risk_pct": 2.2030237580993517,
+        "tokens_per_item": 8022.7216
+      },
+      "3": {
+        "coverage_pct": 90.65999999999998,
+        "risk_pct": 0.44131026886096186,
+        "length_rule_risk_pct": 1.9426048565121403,
+        "tokens_per_item": 12034.0824
+      },
+      "4": {
+        "coverage_pct": 89.39999999999999,
+        "risk_pct": 0.2684577164182696,
+        "length_rule_risk_pct": 1.8344519015659941,
+        "tokens_per_item": 16045.4432
+      },
+      "5": {
+        "coverage_pct": 88.4,
+        "risk_pct": 0.22624434389140274,
+        "length_rule_risk_pct": 1.6742081447963808,
+        "tokens_per_item": 20056.804
+      }
+    },
+    "Qwen-7B_FP8": {
+      "2": {
+        "coverage_pct": 92.66,
+        "risk_pct": 0.6895328835744029,
+        "length_rule_risk_pct": 2.1598272138228958,
+        "tokens_per_item": 8015.3488
+      },
+      "3": {
+        "coverage_pct": 90.72000000000001,
+        "risk_pct": 0.1757859220538965,
+        "length_rule_risk_pct": 1.9383259911894268,
+        "tokens_per_item": 12023.0232
+      },
+      "4": {
+        "coverage_pct": 89.56,
+        "risk_pct": 0.0,
+        "length_rule_risk_pct": 1.8750000000000024,
+        "tokens_per_item": 16030.6976
+      },
+      "5": {
+        "coverage_pct": 88.8,
+        "risk_pct": 0.0,
+        "length_rule_risk_pct": 1.7117117117117098,
+        "tokens_per_item": 20038.372
+      }
+    },
+    "Qwen-7B_AWQ-4": {
+      "2": {
+        "coverage_pct": 91.17999999999998,
+        "risk_pct": 1.051998389440072,
+        "length_rule_risk_pct": 2.5438596491228083,
+        "tokens_per_item": 8530.6392
+      },
+      "3": {
+        "coverage_pct": 88.78,
+        "risk_pct": 0.42803623480248937,
+        "length_rule_risk_pct": 2.3423423423423406,
+        "tokens_per_item": 12795.9588
+      },
+      "4": {
+        "coverage_pct": 87.36,
+        "risk_pct": 0.27481091548149056,
+        "length_rule_risk_pct": 2.151029748283757,
+        "tokens_per_item": 17061.2784
+      },
+      "5": {
+        "coverage_pct": 86.4,
+        "risk_pct": 0.23148148148148145,
+        "length_rule_risk_pct": 1.9907407407407394,
+        "tokens_per_item": 21326.597999999998
+      }
+    },
+    "Qwen-7B_GPTQ-4": {
+      "2": {
+        "coverage_pct": 91.58,
+        "risk_pct": 0.8729932072602127,
+        "length_rule_risk_pct": 2.314410480349345,
+        "tokens_per_item": 8574.4616
+      },
+      "3": {
+        "coverage_pct": 89.34,
+        "risk_pct": 0.2901501165605028,
+        "length_rule_risk_pct": 1.9239373601789733,
+        "tokens_per_item": 12861.6924
+      },
+      "4": {
+        "coverage_pct": 87.84,
+        "risk_pct": 0.09039559564058303,
+        "length_rule_risk_pct": 1.6856492027334837,
+        "tokens_per_item": 17148.9232
+      },
+      "5": {
+        "coverage_pct": 86.6,
+        "risk_pct": 0.0,
+        "length_rule_risk_pct": 1.616628175519632,
+        "tokens_per_item": 21436.154000000002
+      }
+    },
+    "Llama-8B_BF16": {
+      "2": {
+        "coverage_pct": 85.83999999999999,
+        "risk_pct": 1.8607912599742573,
+        "length_rule_risk_pct": 4.055944055944054,
+        "tokens_per_item": 9313.1824
+      },
+      "3": {
+        "coverage_pct": 81.46000000000001,
+        "risk_pct": 0.7098118611153224,
+        "length_rule_risk_pct": 3.3415233415233407,
+        "tokens_per_item": 13969.7736
+      },
+      "4": {
+        "coverage_pct": 78.52000000000001,
+        "risk_pct": 0.35548144085109634,
+        "length_rule_risk_pct": 3.1552162849872794,
+        "tokens_per_item": 18626.3648
+      },
+      "5": {
+        "coverage_pct": 76.2,
+        "risk_pct": 0.26246719160104987,
+        "length_rule_risk_pct": 2.834645669291338,
+        "tokens_per_item": 23282.956
+      }
+    },
+    "Llama-8B_FP8": {
+      "2": {
+        "coverage_pct": 86.9,
+        "risk_pct": 1.9081166450570013,
+        "length_rule_risk_pct": 4.470046082949308,
+        "tokens_per_item": 9101.5816
+      },
+      "3": {
+        "coverage_pct": 82.87999999999998,
+        "risk_pct": 0.6271622299975096,
+        "length_rule_risk_pct": 3.816425120772946,
+        "tokens_per_item": 13652.3724
+      },
+      "4": {
+        "coverage_pct": 80.28,
+        "risk_pct": 0.19964333405072943,
+        "length_rule_risk_pct": 3.3915211970074832,
+        "tokens_per_item": 18203.1632
+      },
+      "5": {
+        "coverage_pct": 78.2,
+        "risk_pct": 0.0,
+        "length_rule_risk_pct": 3.171355498721225,
+        "tokens_per_item": 22753.953999999998
+      }
+    },
+    "Llama-8B_AWQ-4": {
+      "2": {
+        "coverage_pct": 82.11999999999999,
+        "risk_pct": 2.363433061263685,
+        "length_rule_risk_pct": 5.839416058394162,
+        "tokens_per_item": 9472.9144
+      },
+      "3": {
+        "coverage_pct": 76.82,
+        "risk_pct": 1.0682482634670571,
+        "length_rule_risk_pct": 4.895833333333335,
+        "tokens_per_item": 14209.371599999999
+      },
+      "4": {
+        "coverage_pct": 73.08,
+        "risk_pct": 0.43787479294889203,
+        "length_rule_risk_pct": 4.7123287671232905,
+        "tokens_per_item": 18945.8288
+      },
+      "5": {
+        "coverage_pct": 70.19999999999999,
+        "risk_pct": 0.0,
+        "length_rule_risk_pct": 4.5584045584045585,
+        "tokens_per_item": 23682.286
+      }
+    },
+    "Llama-8B_GPTQ-4": {
+      "2": {
+        "coverage_pct": 85.1,
+        "risk_pct": 1.7641978869390487,
+        "length_rule_risk_pct": 4.08450704225352,
+        "tokens_per_item": 9681.0056
+      },
+      "3": {
+        "coverage_pct": 80.54,
+        "risk_pct": 0.6213666599349611,
+        "length_rule_risk_pct": 3.0272952853598034,
+        "tokens_per_item": 14521.5084
+      },
+      "4": {
+        "coverage_pct": 77.60000000000001,
+        "risk_pct": 0.309285198905251,
+        "length_rule_risk_pct": 2.7835051546391765,
+        "tokens_per_item": 19362.0112
+      },
+      "5": {
+        "coverage_pct": 75.4,
+        "risk_pct": 0.2652519893899204,
+        "length_rule_risk_pct": 2.5464190981432355,
+        "tokens_per_item": 24202.514000000003
+      }
+    }
+  }
+}

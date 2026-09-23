@@ -37,6 +37,7 @@ SERVING_PATH = os.path.join(
     "measured_serving_confirmation_report.json",
 )
 MODAL_PATH = os.path.join(REPO, "results", "reports", "modal_agreement_report.json")
+SENS_PATH = os.path.join(REPO, "results", "reports", "revision_sensitivities.json")
 
 Check = tuple[str, str, str]  # (cell_id, expected, found_or_MISSING)
 
@@ -575,6 +576,76 @@ def fp8_rep_checks(tex_rows: list[list[str]], md_rows: list[list[str]]) -> list[
     return out
 
 
+def apply_gpqa_borderline(groups: dict[str, list[Check]], tex: str, sens: dict[str, Any]) -> None:
+    """Replace frozen B=10^4 expectations for the GPQA Qwen AWQ-4 cell with the
+    B=10^6 borderline record from revision_sensitivities.json."""
+    gb = sens["gpqa_borderline"]
+    p = fmt_p(gb["p_bootstrap_B1e6"])
+    expected = {
+        ("Table tab:gpqa-contrasts", "tab:gpqa-contrasts/Qwen AWQ-4 p"): p,
+        ("Table tab:gpqa-contrasts", "tab:gpqa-contrasts/Qwen AWQ-4 Holm-6"): "border.",
+        ("Table tab:holm18", "tab:holm18/GPQA Qwen AWQ-4 p"): p,
+        ("Table tab:holm18", "tab:holm18/GPQA Qwen AWQ-4 Holm-6"): "border.",
+        ("Table tab:holm18", "tab:holm18/GPQA Qwen AWQ-4 Holm-18 p"): fmt_p(gb["holm18_adjusted_bootstrap_B1e6"]),
+    }
+    tables = {
+        "Table tab:gpqa-contrasts": tex_data_rows(extract_tabular(tex, "tab:gpqa-contrasts")),
+        "Table tab:holm18": tex_data_rows(extract_tabular(tex, "tab:holm18")),
+    }
+    for (group, loc), exp in expected.items():
+        rows = tables[group]
+        row = next((r for r in rows if "Qwen AWQ-4" in " ".join(r) and (group != "Table tab:holm18" or "GPQA" in " ".join(r))), None)
+        body = " ".join(row) if row else "MISSING"
+        found = "PASS" if row and exp in body.replace(" ", "") + body else body
+        groups[group] = [check for check in groups[group] if check[0] != loc] + [(loc, exp, found)]
+
+
+def placebo_checks(tex_rows: list[list[str]], sens: dict[str, Any], token_analysis: dict[str, Any]) -> list[Check]:
+    out: list[Check] = []
+    for fam in ("Qwen-7B", "Llama-8B"):
+        for fmt in ("BF16", "FP8", "AWQ-4", "GPTQ-4"):
+            if fmt == "BF16":
+                rec = sens["seed_placebo"][f"{fam}_BF16_placebo"]
+                mean, (lo, hi) = rec["reference_correct"], rec["reference_correct_ci95"]
+                needle = "placebo"
+            else:
+                rec = token_analysis[f"{fam}_{fmt}"]["lian_bf16_correct_delta"]
+                mean, lo, hi = rec["mean"], rec["ci95_lo"], rec["ci95_hi"]
+                needle = f"{fmt} vs BF16"
+            row = next((r for r in tex_rows if r[0].startswith(fam) and needle in " ".join(r)), None)
+            loc = f"tab:placebo/{fam} {needle}"
+            if row is None:
+                out.append((loc, "row", "MISSING"))
+                continue
+            body = " ".join(row)
+            m = f"{int(round(mean)):+d}"
+            out.append((f"{loc} mean", m, "PASS" if m in body.replace(" ", "") else body))
+            ci = f"[{lo:+.0f},{hi:+.0f}]"
+            out.append((f"{loc} CI", ci, "PASS" if ci_close(ci, body, tol=1.1) else body))
+    return out
+
+
+def kcurve_checks(tex_rows: list[list[str]], sens: dict[str, Any]) -> list[Check]:
+    out: list[Check] = []
+    for fam in ("Qwen-7B", "Llama-8B"):
+        for fmt in ("BF16", "FP8", "AWQ-4", "GPTQ-4"):
+            row = next((r for r in tex_rows if len(r) > 2 and r[0] == fam and r[1] == fmt), None)
+            loc = f"tab:kcurve/{fam} {fmt}"
+            if row is None:
+                out.append((loc, "row", "MISSING"))
+                continue
+            cells = row[2:]
+            for i, k in enumerate(("2", "3", "4", "5")):
+                rec = sens["k_curve"][f"{fam}_{fmt}"][k]
+                for j, (name, fmt_s) in enumerate(
+                    (("coverage_pct", "{:.1f}"), ("risk_pct", "{:.2f}"), ("length_rule_risk_pct", "{:.2f}"))
+                ):
+                    exp = fmt_s.format(rec[name])
+                    got = cells[3 * i + j] if 3 * i + j < len(cells) else "MISSING"
+                    out.append((f"{loc} k={k} {name}", exp, "PASS" if got.strip() == exp else got))
+    return out
+
+
 def summarize(groups: dict[str, list[Check]]) -> int:
     print("Checking manuscript numbers...\n")
     n_fail = 0
@@ -724,6 +795,15 @@ def main() -> int:
                 )
             )
     groups["Table tab:multitask"] = mt_checks
+
+    sens = json.loads(load(SENS_PATH))
+    apply_gpqa_borderline(groups, tex, sens)
+    groups["Table tab:placebo (seed placebo)"] = placebo_checks(
+        tex_data_rows(extract_tabular(tex, "tab:placebo")), sens, report["math500"]["token_analysis"]
+    )
+    groups["Table tab:kcurve (k-sample unanimity)"] = kcurve_checks(
+        tex_data_rows(extract_tabular(tex, "tab:kcurve")), sens
+    )
 
     _ = SERVING_PATH  # confirmation JSON used via frozen markdown
     return summarize(groups)
