@@ -1,4 +1,4 @@
-# Evaluation-Target Instability in Quantized Reasoning Checkpoints: One Stack, Many Rankings
+# Pitfalls of Single-Metric Evaluation for Quantized Reasoning Checkpoints
 
 **Manish Nandish**<sup>1,2</sup>, **Rajiv Misra**<sup>1</sup>, and **Midhunchakkaravarthy Janarthanan**<sup>2</sup>
 
@@ -16,9 +16,9 @@ Email: midhun@lincoln.edu.my
 
 ## Abstract (same claims as `main.tex`)
 
-Practitioners often select a public quantized reasoning checkpoint from a single metric. We pin one A100 stack (vLLM 0.7.0 eager) and evaluate eight DeepSeek-R1-Distill checkpoints on MATH-500, GSM8K, and GPQA-Diamond (88 runs, 56,408 completions).
+Practitioners often select a public quantized reasoning checkpoint from a single metric. We pin one A100 stack and evaluate eight DeepSeek-R1-Distill checkpoints (88 runs, 56,408 completions).
 
-MATH-500 FP8–BF16 pass@1 differences are $+0.40$ and $+0.28$ pp; item-level 95% intervals include zero, and the 90% intervals extend to $+1.12$ and $+1.28$ pp. Gold-free 5/5 agreement has selective risk at most $0.27\%$; a one-sample length rule at the same coverage has selective risk of $1.6$–$4.6\%$. Subset GPU-seconds and campaign-length cost do not share a point order. Llama FP8 averages about $7{,}288$ tokens per query on the 20-prompt Condition A draw and $4{,}551$ on the full grid. Timing intervals do not cover that length draw.
+The robust accuracy drop is Llama AWQ-4 (MATH-500 −2.76 pp; GSM8K −1.57 pp). maj@5 cuts that MATH gap to about −1.4 pp. A BF16-correct length contrast is positive in every cell; the quant-correct mirror flips sign in four of six, and three of those intervals exclude zero. Subset serving cost is one length draw: Llama FP8 is about 7,288 tokens on Condition A and 4,551 on the full grid. Five-sample agreement has selective risk at most 0.27%, against 1.6–4.6% for a one-sample length rule at matched coverage.
 
 ---
 

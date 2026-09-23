@@ -1,5 +1,7 @@
 # Submission review (2026-09-02)
 
+**Title update (2026-09-23):** *Pitfalls of Single-Metric Evaluation for Quantized Reasoning Checkpoints*. The paper is framed as methodological pitfalls of single-metric evaluation. Frozen pass@1, token, and serving means were not changed.
+
 **Title update (2026-09-09):** *Evaluation-Target Instability in Quantized Reasoning Checkpoints: One Stack, Many Rankings*. Supervisor wording used “models” and “systematic study”; those were not used. Frozen numbers were not changed. See `SCIENTIFIC_AUDIT.md`.
 
 Final technical-editor / reproducibility review of the stack-pinned measurement study.

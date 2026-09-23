@@ -6,7 +6,7 @@ The manuscript should read as: a careful empirical measurement showing that quan
 
 It should **not** read as: a new quantization algorithm, a proof that AWQ fails, a universal 4-bit law, a native-FP8 result, or a production-deployment recommendation.
 
-Title: *Evaluation-Target Instability in Quantized Reasoning Checkpoints: One Stack, Many Rankings*.
+Title: *Pitfalls of Single-Metric Evaluation for Quantized Reasoning Checkpoints*.
 
 ---
 

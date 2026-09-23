@@ -3,9 +3,9 @@
 **Cluster:** PARAM Rudra HPC (C-DAC / NSM), NVIDIA A100 80GB GPUs  
 **Repository:** `/scratch/manishn_iitp/reasoning-compression-lab`  
 **GitHub:** [https://github.com/Manish06N/reasoning-compression-lab](https://github.com/Manish06N/reasoning-compression-lab)  
-**Last Updated:** 2026-09-02 (evaluation-target-instability title; science numbers frozen; GPU frozen)
+**Last Updated:** 2026-09-23 (single-metric pitfalls title; science numbers frozen; GPU frozen)
 
-**Superseding scientific claims (use these, not the 2026-08-15 blocks below):** Title is *Evaluation-Target Instability in Quantized Reasoning Checkpoints: One Stack, Many Rankings*. Manuscript revised 2026-09-23. Three findings: MATH-500 FP8–BF16 pass@1 differences are $+0.40$ and $+0.28$ pp, with 90% intervals to $+1.12$ and $+1.28$ pp; gold-free 5/5 selective risk is at most $0.27\%$, against $1.6$–$4.6\%$ for a one-sample length rule; subset GPU-seconds and campaign-length cost do not share a point order. Timing intervals cover wall-clock repeats of one seed, not length variance. Contributions: (C1) pinned protocol with recorded dtype and kernel; (C2) estimator-sensitive point orders; (C3) AWQ results scoped to the jakiAJK artifacts, run in float16. Pathology: **25 loops / 0 re-encoded cap hits / 209 near-cap completions**. The cap count is not a finish reason. FP8 is Marlin **W8A16**, not native W8A8. Qwen AWQ GPQA is Holm-6 significant and Holm-18 not significant; it is not a headline. Do not cite architecture-dependent, statistically tied, unique cheapest, “true Pareto,” or first-run $+18.7\%$ / $-19.8\%$. Frozen tables: `results/reports/major_revision_tables.md`. Sensitivity script: `scripts/analysis/review_response_sensitivity.py`. Reproduce: `REPRODUCE.md`. **Experimental GPU work is closed.** Live git branch is `main`. Do not rewrite frozen numbers.
+**Superseding scientific claims (use these, not the 2026-08-15 blocks below):** Title is *Pitfalls of Single-Metric Evaluation for Quantized Reasoning Checkpoints* (revised 2026-09-23). The robust accuracy drop is Llama AWQ-4. The BF16-correct length column is a selection effect; its quant-correct mirror flips sign in four of six contrasts. Subset serving cost is one length draw that timing repeats do not cover. Five-sample agreement beats a one-sample length rule on selective risk. GPQA letter order is not a certified paired contrast. AWQ used the GEMM `awq` kernel in float16. Do not cite ranking instability, architecture-dependent, statistically tied, unique cheapest, “true Pareto,” or first-run $+18.7\%$ / $-19.8\%$. Frozen tables: `results/reports/major_revision_tables.md`. Sensitivity script: `scripts/analysis/manuscript_sensitivities.py`. **Experimental GPU work is closed.** Live git branch is `main`. Do not rewrite frozen numbers.
 
 ---
 
@@ -31,7 +31,7 @@ graph TD
 
 | Output | Type | Title / Focus | Target Venues (Verify Q1) | Hardware / Stack | Status / Target Date |
 |---|---|---|---|---|---|
-| **J1** | Main Journal | *Evaluation-Target Instability in Quantized Reasoning Checkpoints: One Stack, Many Rankings* | *JMLR* next (SCI Q1); TMLR parked; not JSS/FGCS | HPC 2× A100, `qrm-official` (vLLM 0.7.0 eager) | Frozen science on `main`; GPU closed |
+| **J1** | Main Journal | *Pitfalls of Single-Metric Evaluation for Quantized Reasoning Checkpoints* | *JMLR* next (SCI Q1); TMLR parked; not JSS/FGCS | HPC 2× A100, `qrm-official` (vLLM 0.7.0 eager) | Frozen science on `main`; GPU closed |
 | **C1** | Conference / Workshop | *Trace-Level Evaluation Metrology for Compressed Reasoning Models* | NeurIPS/ICLR/ACL Workshops (Eval4NLP, Efficient Natural Language, MLPerf) | HPC A100 | Submission Month 6–12 (Post-J1 pilot packaging) |
 | **J2** | Journal 2 | *Reasoning-Aware Speculative Decoding: Acceptance Dynamics and Serving Acceleration* | *JSS*, *Engineering Applications of AI (EAAI)*, *FGCS* | HPC 2× A100 | Year 2 (Methods & draft model training) |
 | **C2** | Conference / Workshop | *High-Throughput Speculative Serving of Compressed Reasoning LLMs* | MLSys / EuroSys / ACL Demo Track | HPC A100 | Year 2 |
@@ -83,7 +83,7 @@ ssh -L 8080:<NODE>:8080 -N manishn_iitp@paramrudra.iitp.ac.in -p 4422
 ## 3. Paper 1 (J1): Scientific Positioning & Breakthrough Results
 
 ### Provisional Title
-> **"Evaluation-Target Instability in Quantized Reasoning Checkpoints: One Stack, Many Rankings"**
+> **"Pitfalls of Single-Metric Evaluation for Quantized Reasoning Checkpoints"**
 
 ### Novelty Positioning Against Prior Literature
 * **The Literature Gap:** Prior works (QRM 2025, A Sober Look 2025, Quantized LLMs Can Still Be Calibrated 2025, Cost-of-Pass 2025, Quantization Inflates Reasoning 2026, Reliability Scaling Laws 2026) studied accuracy, seed variance, or token count in isolation.

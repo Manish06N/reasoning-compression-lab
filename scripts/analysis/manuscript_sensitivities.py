@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""CPU sensitivities requested after the manuscript review.
+"""CPU sensitivities from the frozen campaign rows.
 
 Does not change frozen pass@1, token, or serving JSON. Prints:
 - quant-correct length deltas (n-weighted Both-OK and Quant-only)
@@ -193,6 +193,12 @@ def main() -> None:
     campaign_seconds()
     length_abstention(preds)
     ranks(preds)
+    import sys
+
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    from frozen_row_checks import main as row_checks
+
+    row_checks()
 
 
 if __name__ == "__main__":

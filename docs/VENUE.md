@@ -23,7 +23,7 @@ Supervisors require **SCI / Web of Science (JCR) Q1**. “Q1” here means Clari
 
 ## Next venue
 
-Packages use title *Evaluation-Target Instability in Quantized Reasoning Checkpoints: One Stack, Many Rankings* (third-author email `midhun@lincoln.edu.my`).
+Packages use title *Pitfalls of Single-Metric Evaluation for Quantized Reasoning Checkpoints* (third-author email `midhun@lincoln.edu.my`).
 
 | Rank | Venue | Why | Package | Watch-out |
 |------|--------|-----|---------|-----------|

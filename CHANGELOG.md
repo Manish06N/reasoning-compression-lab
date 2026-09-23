@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-09-23 — Framing realigned to the evidence (no GPU)
+
+Title is now *Pitfalls of Single-Metric Evaluation for Quantized Reasoning Checkpoints*. Research questions and contributions follow the four results the tables support: Llama AWQ-4, the BF16-correct length selection effect, subset cost as one length draw, and five-sample agreement versus a length rule. Frozen pass@1, token, and serving means are unchanged.
+
+- Quant-correct length intervals are in the length table. Serving brackets are repeat min--max. The Condition B figure uses campaign-length seconds.
+- MATH-500 level join, prompt-cap recount, and unboxed-by-near-cap counts are reported. GPQA letter order is the QRM `random.randint` prompt, not a certified paired contrast.
+- The shared $65 tok/s dollar proxy is removed. The sensitivity script is `scripts/analysis/manuscript_sensitivities.py`.
+- `paper/arxiv_source.zip` rebuilt from this manuscript. SHA256 `b35f4724e2effa5073c6fa6ae8d9a3df23b51de6f50e83767303e15b3630c540`.
+
 ## 2026-09-23 — Manuscript revision from two reviews (no GPU)
 
 Frozen pass@1, token, and serving tables are unchanged. `paper/main.tex` now states what those tables do not support.
@@ -8,6 +17,7 @@ Frozen pass@1, token, and serving tables are unchanged. `paper/main.tex` now sta
 - maj@5 accuracies, quant-correct length deltas, one-sample length abstention, dtype/kernel, GPQA prompt limit, cap definition, TOST margins, and rank-1 frequencies are reported. Script: `scripts/analysis/review_response_sensitivity.py`.
 - No new GPU jobs. Qwen was not rerun on the other host. Cap hits were not reclassified, because `finish_reason` and prompt lengths are not in the compact JSON.
 - Local venue packages were regenerated from this manuscript. Those folders are not in this repository.
+- `paper/arxiv_source.zip` rebuilt 2026-09-23 from current `main.tex` + `references.bib` + `main.bbl`. SHA256 `26b6067bc25b1b17cd92908b42a620b06844ca3763dd17aef65fe59058fd1919`. Not pushed yet.
 
 ## 2026-09-21 — FGCS manuscript PDF (no GPU)
 

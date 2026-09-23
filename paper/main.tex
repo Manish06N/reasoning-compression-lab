@@ -23,7 +23,7 @@
     urlcolor=blue
 }
 
-\title{\textbf{Evaluation-Target Instability in Quantized Reasoning Checkpoints: One Stack, Many Rankings}}
+\title{\textbf{Pitfalls of Single-Metric Evaluation for Quantized Reasoning Checkpoints}}
 
 \author[1,2]{Manish Nandish}
 \author[1]{Rajiv Misra}
@@ -43,36 +43,36 @@
 \begin{abstract}
 Practitioners often select a public quantized reasoning checkpoint from a single metric. We pin one A100 stack (vLLM~0.7.0 eager~\cite{kwon2023vllm}) and evaluate eight DeepSeek-R1-Distill checkpoints---Qwen-7B and Llama-8B, in BF16, Marlin W8A16 FP8~\cite{frantar2024marlin}, community AWQ-4, and RedHatAI GPTQ-4---on MATH-500~\cite{hendrycks2021math,lightman2023lets}, GSM8K~\cite{cobbe2021gsm8k}, and GPQA-Diamond~\cite{rein2023gpqa} (88 runs, 56{,}408 completions).
 
-Three findings follow. MATH-500 FP8--BF16 pass@1 differences are $+0.40$ and $+0.28$ percentage points; item-level 95\% intervals include zero, and the 90\% intervals extend to $+1.12$ and $+1.28$\,pp, so a $\pm 1$\,pp equivalence test is not passed. Gold-free 5/5 answer agreement on MATH-500 has selective risk at most $0.27\%$, while a one-sample length rule at the same coverage has selective risk of $1.6$--$4.6\%$. Subset GPU-seconds and a campaign-length cost (full-grid mean tokens divided by measured tok/s) do not produce the same point order: on the 20-prompt Condition~A draw, Llama FP8 averages about $7{,}288$ output tokens per query, against $4{,}551$ on the full MATH-500 grid. Timing intervals cover wall-clock repeats of one token sequence. They do not cover that length draw.
+The robust accuracy drop is Llama AWQ-4 (MATH-500 $-2.76$\,pp; GSM8K $-1.57$\,pp). maj@5 cuts that MATH gap to about $-1.4$\,pp and removes the smaller Qwen AWQ-4 gap. A BF16-correct length contrast is positive in every cell because it includes quantized failures; the mirrored quant-correct contrast flips sign in four of six cells, and three of those intervals exclude zero. Subset serving cost is dominated by one length draw: Llama FP8 averages about $7{,}288$ tokens on the 20-prompt Condition~A subset and $4{,}551$ on the full grid, and timing repeats do not resample that draw. Gold-free 5/5 agreement has selective risk at most $0.27\%$, against $1.6$--$4.6\%$ for a one-sample length rule at matched coverage.
 \end{abstract}
 
 \vspace{0.6em}
-\noindent\textbf{Keywords:} Reasoning language models, public quantization checkpoints, pinned serving stack, estimand disagreement, Cost-of-Pass.
+\noindent\textbf{Keywords:} Reasoning language models, quantization checkpoints, selection effects, majority vote, selective prediction.
 
 \section{Introduction}
 Reasoning models such as DeepSeek-R1~\cite{guo2025deepseekr1} emit long traces before a final answer. Post-training quantization (FP8, AWQ-4~\cite{lin2023awq}, GPTQ-4~\cite{frantar2022gptq}) is a common serving choice, and practitioners often pick a public checkpoint from a single published pass@1. Isolated pass@1 numbers hide whether the same checkpoint also changes trace length~\cite{lian2026quantinflates,liu2025qrm,lotfi2026overthinking}, termination, or the cost of a correct answer~\cite{erol2025costofpass,kurtic2025give}. Serving-stack details---engine version, decoding flags, CUDA graphs---can materially move reasoning scores~\cite{hochlehnert2025sober}. This paper \emph{pins} one stack rather than shifting it: we do not run a factorial vLLM $0.7.0$ vs.\ $0.8.5$ experiment. The unit of analysis is the public checkpoint $\times$ pinned serving stack $\times$ evaluation target.
 
 We ask four questions under that pin:
 \begin{itemize}
-    \item \textbf{RQ1.} Do the evaluated quantized checkpoints differ in \emph{pass@1} from matched BF16, with item-level uncertainty?
-    \item \textbf{RQ2.} How do completion length and correctness-conditioned length differ across the evaluated checkpoints, and what do identical-word loops and near-cap completions reveal about the long-tail behavior?
-    \item \textbf{RQ3.} What can observable multi-sample agreement say about selective abstention without gold labels at serve time?
-    \item \textbf{RQ4.} Do checkpoint rankings agree across the historical token proxy, sequential Condition~A, and batched Condition~B aggregate serving-cost proxies?
+    \item \textbf{RQ1.} Which pass@1 differences survive an item-level interval, and how much of a 4-bit gap does maj@5 remove?
+    \item \textbf{RQ2.} Is a BF16-correct length increase a property of the checkpoint, or a selection effect of conditioning on quantized failures?
+    \item \textbf{RQ3.} At matched coverage, does five-sample answer agreement have lower selective risk than a one-sample length rule?
+    \item \textbf{RQ4.} How much of a subset serving-cost gap is one length draw that timing repeats do not cover?
 \end{itemize}
 
 \noindent\textbf{Contributions.}
-(C1)~\textbf{Pinned evaluation protocol.} NVIDIA A100-80GB; vLLM~0.7.0 eager; public DeepSeek-R1-Distill checkpoints; recorded activation dtype and kernel per cell; item-level bootstrap; Holm correction; TOST $\pm 1$\,pp; and pass@1 reported beside maj@5.
-(C2)~\textbf{Estimator-sensitive point orders.} Pass@1, maj@5, correctness-conditioned length, subset GPU-seconds, and campaign-length cost do not share one point order. Several of those differences are ties or a single length draw on a 20-prompt subset. We report rank frequencies where the frozen rows support them.
-(C3)~\textbf{Artifact scope.} Both AWQ-4 checkpoints are one community upload (\texttt{jakiAJK}). FP8 and GPTQ-4 are RedHatAI artifacts. Format is collinear with publisher, calibration set, and toolchain, so an AWQ-versus-GPTQ gap is not a method comparison. The released grid supports reanalysis of these checkpoints.
+(C1)~\textbf{Selection effect in the BF16-correct length estimator.} The Lian-style conditional is positive in every contrast. Its quant-correct mirror flips sign in four of six contrasts. Both columns are selection effects, not a reconciliation of prior length claims.
+(C2)~\textbf{Subset serving cost is a length draw.} Timing repeats share one sampling seed. Campaign-length seconds, using the same measured tok/s, put Llama FP8 first on both conditions in all $10{,}000$ item resamples. The 20-prompt Condition~A order does not.
+(C3)~\textbf{One robust accuracy drop, and a gold-free check.} Llama AWQ-4 is the Holm-significant MATH and GSM8K drop. maj@5 recovers most of it. Five-sample agreement beats a one-sample length rule on selective risk at matched coverage. AWQ results are properties of the \texttt{jakiAJK} artifacts run in \texttt{float16} on the GEMM \texttt{awq} kernel, not a property of the AWQ method.
 
 \section{Related Work}
 GPTQ~\cite{frantar2022gptq} and AWQ~\cite{lin2023awq} were originally validated mainly on short-form benchmarks. Liu et al.\ (QRM; COLM 2025)~\cite{liu2025qrm} evaluate DeepSeek-R1 distillations across weight, activation, and KV quantization, reporting accuracy and mean length. Kurtic et al.~\cite{kurtic2025give} study vLLM serving efficiency across formats and batching regimes. Lian et al.~\cite{lian2026quantinflates} isolate token inflation on BF16-correct traces. Hochlehnert et al.~\cite{hochlehnert2025sober} show that seeds, prompts, decoding, and software move reasoning scores. Erol et al.~\cite{erol2025costofpass} define Cost-of-Pass as expected monetary cost per correct solution.
 
-Existing studies evaluate quantization accuracy, throughput, or individual reasoning behaviors. Kurtic et al.\ already show that format recommendations change between synchronous decode and continuous batching. Our Condition~A versus Condition~B contrast is a pinned-stack sensitivity on these public checkpoints, not a second batching law. The shared-$65$ tok/s proxy assumes one throughput for every format, so it ranks checkpoints by mean tokens divided by pass@1; it is a sensitivity, not a serving measurement. Appendix Table~\ref{tab:related} places this grid against those studies. The unit of comparison is the public checkpoint $\times$ pinned stack $\times$ evaluation target.
+Existing studies evaluate quantization accuracy, throughput, or individual reasoning behaviors. Kurtic et al.\ already show that format recommendations change between synchronous decode and continuous batching. Our Condition~A versus Condition~B contrast is a pinned-stack sensitivity on these public checkpoints, not a second batching law. Appendix Table~\ref{tab:economics} reports mean tokens divided by pass@1. Appendix Table~\ref{tab:related} places this grid against those studies. The unit of comparison is the public checkpoint $\times$ pinned stack $\times$ evaluation target.
 
 \begin{table}[t]
 \centering
-\caption{Qwen-7B numbers reported by QRM beside this pinned grid. Cells are matched by benchmark and format. The discrepancy is checkpoint- and stack-sensitive measurement, not a superiority claim.}
+\caption{Qwen-7B numbers reported by QRM beside this pinned grid. Cells are matched by benchmark and format. The GPQA row is not a certified paired contrast (Appendix Section~\ref{sec:prompt}). The discrepancy is checkpoint- and stack-sensitive measurement, not a superiority claim.}
 \label{tab:qrm-compare}
 \small
 \begin{tabular}{lcc}
@@ -86,18 +86,18 @@ GPQA-Diamond AWQ-4 & 50.00 & 44.78 \\
 \end{tabular}
 \end{table}
 
-The FP8 and GPTQ-4 cells are public RedHatAI compressed-tensors artifacts evaluated as A100 Marlin weight-only kernels. These are not Red Hat production-deployment measurements. We do not rerun SmoothQuant~\cite{xiao2023smoothquant}. Lotfi et al.~\cite{lotfi2026overthinking}, Li et al.~\cite{li2025quantmeets}, Helcig et al.~\cite{helcig2026slq}, Zhong et al.~\cite{zhong2025quantized}, and Ayadi et al.~\cite{ayadi2026reliability} study overthinking, reasoning degradation, statistically lossless quantization, calibration, and reliability scaling; we do not re-estimate those quantities. Self-consistency~\cite{wang2022selfconsistency} and G-Pass@$k$~\cite{liu2025gpass} are different estimands from the unique-mode rule in Section~\ref{sec:modal}. We report a historical shared-$65$ tok/s token proxy and an aggregate hybrid Cost-of-Pass proxy; neither is Erol et al.'s per-problem estimator.
+The FP8 and GPTQ-4 cells are public RedHatAI compressed-tensors checkpoints evaluated as A100 Marlin weight-only kernels. These are not Red Hat production-deployment measurements. We do not rerun SmoothQuant~\cite{xiao2023smoothquant}. Lotfi et al.~\cite{lotfi2026overthinking}, Li et al.~\cite{li2025quantmeets}, Helcig et al.~\cite{helcig2026slq}, Zhong et al.~\cite{zhong2025quantized}, and Ayadi et al.~\cite{ayadi2026reliability} study overthinking, reasoning degradation, statistically lossless quantization, calibration, and reliability scaling; we do not re-estimate those quantities. Self-consistency~\cite{wang2022selfconsistency} and G-Pass@$k$~\cite{liu2025gpass} are different estimands from the unique-mode rule in Section~\ref{sec:modal}. We report mean tokens divided by pass@1, and an aggregate hybrid Cost-of-Pass proxy from measured GPU-seconds; neither is Erol et al.'s per-problem estimator.
 
 \section{Experimental Methodology}
 \subsection{Models and precision formats}
 We evaluate DeepSeek-R1-Distill-Qwen-7B and DeepSeek-R1-Distill-Llama-8B~\cite{guo2025deepseekr1}. Formats: uncompressed \textbf{BF16}; \textbf{FP8} checkpoints served on A100 via vLLM's Marlin \textbf{W8A16} weight-only fallback (not native W8A8 tensor-core FP8); \textbf{AWQ-4} (group size 128); \textbf{GPTQ-4} (group size 128). Hugging Face IDs and revisions are in Appendix Table~\ref{tab:checkpoints}. Table~\ref{tab:dtype} records the activation dtype and kernel. An AWQ-versus-BF16 contrast is therefore quantization plus a change from \texttt{bfloat16} to \texttt{float16} activations. Qwen-family models have a known \texttt{float16} overflow history; this grid does not include a BF16 checkpoint rerun at \texttt{dtype=float16}, so that mechanism is not identified. Accuracy-campaign GPTQ-4 stays on \texttt{bfloat16}. The serving script sets \texttt{float16} for both AWQ-4 and GPTQ-4, so the GPTQ accuracy cells and the GPTQ timing cells do not share an activation dtype.
 
 \subsection{Benchmarks and protocol}
-MATH-500~\cite{hendrycks2021math,lightman2023lets} ($n=500$, seeds $42$--$46$): 20{,}000 completions. GSM8K~\cite{cobbe2021gsm8k} ($n=1{,}319$, seeds $42$--$44$) and GPQA-Diamond~\cite{rein2023gpqa} ($n=198$, seeds $42$--$44$): breadth. Decoding: zero-shot \texttt{<think>} prefix (appendix), $T=0.6$, top-$p=0.95$, repetition penalty $1.0$ (deliberately not used to hide loops), max new tokens $32{,}768$. Total: $56{,}408$ completions in 88 checkpoint$\times$benchmark$\times$seed runs. Throughout, a \emph{run} denotes one checkpoint$\times$benchmark$\times$seed evaluation; a \emph{cell} denotes one checkpoint$\times$benchmark aggregated over its evaluated seeds; a \emph{format contrast} compares a quantized checkpoint with its matched BF16 checkpoint within the same model family and benchmark. MATH and GSM8K are widely used; a paired within-item design reduces but does not eliminate contamination interaction with format.
+MATH-500~\cite{hendrycks2021math,lightman2023lets} ($n=500$, seeds $42$--$46$): 20{,}000 completions. GSM8K~\cite{cobbe2021gsm8k} ($n=1{,}319$, seeds $42$--$44$) and GPQA-Diamond~\cite{rein2023gpqa} ($n=198$, seeds $42$--$44$): breadth. Decoding follows the QRM chat template in Appendix Section~\ref{sec:prompt}, with $T=0.6$, top-$p=0.95$, repetition penalty $1.0$ (deliberately not used to hide loops), and max new tokens $32{,}768$. Total: $56{,}408$ completions in 88 checkpoint$\times$benchmark$\times$seed runs. Throughout, a \emph{run} denotes one checkpoint$\times$benchmark$\times$seed evaluation; a \emph{cell} denotes one checkpoint$\times$benchmark aggregated over its evaluated seeds; a \emph{format contrast} compares a quantized checkpoint with its matched BF16 checkpoint within the same model family and benchmark. MATH and GSM8K are widely used; a paired within-item design reduces but does not eliminate contamination interaction with format.
 
 \begin{table}[t]
 \centering
-\caption{Activation dtype and vLLM kernel. Accuracy dtype is the 56k campaign. Serving dtype is the confirmation timer. AWQ uses the GEMM awq kernel, not awq-marlin.}
+\caption{Activation dtype and vLLM kernel. Accuracy dtype is the 56k campaign. Serving dtype is the confirmation timer. AWQ uses the GEMM awq kernel, not awq-marlin. GPTQ's checkpoint file is compressed-tensors; the kernel is Marlin W4A16. Accuracy-campaign GPTQ uses bfloat16 and the timer uses float16.}
 \label{tab:dtype}
 \small
 \begin{tabular}{llll}
@@ -107,7 +107,7 @@ MATH-500~\cite{hendrycks2021math,lightman2023lets} ($n=500$, seeds $42$--$46$): 
 BF16 & \texttt{bfloat16} & native & \texttt{bfloat16} \\
 FP8 & \texttt{bfloat16} & Marlin W8A16 & \texttt{bfloat16} \\
 AWQ-4 & \texttt{float16} & GEMM \texttt{awq} & \texttt{float16} \\
-GPTQ-4 & \texttt{bfloat16} & compressed-tensors & \texttt{float16} \\
+GPTQ-4 & \texttt{bfloat16} & Marlin W4A16 & \texttt{float16} \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -135,23 +135,19 @@ p_{\mathrm{hi}}=\#\{\Delta^*_b\ge 0\}/B,\quad
 p_{\mathrm{lo}}=\#\{\Delta^*_b\le 0\}/B,\quad
 p=\min\bigl(1,\,2\min(p_{\mathrm{hi}},p_{\mathrm{lo}})\bigr).
 \end{equation}
-A reported $p=0$ or $p<0.001$ means that no sign-crossing bootstrap replicate was observed among the $10{,}000$ draws; it is not a literal probability of zero. Holm--Bonferroni is applied separately to the six primary within-benchmark format contrasts (MATH-500, GSM8K, GPQA-Diamond). Each benchmark is a distinct inferential family because each corresponds to a separate task distribution; we do not pool the 18 contrasts for the primary analysis. A joint Holm correction over all 18 contrasts is reported only as a stricter sensitivity (Appendix Table~\ref{tab:holm18}). Two one-sided tests (TOST) at a $\pm 1$\,pp equivalence margin use the 90\% CI; this is an equivalence check, not a default claim. We use $\pm 1$\,pp as a study tolerance, not a universal equivalence standard. On MATH-500 the paired standard error is about $0.45$\,pp, so a $\pm 1$\,pp TOST passes only when the point estimate is close to zero. The smallest margin that would contain the FP8 90\% intervals is $1.12$\,pp for Qwen and $1.28$\,pp for Llama. A failed $\pm 1$\,pp test at this $n$ is mostly a statement about that margin.
+A reported $p=0$ or $p<0.001$ means that no sign-crossing bootstrap replicate was observed among the $10{,}000$ draws; it is not a literal probability of zero. Holm--Bonferroni is applied separately to the six primary within-benchmark format contrasts (MATH-500, GSM8K, GPQA-Diamond). Each benchmark is a distinct inferential family because each corresponds to a separate task distribution; we do not pool the 18 contrasts for the primary analysis. A joint Holm correction over all 18 contrasts is reported only as a stricter sensitivity (Appendix Table~\ref{tab:holm18}). Two one-sided tests (TOST) at a $\pm 1$\,pp equivalence margin use the 90\% CI; this is an equivalence check, not a default claim. We use $\pm 1$\,pp as a study tolerance, not a universal equivalence standard. On MATH-500 the paired standard error is about $0.45$\,pp, so a $\pm 1$\,pp TOST passes only when the point estimate is close to zero. The smallest margin that would contain the FP8 90\% intervals is $1.12$\,pp for Qwen and $1.28$\,pp for Llama. A failed $\pm 1$\,pp test at this $n$ reflects the sample size relative to that margin.
 
 \paragraph{maj@5.}
 A problem is maj@5-correct if at least 3 of 5 MATH-500 seeds match gold. We report the accuracy, not only the McNemar test against BF16. Non-significant maj@5 tests do not imply that pass@1 effects are absent.
 
 \paragraph{Pathology.}
-A row is a \emph{loop} if the longest consecutive identical-word run is $\ge 20$ (Unicode word tokens, case-folded). The launcher sets both \texttt{max\_model\_len} and \texttt{max\_new\_tokens} to $32{,}768$. In vLLM the first bound is prompt plus output, so the effective output cap is $32{,}768$ minus that item's prompt length. A row is counted as an exact cap hit only when the re-encoded completion is $\ge 32{,}768$. The observed maximum is $32{,}737$, and that count is $0$. Compact JSON has no \texttt{finish\_reason} and no per-item prompt length, so near-cap rows ($\ge 32{,}500$ tokens) are not reclassified as truncations. A longer GPQA prompt can truncate below that $32{,}500$ threshold. The \texttt{boxed} flag is a string search for \texttt{\textbackslash boxed}, which is separate from extractive match.
+A row is a \emph{loop} if the longest consecutive identical-word run is $\ge 20$ (Unicode word tokens, case-folded). The launcher sets both \texttt{max\_model\_len} and \texttt{max\_new\_tokens} to $32{,}768$. In vLLM the first bound is prompt plus output, so the effective output cap is $32{,}768$ minus that item's prompt length. Compact JSON has no \texttt{finish\_reason}. We recompute the prompt with each family's chat template on the public MATH-500 and GSM8K text (Qwen prompts $29$--$811$ tokens; Llama $27$--$776$) and count a row when the re-encoded completion is at least that cap. Near-cap remains $\ge 32{,}500$ tokens. The \texttt{boxed} flag is a string search for \texttt{\textbackslash boxed}, which is separate from extractive match.
 
 \paragraph{Length.}
-Primary estimator: ratio of means over all seeds, plus the mean paired per-item token delta with a clustered percentile bootstrap CI. We also report the mean of per-item ratios, which is a different estimand and is dominated by short BF16 traces. Length is stratified by the $2\times 2$ of BF16/quantized extractive correctness, with clustered 95\% CIs on each cell. A direct clustered contrast $D=\overline{\Delta}_{\mathrm{BF16-only}}-\overline{\Delta}_{\mathrm{Both-OK}}$ uses the same problem-level resamples for both stratum means; replicates in which either stratum is empty are skipped. $D$ compares conditional means and is not a causal effect. A BF16-internal control compares BF16 length when BF16 is correct versus incorrect. The BF16-correct conditional $\Delta$, following Lian et al., is the mean quantized$-$BF16 $\Delta$ on pairs where BF16 is correct (Both-OK $\cup$ BF16-only). The mirrored quant-correct conditional is the same mean on pairs where the quantized checkpoint is correct (Both-OK $\cup$ Quant-only). Conditioning on BF16-correct pulls in quantized failures, which are long, so the BF16-correct column is positive even when the unconditional change is near zero. Conditioning on quant-correct pulls in BF16 failures and moves the sign the other way. Both columns are selection effects. $D$ compares the BF16-only and Both-OK means on shared item resamples and is a mismatch diagnostic, not a causal token increase.
+Primary estimator: ratio of means over all seeds, plus the mean paired per-item token delta with an item-level percentile bootstrap CI. We also report the mean of per-item ratios, which is a different estimand and is dominated by short BF16 traces. Length is stratified by the $2\times 2$ of BF16/quantized extractive correctness, with item-level 95\% CIs on each cell. A direct contrast $D=\overline{\Delta}_{\mathrm{BF16-only}}-\overline{\Delta}_{\mathrm{Both-OK}}$ uses the same item resamples for both stratum means; replicates in which either stratum is empty are skipped. $D$ compares conditional means and is not a causal effect. A BF16-internal control compares BF16 length when BF16 is correct versus incorrect. The BF16-correct conditional $\Delta$, following Lian et al., is the mean quantized$-$BF16 $\Delta$ on pairs where BF16 is correct (Both-OK $\cup$ BF16-only). The mirrored quant-correct conditional is the same mean on pairs where the quantized checkpoint is correct (Both-OK $\cup$ Quant-only). Conditioning on BF16-correct pulls in quantized failures, which are long, so the BF16-correct column is positive even when the unconditional change is near zero. Conditioning on quant-correct pulls in BF16 failures and moves the sign the other way. Both columns are selection effects. $D$ compares the BF16-only and Both-OK means on shared item resamples and is a mismatch diagnostic, not a causal token increase.
 
-\paragraph{Historical token-implied aggregate cost proxy.}
-Following the Cost-of-Pass ratio form of Erol et al.~\cite{erol2025costofpass}, a historical token-implied aggregate cost proxy is
-\begin{equation}
-\text{Cost per query} = (\bar{T}/\tau)\times (R/3600),
-\end{equation}
-divided by campaign pass@1, with $\tau = 65$ tok/s and $R=\$1.50$ per A100-hour. The constant $65$ matches none of the measured tok/s values ($43.9$--$82.7$ on Condition~A, $253$--$488$ on Condition~B). It is an unmeasured shared placeholder from an earlier draft of this proxy. Because $\tau$ and $R$ are shared, the ranking equals the ranking by $\bar{T}/\mathrm{pass@1}$. Changing $65$ rescales the dollars and does not reorder checkpoints. Appendix Table~\ref{tab:economics} keeps the historical dollars. Primary cost evidence is Table~\ref{tab:serving-main} together with the campaign-length sensitivity in Table~\ref{tab:length-cost}.
+\paragraph{Tokens per correct answer.}
+Appendix Table~\ref{tab:economics} reports campaign mean tokens divided by MATH-500 pass@1. That ratio is what a shared throughput would rank. It does not use a tok/s constant. Primary cost evidence is Table~\ref{tab:serving-main} together with the campaign-length sensitivity in Table~\ref{tab:length-cost}. The hybrid dollar in Table~\ref{tab:serving-main} divides measured GPU-seconds by pass@1. For GPTQ-4 those GPU-seconds were timed at \texttt{float16}, while the pass@1 denominator comes from the \texttt{bfloat16} accuracy campaign. The two GPTQ cells are not the same configuration.
 
 \paragraph{Observable modal agreement.}
 \label{sec:modal-def}
@@ -208,11 +204,11 @@ Llama FP8    & $+0.28$ & $[-0.92,+1.48]$ & $0.647$ & n.s. & $[-0.72,+1.28]$ & fa
 \end{table}
 
 \subsection{GSM8K and GPQA-Diamond}
-Table~\ref{tab:multitask} gives cell means; Tables~\ref{tab:gsm-contrasts} and~\ref{tab:gpqa-contrasts} are the item-level tests. FP8 stays within about one point of BF16 on all three tasks. Several GSM8K contrasts pass TOST at $\pm 1$\,pp, where $n=1{,}319$ and the interval is narrower than on MATH-500. Llama AWQ-4 also drops on GSM8K ($-1.57$\,pp, $95\%$ CI $[-2.55,-0.58]$, $p=0.002$). Qwen AWQ-4 differs from Qwen BF16 by $-5.56$\,pp on GPQA-Diamond ($95\%$ CI $[-9.60,-1.52]$; raw bootstrap $p=0.0068$, printed $0.007$). The Monte Carlo standard error of that $p$ at $B=10{,}000$ is about $0.0008$, so the Holm-6 adjusted value is about $0.041\pm 0.005$. The same contrast is not significant under the Holm-18 sensitivity (adjusted $p=0.109$; Appendix Table~\ref{tab:holm18}). The difference is spread across items: 75 of 198 GPQA items flip on at least one seed, and none is BF16-correct and AWQ-wrong on all three seeds. The other GPQA contrasts have wide intervals. This GPQA contrast is not a headline result.
+Table~\ref{tab:multitask} gives cell means; Tables~\ref{tab:gsm-contrasts} and~\ref{tab:gpqa-contrasts} are the item-level tests. FP8 stays within about one point of BF16 on all three tasks. Several GSM8K contrasts pass TOST at $\pm 1$\,pp, where $n=1{,}319$ and the interval is narrower than on MATH-500. Llama AWQ-4 also drops on GSM8K ($-1.57$\,pp, $95\%$ CI $[-2.55,-0.58]$, $p=0.002$). Qwen AWQ-4 differs from Qwen BF16 by $-5.56$\,pp on GPQA-Diamond ($95\%$ CI $[-9.60,-1.52]$; raw bootstrap $p=0.0068$, printed $0.007$). The Monte Carlo standard error of that $p$ at $B=10{,}000$ is about $0.0008$, so the Holm-6 adjusted value is about $0.041\pm 0.005$. The same contrast is not significant under the Holm-18 sensitivity (adjusted $p=0.109$; Appendix Table~\ref{tab:holm18}). Appendix Section~\ref{sec:prompt} shows that QRM draws the GPQA correct letter with \texttt{random.randint} after model load, so this contrast is not a certified paired comparison. It is not a headline result.
 
 \begin{table}[t]
 \centering
-\caption{GSM8K clustered pass@1 versus matched BF16 ($n=1{,}319$, 3 seeds). Holm over six contrasts. TOST $\pm 1$\,pp uses the 90\% CI. sig.: Holm-significant at $\alpha=0.05$; n.s.: not significant.}
+\caption{GSM8K item-level pass@1 versus matched BF16 ($n=1{,}319$, 3 seeds). Holm over six contrasts. TOST $\pm 1$\,pp uses the 90\% CI. sig.: Holm-significant at $\alpha=0.05$; n.s.: not significant.}
 \label{tab:gsm-contrasts}
 \small
 \begin{tabular}{lcccccc}
@@ -231,7 +227,7 @@ Llama FP8    & $+0.13$ & $[-0.66,+0.94]$ & $0.761$ & n.s. & $[-0.53,+0.81]$ & pa
 
 \begin{table}[t]
 \centering
-\caption{GPQA-Diamond item-level pass@1 versus matched BF16 ($n=198$, 3 seeds). Holm over six contrasts. sig.: Holm-significant at $\alpha=0.05$; n.s.: not significant. The Qwen AWQ-4 row is Holm-6 significant and Holm-18 not significant (Appendix Table~\ref{tab:holm18}). It is not a headline claim.}
+\caption{GPQA-Diamond pass@1 versus matched BF16 ($n=198$, 3 seeds). The rows are descriptive. Choice order is not certified as paired across checkpoints (Appendix Section~\ref{sec:prompt}). The Qwen AWQ-4 row is Holm-6 significant and Holm-18 not significant if the pairing is taken at face value. It is not a headline claim.}
 \label{tab:gpqa-contrasts}
 \small
 \begin{tabular}{lcccccc}
@@ -250,9 +246,9 @@ Llama FP8    & $+1.68$ & $[-2.19,+5.39]$ & $0.403$ & n.s. & $[-1.52,+4.88]$ & fa
 
 \subsection{Loops and near-cap completions}
 \label{sec:pathology}
-Across 88 runs the validator records \textbf{25} repetition-flagged completions ($0.044\%$ of 56{,}408) and \textbf{0} rows whose re-encoded length is $\ge 32{,}768$. Loops occur in BF16 as well as quantized cells (Llama MATH: 3/3/3/2 for BF16/FP8/AWQ/GPTQ). Three completions exceed 10{,}000 identical consecutive words. Near-cap completions ($\ge 32{,}500$ tokens) total 209; on MATH-500, Qwen AWQ-4/GPTQ-4 have 25 and 24 versus BF16's 14. Those near-cap counts can include truncations at \texttt{max\_model\_len} minus the prompt, and they can miss shorter GPQA truncations. Native stop reasons were not logged.
+Across 88 runs the validator records \textbf{25} repetition-flagged completions ($0.044\%$ of 56{,}408). The old exact cap count, re-encoded length $\ge 32{,}768$, remains \textbf{0}. The observed maximum is $32{,}737$. Loops occur in BF16 as well as quantized cells (Llama MATH: 3/3/3/2 for BF16/FP8/AWQ/GPTQ). Three completions exceed 10{,}000 identical consecutive words. Near-cap completions ($\ge 32{,}500$ tokens) total 209; on MATH-500, Qwen AWQ-4/GPTQ-4 have 25 and 24 versus BF16's 14.
 
-On MATH-500, completions containing \texttt{\textbackslash boxed} are $98.96$--$99.68\%$ of each cell ($13$--$26$ unboxed rows out of $2{,}500$). Unboxed rows that are still scored correct are rare (at most two per seed file). The 4-bit MATH gaps are parsed wrong answers, not missing boxes. GSM8K boxed rates are $99.70$--$99.87\%$. GPQA is different: $0$--$2$ of $198$ rows per seed contain \texttt{\textbackslash boxed}, in every format including BF16, while pass@1 remains about $41$--$53\%$. GPQA extractive match is not a boxed-answer grade.
+Re-encoding each MATH-500 and GSM8K prompt with the chat template and counting completions at or above $32{,}768$ minus that prompt length gives 40 MATH-500 rows and 31 GSM8K rows. Every one of those MATH rows is also near-cap. On MATH-500, 120 of 134 unboxed rows are near-cap (140 near-cap rows in total). A missing box on MATH is usually a long trace. It is not the 4-bit accuracy gap: unboxed rows that are still scored correct are rare (at most two per seed file), and boxed rates are $98.96$--$99.68\%$. GSM8K is similar (52 of 66 unboxed rows are near-cap; boxed rates $99.70$--$99.87\%$). GPQA is different: $4{,}746$ of $4{,}752$ rows are unboxed, and only 12 are near-cap. GPQA extractive match is not a boxed-answer grade, and the long-tail proxy does not explain it. Native stop reasons were not logged, and the re-encode can disagree with vLLM's token count, so the 40 and 31 counts are a prompt-length reconstruction rather than \texttt{finish\_reason}.
 
 \subsection{Token length}
 \label{sec:economics}
@@ -260,24 +256,24 @@ On the \emph{full} MATH-500 grid and all five seeds (Table~\ref{tab:tokens}, Fig
 
 A 200-item even-index, seed-42, mean-of-ratios analysis is an earlier estimator. It is not the full-grid ratio of means. The note is in the repository changelog, not in these results.
 
-Figure~\ref{fig:strata} and Table~\ref{tab:tokens} split paired token deltas by the $2\times 2$. Qwen AWQ-4 and GPTQ-4 Both-OK intervals exclude zero ($+166\ [+80,+254]$ and $+136\ [+45,+239]$). Qwen FP8 and all three Llama Both-OK intervals include zero. The BF16-correct conditional $\Delta$ is positive with intervals excluding zero in every contrast ($+166$ to $+417$ tokens), including Qwen FP8, whose unconditional change is $-4$ tokens $[-142,+134]$. That column equals the $n$-weighted mix of Both-OK and BF16-only. For Qwen FP8, $(2297\times 51 + 53\times 5444)/2350 = 172$. Failure traces are long ($15{,}843$ vs.\ $3{,}256$ tokens on Qwen BF16; $13{,}928$ vs.\ $3{,}539$ on Llama). The mirrored quant-correct conditional, the $n$-weighted mix of Both-OK and Quant-only, is $-136$, $+5$, $+22$, $-182$, $-141$, and $-183$ tokens for Qwen FP8, Qwen AWQ-4, Qwen GPTQ-4, Llama FP8, Llama AWQ-4, and Llama GPTQ-4. Four of the six signs flip. Qwen AWQ-4 and GPTQ-4 stay near zero because the Both-OK lengthening offsets a smaller Quant-only tail. This is the selection effect in the Lian-style estimator. We report both conditionals. We do not call either a Liu--Lian reconciliation. $D$ (Table~\ref{tab:mismatch-excess}) remains a mismatch diagnostic.
+Figure~\ref{fig:strata} and Table~\ref{tab:tokens} split paired token deltas by the $2\times 2$. Qwen AWQ-4 and GPTQ-4 Both-OK intervals exclude zero ($+166\ [+80,+254]$ and $+136\ [+45,+239]$). Qwen FP8 and all three Llama Both-OK intervals include zero. The BF16-correct conditional $\Delta$ is positive with intervals excluding zero in every contrast ($+166$ to $+417$ tokens), including Qwen FP8, whose unconditional change is $-4$ tokens $[-142,+134]$. That column equals the $n$-weighted mix of Both-OK and BF16-only. For Qwen FP8, $(2297\times 51 + 53\times 5444)/2350 = 172$. Failure traces are long ($15{,}843$ vs.\ $3{,}256$ tokens on Qwen BF16; $13{,}928$ vs.\ $3{,}539$ on Llama). The mirrored quant-correct conditional, the $n$-weighted mix of Both-OK and Quant-only, is $-136\ [-273,-3]$, $+5\ [-111,+114]$, $+22\ [-99,+151]$, $-182\ [-339,-35]$, $-141\ [-303,+12]$, and $-183\ [-335,-35]$ tokens. Three of those six intervals exclude zero, all on the negative side. Qwen AWQ-4 and GPTQ-4 stay near zero because the Both-OK lengthening offsets a smaller Quant-only tail. This is the selection effect in the Lian-style estimator. We report both conditionals in Table~\ref{tab:tokens}. We do not call either a Liu--Lian reconciliation. $D$ (Table~\ref{tab:mismatch-excess}) remains a mismatch diagnostic.
 
 \begin{table*}[t]
 \centering
-\caption{MATH-500 length versus BF16, all five seeds. RoM: ratio of means. $\Delta$: mean paired per-item token difference with clustered 95\% CI. $2\times 2$ cells are mean quantized$-$BF16 $\Delta$ with clustered 95\% CI and pair count $n$. BF16-correct column: BF16-correct conditional $\Delta$, following Lian et al. BF16 len.: mean BF16 tokens when BF16 is correct vs.\ incorrect.}
+\caption{MATH-500 length versus BF16, all five seeds. RoM: ratio of means. $\Delta$: mean paired per-item token difference with an item-level 95\% CI. $2\times 2$ cells are mean quantized$-$BF16 $\Delta$ with an item-level 95\% CI and pair count $n$. BF16-correct and quant-correct columns use the same item resamples on Both-OK $\cup$ BF16-only and Both-OK $\cup$ Quant-only.}
 \label{tab:tokens}
 \small
 \resizebox{\textwidth}{!}{%
-\begin{tabular}{lccccccc}
+\begin{tabular}{lcccccccc}
 \toprule
-\textbf{Contrast} & \textbf{RoM} & \textbf{Mean $\Delta$ [95\% CI]} & \textbf{Both OK} & \textbf{BF16 only} & \textbf{Quant only} & \textbf{Both wrong} & \textbf{BF16-correct $\Delta$ [95\% CI]} \\
+\textbf{Contrast} & \textbf{RoM} & \textbf{Mean $\Delta$ [95\% CI]} & \textbf{Both OK} & \textbf{BF16 only} & \textbf{Quant only} & \textbf{Both wrong} & \textbf{BF16-correct} & \textbf{Quant-correct} \\
 \midrule
-Qwen FP8     & $-0.1\%$ & $-4\ [-142,+134]$ & $+51\ [-42,+145]$ ($n{=}2297$) & $+5444\ [+2922,+8035]$ ($n{=}53$) & $-6940\ [-9479,-4345]$ ($n{=}63$) & $+264\ [-1126,+1685]$ ($n{=}87$) & $+172\ [+63,+291]$ \\
-Qwen AWQ-4   & $+6.3\%$ & $+254\ [+116,+398]$ & $+166\ [+80,+254]$ ($n{=}2272$) & $+6915\ [+4534,+9345]$ ($n{=}78$) & $-6533\ [-8933,-4255]$ ($n{=}56$) & $+894\ [-620,+2420]$ ($n{=}94$) & $+390\ [+261,+531]$ \\
-Qwen GPTQ-4  & $+6.9\%$ & $+276\ [+121,+431]$ & $+136\ [+45,+239]$ ($n{=}2284$) & $+6892\ [+4090,+9896]$ ($n{=}66$) & $-4910\ [-8180,-1715]$ ($n{=}53$) & $+1893\ [+204,+3388]$ ($n{=}97$) & $+326\ [+198,+464]$ \\
-Llama FP8    & $-2.3\%$ & $-106\ [-284,+65]$ & $+38\ [-74,+152]$ ($n{=}2121$) & $+2629\ [+1098,+4265]$ ($n{=}110$) & $-4159\ [-6040,-2428]$ ($n{=}117$) & $-968\ [-2252,+198]$ ($n{=}152$) & $+166\ [+33,+302]$ \\
-Llama AWQ-4  & $+1.7\%$ & $+80\ [-109,+268]$ & $+91\ [-25,+210]$ ($n{=}2052$) & $+3090\ [+1995,+4286]$ ($n{=}179$) & $-4477\ [-6503,-2588]$ ($n{=}110$) & $-305\ [-1520,+907]$ ($n{=}159$) & $+332\ [+182,+490]$ \\
-Llama GPTQ-4 & $+3.9\%$ & $+184\ [+12,+359]$ & $+66\ [-43,+181]$ ($n{=}2097$) & $+5915\ [+4335,+7605]$ ($n{=}134$) & $-4327\ [-6138,-2561]$ ($n{=}126$) & $+521\ [-506,+1585]$ ($n{=}143$) & $+417\ [+261,+583]$ \\
+Qwen FP8     & $-0.1\%$ & $-4\ [-142,+134]$ & $+51\ [-42,+145]$ ($n{=}2297$) & $+5444\ [+2922,+8035]$ ($n{=}53$) & $-6940\ [-9479,-4345]$ ($n{=}63$) & $+264\ [-1126,+1685]$ ($n{=}87$) & $+172\ [+63,+291]$ & $-136\ [-273,-3]$ \\
+Qwen AWQ-4   & $+6.3\%$ & $+254\ [+116,+398]$ & $+166\ [+80,+254]$ ($n{=}2272$) & $+6915\ [+4534,+9345]$ ($n{=}78$) & $-6533\ [-8933,-4255]$ ($n{=}56$) & $+894\ [-620,+2420]$ ($n{=}94$) & $+390\ [+261,+531]$ & $+5\ [-111,+114]$ \\
+Qwen GPTQ-4  & $+6.9\%$ & $+276\ [+121,+431]$ & $+136\ [+45,+239]$ ($n{=}2284$) & $+6892\ [+4090,+9896]$ ($n{=}66$) & $-4910\ [-8180,-1715]$ ($n{=}53$) & $+1893\ [+204,+3388]$ ($n{=}97$) & $+326\ [+198,+464]$ & $+22\ [-99,+151]$ \\
+Llama FP8    & $-2.3\%$ & $-106\ [-284,+65]$ & $+38\ [-74,+152]$ ($n{=}2121$) & $+2629\ [+1098,+4265]$ ($n{=}110$) & $-4159\ [-6040,-2428]$ ($n{=}117$) & $-968\ [-2252,+198]$ ($n{=}152$) & $+166\ [+33,+302]$ & $-182\ [-339,-35]$ \\
+Llama AWQ-4  & $+1.7\%$ & $+80\ [-109,+268]$ & $+91\ [-25,+210]$ ($n{=}2052$) & $+3090\ [+1995,+4286]$ ($n{=}179$) & $-4477\ [-6503,-2588]$ ($n{=}110$) & $-305\ [-1520,+907]$ ($n{=}159$) & $+332\ [+182,+490]$ & $-141\ [-303,+12]$ \\
+Llama GPTQ-4 & $+3.9\%$ & $+184\ [+12,+359]$ & $+66\ [-43,+181]$ ($n{=}2097$) & $+5915\ [+4335,+7605]$ ($n{=}134$) & $-4327\ [-6138,-2561]$ ($n{=}126$) & $+521\ [-506,+1585]$ ($n{=}143$) & $+417\ [+261,+583]$ & $-183\ [-335,-35]$ \\
 \bottomrule
 \end{tabular}%
 }
@@ -285,7 +281,7 @@ Llama GPTQ-4 & $+3.9\%$ & $+184\ [+12,+359]$ & $+66\ [-43,+181]$ ($n{=}2097$) & 
 
 \begin{table}[t]
 \centering
-\caption{Clustered mismatch excess $D=\overline{\Delta}_{\mathrm{BF16-only}}-\overline{\Delta}_{\mathrm{Both-OK}}$ on MATH-500. Both stratum means are formed on the same problem-level resamples ($B=10{,}000$; empty-stratum replicates skipped; none occurred). $D$ is a diagnostic of correctness-conditioned mismatch asymmetry, not a causal quantization-induced token increase.}
+\caption{Item-level mismatch excess $D=\overline{\Delta}_{\mathrm{BF16-only}}-\overline{\Delta}_{\mathrm{Both-OK}}$ on MATH-500. Both stratum means are formed on the same item resamples ($B=10{,}000$; empty-stratum replicates skipped; none occurred). $D$ is a diagnostic of correctness-conditioned mismatch asymmetry, not a causal quantization-induced token increase.}
 \label{tab:mismatch-excess}
 \small
 \begin{tabular}{lccc}
@@ -302,7 +298,7 @@ Llama GPTQ-4 & $+66\ [-43,+181]$ & $+5915\ [+4335,+7605]$ & $+5849\ [+4258,+7553
 \end{tabular}
 \end{table}
 
-Under the shared-$\tau$ proxy (Appendix Table~\ref{tab:economics}), FP8 ranks first among Qwen cells. Measured Conditions~A and~B disagree with that order (Section~\ref{sec:serving-results}).
+Mean tokens divided by pass@1 (Appendix Table~\ref{tab:economics}) ranks Qwen FP8 first among Qwen cells. Campaign-length seconds, which divide by the measured tok/s, do not (Section~\ref{sec:serving-results}).
 
 \begin{table*}[t]
 \centering
@@ -353,7 +349,7 @@ Llama GPTQ-4 & $88.92\pm1.55$ & $88.96\pm0.70$ & $44.95\pm4.32$ & 3 / 31 \\
 \end{table*}
 
 \subsection{Difficulty labels}
-Table~\ref{tab:difficulty}: Level~1 is easy for every format in this sample. Llama AWQ-4 has the lowest Llama pass@1 on Levels 2--4. Level~2 is harder than Level~5 for both BF16 backbones (Qwen $89.11\%$ vs.\ $92.69\%$; Llama $84.67\%$ vs.\ $88.06\%$). The recovered answer file has no level field, so this split was not re-audited for extraction failures concentrated in Level~2. The non-monotonicity is a property of these labels under the campaign grader.
+Table~\ref{tab:difficulty}: Level~1 is easy for every format in this sample. Llama AWQ-4 has the lowest Llama pass@1 on Levels 2--4. Level~2 is harder than Level~5 for both BF16 backbones (Qwen $89.11\%$ vs.\ $92.69\%$; Llama $84.67\%$ vs.\ $88.06\%$). Joining the public MATH-500 \texttt{level} field on item index reproduces those rates. On Qwen BF16, Level~2 has 6 unboxed rows out of 450, against about 49 incorrect answers; Llama BF16 has 5 unboxed rows against about 69 incorrect answers. The Level~2 dip is graded wrong answers, not missing boxes.
 
 \subsection{Item-level descriptive checks}
 CPU-only reanalysis of the released compact JSON (\path{results/reports/item_level_descriptive_report.md}) is descriptive, not causal. MATH-500 has no item that is BF16-correct and quantized-wrong on all five seeds for any tested format. Incorrect MATH traces are longer than correct traces in every cell (for example, Qwen BF16 mean tokens $3{,}256$ when correct vs.\ $15{,}843$ when incorrect). GPQA-Diamond Qwen AWQ flips remain distributed (75 of 198 items flip on at least one seed; 0 items flip on all three seeds). These counts do not identify a small set of items that would explain the GPQA contrast.
@@ -364,7 +360,7 @@ Because MATH-500 was evaluated with five generations per item, we additionally e
 
 Llama AWQ-4 5/5 coverage is $70.2\%$ versus $76.2\%$ for BF16 ($-6.0$\,pp, $95\%$ CI $[-9.4,-2.6]$). Two further coverage intervals exclude zero and stop at $-0.6$\,pp: Llama AWQ-4 at $\ge 4/5$ ($-3.2$\,pp) and Qwen AWQ-4 at $\ge 4/5$ ($-2.2$\,pp). The remaining coverage contrasts include zero. These 18 intervals are exploratory. They do not receive the Holm correction used for pass@1. Among 18 tests at $\alpha=0.05$, about one false positive is expected. The Llama AWQ-4 5/5 interval is the one that sits well clear of zero. Appendix Table~\ref{tab:modal-paired} lists the full pattern.
 
-A one-sample length rule is also gold-free and costs one generation. For each seed we serve the shortest $k$ traces, with $k$ set to the published 5/5 coverage of that cell, and average the selective risk over the five seeds (Table~\ref{tab:length-abstain}). At that matched coverage the length rule's risk is $1.61$--$4.56\%$, against at most $0.27\%$ for 5/5 modal agreement. The threshold is chosen to hit the modal coverage, which favors the length rule. The five-sample rule still has the lower selective risk. It also spends about five times the tokens ($T_5$ below).
+A one-sample length rule is also gold-free and costs one generation. For each seed we serve the shortest $k$ traces, with $k$ set to the published 5/5 coverage of that cell, and average the selective risk over the five seeds (Table~\ref{tab:length-abstain}). At that matched coverage the length rule's risk is $1.61$--$4.56\%$, against at most $0.27\%$ for 5/5 modal agreement. The five-sample rule still has the lower selective risk. It also spends about five times the tokens ($T_5$ below).
 
 Mean $T_5$ is $20{,}057$ / $20{,}038$ / $21{,}327$ / $21{,}436$ tokens for Qwen BF16/FP8/AWQ-4/GPTQ-4 and $23{,}283$ / $22{,}754$ / $23{,}682$ / $24{,}203$ for Llama. $T_5$ is five times the mean completion length. Abstained items still pay those tokens. Figure~\ref{fig:modal} shows the three operating points.
 
@@ -451,67 +447,26 @@ Llama-8B & GPTQ-4 & 93.8 & 2.77 & 86.4 & 0.46 & 75.4 & 0.27 & 24{,}203 \\
         ylabels at=edge left,
     },
     width=0.46\linewidth, height=5.6cm,
-    xlabel={$\widetilde{C}_{\mathrm{pass}}^{\mathrm{hyb}}$ (\$ $\times 10^{-3}$ / correct)},
+    xlabel={Campaign-length seconds / correct},
     ylabel={MATH-500 mean pass@1 (\%)},
-    xmin=3.0, xmax=6.3,
     ymin=85, ymax=96,
     grid=major,
     legend style={font=\scriptsize},
 ]
-\nextgroupplot[title={Qwen-7B (\texttt{ragpu003})}]
-\addplot[only marks, mark=*, blue, mark size=3pt,
-    error bars/.cd, x dir=both, x explicit, y dir=none]
-    table[row sep=\\, x=x, y=y, x error minus=xm, x error plus=xp] {
-    x y xm xp \\
-    5.956865 94.00 0.103286 0.114559 \\
-    };
-\addplot[only marks, mark=square*, green!60!black, mark size=3pt,
-    error bars/.cd, x dir=both, x explicit, y dir=none]
-    table[row sep=\\, x=x, y=y, x error minus=xm, x error plus=xp] {
-    x y xm xp \\
-    3.814391 94.40 0.671988 0.660611 \\
-    };
-\addplot[only marks, mark=triangle*, red, mark size=3.5pt,
-    error bars/.cd, x dir=both, x explicit, y dir=none]
-    table[row sep=\\, x=x, y=y, x error minus=xm, x error plus=xp] {
-    x y xm xp \\
-    3.499199 93.12 0.064740 0.070019 \\
-    };
-\addplot[only marks, mark=diamond*, orange, mark size=3.5pt,
-    error bars/.cd, x dir=both, x explicit, y dir=none]
-    table[row sep=\\, x=x, y=y, x error minus=xm, x error plus=xp] {
-    x y xm xp \\
-    3.222761 93.48 0.058101 0.063274 \\
-    };
+\nextgroupplot[title={Qwen-7B (\texttt{ragpu003})}, xmin=8, xmax=18]
+\addplot[only marks, mark=*, blue, mark size=3pt] coordinates {(16.89,94.00)};
+\addplot[only marks, mark=square*, green!60!black, mark size=3pt] coordinates {(9.44,94.40)};
+\addplot[only marks, mark=triangle*, red, mark size=3.5pt] coordinates {(10.95,93.12)};
+\addplot[only marks, mark=diamond*, orange, mark size=3.5pt] coordinates {(9.39,93.48)};
 \legend{BF16, FP8, AWQ-4, GPTQ-4}
-\nextgroupplot[title={Llama-8B (\texttt{ragpu004})}]
-\addplot[only marks, mark=*, blue, mark size=3pt,
-    error bars/.cd, x dir=both, x explicit, y dir=none]
-    table[row sep=\\, x=x, y=y, x error minus=xm, x error plus=xp] {
-    x y xm xp \\
-    4.728241 89.24 0.106368 0.115058 \\
-    };
-\addplot[only marks, mark=square*, green!60!black, mark size=3pt,
-    error bars/.cd, x dir=both, x explicit, y dir=none]
-    table[row sep=\\, x=x, y=y, x error minus=xm, x error plus=xp] {
-    x y xm xp \\
-    4.340136 89.52 0.098358 0.107171 \\
-    };
-\addplot[only marks, mark=triangle*, red, mark size=3.5pt,
-    error bars/.cd, x dir=both, x explicit, y dir=none]
-    table[row sep=\\, x=x, y=y, x error minus=xm, x error plus=xp] {
-    x y xm xp \\
-    5.604882 86.48 0.139051 0.151922 \\
-    };
-\addplot[only marks, mark=diamond*, orange, mark size=3.5pt,
-    error bars/.cd, x dir=both, x explicit, y dir=none]
-    table[row sep=\\, x=x, y=y, x error minus=xm, x error plus=xp] {
-    x y xm xp \\
-    5.905101 88.92 0.130589 0.141440 \\
-    };
+\nextgroupplot[title={Llama-8B (\texttt{ragpu004})}, xmin=9, xmax=16]
+\addplot[only marks, mark=*, blue, mark size=3pt] coordinates {(14.22,89.24)};
+\addplot[only marks, mark=square*, green!60!black, mark size=3pt] coordinates {(10.56,89.52)};
+\addplot[only marks, mark=triangle*, red, mark size=3.5pt] coordinates {(14.00,86.48)};
+\addplot[only marks, mark=diamond*, orange, mark size=3.5pt] coordinates {(14.87,88.92)};
 \end{groupplot}
 \end{tikzpicture}
-\caption{Condition~B cost-accuracy scatter: aggregate hybrid Cost-of-Pass proxy versus campaign MATH-500 pass@1 (\$ $\times 10^{-3}$). Whiskers are 95\% uncertainty intervals conditional on the observed timing repetitions and clustered accuracy bootstrap. Points are not joined. Panels represent separate serving conditions (Qwen-7B on \texttt{ragpu003}; Llama-8B on \texttt{ragpu004}) and are not a pooled trade-off plot. Qwen FP8's wide whisker is the five-rep wall-clock spread.}
+\caption{Campaign-length seconds per correct answer versus MATH-500 pass@1. The horizontal axis is full-grid mean tokens divided by the measured Condition~B tok/s and by pass@1. There are no timing whiskers: $R=3$ or $5$ does not support a percentile interval, and those repeats do not resample length. Points are not joined. Panels are separate hosts and are not a pooled trade-off plot.}
 \label{fig:condB-scatter}
 \end{figure}
 
@@ -533,7 +488,7 @@ Llama-8B & GPTQ-4 & 93.8 & 2.77 & 86.4 & 0.46 & 75.4 & 0.27 & 24{,}203 \\
 \legend{Qwen-7B, Llama-8B}
 \end{axis}
 \end{tikzpicture}
-\caption{Full-grid mean MATH-500 completion tokens (ratio-of-means estimand). Bars are point estimates; clustered 95\% intervals on paired token $\Delta$ are in Table~\ref{tab:tokens} and are not drawn on this axis.}
+\caption{Full-grid mean MATH-500 completion tokens (ratio-of-means estimand). Bars are point estimates. Item-level 95\% intervals on paired token $\Delta$ are in Table~\ref{tab:tokens} and are not drawn on this axis.}
 \label{fig:tokens}
 \end{figure}
 
@@ -602,31 +557,31 @@ Llama-8B & GPTQ-4 & 93.8 & 2.77 & 86.4 & 0.46 & 75.4 & 0.27 & 24{,}203 \\
 \label{sec:serving-results}
 Table~\ref{tab:serving-main} separates tok/s from GPU-seconds per query. GPU-seconds equal output tokens divided by tok/s, so a long subset draw raises cost even when the kernel is faster. Multiplying the printed tok/s by GPU-s/q recovers the subset length. Llama FP8 Condition~A is about $7{,}288$ tokens per query. The same checkpoint's campaign mean is $4{,}550.8$, which is $2.3\%$ shorter than Llama BF16. That single 20-prompt draw, not a slower kernel, is why Condition~A ranks Llama BF16 cheapest ($\$0.0310$ vs.\ about $\$0.043$). Llama GPTQ-4 Condition~B tok/s is $0.2\%$ below BF16 ($366.16$ vs.\ $366.98$) while hybrid cost is $+24.9\%$; the gap is mostly length.
 
-The printed dollar intervals multiply wall-clock repeats by a pass@1 bootstrap. Repeats share seed $20260816$, so they do not include length variance. With $R=3$ we report the observed tok/s range rather than a percentile story: Qwen BF16 Condition~A is $43.88$--$43.96$; Qwen FP8 Condition~B is $350.68$--$546.26$. Qwen FP8 Condition~B tok/s of $449.79$ is the mean of five ratios. Mean GPU-s/q is $8.64$, and $3{,}738/8.64 \approx 432.5$ tok/s. The two aggregations are not the same. Appendix Table~\ref{tab:fp8-reps} lists the five repeats. Llama FP8 and AWQ-4 Condition~A both print as $\$0.0431$ $[0.0415, 0.0450]$. The unrounded costs are $0.04308$ and $0.04313$. They are not a copied cell.
+The brackets in Table~\ref{tab:serving-main} are the minimum and maximum hybrid cost across timing repeats, with campaign pass@1 held fixed. They are not a 95\% interval. Repeats share seed $20260816$, so they do not include length variance. Qwen BF16 Condition~A tok/s runs only from $43.88$ to $43.96$. Qwen FP8 Condition~B runs from $350.68$ to $546.26$, and its dollar min--max is $\$0.0030$--$\$0.0047$. Qwen FP8 Condition~B tok/s of $449.79$ is the mean of five ratios. Mean GPU-s/q is $8.64$, and $3{,}738/8.64 \approx 432.5$ tok/s. The two aggregations are not the same. Appendix Table~\ref{tab:fp8-reps} lists the five repeats. Llama FP8 and AWQ-4 Condition~A means both round to $\$0.0431$. Their repeat ranges do not: $\$0.0421$--$\$0.0449$ and $\$0.0423$--$\$0.0463$.
 
-Table~\ref{tab:length-cost} substitutes campaign mean tokens for the subset length and keeps the measured tok/s. Under that sensitivity, Qwen GPTQ-4 is cheapest on Condition~A and tied with FP8 on Condition~B, so the AWQ/GPTQ reversal between A and B disappears. Llama FP8 is cheapest on both conditions and on the token proxy. An item bootstrap of campaign tokens and pass@1, with tok/s held fixed ($B=10{,}000$), gives Llama FP8 rank~1 on both campaign-length costs in all $10{,}000$ draws. Qwen GPTQ-4 is rank~1 on Condition~A in $99.9\%$ of draws and on Condition~B in $59.6\%$, with FP8 taking the other $40.4\%$. Kendall's $\tau$ between the Qwen pass@1 order and the Condition~A campaign-length order is $-0.33$. Measured tok/s still depends on the subset's length, so Table~\ref{tab:length-cost} is not a final serving measurement.
+Table~\ref{tab:length-cost} substitutes campaign mean tokens for the subset length and keeps the measured tok/s. Under that sensitivity, Qwen GPTQ-4 is cheapest on Condition~A and tied with FP8 on Condition~B, so the AWQ/GPTQ reversal between A and B disappears. Llama FP8 is cheapest on both conditions and on mean tokens divided by pass@1. An item bootstrap of campaign tokens and pass@1, with tok/s held fixed ($B=10{,}000$), gives Llama FP8 rank~1 on both campaign-length costs in all $10{,}000$ draws. Qwen GPTQ-4 is rank~1 on Condition~A in $99.9\%$ of draws and on Condition~B in $59.6\%$, with FP8 taking the other $40.4\%$. Kendall's $\tau$ between the Qwen pass@1 order and the Condition~A campaign-length order is $-0.33$. Measured tok/s still depends on the subset's length, so Table~\ref{tab:length-cost} is not a final serving measurement. Figure~\ref{fig:condB-scatter} plots the Condition~B campaign-length seconds, not the subset dollars.
 
-Qwen BF16 decodes at $43.92$ tok/s on Condition~A and $205.41$ tok/s in the fixed-512 microbenchmark. Llama BF16, on the other host, reaches $72.34$ and $362.01$. The fixed-length gap remains, so it is not the Condition~A length draw. Every Qwen saving in Table~\ref{tab:serving-main} ($-36.0\%$ to $-45.9\%$) is relative to that Qwen BF16 baseline on \texttt{ragpu003}. The Qwen FP8 slow/mid/fast regimes were also on that host. Clocks were not logged. These FP8 numbers are A100 Marlin W8A16, not Hopper W8A8. Peak allocated VRAM is $53.9$--$56.1$\,GB, the $0.75$ engine pool. Figure~\ref{fig:condB-scatter} is not a pooled trade-off plot. Condition~A latency is in Appendix Table~\ref{tab:serving-single}.
+Qwen BF16 decodes at $43.92$ tok/s on Condition~A and $205.41$ tok/s in the fixed-512 microbenchmark. Llama BF16, on the other host, reaches $72.34$ and $362.01$. The fixed-length gap remains, so it is not the Condition~A length draw. Every Qwen saving in Table~\ref{tab:serving-main} ($-36.0\%$ to $-45.9\%$) is relative to that Qwen BF16 baseline on \texttt{ragpu003}. The Qwen FP8 slow/mid/fast regimes were also on that host. Clocks were not logged. AWQ-4 used the GEMM \texttt{awq} kernel rather than \texttt{awq\_marlin}. On A100 the Marlin path is the one vLLM usually selects, and it is typically faster, so every AWQ throughput number is a kernel choice as well as a format property. That choice can contribute to Llama AWQ-4 decoding more slowly than BF16 on Condition~A ($70.20$ vs.\ $72.34$ tok/s). GPTQ-4 timing used \texttt{float16} while GPTQ-4 pass@1 used \texttt{bfloat16}, so the hybrid ratio joins two configurations. These FP8 numbers are A100 Marlin W8A16, not Hopper W8A8. Peak allocated VRAM is $53.9$--$56.1$\,GB, the $0.75$ engine pool. Condition~A latency is in Appendix Table~\ref{tab:serving-single}.
 
 \begin{table*}[t]
 \centering
-\caption{Aggregate hybrid Cost-of-Pass proxy $\widetilde{C}_{\mathrm{pass}}^{\mathrm{hyb}}$ on the controlled confirmation. Condition~A: 20 sequential prompts. Condition~B: 100-prompt \texttt{llm.generate}, \texttt{max\_num\_seqs=8}. Tok/s is mean$\pm$ sample SD. The numerator is confirmation GPU-sec/query; the denominator is campaign MATH-500 pass@1 at $\$1.50$/A100-hour. Intervals are 95\% (timing-rep $\times$ clustered pass@1), conditional on the observed timing repetitions. Qwen: \texttt{ragpu003}. Llama: \texttt{ragpu004}.}
+\caption{Hybrid cost on the controlled confirmation. Condition~A: 20 sequential prompts. Condition~B: 100-prompt \texttt{llm.generate}, \texttt{max\_num\_seqs=8}. Tok/s is mean$\pm$ sample SD. Brackets are the minimum and maximum hybrid cost across timing repeats, with campaign pass@1 held fixed. They are not a 95\% interval. The B $\Delta$\% column is the point estimate only. Qwen: \texttt{ragpu003}. Llama: \texttt{ragpu004}. GPTQ dollars join \texttt{float16} timing with \texttt{bfloat16} pass@1.}
 \label{tab:serving-main}
 \small
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{llccccccc}
 \toprule
-\textbf{Model} & \textbf{Fmt} & \textbf{A tok/s} & \textbf{A GPU-s/q} & \textbf{A $\widetilde{C}_{\mathrm{pass}}^{\mathrm{hyb}}$ [95\% CI]} & \textbf{B tok/s} & \textbf{B GPU-s/q} & \textbf{B $\widetilde{C}_{\mathrm{pass}}^{\mathrm{hyb}}$ [95\% CI]} & \textbf{B $\Delta$\% vs BF16} \\
+\textbf{Model} & \textbf{Fmt} & \textbf{A tok/s} & \textbf{A GPU-s/q} & \textbf{A $\widetilde{C}$ [min, max]} & \textbf{B tok/s} & \textbf{B GPU-s/q} & \textbf{B $\widetilde{C}$ [min, max]} & \textbf{B $\Delta$\%} \\
 \midrule
-Qwen-7B & BF16   & $43.92\pm 0.04$ & 102.51 & \$0.0454 [0.0447, 0.0463] & $252.72\pm 0.56$ & 13.44 & \$0.0060 [0.0059, 0.0061] & anchor \\
-Qwen-7B & FP8    & $62.50\pm 0.08$ & 84.60 & \$0.0373 [0.0367, 0.0380] & $449.79\pm 97.53$ & 8.64 & \$0.0038 [0.0031, 0.0045] & $-36.0$ $[-47.2,-24.8]$ \\
-Qwen-7B & AWQ-4  & $76.89\pm 0.70$ & 48.04 & \$0.0215 [0.0211, 0.0219] & $418.15\pm 2.03$ & 7.82 & \$0.0035 [0.0034, 0.0036] & $-41.3$ $[-41.9,-40.6]$ \\
-Qwen-7B & GPTQ-4 & $82.67\pm 0.69$ & 54.39 & \$0.0242 [0.0238, 0.0248] & $488.26\pm 0.64$ & 7.23 & \$0.0032 [0.0032, 0.0033] & $-45.9$ $[-46.4,-45.4]$ \\
+Qwen-7B & BF16   & $43.92\pm 0.04$ & 102.51 & \$0.0454 [0.0454, 0.0455] & $252.72\pm 0.56$ & 13.44 & \$0.0060 [0.0059, 0.0060] & anchor \\
+Qwen-7B & FP8    & $62.50\pm 0.08$ & 84.60 & \$0.0373 [0.0373, 0.0374] & $449.79\pm 97.53$ & 8.64 & \$0.0038 [0.0030, 0.0047] & $-36.0$ \\
+Qwen-7B & AWQ-4  & $76.89\pm 0.70$ & 48.04 & \$0.0215 [0.0213, 0.0217] & $418.15\pm 2.03$ & 7.82 & \$0.0035 [0.0035, 0.0035] & $-41.3$ \\
+Qwen-7B & GPTQ-4 & $82.67\pm 0.69$ & 54.39 & \$0.0242 [0.0241, 0.0245] & $488.26\pm 0.64$ & 7.23 & \$0.0032 [0.0032, 0.0032] & $-45.9$ \\
 \midrule
-Llama-8B & BF16   & $72.34\pm 0.27$ & 66.43 & \$0.0310 [0.0303, 0.0318] & $366.98\pm 1.90$ & 10.13 & \$0.0047 [0.0046, 0.0048] & anchor \\
-Llama-8B & FP8    & $78.75\pm 2.89$ & 92.55 & \$0.0431 [0.0415, 0.0450] & $481.42\pm 1.36$ & 9.32 & \$0.0043 [0.0042, 0.0044] & $-8.2$ $[-9.5,-6.9]$ \\
-Llama-8B & AWQ-4  & $70.20\pm 2.71$ & 89.51 & \$0.0431 [0.0415, 0.0450] & $391.11\pm 0.48$ & 11.63 & \$0.0056 [0.0055, 0.0058] & $+18.5$ $[+16.6,+20.5]$ \\
-Llama-8B & GPTQ-4 & $63.49\pm 0.41$ & 86.95 & \$0.0407 [0.0398, 0.0418] & $366.16\pm 0.79$ & 12.60 & \$0.0059 [0.0058, 0.0060] & $+24.9$ $[+23.0,+26.7]$ \\
+Llama-8B & BF16   & $72.34\pm 0.27$ & 66.43 & \$0.0310 [0.0309, 0.0311] & $366.98\pm 1.90$ & 10.13 & \$0.0047 [0.0047, 0.0048] & anchor \\
+Llama-8B & FP8    & $78.75\pm 2.89$ & 92.55 & \$0.0431 [0.0421, 0.0449] & $481.42\pm 1.36$ & 9.32 & \$0.0043 [0.0043, 0.0044] & $-8.2$ \\
+Llama-8B & AWQ-4  & $70.20\pm 2.71$ & 89.51 & \$0.0431 [0.0423, 0.0463] & $391.11\pm 0.48$ & 11.63 & \$0.0056 [0.0056, 0.0056] & $+18.5$ \\
+Llama-8B & GPTQ-4 & $63.49\pm 0.41$ & 86.95 & \$0.0407 [0.0405, 0.0410] & $366.16\pm 0.79$ & 12.60 & \$0.0059 [0.0059, 0.0059] & $+24.9$ \\
 \bottomrule
 \end{tabular}%
 }
@@ -656,11 +611,11 @@ Llama-8B & GPTQ-4 & 85.74 & 4 & 14.87 & 4 \\
 \FloatBarrier
 
 \section{Discussion}
-Table~\ref{tab:summary} collects the quantities a practitioner has to assemble from the earlier tables. MATH-500 FP8--BF16 intervals include zero. The $\pm 1$\,pp TOST fails because those 90\% intervals reach $+1.12$ and $+1.28$\,pp. Llama AWQ-4 is the MATH and GSM8K accuracy drop in this grid. Qwen AWQ-4 stays near BF16 on those two tasks. Its GPQA contrast is in Table~\ref{tab:gpqa-contrasts} and is not a headline. Qwen 4-bit Both-OK traces are longer. The BF16-correct length column is positive in every contrast because it includes quantized failures. The quant-correct column does not have that sign.
+Llama AWQ-4 is the accuracy result that survives the item-level intervals on both MATH-500 and GSM8K. maj@5 removes the Qwen AWQ-4 pass@1 gap and about half of the Llama AWQ-4 gap. The BF16-correct length column is positive in every contrast because it includes quantized failures. The quant-correct column flips that sign in four of six contrasts, and three of those intervals exclude zero (Table~\ref{tab:tokens}). Both columns are selection effects.
 
-maj@5 removes the Qwen AWQ-4 pass@1 gap and about half of the Llama AWQ-4 gap. Modal 5/5 coverage for Llama AWQ-4 is $6.0$\,pp lower than BF16. A one-sample length threshold at the same coverage has higher selective risk (Table~\ref{tab:length-abstain}). The five-sample rule earns that lower risk at about five times the tokens.
+Five-sample agreement has selective risk at most $0.27\%$. A one-sample length rule at matched coverage is higher (Table~\ref{tab:length-abstain}). The five-sample rule earns that lower risk at about five times the tokens.
 
-Subset GPU-seconds and campaign-length seconds do not share a point order. The subset order is real for the measured draws. It is also sensitive to a length variance the printed intervals do not cover. Eager execution and the Qwen host are part of that serving result. A point order among tied or non-significant cells is not, by itself, evidence that rankings are unstable.
+Subset GPU-seconds and campaign-length seconds do not share a point order. Llama FP8 is cheapest on the campaign-length estimator in every item resample. The subset order is a property of one 20-prompt draw. Timing min--max does not cover that draw. AWQ throughput also depends on the GEMM kernel, and Qwen savings are relative to a BF16 baseline on \texttt{ragpu003}. A point order among tied cells is not evidence that bit-width has a stable deployment ranking.
 
 \begin{table*}[t]
 \centering
@@ -690,12 +645,12 @@ Llama-8B & GPTQ-4 & 88.92 & 91.2 & 4{,}841 & 0.0407 & 0.0059 & 85.7 / 14.9 \\
     \item \textbf{A100 W8A16 fallback.} FP8 checkpoints were executed as Marlin W8A16 on A100, not native W8A8. Numbers do not transfer to Hopper native W8A8.
     \item \textbf{Measured serving scope.} Throughput and GPU-seconds are measured on balanced MATH-500 subsets, not the full campaign. Repeats share one sampling seed, so cost intervals omit length variance. Condition~B elapsed time includes the straggler tail; occupancy time was not stored. $R=3$ or $5$ does not support a stable percentile interval. Eager execution was not compared with CUDA graphs. Qwen and Llama used different hosts, and clocks were not logged. The $\$1.50$/A100-hour rate is a pricing scenario. Peak VRAM is the $0.75$ engine pool.
     \item \textbf{Activation dtype.} AWQ-4 accuracy runs use \texttt{float16}. BF16, FP8, and accuracy-campaign GPTQ-4 use \texttt{bfloat16}. Serving GPTQ-4 uses \texttt{float16}. No BF16-at-\texttt{float16} control was run.
-    \item \textbf{Pathology metrology.} The loop detector is identical-word runs $\ge 20$. Phrase-level cycles and \texttt{finish\_reason} were not saved. The exact-cap count is re-encoded length, not \texttt{max\_model\_len} minus the prompt. Near-cap is a proxy and can miss GPQA truncations.
+    \item \textbf{Pathology metrology.} The loop detector is identical-word runs $\ge 20$. Phrase-level cycles and \texttt{finish\_reason} were not saved. A chat-template recount flags 40 MATH-500 rows and 31 GSM8K rows at $32{,}768$ minus the prompt. That recount uses re-encoded completion length, which can disagree with vLLM's token count. GPQA prompts were not reconstructed, because the letter order is a process-RNG draw.
     \item \textbf{Modal agreement.} Five generations are required per attempted MATH problem. Only MATH-500 has five seeds in this campaign. Mathematical answer equivalence is evaluator- and task-specific (campaign LightEval~0.8.0 / math-verify). High agreement can still be wrong. The signal is not general uncertainty calibration, not softmax calibration, and not a safety property.
     \item \textbf{Checkpoint provenance.} Both AWQ-4 checkpoints are \texttt{jakiAJK} uploads with unknown calibration. FP8 and GPTQ-4 are RedHatAI artifacts. Format, publisher, and toolchain are collinear. No second AWQ artifact was quantized in this study.
     \item \textbf{Scope.} Two 7--8B DeepSeek-R1 distillations, English math/science, one pinned serving stack, one prompt. GSM8K/GPQA use three seeds.
     \item \textbf{Not evaluated.} This study does not evaluate AIME, LiveCodeBench, 32B models, Hopper native W8A8 FP8, energy measurements, production continuous batching, or probability calibration.
-    \item \textbf{Reproducibility surface.} Compact JSON, recovered MATH-500 answer strings, confirmation timing, and analysis reports are released. Full chain-of-thought traces are not. Compact JSON omits \texttt{finish\_reason} and output token IDs. Replay needs an A100-80GB, the listed weights, and \path{runtime_manifest.json}. The driver is UNRECORDED. New sensitivities are recomputed by \path{scripts/analysis/review_response_sensitivity.py}.
+    \item \textbf{Reproducibility surface.} Compact JSON, recovered MATH-500 answer strings, confirmation timing, and analysis reports are released. Full chain-of-thought traces are not. Compact JSON omits \texttt{finish\_reason} and output token IDs. Replay needs an A100-80GB, the listed weights, and \path{runtime_manifest.json}. The driver is UNRECORDED. New sensitivities are recomputed by \path{scripts/analysis/manuscript_sensitivities.py}.
     \item \textbf{Contamination.} MATH and GSM8K overlap public pretraining corpora. A paired within-item design reduces but does not eliminate contamination interaction with checkpoint.
     \item \textbf{Launcher record.} Effective flags, including \texttt{max\_model\_len=32768}, are reconstructed in \path{runtime_manifest.json} from the launcher. They are not per-job telemetry. The NVIDIA driver is recorded as UNRECORDED. Historical harness configs are not the campaign stack.
 \end{enumerate}
@@ -704,12 +659,12 @@ Llama-8B & GPTQ-4 & 88.92 & 91.2 & 4{,}841 & 0.0407 & 0.0059 & 85.7 / 14.9 \\
 Construct: pass@1, maj@5, token length, subset GPU-seconds, and campaign-length seconds are distinct estimands. The hybrid proxy is not Erol et al.'s per-problem Cost-of-Pass. Internal: Conditions~A and~B differ in subset and regime together; timing repeats do not resample length; Qwen and Llama used different hosts. External: two 7--8B families, one eager A100 stack, and three English benchmarks. Results do not transfer to CUDA-graph serving, Hopper W8A8, or a different publisher's AWQ artifact.
 
 \section{Conclusion}
-Under this pinned A100 / vLLM~0.7.0 eager stack, pass@1 does not order the eight checkpoints by itself. The only Holm-significant MATH drop is Llama AWQ-4 ($-2.76$\,pp); maj@5 cuts that gap to about $-1.4$\,pp and removes the Qwen AWQ-4 gap. Gold-free 5/5 agreement has selective risk at most $0.27\%$, against $1.6$--$4.6\%$ for a one-sample length rule at the same coverage. The BF16-correct length increase is positive in every contrast because it conditions on quantized failures; the quant-correct mirror does not keep that sign. Subset GPU-second rankings disagree with a campaign-length cost that uses the same measured tok/s, and the subset intervals do not cover length variance. Qwen savings are relative to a BF16 baseline on \texttt{ragpu003}. AWQ-4 results are properties of the \texttt{jakiAJK} artifacts, run in \texttt{float16}, not a property of the AWQ method.
+Under this pinned A100 / vLLM~0.7.0 eager stack, the defensible results are a selection effect in the BF16-correct length estimator, a subset serving cost that one length draw can reorder, and one robust accuracy drop. Llama AWQ-4 falls $-2.76$\,pp on MATH-500; maj@5 cuts that gap to about $-1.4$\,pp. Gold-free 5/5 agreement has selective risk at most $0.27\%$, against $1.6$--$4.6\%$ for a one-sample length rule at matched coverage. The quant-correct length mirror does not keep the sign of the BF16-correct column. Llama FP8 is cheapest once campaign length replaces the 20-prompt draw. AWQ-4 results are properties of the \texttt{jakiAJK} artifacts, run in \texttt{float16} on the GEMM \texttt{awq} kernel. GPQA letter order is not a certified paired contrast.
 
 \section*{Reproducibility and Artifact Availability}
 The released artifact enables verification of reported analyses; reproducing the complete GPU campaign requires equivalent hardware and checkpoint availability.
 
-CPU-reproducible from compact JSON: tables, analysis scripts, and \path{scripts/analysis/review_response_sensitivity.py} (see \path{REPRODUCE.md}). Replay of the 88-run campaign requires an NVIDIA A100-80GB, the listed weights, and \path{results/reports/runtime_manifest.json}. The driver version was not archived. Full chain-of-thought traces are not released.
+CPU-reproducible from compact JSON: tables, analysis scripts, and \path{scripts/analysis/manuscript_sensitivities.py} (see \path{REPRODUCE.md}). Replay of the 88-run campaign requires an NVIDIA A100-80GB, the listed weights, and \path{results/reports/runtime_manifest.json}. The driver version was not archived. Full chain-of-thought traces are not released.
 
 Code, patches, validation JSON, and analysis reports:
 \href{https://github.com/Manish06N/reasoning-compression-lab}{\nolinkurl{Manish06N/reasoning-compression-lab}}.
@@ -731,14 +686,16 @@ The first author's dual affiliation (IIT Patna and Lincoln University College) r
 
 \appendix
 \section{Prompt}
-MATH-500 and GSM8K use the QRM template, with a \texttt{<think>} prefix on the official QRM path:
+\label{sec:prompt}
+MATH-500 and GSM8K use the QRM template. Official \texttt{inference.py} calls LightEval with \texttt{use\_chat\_template=True}:
 \begin{verbatim}
 {question}
 
 Please reason step by step, and put your final
 answer within \boxed{}.
 \end{verbatim}
-GPQA-Diamond does not match that template in the stored rows. Across all 24 GPQA cells, $0$--$2$ completions per seed contain \texttt{\textbackslash boxed}, while pass@1 is about $41$--$53\%$ for every format, including BF16. Extractive match on GPQA is therefore not a boxed-answer score. The campaign was launched through official QRM \texttt{inference.py}. The prompt string itself is not stored in the compact JSON. The repository template \path{prompts/gpqa_diamond.txt} presents choices A--D and requests a final line \texttt{Answer: \$LETTER}. A local loader shuffles those choices with \texttt{Random(seed * 1000003 + item)}, which would keep choice order paired across checkpoints at a fixed seed. We do not claim that the QRM job used that shuffle, because the prompt text was not archived.
+The prompt-cap recount applies that string through each family's chat template, including the generation prompt. Saved completions also begin with \texttt{<think>}; we did not insert that marker as a separate prefix.
+GPQA-Diamond uses a different function in QRM's \path{lighteval_custom/tasks/reasoning.py}. The prompt asks for a final line \texttt{Answer: \$LETTER} and inserts the correct choice with \texttt{random.randint(0, 3)}. \texttt{inference.py} seeds Python's RNG with the generation seed, then loads the model, then builds prompts. The pipeline's later \texttt{random.seed(1234)} runs only after those prompts exist. Model load can consume RNG draws, and AWQ and BF16 do not take the same init path, so the letter sequence is not certified to match across checkpoints. Stored GPQA rows agree with that template: $4{,}746$ of $4{,}752$ completions contain no \texttt{\textbackslash boxed}, while pass@1 is about $41$--$53\%$ in every format, including BF16. Extractive match on GPQA is a letter match, not a boxed-answer grade. The QRM comparison row for GPQA in Table~\ref{tab:qrm-compare} is therefore not a paired contrast.
 
 \section{Checkpoints}
 \begin{table}[t]
@@ -776,7 +733,7 @@ AWQ-4 checkpoints are third-party community uploads; calibration corpus and quan
 Serving confirmation protocol and raw JSON live under \path{docs/MEASURED_SERVING_CONFIRMATION_PROTOCOL.md} and \path{results/measured_serving_confirmation/raw/}. Aggregates: \path{measured_serving_confirmation_report.json}. An earlier unconstrained timing (\path{docs/MEASURED_SERVING_PROTOCOL.md}, \path{results/measured_serving/}) is provenance only and is not mixed with confirmation means.
 
 \section{Reanalysis}
-Pathology, clustered bootstrap, and token strata are produced by the canonical reanalysis script from the released per-cell JSON. Loop threshold $=20$. Near-cap threshold $=32{,}500$. Bootstrap $B=10{,}000$, seed $0$.
+Pathology, the item-level bootstrap, and token strata are produced by the canonical reanalysis script from the released per-cell JSON. Loop threshold $=20$. Near-cap threshold $=32{,}500$. Bootstrap $B=10{,}000$, seed $0$.
 
 \section{Modal-agreement details}
 \label{app:modal}
@@ -805,7 +762,7 @@ Llama GPTQ-4 & $-0.2\ [-2.2,+1.8]$ & $-1.4\ [-3.8,+1.0]$ & $-0.8\ [-4.2,+2.6]$ \
 
 \section{Measured serving: latency, microbenchmark, FP8 repeats, and token proxy}
 \label{app:serving}
-Condition~A latency detail (Table~\ref{tab:serving-single}) is sequential decode of a balanced 20-prompt MATH-500 subset. Median latency is the mean of per-run medians. $R=3$ except Llama AWQ-4 ($R=5$; CV-triggered). Fixed-token microbenchmark (Table~\ref{tab:serving-micro}): 10 prompts $\times$ 512 tokens, $T=0.0$, \texttt{ignore\_eos}. Table~\ref{tab:fp8-reps} lists all five Qwen FP8 Condition~B repeats. Table~\ref{tab:economics} is the historical $65$ tok/s token proxy, not measured wall-clock.
+Condition~A latency detail (Table~\ref{tab:serving-single}) is sequential decode of a balanced 20-prompt MATH-500 subset. Median latency is the mean of per-run medians. $R=3$ except Llama AWQ-4 ($R=5$; CV-triggered). Fixed-token microbenchmark (Table~\ref{tab:serving-micro}): 10 prompts $\times$ 512 tokens, $T=0.0$, \texttt{ignore\_eos}. Table~\ref{tab:fp8-reps} lists all five Qwen FP8 Condition~B repeats. Table~\ref{tab:economics} reports mean tokens divided by pass@1. It is not measured wall-clock.
 
 \begin{table*}[t]
 \centering
@@ -874,22 +831,22 @@ Median / IQR & 455.90 / [350.91, 545.18] & --- & --- & --- \\
 
 \begin{table}[t]
 \centering
-\caption{Historical token-implied aggregate cost proxy on MATH-500 at $\$1.50$/A100-hour and a shared $65$ tok/s. Not measured wall-clock. Ranking equals ranking by mean tokens $/$ pass@1. Primary cost evidence is Table~\ref{tab:serving-main}.}
+\caption{MATH-500 mean tokens divided by pass@1. This is the order a shared throughput would produce. It is not measured wall-clock. Primary cost evidence is Table~\ref{tab:serving-main} and Table~\ref{tab:length-cost}.}
 \label{tab:economics}
 \small
-\begin{tabular}{lccc}
+\begin{tabular}{lcc}
 \toprule
-\textbf{Cell} & \textbf{Mean tok.} & \textbf{Cost / Q} & \textbf{Token proxy} \\
+\textbf{Cell} & \textbf{Mean tok.} & \textbf{Tokens / correct} \\
 \midrule
-Qwen BF16   & 4{,}011.4 & \$0.02571 & \$0.02736 \\
-Qwen FP8    & 4{,}007.7 & \$0.02569 & \$0.02721 \\
-Qwen AWQ-4  & 4{,}265.3 & \$0.02734 & \$0.02936 \\
-Qwen GPTQ-4 & 4{,}287.2 & \$0.02748 & \$0.02940 \\
+Qwen BF16   & 4{,}011.4 & 4{,}267 \\
+Qwen FP8    & 4{,}007.7 & 4{,}245 \\
+Qwen AWQ-4  & 4{,}265.3 & 4{,}580 \\
+Qwen GPTQ-4 & 4{,}287.2 & 4{,}586 \\
 \midrule
-Llama BF16   & 4{,}656.6 & \$0.02985 & \$0.03345 \\
-Llama FP8    & 4{,}550.8 & \$0.02917 & \$0.03259 \\
-Llama AWQ-4  & 4{,}736.5 & \$0.03036 & \$0.03511 \\
-Llama GPTQ-4 & 4{,}840.5 & \$0.03103 & \$0.03490 \\
+Llama BF16   & 4{,}656.6 & 5{,}218 \\
+Llama FP8    & 4{,}550.8 & 5{,}084 \\
+Llama AWQ-4  & 4{,}736.5 & 5{,}477 \\
+Llama GPTQ-4 & 4{,}840.5 & 5{,}443 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -908,7 +865,7 @@ Table~\ref{tab:related} is a compact comparison. It is not a claim that this pap
 \toprule
 \textbf{Study} & \textbf{Models} & \textbf{Bits} & \textbf{Engine pinned} & \textbf{Seeds} & \textbf{Length estimand} & \textbf{Correctness split} & \textbf{Serving / cost} & \textbf{Statistics} \\
 \midrule
-This paper & 2 R1 distill (7B/8B) & BF16, FP8, AWQ-4, GPTQ-4 & vLLM 0.7.0 eager, A100 & 5 MATH; 3 GSM/GPQA & RoM, paired $\Delta$, BF16-correct $\Delta$ & $2\times 2$ + BF16 failure control & token proxy; seq.\ \& batched GPU-s; $\widetilde{C}_{\mathrm{pass}}^{\mathrm{hyb}}$ & clustered bootstrap, Holm, TOST \\
+This paper & 2 R1 distill (7B/8B) & BF16, FP8, AWQ-4, GPTQ-4 & vLLM 0.7.0 eager, A100 & 5 MATH; 3 GSM/GPQA & RoM, paired $\Delta$, both conditionals & $2\times 2$ + both mirrors & GPU-s; campaign-length seconds & item-level bootstrap, Holm, TOST \\
 QRM~\cite{liu2025qrm} & R1 distill family & W/A/KV incl.\ W4A16 & QRM harness (multi-config) & typically 1 & mean tokens & not $2\times 2$ & limited & per-cell means \\
 Lian et al.~\cite{lian2026quantinflates} & reasoning PTQ & low-bit PTQ & paper stack & paper-specific & BF16-correct $\Delta$ & BF16-correct vs rest & token cost & paired length \\
 Lotfi et al.~\cite{lotfi2026overthinking} & 1.5B--32B reasoning & aggressive PTQ & paper stack & paper-specific & CoT length; overthinking & abandoned intermediates & logit-penalty Pareto & error-type counts \\
