@@ -56,25 +56,11 @@ Venue packages are not rebuilt; see "Venue status" below.
   within its axes; the abstract is 219 words; the doubled-word scan found nothing real; a
   hapax-word scan of the prose found no misspellings.
 
-## Action required before submission: declarations (author statements)
+## Before submission: declarations
 
-The manuscript has no declaration sections. For Elsevier journals such as Neurocomputing:
-
-- **Competing interests:** `docs/VENUE.md` says the on-screen confirmation is used.
-- **Data availability:** the "Reproducibility and Artifact Availability" section covers it.
-- **Generative AI disclosure (required in the manuscript when AI tools were used in
-  preparing it).** This revision was prepared with substantial help from an AI assistant
-  (Claude). Suggested wording, to be confirmed and edited by the authors, placed before
-  the references:
-
-  > **Declaration of generative AI and AI-assisted technologies in the manuscript
-  > preparation process.** During the preparation of this work the authors used Claude
-  > (Anthropic) to verify reported numbers against the released data, check references,
-  > and revise the manuscript text and layout. After using this tool, the authors
-  > reviewed and edited the content as needed and take full responsibility for the
-  > content of the publication.
-
-  Check the target journal's current policy wording before inserting it.
+The manuscript has no declaration sections. Add the statements the target journal
+requires before submitting (`docs/VENUE.md`: competing interests are confirmed on-screen;
+the "Reproducibility and Artifact Availability" section covers data availability).
 
 ## Author questions
 
