@@ -10,30 +10,28 @@ Email: midhun@lincoln.edu.my
 
 **Do not cite this markdown file for numbers.** The canonical manuscript is [`main.tex`](main.tex) compiled to [`main.pdf`](main.pdf). This file exists only so repository markdown matches the LaTeX story.
 
-**Keywords:** Reasoning language models, public quantization checkpoints, pinned serving stack, estimand disagreement, Cost-of-Pass.
+**Keywords:** Reasoning language models, quantization checkpoints, selection effects, majority vote, selective prediction.
 
 ---
 
 ## Abstract (same claims as `main.tex`)
 
-Practitioners often select a public quantized reasoning checkpoint from a single metric. We pin one A100 stack and evaluate eight DeepSeek-R1-Distill checkpoints (88 runs, 56,408 completions).
+Practitioners often choose a public quantized reasoning checkpoint from a single published number. We show three ways that one summary number misleads — a single pass@1, a single correctness-conditioned length estimate, and a single serving subset — using one pinned A100 stack (vLLM 0.7.0, eager) and eight DeepSeek-R1-Distill checkpoints (Qwen-7B and Llama-8B in BF16, FP8 executed as Marlin W8A16, community AWQ-4, and RedHatAI GPTQ-4) on MATH-500, GSM8K, and GPQA-Diamond (88 runs, 56,408 completions).
 
-The robust accuracy drop is Llama AWQ-4 (MATH-500 −2.76 pp; GSM8K −1.57 pp). maj@5 cuts that MATH gap to about −1.4 pp. A BF16-correct length contrast is positive in every cell; the quant-correct mirror flips sign in four of six, and three of those intervals exclude zero. Subset serving cost is one length draw: Llama FP8 is about 7,288 tokens on Condition A and 4,551 on the full grid. Five-sample agreement has selective risk at most 0.27%, against 1.6–4.6% for a one-sample length rule at matched coverage.
+(i) *Accuracy.* Only one drop survives item-level intervals and multiplicity control: Llama AWQ-4 (MATH-500 −2.76 pp; GSM8K −1.57 pp). Strict-majority voting over five samples (maj@5) halves the MATH gap to −1.4 pp. (ii) *Length.* The BF16-correct token-inflation contrast is biased by selection: comparing two BF16 seeds, with no quantization at all, already yields +138 (Qwen) and +235 (Llama) tokens, and conditioning on the quantized model's success instead flips the sign in four of six contrasts. (iii) *Cost.* On a 20-prompt serving subset a single length draw decides the ranking: Llama FP8 averages 7,288 tokens there versus 4,551 on the full grid, and timing repeats that share one sampling seed cannot expose this. As a gold-free alternative to length heuristics, unanimous agreement of just two samples lowers selective risk to 0.7–2.4%, against 2.2–5.8% for a one-sample length rule at matched coverage; five samples reach at most 0.27%.
 
 ---
 
-## Research questions
+## Research questions (as in `main.tex`)
 
-1. **RQ1.** Do the evaluated quantized checkpoints differ in *pass@1* from matched BF16, with problem-clustered uncertainty?
-2. **RQ2.** How do completion length and correctness-conditioned length differ across the evaluated checkpoints, and what do identical-word loops and near-cap completions reveal about the long-tail behavior?
-3. **RQ3.** What can observable multi-sample agreement say about selective abstention without gold labels at serve time?
-4. **RQ4.** Do checkpoint rankings agree across the historical token proxy, sequential Condition A, and batched Condition B aggregate serving-cost proxies?
+1. **RQ1.** Which pass@1 differences survive an item-level interval, and how much of a 4-bit gap does maj@5 remove?
+2. **RQ2.** Is a BF16-correct length increase a property of the checkpoint, or a selection effect of conditioning on quantized failures?
+3. **RQ3.** At matched coverage, does k-sample answer agreement have lower selective risk than a one-sample length rule, and how does that gain scale with k?
+4. **RQ4.** How much of a subset serving-cost gap is one length draw that timing repeats do not cover?
 
-This paper **pins** one stack. Contributions in `main.tex` are (C1) pinned protocol with recorded dtype and kernel, (C2) estimator-sensitive point orders, with length variance stated, (C3) AWQ results scoped to the jakiAJK artifacts.
+Contributions (C1–C4) answer RQ1–RQ4: one robust accuracy drop (Llama AWQ-4, concentrated at difficulty levels 3–5); a placebo-calibrated selection effect in the BF16-correct length estimator; a cost curve for gold-free agreement; subset serving cost as a length draw.
 
-**Novelty defense (same claim as related work in `main.tex`):** Existing studies evaluate quantization accuracy, throughput, or individual reasoning behaviors. Our question is different: after fixing the serving stack, do practitioners receive the same checkpoint recommendation when the evaluation target changes? We study ranking stability rather than proposing another quantization method.
-
-**Venue:** Journal of Systems and Software (JSS) first. This 22-page single-column PDF is the initial-submission form (Elsevier Your Paper Your Way). Do not send it unchanged to TMLR or FGCS. See [`../docs/VENUE.md`](../docs/VENUE.md).
+**Venue:** see [`../docs/VENUE.md`](../docs/VENUE.md) (JCR Q1 required; JSS and FGCS closed). Q1 revision notes: [`REVISION_RESPONSE_Q1.md`](REVISION_RESPONSE_Q1.md).
 
 ---
 
@@ -41,23 +39,24 @@ This paper **pins** one stack. Contributions in `main.tex` are (C1) pinned proto
 
 | Topic | Claim in this manuscript |
 |---|---|
-| Serving stack | Pinned `qrm-official` / vLLM 0.7.0 eager / A100 W8A16 FP8 fallback |
-| Pathology | 25 loop-flagged completions; 0 exact cap hits; 209 near-cap completions ($\ge 32{,}500$ tokens); tested Qwen AWQ/GPTQ MATH near-cap $25$/$24$ vs BF16 $14$ |
-| Llama AWQ-4 | Tested `jakiAJK` checkpoint: significant MATH-500 and GSM8K pass@1 drop vs BF16 |
-| Qwen AWQ-4 | Not a headline. Tested community artifact: 5.56 pp GPQA-Diamond difference under Holm-6; not significant under Holm-18 joint sensitivity. 75 of 198 items flip on at least one seed; 0 all-three-seed flips |
-| Qwen 4-bit tokens | $+6.3$–$6.9\%$ RoM vs BF16; Both-OK CIs exclude 0; mismatch-conditioned $D$ is a diagnostic (not causal); BF16-correct conditional $\Delta$, following Lian et al., positive |
-| 200-item subset | Superseded estimator (Appendix); not a result |
-| Modal-answer selective prediction | Secondary gold-free unique-mode abstention; 5/5 observed risk $\le 0.27\%$; Wilson upper bounds on $0/n$ cells 0.82%–1.08%. Not G-Pass@k. Not a safety property. |
-| Cost | Subset GPU-seconds and a campaign-length sensitivity (tokens / measured tok/s / pass@1) do not share a point order. Timing intervals are wall-clock repeats of one seed. Qwen FP8 B tok/s $449.79$ is a mean of ratios; $8.64$ GPU-s/q implies about $432.5$ tok/s. |
-| FP8 vs BF16 | 95% CIs include 0; TOST $\pm 1$ pp **fails**; not claimed equivalent |
+| Serving stack | Pinned `qrm-official` / vLLM 0.7.0 eager / A100; FP8 runs as Marlin W8A16 fallback, not native W8A8 |
+| Llama AWQ-4 | Only contrast significant on MATH-500 and GSM8K (Holm-6 and Holm-18). Not detectable at difficulty levels 1–2; −2.48 / −3.75 / −4.63 pp at levels 3 / 4 / 5 |
+| AWQ-4 artifacts | Properties of the `jakiAJK` uploads: own chat template (omits the `<think>\n` generation suffix; the model emits it itself), float16 activations, configured GEMM `awq` path |
+| Qwen AWQ-4 GPQA | −5.56 pp; borderline under Holm-6, not significant under Holm-18; not a headline. GPQA prompts are byte-identical across checkpoints, so the contrast is paired |
+| Length | Qwen 4-bit +6.3–6.9% ratio of means; the BF16-correct conditional is selection-biased (seed placebo +138 / +235); the unconditional estimator is primary |
+| Pathology | 25 loop-flagged completions; 209 near-cap (≥32,500 tokens); per-item cap band (within 16 tokens of the prompt-specific cap): 155 on MATH-500, containing 139 of 140 near-cap rows |
+| Modal agreement | 5/5 observed risk ≤ 0.27% (Wilson upper bounds on 0/n cells 0.82–1.08%); two-sample unanimity 0.7–2.4% vs 2.2–5.8% for the matched length rule. Not G-Pass@k, not calibration, not a safety property |
+| Cost | No deployment cost ranking is claimed. Subset GPU-seconds and campaign-length seconds do not share a point order; timing repeats share one sampling seed |
+| FP8 vs BF16 | 95% CIs include 0; TOST ±1 pp fails on MATH-500; not claimed equivalent |
 
-Tables, TikZ figures, limitations, and the appendix live in `main.tex` / `main.pdf`. Frozen analysis tables: `results/reports/major_revision_tables.md`. Reproduce numbers with:
+Tables, TikZ figures, limitations, and the appendix live in `main.tex` / `main.pdf` (25 pages). Reproduce numbers with:
 
 ```bash
 python3 scripts/analysis/revision_reanalysis.py --check
-python3 scripts/hpc/qrm_parity/benchmark_serving_confirmation.py --check
 python3 scripts/analysis/emit_major_revision_tables.py --check
+python3 scripts/analysis/revision_sensitivities.py --check
 python3 scripts/check_tex_tables.py --check
+python3 scripts/analysis/q1_revision_analyses.py   # levels, cap band, template and GPQA audits
 ```
 
 See [`../REPRODUCE.md`](../REPRODUCE.md).

@@ -36,7 +36,7 @@ No `pip install` is required for:
 - `check_manuscript_numbers.py --check`
 - `check_tex_tables.py --check`
 
-`revision_sensitivities.py --check` is the one CPU check that needs packages. It recomputes the seed placebo (Table 7), the $k$-sample cost curve (Table 11), the GPQA borderline rerun, the near-cap bands, and the item-order diagnostic, then compares them with `results/reports/revision_sensitivities.json`:
+`revision_sensitivities.py --check` is the one CPU check that needs packages. It recomputes the seed placebo (Table 7), the $k$-sample cost curve (Table 12), the GPQA borderline rerun, the near-cap bands, and the item-order diagnostic, then compares them with `results/reports/revision_sensitivities.json`:
 
 ```bash
 pip install numpy==2.5.0 scipy==1.18.0 sympy==1.14.0 math-verify==0.9.0 datasets==5.0.1

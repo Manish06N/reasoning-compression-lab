@@ -5,7 +5,7 @@
 **GitHub:** [https://github.com/Manish06N/reasoning-compression-lab](https://github.com/Manish06N/reasoning-compression-lab)  
 **Last Updated:** 2026-09-23 (single-metric pitfalls title; science numbers frozen; GPU frozen)
 
-**Superseding scientific claims (use these, not the 2026-08-15 blocks below):** Title is *Pitfalls of Single-Metric Evaluation for Quantized Reasoning Checkpoints* (revised 2026-09-23). The robust accuracy drop is Llama AWQ-4. The BF16-correct length column is a selection effect; its quant-correct mirror flips sign in four of six contrasts. Subset serving cost is one length draw that timing repeats do not cover. Five-sample agreement beats a one-sample length rule on selective risk. GPQA letter order is not a certified paired contrast. AWQ used the GEMM `awq` kernel in float16. Do not cite ranking instability, architecture-dependent, statistically tied, unique cheapest, “true Pareto,” or first-run $+18.7\%$ / $-19.8\%$. Frozen tables: `results/reports/major_revision_tables.md`. Sensitivity script: `scripts/analysis/manuscript_sensitivities.py`. **Experimental GPU work is closed.** Live git branch is `main`. Do not rewrite frozen numbers.
+**Superseding scientific claims (use these, not the 2026-08-15 blocks below):** Title is *Pitfalls of Single-Metric Evaluation for Quantized Reasoning Checkpoints* (revised 2026-09-23). The robust accuracy drop is Llama AWQ-4. The BF16-correct length column is a selection effect; its quant-correct mirror flips sign in four of six contrasts. Subset serving cost is one length draw that timing repeats do not cover. Five-sample agreement beats a one-sample length rule on selective risk. GPQA prompts are byte-identical across checkpoints, so GPQA contrasts are paired (Q1 revision 2026-09-24). AWQ-4 used its own chat template (no `<think>\n` generation suffix; the model emits it), float16, and the configured GEMM `awq` path. The Llama AWQ-4 drop grows at difficulty levels 3–5. Do not cite ranking instability, architecture-dependent, statistically tied, unique cheapest, “true Pareto,” or first-run $+18.7\%$ / $-19.8\%$. Frozen tables: `results/reports/major_revision_tables.md`. Sensitivity script: `scripts/analysis/manuscript_sensitivities.py`. **Experimental GPU work is closed.** Live git branch is `main`. Do not rewrite frozen numbers.
 
 ---
 
@@ -152,7 +152,7 @@ gantt
 #### [x] Phase 6: Manuscript Completion & Submission Packaging (COMPLETED)
 - Canonical manuscript: [`paper/main.tex`](paper/main.tex) compiled to [`paper/main.pdf`](paper/main.pdf) (**21 pages**). Markdown mirror: [`paper/main.md`](paper/main.md) (do not cite for numbers).
 - ArXiv zip: [`paper/arxiv_source.zip`](paper/arxiv_source.zip) rebuilt from current `main.tex` + `references.bib` + `main.bbl`.
-- Target venue: *Future Generation Computer Systems (FGCS)* / *Journal of Systems and Software (JSS)* (Q1).
+- Target venue: see [`docs/VENUE.md`](docs/VENUE.md) (JSS and FGCS desk-rejected; JCR Q1 required).
 - All 88 validation JSON files across MATH-500, GSM8K, and GPQA are in `results/` on `paper-major-revision` (`d707e44`). Next: visual PDF QA, then referee review. Do not merge to `main`.
 
 ---

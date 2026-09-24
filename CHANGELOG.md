@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-09-24 — Q1 revision after independent peer review (no GPU)
+
+Addresses every point in `paper/REVISION_RESPONSE_Q1.md`. No frozen campaign result changed.
+
+- Both AWQ-4 chat templates omit the `<think>\n` generation suffix; all 14,102 AWQ-4 completions emit it themselves. Disclosed in Methods, Table 2, Appendix A, Limitations. The earlier Appendix A sentence "saved completions also begin with <think>" was wrong for six of eight cells.
+- **Supersedes the 2026-09-23 GPQA note:** stored prompts are byte-identical across the four checkpoints of each family and seed, so GPQA contrasts are paired.
+- New difficulty-level table (exact question-text join, 500/500): the Llama AWQ-4 drop grows at levels 3–5. Per-item cap band: 155 MATH-500 truncations, 139 of 140 near-cap rows inside. Llama prompt range corrected to 28–747 tokens.
+- Table 1 now shows QRM arXiv v1 and COLM v2 values; the old values were v1 while the bibliography cites COLM.
+- New script `scripts/analysis/q1_revision_analyses.py` → `results/reports/q1_revision_analyses.json`; `think_prefix_audit` committed.
+- `paper/main.pdf` is 25 pages. `paper/arxiv_source.zip` SHA256 `0113391d8f15da73c526845bece9714a19ec2250ace7ea4ede9471cd2ef3f078`.
+
 ## 2026-09-23 — Length table stacked cells and k-curve correction (no GPU)
 
 `paper/main.tex` stacks each length interval under its point estimate. The k=5 Qwen GPTQ-4 coverage in the unanimity curve is 86.6%, one item below the modal table, because equivalence is recomputed on stored strings. `paper/arxiv_source.zip` SHA256 `49a9b4339c8784d4f97ab0954a55091b16addff9f0927e13c9a8998baa680087`. PDF is 24 pages.
