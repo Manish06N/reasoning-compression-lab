@@ -9,8 +9,9 @@ manuscript traces to those files.
 
 Build check: `main.tex` compiles to 25 pages with 0 errors, 0 undefined references,
 0 overfull boxes and 0 BibTeX warnings. `scripts/analysis/check_manuscript_numbers.py
---check` still passes (20/20). **Rebuild `main.pdf` and `arxiv_source.zip` on your
-usual machine before submission**; the HPC build used TeX Live 2018.
+--check` still passes (20/20). `main.pdf` and `arxiv_source.zip` were rebuilt in
+commit `8d384b5` (TeX Live 2018 on HPC, Type 1 fonts only; the zip compiles standalone).
+Venue packages are not rebuilt; see "Venue status" below.
 
 ## Major comments
 
@@ -45,9 +46,21 @@ usual machine before submission**; the HPC build used TeX Live 2018.
 | Q2 | Unconditional placebo | Exactly zero by construction when pooled over ordered seed pairs; stated in §3.5 as the reason it is the primary length estimand. |
 | Q3 | Equivalence-relation sensitivity of the k-curve | Exact-string equality moves coverage ≤0.4 pp and risk ≤0.11 pp; all comparisons with the length rule unchanged (§4.8). |
 
-## Suggested Q1 targets (systems / measurement)
+## Venue status (from `docs/VENUE.md`)
 
-Journal of Systems and Software (current target), Future Generation Computer Systems,
-and Expert Systems with Applications. Check each journal's current quartile in its
-subject category (JCR/SJR) before submitting. For JSS the length is acceptable; for
-FGCS, consider moving §3.5's pathology and TOST detail to an appendix (m9).
+Supervisors require **Clarivate JCR Q1**. **Closed:** JSS (desk reject 2026-09-09,
+out of scope) and FGCS (desk reject). **Parked:** TMLR (Scopus Q2). **Current:**
+Neurocomputing (package built 2026-09-22). **Backups:** JMLR, ACM TIST. Only one journal
+may be under review at a time.
+
+The venue packages (`one-stack-many-rankings-{neurocomputing,aiopen,jmlr,tist}/`) are
+separate MacBook-only repositories with a frozen `source_snapshot/`. **This revision does
+not update them.** If Neurocomputing is already under review, keep the submitted version
+and use this revision for the revision round. Otherwise refresh the chosen package from
+`main@8d384b5` on the MacBook and rebuild it there.
+
+Note for the packages' "no scientific number changes" rule: this revision adds new
+analyses (difficulty levels, cap band, template and GPQA audits). It corrects one
+descriptive number (Llama prompt range 27–776 → 28–747, from the stored prompts) and
+the externally sourced QRM values in Table 1 (arXiv v1 → both v1 and the COLM v2). No
+frozen campaign result changed.
