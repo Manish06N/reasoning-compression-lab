@@ -9,7 +9,7 @@ Addresses every point in `paper/REVISION_RESPONSE_Q1.md`. No frozen campaign res
 - New difficulty-level table (exact question-text join, 500/500): the Llama AWQ-4 drop grows at levels 3–5. Per-item cap band: 155 MATH-500 truncations, 139 of 140 near-cap rows inside. Llama prompt range corrected to 28–747 tokens.
 - Table 1 now shows QRM arXiv v1 and COLM v2 values; the old values were v1 while the bibliography cites COLM.
 - New script `scripts/analysis/q1_revision_analyses.py` → `results/reports/q1_revision_analyses.json`; `think_prefix_audit` committed.
-- `paper/main.pdf` is 25 pages. `paper/arxiv_source.zip` SHA256 `0113391d8f15da73c526845bece9714a19ec2250ace7ea4ede9471cd2ef3f078`.
+- `paper/main.pdf` is 25 pages. `paper/arxiv_source.zip` SHA256 `c590dab0c05332041f982feb33759a5c72108b7280547285c26e7abd6a187a80`.
 
 ## 2026-09-23 — Length table stacked cells and k-curve correction (no GPU)
 
