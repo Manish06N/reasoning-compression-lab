@@ -48,6 +48,34 @@ Venue packages are not rebuilt; see "Venue status" below.
 | Float placement | Appendix tables no longer split the reference list (`\FloatBarrier` before the bibliography). |
 | Verified, no change needed | Every numeric sentence in the prose; QRM `inference.py` seeding order and `use_chat_template=True`; Lian et al. CTIR and Appendix E, Kurtic et al., Lotfi et al., Helcig et al. characterizations; modal-report internals (116 ties, seeds, SHA prefix). |
 
+## Fourth verification round
+
+- American spelling restored in two revision sentences ("desynchronized", "normalizing").
+- Checked and clean: the GitHub repository and `paper/main.pdf` are publicly reachable;
+  every repository path cited in the manuscript is tracked; every figure data point lies
+  within its axes; the abstract is 219 words; the doubled-word scan found nothing real; a
+  hapax-word scan of the prose found no misspellings.
+
+## Action required before submission: declarations (author statements)
+
+The manuscript has no declaration sections. For Elsevier journals such as Neurocomputing:
+
+- **Competing interests:** `docs/VENUE.md` says the on-screen confirmation is used.
+- **Data availability:** the "Reproducibility and Artifact Availability" section covers it.
+- **Generative AI disclosure (required in the manuscript when AI tools were used in
+  preparing it).** This revision was prepared with substantial help from an AI assistant
+  (Claude). Suggested wording, to be confirmed and edited by the authors, placed before
+  the references:
+
+  > **Declaration of generative AI and AI-assisted technologies in the manuscript
+  > preparation process.** During the preparation of this work the authors used Claude
+  > (Anthropic) to verify reported numbers against the released data, check references,
+  > and revise the manuscript text and layout. After using this tool, the authors
+  > reviewed and edited the content as needed and take full responsibility for the
+  > content of the publication.
+
+  Check the target journal's current policy wording before inserting it.
+
 ## Author questions
 
 | # | Question | Answer in the manuscript |

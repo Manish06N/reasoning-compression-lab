@@ -10,7 +10,7 @@ Addresses every point in `paper/REVISION_RESPONSE_Q1.md`. No frozen campaign res
 - Table 1 now shows QRM arXiv v1 and COLM v2 values; the old values were v1 while the bibliography cites COLM.
 - New script `scripts/analysis/q1_revision_analyses.py` → `results/reports/q1_revision_analyses.json`; `think_prefix_audit` committed.
 - Round-3 checks: CV rule stated with its population SD; five references moved to published versions (Nature, PPoPP, ICLR x2, COLM); Table 24 rebuilt readable; Tables 8, 12, 15 set sideways at natural size (were 6.5-7.5 pt); Table 17 no longer upscaled; floats kept out of the bibliography.
-- `paper/main.pdf` is 28 pages. `paper/arxiv_source.zip` SHA256 `ffaa1468a578673a082d89b7a37154dee7ee61a691bb963517a4d6d85b614fc8`.
+- `paper/main.pdf` is 28 pages. `paper/arxiv_source.zip` SHA256 `837a499a15b10fad2517e828754d1549ff4069e842fa73bee038e9b0ee7e82fc`.
 
 ## 2026-09-23 — Length table stacked cells and k-curve correction (no GPU)
 
