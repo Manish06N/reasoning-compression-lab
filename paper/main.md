@@ -49,7 +49,7 @@ Contributions (C1–C4) answer RQ1–RQ4: one robust accuracy drop (Llama AWQ-4,
 | Cost | No deployment cost ranking is claimed. Subset GPU-seconds and campaign-length seconds do not share a point order; timing repeats share one sampling seed |
 | FP8 vs BF16 | 95% CIs include 0; TOST ±1 pp fails on MATH-500; not claimed equivalent |
 
-Tables, TikZ figures, limitations, and the appendix live in `main.tex` / `main.pdf` (25 pages). Reproduce numbers with:
+Tables, TikZ figures, limitations, and the appendix live in `main.tex` / `main.pdf` (28 pages). Reproduce numbers with:
 
 ```bash
 python3 scripts/analysis/revision_reanalysis.py --check

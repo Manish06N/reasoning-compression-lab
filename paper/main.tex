@@ -5,6 +5,9 @@
 \usepackage{amsmath,amssymb,amsfonts}
 \usepackage{graphicx}
 \usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{rotating}
+\usepackage{array}
 \usepackage{placeins}
 \usepackage{hyperref}
 \usepackage{url}
@@ -124,7 +127,7 @@ PARAM Rudra HPC (IIT Patna / NSM), NVIDIA A100-PCIE-80GB. Publication runs use t
 \label{sec:measured-serving}
 After the 56k accuracy campaign we timed the same eight checkpoints on A100-80GB under vLLM~0.7.0 eager. Primary numbers are the controlled confirmation (protocol: \path{docs/MEASURED_SERVING_CONFIRMATION_PROTOCOL.md}; raw JSON under \path{results/measured_serving_confirmation/raw/}). Condition~A is 20 sequential MATH-500 prompts (4 per difficulty level). Condition~B is 100 prompts (20 per level) in one \texttt{llm.generate} call with \texttt{max\_num\_seqs=8}. The two conditions differ in both the prompt subset and the serving regime, so a ranking change between them is a property of the whole condition. With \texttt{max\_num\_seqs=8}, Condition~B elapsed time runs until the last trace finishes. One or two long traces can decode alone after the batch drains. The raw JSON stores aggregate tokens and elapsed time, not time spent below a full batch of 8, so that tail share is not reported. A secondary microbenchmark forces 10 prompts to 512 tokens (\texttt{ignore\_eos}).
 
-Three warmup queries are discarded. $\Delta t_{\mathrm{steady}}$ is then the wall-clock from the first measured request to the return of the last measured response, bracketed by \texttt{torch.cuda.synchronize()}. Engine initialization is outside that interval. The first measured prefill and the straggler tail are inside it. Output tok/s $=(\sum \text{output tokens})/\Delta t_{\mathrm{steady}}$. GPU-sec/query $=\Delta t_{\mathrm{steady}}/N$ on one GPU. Sampling matches the campaign ($T=0.6$, top-$p=0.95$) with seed $20260816$. Repetitions share that seed, so output tokens are identical across repeats. The tok/s spread is wall-clock jitter on one token sequence. It is not length variance. $R=3$, expanded to $R=5$ when the CV of the first three tok/s values exceeds $3\%$. With three repeats a percentile interval has at most ten distinct means. We therefore report the sample mean, the sample SD, and the observed min--max, and we do not treat those intervals as a stable estimate of timing noise. Qwen-7B jobs ran on \texttt{ragpu003} and Llama-8B jobs on \texttt{ragpu004}; both are two-GPU nodes, and each SLURM job requested one GPU and 16 CPU cores without \texttt{--exclusive}. The raw records log NVIDIA driver 550.54.14 on both hosts. Within a family, all four formats share a host but ran sequentially on one day (Qwen: BF16 05:36, FP8 08:29, AWQ-4 11:09, GPTQ-4 12:38 UTC), so format is also confounded with time on a node that other jobs could share. Eager decode is bound by kernel-launch CPU time, so host load moves single-stream tok/s. Across families, host and architecture are confounded. Archived logs do not contain per-run clocks, power, or co-tenant load. Peak VRAM is \texttt{torch.cuda.max\_memory\_allocated} after the $0.75$ utilization preallocation.
+Three warmup queries are discarded. $\Delta t_{\mathrm{steady}}$ is then the wall-clock from the first measured request to the return of the last measured response, bracketed by \texttt{torch.cuda.synchronize()}. Engine initialization is outside that interval. The first measured prefill and the straggler tail are inside it. Output tok/s $=(\sum \text{output tokens})/\Delta t_{\mathrm{steady}}$. GPU-sec/query $=\Delta t_{\mathrm{steady}}/N$ on one GPU. Sampling matches the campaign ($T=0.6$, top-$p=0.95$) with seed $20260816$. Repetitions share that seed, so output tokens are identical across repeats. The tok/s spread is wall-clock jitter on one token sequence. It is not length variance. $R=3$, expanded to $R=5$ when the CV of the first three tok/s values exceeds $3\%$; as implemented, that CV uses the population standard deviation (Llama FP8 Condition~A sits at $2.995\%$ and keeps $R=3$), whereas the reported tok/s spreads are sample SDs. With three repeats a percentile interval has at most ten distinct means. We therefore report the sample mean, the sample SD, and the observed min--max, and we do not treat those intervals as a stable estimate of timing noise. Qwen-7B jobs ran on \texttt{ragpu003} and Llama-8B jobs on \texttt{ragpu004}; both are two-GPU nodes, and each SLURM job requested one GPU and 16 CPU cores without \texttt{--exclusive}. The raw records log NVIDIA driver 550.54.14 on both hosts. Within a family, all four formats share a host but ran sequentially on one day (Qwen: BF16 05:36, FP8 08:29, AWQ-4 11:09, GPTQ-4 12:38 UTC), so format is also confounded with time on a node that other jobs could share. Eager decode is bound by kernel-launch CPU time, so host load moves single-stream tok/s. Across families, host and architecture are confounded. Archived logs do not contain per-run clocks, power, or co-tenant load. Peak VRAM is \texttt{torch.cuda.max\_memory\_allocated} after the $0.75$ utilization preallocation.
 
 \begin{equation}
 \widetilde{C}_{\mathrm{pass}}^{\mathrm{hyb}} = \frac{(\text{GPU-sec/query})\times (\$1.50/3600)}{\mathrm{pass@1}},
@@ -287,12 +290,11 @@ Llama-8B & GPTQ-4 vs BF16 & $+417\ [+261,+583]$ \\
 \end{tabular}
 \end{table}
 
-\begin{table*}[t]
+\begin{sidewaystable}
 \centering
 \caption{MATH-500 length versus BF16, all five seeds. RoM: ratio of means. $\Delta$: mean paired per-item token difference with an item-level 95\% CI. $2\times 2$ cells are mean quantized$-$BF16 $\Delta$ with an item-level 95\% CI and pair count $n$. BF16-correct and quant-correct columns use the same item resamples on Both-OK $\cup$ BF16-only and Both-OK $\cup$ Quant-only.}
 \label{tab:tokens}
 \small
-\resizebox{\textwidth}{!}{%
 \begin{tabular}{lcccccccc}
 \toprule
 \textbf{Contrast} & \textbf{RoM} & \textbf{Mean $\Delta$ [95\% CI]} & \textbf{Both OK} & \textbf{BF16 only} & \textbf{Quant only} & \textbf{Both wrong} & \textbf{BF16-correct} & \textbf{Quant-correct} \\
@@ -304,9 +306,8 @@ Llama FP8    & $-2.3\%$ & \vcell{$-106$}{$[-284,+65]$} & \vcell{$+38$ ($n{=}2121
 Llama AWQ-4  & $+1.7\%$ & \vcell{$+80$}{$[-109,+268]$} & \vcell{$+91$ ($n{=}2052$)}{$[-25,+210]$} & \vcell{$+3090$ ($n{=}179$)}{$[+1995,+4286]$} & \vcell{$-4477$ ($n{=}110$)}{$[-6503,-2588]$} & \vcell{$-305$ ($n{=}159$)}{$[-1520,+907]$} & \vcell{$+332$}{$[+182,+490]$} & \vcell{$-141$}{$[-303,+12]$} \\
 Llama GPTQ-4 & $+3.9\%$ & \vcell{$+184$}{$[+12,+359]$} & \vcell{$+66$ ($n{=}2097$)}{$[-43,+181]$} & \vcell{$+5915$ ($n{=}134$)}{$[+4335,+7605]$} & \vcell{$-4327$ ($n{=}126$)}{$[-6138,-2561]$} & \vcell{$+521$ ($n{=}143$)}{$[-506,+1585]$} & \vcell{$+417$}{$[+261,+583]$} & \vcell{$-183$}{$[-335,-35]$} \\
 \bottomrule
-\end{tabular}%
-}
-\end{table*}
+\end{tabular}
+\end{sidewaystable}
 
 \begin{table}[t]
 \centering
@@ -396,12 +397,11 @@ A one-sample length rule is also gold-free and costs one generation. For each se
 
 Table~\ref{tab:kcurve} gives the cost curve between those two ends. Unanimity of only two samples serves $82.1$--$92.7\%$ of items at $0.69$--$2.36\%$ risk. The length rule at the same coverage has $2.16$--$5.84\%$ risk, so two samples cut risk by a factor of about $2.2$--$3.1$ for twice the tokens. Three samples reach $0.18$--$1.07\%$. Every $k$ beats the matched length rule in every cell. Most of the gain comes from the second sample, so a deployment that cannot afford five generations keeps most of the benefit at $k=2$ or $3$. These values come from the recovered answer strings, with equivalence recomputed by math-verify on the stored representations. The same code reproduces 23 of the 24 corresponding 5/5 coverage, 5/5 risk, and length-rule entries in Tables~\ref{tab:modal} and~\ref{tab:length-abstain} exactly. The exception is Qwen GPTQ-4 5/5 coverage, which is one item lower ($86.6$ vs.\ $86.8\%$) because equivalence is judged here on stored string representations rather than on the original parsed answers. The reconstruction is computed by \path{scripts/analysis/revision_sensitivities.py}. Replacing math-verify equivalence by exact equality of the extracted answer strings lowers $k$-sample coverage by at most $0.4$\,pp and changes selective risk by at most $0.11$\,pp, so every comparison with the length rule is unchanged.
 
-\begin{table*}[t]
+\begin{sidewaystable}
 \centering
 \caption{Cost curve for $k$-sample unanimity on MATH-500. Coverage (Cov.) and selective risk (Risk) are averaged over all $\binom{5}{k}$ seed subsets. Len.: one-sample shortest-trace rule at the same coverage, averaged over five seeds. Tokens per item are $k$ times the mean completion length. The $k=5$ column reproduces the 5/5 columns of Tables~\ref{tab:modal} and~\ref{tab:length-abstain} except one item in Qwen GPTQ-4 coverage ($86.6$ here, $86.8$ there). All values are percentages except tokens.}
 \label{tab:kcurve}
 \small
-\resizebox{\textwidth}{!}{%
 \begin{tabular}{llcccccccccccc}
 \toprule
  & & \multicolumn{3}{c}{$k=2$} & \multicolumn{3}{c}{$k=3$} & \multicolumn{3}{c}{$k=4$} & \multicolumn{3}{c}{$k=5$} \\
@@ -420,9 +420,8 @@ Llama-8B & GPTQ-4 & 85.1 & 1.76 & 4.08 & 80.5 & 0.62 & 3.03 & 77.6 & 0.31 & 2.78
 \midrule
 \multicolumn{2}{l}{Tokens / item (Qwen; Llama)} & \multicolumn{3}{c}{$\approx 8.0$--$8.6$k; $9.1$--$9.7$k} & \multicolumn{3}{c}{$\approx 12.0$--$12.9$k; $13.7$--$14.5$k} & \multicolumn{3}{c}{$\approx 16.0$--$17.1$k; $18.2$--$19.4$k} & \multicolumn{3}{c}{$\approx 20.0$--$21.4$k; $22.8$--$24.2$k} \\
 \bottomrule
-\end{tabular}%
-}
-\end{table*}
+\end{tabular}
+\end{sidewaystable}
 
 Mean $T_5$ is $20{,}057$ / $20{,}038$ / $21{,}327$ / $21{,}436$ tokens for Qwen BF16/FP8/AWQ-4/GPTQ-4 and $23{,}283$ / $22{,}754$ / $23{,}682$ / $24{,}203$ for Llama. $T_5$ is five times the mean completion length. Abstained items still pay those tokens. Figure~\ref{fig:modal} shows the three operating points.
 
@@ -625,12 +624,11 @@ Table~\ref{tab:length-cost} substitutes campaign mean tokens for the subset leng
 
 Qwen BF16 decodes at $43.92$ tok/s on Condition~A and $205.41$ tok/s in the fixed-512 microbenchmark. Llama BF16, on the other host, reaches $72.34$ and $362.01$. The fixed-length gap remains, so it is not the Condition~A length draw. The Qwen BF16 baseline looks anomalous. Qwen-7B is the smaller model, yet it decodes about $40\%$ slower than Llama-8B BF16. In the fixed-length microbenchmark FP8 speeds up Qwen by $2.13\times$ ($437.19/205.41$) but Llama by only $1.08\times$ ($392.05/362.01$), even though both use the same Marlin W8A16 kernel. Every Qwen Condition~B saving in Table~\ref{tab:serving-main} ($-36.0\%$ to $-45.9\%$) is relative to that baseline, which ran first on \texttt{ragpu003}. The Qwen FP8 Condition~B repeats stepped up in run order ($350.9$, $350.7$, $455.9$, $545.2$, $546.3$ tok/s), which fits a change in host load during the job rather than random jitter. We therefore read the Qwen savings as upper bounds that a same-node, exclusively allocated, interleaved rerun would need to confirm. Clocks were not logged. AWQ-4 was launched with \texttt{quantization=awq}, which in vLLM~0.7.0 disables the AWQ-Marlin conversion and selects the GEMM \texttt{AWQLinearMethod}; the selected kernel was not logged at run time. Without that flag vLLM converts compatible AWQ checkpoints to AWQ-Marlin, which is typically faster on A100, so every AWQ throughput number is a kernel choice as well as a format property. That choice can contribute to Llama AWQ-4 decoding more slowly than BF16 on Condition~A ($70.20$ vs.\ $72.34$ tok/s). GPTQ-4 timing used \texttt{float16} while GPTQ-4 pass@1 used \texttt{bfloat16}, so the hybrid ratio joins two configurations. These FP8 numbers are A100 Marlin W8A16, not Hopper W8A8. Peak allocated VRAM is $53.9$--$56.1$\,GB, the $0.75$ engine pool. Condition~A latency is in Appendix Table~\ref{tab:serving-single}.
 
-\begin{table*}[t]
+\begin{sidewaystable}
 \centering
 \caption{Hybrid cost on the controlled confirmation. Condition~A: 20 sequential prompts. Condition~B: 100-prompt \texttt{llm.generate}, \texttt{max\_num\_seqs=8}. Tok/s is mean$\pm$ sample SD. Brackets are the minimum and maximum hybrid cost across timing repeats, with campaign pass@1 held fixed. They are not a 95\% interval. The B $\Delta$\% column is the point estimate only. Qwen: \texttt{ragpu003}. Llama: \texttt{ragpu004}. GPTQ dollars join \texttt{float16} timing with \texttt{bfloat16} pass@1.}
 \label{tab:serving-main}
 \small
-\resizebox{\textwidth}{!}{%
 \begin{tabular}{llccccccc}
 \toprule
 \textbf{Model} & \textbf{Fmt} & \textbf{A tok/s} & \textbf{A GPU-s/q} & \textbf{A $\widetilde{C}$ [min, max]} & \textbf{B tok/s} & \textbf{B GPU-s/q} & \textbf{B $\widetilde{C}$ [min, max]} & \textbf{B $\Delta$\%} \\
@@ -645,9 +643,8 @@ Llama-8B & FP8    & $78.75\pm 2.89$ & 92.55 & \$0.0431 [0.0421, 0.0449] & $481.4
 Llama-8B & AWQ-4  & $70.20\pm 2.71$ & 89.51 & \$0.0431 [0.0423, 0.0463] & $391.11\pm 0.48$ & 11.63 & \$0.0056 [0.0056, 0.0056] & $+18.5$ \\
 Llama-8B & GPTQ-4 & $63.49\pm 0.41$ & 86.95 & \$0.0407 [0.0405, 0.0410] & $366.16\pm 0.79$ & 12.60 & \$0.0059 [0.0059, 0.0059] & $+24.9$ \\
 \bottomrule
-\end{tabular}%
-}
-\end{table*}
+\end{tabular}
+\end{sidewaystable}
 
 \begin{table}[t]
 \centering
@@ -686,7 +683,6 @@ Subset GPU-seconds and campaign-length seconds do not share a point order. Llama
 \caption{Practitioner summary. pass@1 and maj@5 are MATH-500 percent. Tokens are the campaign mean. A\$ and B\$ are $\widetilde{C}_{\mathrm{pass}}^{\mathrm{hyb}}$. A sec.\ and B sec.\ are the campaign-length sensitivity. $^{*}$ marks the Holm-significant MATH or GSM8K pass@1 contrast.}
 \label{tab:summary}
 \small
-\resizebox{\textwidth}{!}{%
 \begin{tabular}{llcccccc}
 \toprule
 \textbf{Model} & \textbf{Fmt} & \textbf{pass@1} & \textbf{maj@5} & \textbf{Tokens} & \textbf{A \$} & \textbf{B \$} & \textbf{A / B sec.} \\
@@ -700,8 +696,7 @@ Llama-8B & FP8 & 89.52 & 91.0 & 4{,}551 & 0.0431 & 0.0043 & 64.6 / 10.6 \\
 Llama-8B & AWQ-4$^{*}$ & 86.48 & 89.8 & 4{,}737 & 0.0431 & 0.0056 & 78.0 / 14.0 \\
 Llama-8B & GPTQ-4 & 88.92 & 91.2 & 4{,}841 & 0.0407 & 0.0059 & 85.7 / 14.9 \\
 \bottomrule
-\end{tabular}%
-}
+\end{tabular}
 \end{table*}
 
 \section{Limitations}
@@ -923,25 +918,25 @@ Table~\ref{tab:related} is a compact comparison. It is not a claim that this pap
 
 \begin{table*}[t]
 \centering
-\caption{Neighboring measurement studies. ``Engine pinned'' means one named serving stack is frozen while checkpoints vary. Length estimands and serving columns are what each paper reports as primary evidence, not an exhaustive inventory.}
+\caption{Neighboring measurement studies. In the engine column, a named version means that serving stack is frozen while checkpoints vary. Length estimands and serving columns are what each paper reports as primary evidence, not an exhaustive inventory.}
 \label{tab:related}
-\small
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{lcccccccc}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{0.14\textwidth}*{4}{>{\raggedright\arraybackslash}X}@{}}
 \toprule
-\textbf{Study} & \textbf{Models} & \textbf{Bits} & \textbf{Engine pinned} & \textbf{Seeds} & \textbf{Length estimand} & \textbf{Correctness split} & \textbf{Serving / cost} & \textbf{Statistics} \\
+\textbf{Study} & \textbf{Models; bits} & \textbf{Engine; seeds} & \textbf{Length estimand; correctness split} & \textbf{Serving / cost; statistics} \\
 \midrule
-This paper & 2 R1 distill (7B/8B) & BF16, FP8, AWQ-4, GPTQ-4 & vLLM 0.7.0 eager, A100 & 5 MATH; 3 GSM/GPQA & RoM, paired $\Delta$, both conditionals, seed placebo & $2\times 2$ + both mirrors & GPU-s; campaign-length seconds & item-level bootstrap, Holm, TOST \\
-QRM~\cite{liu2025qrm} & R1 distill family & W/A/KV incl.\ W4A16 & QRM harness (multi-config) & typically 1 & mean tokens & not $2\times 2$ & limited & per-cell means \\
-Lian et al.~\cite{lian2026quantinflates} & reasoning PTQ & low-bit PTQ & paper stack & paper-specific & CTIR (ratio of means); BF16-correct split (suppl.) & BF16-correct vs rest (suppl.) & token cost & length ratio \\
-Lotfi et al.~\cite{lotfi2026overthinking} & 1.5B--32B reasoning & aggressive PTQ & paper stack & paper-specific & CoT length; overthinking & abandoned intermediates & logit-penalty Pareto & error-type counts \\
-Kurtic et al.~\cite{kurtic2025give} & Llama-3.1 + R1-distill & FP8/INT8/INT4 & vLLM, several GPUs & large evals & not CoT-primary & N/A & sync vs continuous batching & accuracy + tok/s \\
-Helcig et al.~\cite{helcig2026slq} & Llama/Qwen (SLQ) & 3.3--6 bpp & vLLM kernels & 3 (GSM) & thinking tokens & TL vs DL fidelity & vLLM throughput & EAR, Wilcoxon \\
-Erol et al.~\cite{erol2025costofpass} & general LMs & N/A & N/A & N/A & N/A & N/A & $C_{\mathrm{pass}}$ definition & economic \\
-Hochlehnert et al.~\cite{hochlehnert2025sober} & reasoning LMs & N/A & deliberately \emph{un}pinned & many & N/A & N/A & N/A & reproducibility \\
+This paper & 2 R1 distill (7B/8B); BF16, FP8, AWQ-4, GPTQ-4 & vLLM 0.7.0 eager, A100; 5 seeds MATH, 3 GSM/GPQA & RoM, paired $\Delta$, both conditionals, seed placebo; $2\times 2$ + both mirrors & GPU-s, campaign-length seconds; item-level bootstrap, Holm, TOST \\
+QRM~\cite{liu2025qrm} & R1 distill family; W/A/KV incl.\ W4A16 & QRM harness (multi-config); typically 1 seed & mean tokens; not $2\times 2$ & limited; per-cell means \\
+Lian et al.~\cite{lian2026quantinflates} & reasoning models; low-bit PTQ & paper stack; paper-specific seeds & CTIR (ratio of means); BF16-correct vs rest (suppl.) & token cost; length ratio \\
+Lotfi et al.~\cite{lotfi2026overthinking} & 1.5B--32B reasoning; aggressive PTQ & paper stack; paper-specific seeds & CoT length, overthinking; abandoned intermediates & logit-penalty Pareto; error-type counts \\
+Kurtic et al.~\cite{kurtic2025give} & Llama-3.1 + R1-distill; FP8/INT8/INT4 & vLLM, several GPUs; large evals & not CoT-primary; N/A & sync vs continuous batching; accuracy + tok/s \\
+Helcig et al.~\cite{helcig2026slq} & Llama/Qwen (SLQ); 3.3--6 bpp & vLLM kernels; 3 seeds (GSM) & thinking tokens; TL vs DL fidelity & vLLM throughput; EAR, Wilcoxon \\
+Erol et al.~\cite{erol2025costofpass} & general LMs; N/A & N/A & N/A & $C_{\mathrm{pass}}$ definition; economic \\
+Hochlehnert et al.~\cite{hochlehnert2025sober} & reasoning LMs; N/A & deliberately \emph{un}pinned; many seeds & N/A & N/A; reproducibility \\
 \bottomrule
-\end{tabular}%
-}
+\end{tabularx}
 \end{table*}
 
 \section{Holm-18 sensitivity}
@@ -979,6 +974,7 @@ GPQA & Llama AWQ-4 & $0.711$ & n.s. & $1.000$ & n.s. \\
 \end{tabular}
 \end{table}
 
+\FloatBarrier
 \bibliographystyle{plain}
 \bibliography{references}
 

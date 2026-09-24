@@ -7,7 +7,7 @@ existing analysis file was changed. New evidence comes from one new CPU script
 plus the previously untracked `think_prefix_audit` files. Every new number in the
 manuscript traces to those files.
 
-Build check: `main.tex` compiles to 25 pages with 0 errors, 0 undefined references,
+Build check: `main.tex` compiles to 28 pages with 0 errors, 0 undefined references,
 0 overfull boxes and 0 BibTeX warnings. `scripts/analysis/check_manuscript_numbers.py
 --check` still passes (20/20). `main.pdf` and `arxiv_source.zip` were rebuilt in
 commit `8d384b5` (TeX Live 2018 on HPC, Type 1 fonts only; the zip compiles standalone).
@@ -37,6 +37,16 @@ Venue packages are not rebuilt; see "Venue status" below.
 | m8 | Length rule is a weak baseline | Limitations now state that token-level confidence (log-probability, self-certainty) was not stored, so the stronger comparison is not made. |
 | m9 | §3.5 is long | Not restructured, to keep the frozen estimand definitions in one place for a systems-journal audience. Move to an appendix only if the target journal's page limit requires it. |
 | m10 | GPQA in the headline narrative | Already absent from the abstract. **Strengthened instead:** stored prompts prove GPQA answer order was identical across all four checkpoints for every family and seed (594/594), so GPQA contrasts are paired. "Not certified" caveats replaced in Table 1, Table 6, §4.2, App. A, Limitations and Conclusion. The Qwen AWQ-4 contrast stays borderline and non-headline. |
+
+## Third verification round (added after the first push)
+
+| Item | Change |
+|---|---|
+| CV rule | The R=3 → R=5 rule uses the population SD (as implemented; Llama FP8 Condition A = 2.995%), while reported tok/s spreads are sample SDs. Now stated in §3.4. |
+| Published versions | DeepSeek-R1 → *Nature* 645:633–638 (2025); Marlin → PPoPP 2025; GPTQ → ICLR 2023; Let's Verify → ICLR 2024; GPQA → COLM 2024. DOIs checked on Crossref where available. |
+| Table legibility | Table 24 (related studies) was shrunk to unreadable size; rebuilt as a wrapped five-column table. Tables 8, 12, 15 were scaled to ~6.5–7.5 pt; now set sideways at natural 10 pt. Table 17 was enlarged to ~11.6 pt; now natural size. |
+| Float placement | Appendix tables no longer split the reference list (`\FloatBarrier` before the bibliography). |
+| Verified, no change needed | Every numeric sentence in the prose; QRM `inference.py` seeding order and `use_chat_template=True`; Lian et al. CTIR and Appendix E, Kurtic et al., Lotfi et al., Helcig et al. characterizations; modal-report internals (116 ties, seeds, SHA prefix). |
 
 ## Author questions
 
