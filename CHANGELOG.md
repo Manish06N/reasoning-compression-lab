@@ -13,6 +13,7 @@ Source: `~/paper1-review-2026-09-27/PEER_REVIEW.md` (findings 1-8, 10), checked 
 - Lian et al. CTIR no longer called the same estimand (CoT tokens, temperature zero vs whole completion, T=0.6). QRM v2 uses 3 seeds.
 - Near-cap vs cap-band: reported as heuristic agreement (139/140) and 16 further suspected truncations, not validated truncations.
 - Llama `<think>\n` is 2 tokens in the frozen runtime (1 in newer tokenizers). "Within about one point" -> "within 1.7 pp". Figure 3 Llama AWQ bar 4,736; Figure 1 caption corrected. Manuscript date updated.
+- Added `scripts/analysis/review_additions.py` -> `results/reports/review_additions.json` and Appendix "Additional sensitivities" (Tables 25-27): two-way items x seeds bootstrap and seed-level t-test for all 18 pass@1 contrasts (Llama AWQ-4 MATH-500 stays away from zero, [-4.96, -0.68]; the GSM8K seed-level test is marginal, p=0.051); minimum detectable effects (1.3-2.0 pp MATH, 0.9-1.4 GSM8K, 5.5-6.2 GPQA); median and trimmed token deltas (Qwen 4-bit mean difference comes from a minority of long traces); stratified subset-draw simulation (campaign-length order reproduced in 40% / 21% of random 20-prompt draws). Text added to Sections 3.5, 4.4 and 4.9 and Limitation 9.
 - Not changed: frozen results, raw outputs, analysis scripts, the mislabeled `selective_risk_clopper_pearson_ci_95` field (documented in the review), declarations (to be supplied by the authors).
 
 ## 2026-09-24 — Q1 revision after independent peer review (no GPU)

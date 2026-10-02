@@ -1,0 +1,544 @@
+{
+ "inputs": {
+  "B": 10000,
+  "rng_seed": 0,
+  "n_subset_draws": 20000,
+  "note": "exploratory sensitivities; conditional on the archived generation seeds"
+ },
+ "two_way_bootstrap": {
+  "math500|Qwen-7B|FP8": {
+   "delta_pp": 0.4,
+   "two_way_ci95_pp": [
+    -1.28,
+    2.0
+   ],
+   "per_seed_delta_pp": [
+    0.0,
+    1.2,
+    1.0,
+    -2.0,
+    1.8
+   ],
+   "seed_level_paired_t_p": 0.5807,
+   "n_seeds": 5
+  },
+  "math500|Qwen-7B|AWQ-4": {
+   "delta_pp": -0.88,
+   "two_way_ci95_pp": [
+    -2.44,
+    0.72
+   ],
+   "per_seed_delta_pp": [
+    -2.0,
+    -1.2,
+    -0.6,
+    -1.6,
+    1.0
+   ],
+   "seed_level_paired_t_p": 0.1683,
+   "n_seeds": 5
+  },
+  "math500|Qwen-7B|GPTQ-4": {
+   "delta_pp": -0.52,
+   "two_way_ci95_pp": [
+    -1.8,
+    0.72
+   ],
+   "per_seed_delta_pp": [
+    -0.6,
+    -1.4,
+    -0.4,
+    0.0,
+    -0.2
+   ],
+   "seed_level_paired_t_p": 0.0978,
+   "n_seeds": 5
+  },
+  "math500|Llama-8B|FP8": {
+   "delta_pp": 0.28,
+   "two_way_ci95_pp": [
+    -1.68,
+    2.32
+   ],
+   "per_seed_delta_pp": [
+    0.0,
+    1.2,
+    -1.6,
+    -0.6,
+    2.4
+   ],
+   "seed_level_paired_t_p": 0.7086,
+   "n_seeds": 5
+  },
+  "math500|Llama-8B|AWQ-4": {
+   "delta_pp": -2.76,
+   "two_way_ci95_pp": [
+    -4.96,
+    -0.68
+   ],
+   "per_seed_delta_pp": [
+    -4.6,
+    -3.6,
+    -1.0,
+    -2.4,
+    -2.2
+   ],
+   "seed_level_paired_t_p": 0.0111,
+   "n_seeds": 5
+  },
+  "math500|Llama-8B|GPTQ-4": {
+   "delta_pp": -0.32,
+   "two_way_ci95_pp": [
+    -2.76,
+    2.0
+   ],
+   "per_seed_delta_pp": [
+    -1.0,
+    1.2,
+    -3.4,
+    -0.4,
+    2.0
+   ],
+   "seed_level_paired_t_p": 0.7505,
+   "n_seeds": 5
+  },
+  "gsm8k|Qwen-7B|FP8": {
+   "delta_pp": 0.08,
+   "two_way_ci95_pp": [
+    -0.76,
+    0.96
+   ],
+   "per_seed_delta_pp": [
+    0.23,
+    -0.08,
+    0.08
+   ],
+   "seed_level_paired_t_p": 0.4778,
+   "n_seeds": 3
+  },
+  "gsm8k|Qwen-7B|AWQ-4": {
+   "delta_pp": -0.2,
+   "two_way_ci95_pp": [
+    -1.82,
+    1.31
+   ],
+   "per_seed_delta_pp": [
+    0.0,
+    -1.67,
+    1.06
+   ],
+   "seed_level_paired_t_p": 0.8229,
+   "n_seeds": 3
+  },
+  "gsm8k|Qwen-7B|GPTQ-4": {
+   "delta_pp": -0.13,
+   "two_way_ci95_pp": [
+    -1.09,
+    0.81
+   ],
+   "per_seed_delta_pp": [
+    -0.15,
+    -0.15,
+    -0.08
+   ],
+   "seed_level_paired_t_p": 0.0377,
+   "n_seeds": 3
+  },
+  "gsm8k|Llama-8B|FP8": {
+   "delta_pp": 0.13,
+   "two_way_ci95_pp": [
+    -1.31,
+    1.52
+   ],
+   "per_seed_delta_pp": [
+    0.91,
+    0.45,
+    -0.99
+   ],
+   "seed_level_paired_t_p": 0.8455,
+   "n_seeds": 3
+  },
+  "gsm8k|Llama-8B|AWQ-4": {
+   "delta_pp": -1.57,
+   "two_way_ci95_pp": [
+    -2.91,
+    -0.15
+   ],
+   "per_seed_delta_pp": [
+    -0.83,
+    -1.9,
+    -1.97
+   ],
+   "seed_level_paired_t_p": 0.0507,
+   "n_seeds": 3
+  },
+  "gsm8k|Llama-8B|GPTQ-4": {
+   "delta_pp": 0.28,
+   "two_way_ci95_pp": [
+    -0.86,
+    1.44
+   ],
+   "per_seed_delta_pp": [
+    0.3,
+    -0.15,
+    0.68
+   ],
+   "seed_level_paired_t_p": 0.3681,
+   "n_seeds": 3
+  },
+  "gpqa|Qwen-7B|FP8": {
+   "delta_pp": -0.84,
+   "two_way_ci95_pp": [
+    -7.41,
+    5.56
+   ],
+   "per_seed_delta_pp": [
+    -2.02,
+    4.04,
+    -4.55
+   ],
+   "seed_level_paired_t_p": 0.7725,
+   "n_seeds": 3
+  },
+  "gpqa|Qwen-7B|AWQ-4": {
+   "delta_pp": -5.56,
+   "two_way_ci95_pp": [
+    -11.11,
+    0.0
+   ],
+   "per_seed_delta_pp": [
+    -7.07,
+    -5.05,
+    -4.55
+   ],
+   "seed_level_paired_t_p": 0.0187,
+   "n_seeds": 3
+  },
+  "gpqa|Qwen-7B|GPTQ-4": {
+   "delta_pp": -2.36,
+   "two_way_ci95_pp": [
+    -9.43,
+    4.88
+   ],
+   "per_seed_delta_pp": [
+    -4.55,
+    3.03,
+    -5.56
+   ],
+   "seed_level_paired_t_p": 0.4761,
+   "n_seeds": 3
+  },
+  "gpqa|Llama-8B|FP8": {
+   "delta_pp": 1.68,
+   "two_way_ci95_pp": [
+    -4.04,
+    7.07
+   ],
+   "per_seed_delta_pp": [
+    3.54,
+    1.01,
+    0.51
+   ],
+   "seed_level_paired_t_p": 0.2143,
+   "n_seeds": 3
+  },
+  "gpqa|Llama-8B|AWQ-4": {
+   "delta_pp": 0.84,
+   "two_way_ci95_pp": [
+    -5.56,
+    7.07
+   ],
+   "per_seed_delta_pp": [
+    3.03,
+    -2.02,
+    1.52
+   ],
+   "seed_level_paired_t_p": 0.6304,
+   "n_seeds": 3
+  },
+  "gpqa|Llama-8B|GPTQ-4": {
+   "delta_pp": -1.18,
+   "two_way_ci95_pp": [
+    -8.08,
+    5.56
+   ],
+   "per_seed_delta_pp": [
+    0.51,
+    -6.06,
+    2.02
+   ],
+   "seed_level_paired_t_p": 0.6815,
+   "n_seeds": 3
+  }
+ },
+ "minimum_detectable_effect": {
+  "math500|Qwen-7B|FP8": {
+   "paired_se_pp": 0.45,
+   "mde_80pct_pp": 1.25
+  },
+  "math500|Qwen-7B|AWQ-4": {
+   "paired_se_pp": 0.5,
+   "mde_80pct_pp": 1.39
+  },
+  "math500|Qwen-7B|GPTQ-4": {
+   "paired_se_pp": 0.45,
+   "mde_80pct_pp": 1.27
+  },
+  "math500|Llama-8B|FP8": {
+   "paired_se_pp": 0.6,
+   "mde_80pct_pp": 1.69
+  },
+  "math500|Llama-8B|AWQ-4": {
+   "paired_se_pp": 0.7,
+   "mde_80pct_pp": 1.97
+  },
+  "math500|Llama-8B|GPTQ-4": {
+   "paired_se_pp": 0.64,
+   "mde_80pct_pp": 1.79
+  },
+  "gsm8k|Qwen-7B|FP8": {
+   "paired_se_pp": 0.33,
+   "mde_80pct_pp": 0.93
+  },
+  "gsm8k|Qwen-7B|AWQ-4": {
+   "paired_se_pp": 0.36,
+   "mde_80pct_pp": 1.0
+  },
+  "gsm8k|Qwen-7B|GPTQ-4": {
+   "paired_se_pp": 0.38,
+   "mde_80pct_pp": 1.05
+  },
+  "gsm8k|Llama-8B|FP8": {
+   "paired_se_pp": 0.41,
+   "mde_80pct_pp": 1.14
+  },
+  "gsm8k|Llama-8B|AWQ-4": {
+   "paired_se_pp": 0.5,
+   "mde_80pct_pp": 1.4
+  },
+  "gsm8k|Llama-8B|GPTQ-4": {
+   "paired_se_pp": 0.42,
+   "mde_80pct_pp": 1.18
+  },
+  "gpqa|Qwen-7B|FP8": {
+   "paired_se_pp": 2.02,
+   "mde_80pct_pp": 5.65
+  },
+  "gpqa|Qwen-7B|AWQ-4": {
+   "paired_se_pp": 2.1,
+   "mde_80pct_pp": 5.9
+  },
+  "gpqa|Qwen-7B|GPTQ-4": {
+   "paired_se_pp": 2.19,
+   "mde_80pct_pp": 6.15
+  },
+  "gpqa|Llama-8B|FP8": {
+   "paired_se_pp": 1.96,
+   "mde_80pct_pp": 5.5
+  },
+  "gpqa|Llama-8B|AWQ-4": {
+   "paired_se_pp": 2.18,
+   "mde_80pct_pp": 6.11
+  },
+  "gpqa|Llama-8B|GPTQ-4": {
+   "paired_se_pp": 2.15,
+   "mde_80pct_pp": 6.03
+  }
+ },
+ "token_delta_location": {
+  "Qwen-7B|FP8": {
+   "mean": [
+    -3.7,
+    [
+     -144.1,
+     137.1
+    ]
+   ],
+   "median": [
+    -0.5,
+    [
+     -33.4,
+     47.6
+    ]
+   ],
+   "trimmed10": [
+    30.1,
+    [
+     -34.0,
+     91.7
+    ]
+   ]
+  },
+  "Qwen-7B|AWQ-4": {
+   "mean": [
+    254.0,
+    [
+     115.7,
+     393.7
+    ]
+   ],
+   "median": [
+    50.2,
+    [
+     10.4,
+     91.6
+    ]
+   ],
+   "trimmed10": [
+    117.9,
+    [
+     48.9,
+     192.5
+    ]
+   ]
+  },
+  "Qwen-7B|GPTQ-4": {
+   "mean": [
+    275.9,
+    [
+     123.2,
+     433.0
+    ]
+   ],
+   "median": [
+    4.4,
+    [
+     -42.9,
+     56.0
+    ]
+   ],
+   "trimmed10": [
+    92.0,
+    [
+     26.7,
+     169.4
+    ]
+   ]
+  },
+  "Llama-8B|FP8": {
+   "mean": [
+    -105.8,
+    [
+     -278.0,
+     66.9
+    ]
+   ],
+   "median": [
+    -29.2,
+    [
+     -104.6,
+     9.2
+    ]
+   ],
+   "trimmed10": [
+    -57.0,
+    [
+     -147.6,
+     31.9
+    ]
+   ]
+  },
+  "Llama-8B|AWQ-4": {
+   "mean": [
+    79.9,
+    [
+     -110.2,
+     269.8
+    ]
+   ],
+   "median": [
+    10.7,
+    [
+     -61.4,
+     82.6
+    ]
+   ],
+   "trimmed10": [
+    79.0,
+    [
+     -26.1,
+     183.3
+    ]
+   ]
+  },
+  "Llama-8B|GPTQ-4": {
+   "mean": [
+    183.9,
+    [
+     11.1,
+     358.9
+    ]
+   ],
+   "median": [
+    38.2,
+    [
+     -19.3,
+     116.2
+    ]
+   ],
+   "trimmed10": [
+    90.1,
+    [
+     -19.7,
+     205.3
+    ]
+   ]
+  }
+ },
+ "subset_draw_simulation": {
+  "Qwen-7B": {
+   "campaign_length_order": [
+    "GPTQ-4",
+    "AWQ-4",
+    "FP8",
+    "BF16"
+   ],
+   "campaign_length_cost_s_per_correct": {
+    "BF16": 97.16,
+    "FP8": 67.93,
+    "AWQ-4": 59.57,
+    "GPTQ-4": 55.48
+   },
+   "p_cheapest": {
+    "BF16": 0.0,
+    "FP8": 0.078,
+    "AWQ-4": 0.343,
+    "GPTQ-4": 0.58
+   },
+   "p_full_order_equals_campaign_order": 0.403,
+   "measured_condA_tok_s": {
+    "BF16": 43.92,
+    "FP8": 62.5,
+    "AWQ-4": 76.89,
+    "GPTQ-4": 82.67
+   }
+  },
+  "Llama-8B": {
+   "campaign_length_order": [
+    "FP8",
+    "BF16",
+    "AWQ-4",
+    "GPTQ-4"
+   ],
+   "campaign_length_cost_s_per_correct": {
+    "BF16": 72.14,
+    "FP8": 64.55,
+    "AWQ-4": 78.02,
+    "GPTQ-4": 85.74
+   },
+   "p_cheapest": {
+    "BF16": 0.243,
+    "FP8": 0.616,
+    "AWQ-4": 0.104,
+    "GPTQ-4": 0.037
+   },
+   "p_full_order_equals_campaign_order": 0.206,
+   "measured_condA_tok_s": {
+    "BF16": 72.34,
+    "FP8": 78.75,
+    "AWQ-4": 70.2,
+    "GPTQ-4": 63.49
+   }
+  }
+ }
+}
