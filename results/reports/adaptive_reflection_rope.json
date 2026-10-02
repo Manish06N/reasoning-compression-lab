@@ -1,0 +1,1054 @@
+{
+ "inputs": {
+  "B": 10000,
+  "rng_seed": 0,
+  "orderings": 120,
+  "note": "exploratory; conditional on the archived generation seeds"
+ },
+ "rope_flat_dirichlet": {
+  "math500|Qwen-7B|FP8": {
+   "delta_pp": 0.4,
+   "p_within_1pp": 0.912,
+   "p_within_2pp": 1.0,
+   "p_drop_gt_1pp": 0.002
+  },
+  "math500|Qwen-7B|AWQ-4": {
+   "delta_pp": -0.88,
+   "p_within_1pp": 0.608,
+   "p_within_2pp": 0.985,
+   "p_drop_gt_1pp": 0.392
+  },
+  "math500|Qwen-7B|GPTQ-4": {
+   "delta_pp": -0.52,
+   "p_within_1pp": 0.861,
+   "p_within_2pp": 0.999,
+   "p_drop_gt_1pp": 0.138
+  },
+  "math500|Llama-8B|FP8": {
+   "delta_pp": 0.28,
+   "p_within_1pp": 0.867,
+   "p_within_2pp": 0.997,
+   "p_drop_gt_1pp": 0.018
+  },
+  "math500|Llama-8B|AWQ-4": {
+   "delta_pp": -2.76,
+   "p_within_1pp": 0.006,
+   "p_within_2pp": 0.133,
+   "p_drop_gt_1pp": 0.994
+  },
+  "math500|Llama-8B|GPTQ-4": {
+   "delta_pp": -0.32,
+   "p_within_1pp": 0.844,
+   "p_within_2pp": 0.995,
+   "p_drop_gt_1pp": 0.139
+  },
+  "gsm8k|Qwen-7B|FP8": {
+   "delta_pp": 0.08,
+   "p_within_1pp": 0.996,
+   "p_within_2pp": 1.0,
+   "p_drop_gt_1pp": 0.001
+  },
+  "gsm8k|Qwen-7B|AWQ-4": {
+   "delta_pp": -0.2,
+   "p_within_1pp": 0.987,
+   "p_within_2pp": 1.0,
+   "p_drop_gt_1pp": 0.012
+  },
+  "gsm8k|Qwen-7B|GPTQ-4": {
+   "delta_pp": -0.13,
+   "p_within_1pp": 0.988,
+   "p_within_2pp": 1.0,
+   "p_drop_gt_1pp": 0.01
+  },
+  "gsm8k|Llama-8B|FP8": {
+   "delta_pp": 0.13,
+   "p_within_1pp": 0.979,
+   "p_within_2pp": 1.0,
+   "p_drop_gt_1pp": 0.004
+  },
+  "gsm8k|Llama-8B|AWQ-4": {
+   "delta_pp": -1.57,
+   "p_within_1pp": 0.126,
+   "p_within_2pp": 0.806,
+   "p_drop_gt_1pp": 0.875
+  },
+  "gsm8k|Llama-8B|GPTQ-4": {
+   "delta_pp": 0.28,
+   "p_within_1pp": 0.958,
+   "p_within_2pp": 1.0,
+   "p_drop_gt_1pp": 0.001
+  },
+  "gpqa|Qwen-7B|FP8": {
+   "delta_pp": -0.84,
+   "p_within_1pp": 0.351,
+   "p_within_2pp": 0.642,
+   "p_drop_gt_1pp": 0.469
+  },
+  "gpqa|Qwen-7B|AWQ-4": {
+   "delta_pp": -5.56,
+   "p_within_1pp": 0.012,
+   "p_within_2pp": 0.042,
+   "p_drop_gt_1pp": 0.987
+  },
+  "gpqa|Qwen-7B|GPTQ-4": {
+   "delta_pp": -2.36,
+   "p_within_1pp": 0.205,
+   "p_within_2pp": 0.416,
+   "p_drop_gt_1pp": 0.737
+  },
+  "gpqa|Llama-8B|FP8": {
+   "delta_pp": 1.68,
+   "p_within_1pp": 0.278,
+   "p_within_2pp": 0.534,
+   "p_drop_gt_1pp": 0.084
+  },
+  "gpqa|Llama-8B|AWQ-4": {
+   "delta_pp": 0.84,
+   "p_within_1pp": 0.324,
+   "p_within_2pp": 0.604,
+   "p_drop_gt_1pp": 0.203
+  },
+  "gpqa|Llama-8B|GPTQ-4": {
+   "delta_pp": -1.18,
+   "p_within_1pp": 0.315,
+   "p_within_2pp": 0.582,
+   "p_drop_gt_1pp": 0.531
+  }
+ },
+ "reflection_markers": {
+  "Qwen-7B": {
+   "BF16": {
+    "wait_per_1k_tokens": 4.356,
+    "all_markers_per_1k_tokens": 7.072,
+    "wait_per_completion": 17.47,
+    "markers_per_1k_finished": 6.741,
+    "markers_per_1k_truncated": 14.004,
+    "n_truncated": 14,
+    "markers_per_1k_correct": 6.122,
+    "markers_per_1k_incorrect_finished": 9.206
+   },
+   "FP8": {
+    "wait_per_1k_tokens": 4.168,
+    "all_markers_per_1k_tokens": 6.608,
+    "wait_per_completion": 16.7,
+    "markers_per_1k_finished": 6.673,
+    "markers_per_1k_truncated": 5.425,
+    "n_truncated": 16,
+    "markers_per_1k_correct": 6.041,
+    "markers_per_1k_incorrect_finished": 9.569,
+    "minus_BF16": {
+     "markers_per_1k_tokens": [
+      -0.464,
+      [
+       -0.986,
+       -0.04
+      ]
+     ],
+     "markers_per_completion": [
+      -1.89,
+      [
+       -4.47,
+       0.34
+      ]
+     ]
+    }
+   },
+   "AWQ-4": {
+    "wait_per_1k_tokens": 4.695,
+    "all_markers_per_1k_tokens": 7.761,
+    "wait_per_completion": 20.03,
+    "markers_per_1k_finished": 7.455,
+    "markers_per_1k_truncated": 11.166,
+    "n_truncated": 27,
+    "markers_per_1k_correct": 6.91,
+    "markers_per_1k_incorrect_finished": 9.513,
+    "minus_BF16": {
+     "markers_per_1k_tokens": [
+      0.69,
+      [
+       0.089,
+       1.335
+      ]
+     ],
+     "markers_per_completion": [
+      4.74,
+      [
+       1.78,
+       7.86
+      ]
+     ]
+    }
+   },
+   "GPTQ-4": {
+    "wait_per_1k_tokens": 5.949,
+    "all_markers_per_1k_tokens": 8.597,
+    "wait_per_completion": 25.5,
+    "markers_per_1k_finished": 7.653,
+    "markers_per_1k_truncated": 18.355,
+    "n_truncated": 29,
+    "markers_per_1k_correct": 7.801,
+    "markers_per_1k_incorrect_finished": 10.8,
+    "minus_BF16": {
+     "markers_per_1k_tokens": [
+      1.525,
+      [
+       0.529,
+       2.745
+      ]
+     ],
+     "markers_per_completion": [
+      8.49,
+      [
+       3.59,
+       14.46
+      ]
+     ]
+    }
+   }
+  },
+  "Llama-8B": {
+   "BF16": {
+    "wait_per_1k_tokens": 6.522,
+    "all_markers_per_1k_tokens": 9.425,
+    "wait_per_completion": 30.37,
+    "markers_per_1k_finished": 9.429,
+    "markers_per_1k_truncated": 9.369,
+    "n_truncated": 20,
+    "markers_per_1k_correct": 8.844,
+    "markers_per_1k_incorrect_finished": 10.921
+   },
+   "FP8": {
+    "wait_per_1k_tokens": 6.641,
+    "all_markers_per_1k_tokens": 9.436,
+    "wait_per_completion": 30.22,
+    "markers_per_1k_finished": 9.518,
+    "markers_per_1k_truncated": 6.932,
+    "n_truncated": 11,
+    "markers_per_1k_correct": 8.835,
+    "markers_per_1k_incorrect_finished": 11.297,
+    "minus_BF16": {
+     "markers_per_1k_tokens": [
+      0.011,
+      [
+       -0.29,
+       0.303
+      ]
+     ],
+     "markers_per_completion": [
+      -0.95,
+      [
+       -3.38,
+       1.4
+      ]
+     ]
+    }
+   },
+   "AWQ-4": {
+    "wait_per_1k_tokens": 6.874,
+    "all_markers_per_1k_tokens": 9.363,
+    "wait_per_completion": 32.56,
+    "markers_per_1k_finished": 9.478,
+    "markers_per_1k_truncated": 6.691,
+    "n_truncated": 15,
+    "markers_per_1k_correct": 8.955,
+    "markers_per_1k_incorrect_finished": 10.546,
+    "minus_BF16": {
+     "markers_per_1k_tokens": [
+      -0.062,
+      [
+       -0.381,
+       0.242
+      ]
+     ],
+     "markers_per_completion": [
+      0.46,
+      [
+       -2.16,
+       2.96
+      ]
+     ]
+    }
+   },
+   "GPTQ-4": {
+    "wait_per_1k_tokens": 7.6,
+    "all_markers_per_1k_tokens": 10.302,
+    "wait_per_completion": 36.79,
+    "markers_per_1k_finished": 10.118,
+    "markers_per_1k_truncated": 13.078,
+    "n_truncated": 23,
+    "markers_per_1k_correct": 9.275,
+    "markers_per_1k_incorrect_finished": 12.074,
+    "minus_BF16": {
+     "markers_per_1k_tokens": [
+      0.877,
+      [
+       0.433,
+       1.355
+      ]
+     ],
+     "markers_per_completion": [
+      5.98,
+      [
+       2.88,
+       9.12
+      ]
+     ]
+    }
+   }
+  }
+ },
+ "adaptive_agreement": {
+  "Qwen-7B|BF16": {
+   "fixed2": {
+    "coverage_pct": [
+     92.54,
+     [
+      90.52,
+      94.46
+     ]
+    ],
+    "risk_pct": [
+     0.89,
+     [
+      0.38,
+      1.55
+     ]
+    ],
+    "tokens_per_item": [
+     8023.0,
+     [
+      7328.0,
+      8747.0
+     ]
+    ]
+   },
+   "pair@3": {
+    "coverage_pct": [
+     96.3,
+     [
+      94.82,
+      97.62
+     ]
+    ],
+    "risk_pct": [
+     1.72,
+     [
+      0.87,
+      2.76
+     ]
+    ],
+    "tokens_per_item": [
+     8989.0,
+     [
+      8019.0,
+      10056.0
+     ]
+    ]
+   },
+   "pair@5": {
+    "coverage_pct": [
+     98.4,
+     [
+      97.2,
+      99.4
+     ]
+    ],
+    "risk_pct": [
+     2.56,
+     [
+      1.38,
+      4.0
+     ]
+    ],
+    "tokens_per_item": [
+     10048.0,
+     [
+      8608.0,
+      11564.0
+     ]
+    ]
+   },
+   "2-then-3of5": {
+    "coverage_pct": [
+     96.26,
+     [
+      94.6,
+      97.76
+     ]
+    ],
+    "risk_pct": [
+     1.72,
+     [
+      0.71,
+      2.94
+     ]
+    ],
+    "tokens_per_item": [
+     10922.0,
+     [
+      9410.0,
+      12547.0
+     ]
+    ]
+   }
+  },
+  "Qwen-7B|FP8": {
+   "fixed2": {
+    "coverage_pct": [
+     92.66,
+     [
+      90.66,
+      94.6
+     ]
+    ],
+    "risk_pct": [
+     0.69,
+     [
+      0.34,
+      1.1
+     ]
+    ],
+    "tokens_per_item": [
+     8015.0,
+     [
+      7349.0,
+      8698.0
+     ]
+    ]
+   },
+   "pair@3": {
+    "coverage_pct": [
+     96.54,
+     [
+      95.14,
+      97.82
+     ]
+    ],
+    "risk_pct": [
+     1.66,
+     [
+      0.83,
+      2.61
+     ]
+    ],
+    "tokens_per_item": [
+     8920.0,
+     [
+      8027.0,
+      9877.0
+     ]
+    ]
+   },
+   "pair@5": {
+    "coverage_pct": [
+     98.2,
+     [
+      97.0,
+      99.2
+     ]
+    ],
+    "risk_pct": [
+     2.16,
+     [
+      1.14,
+      3.39
+     ]
+    ],
+    "tokens_per_item": [
+     9846.0,
+     [
+      8541.0,
+      11254.0
+     ]
+    ]
+   },
+   "2-then-3of5": {
+    "coverage_pct": [
+     96.84,
+     [
+      95.28,
+      98.32
+     ]
+    ],
+    "risk_pct": [
+     1.71,
+     [
+      0.72,
+      2.78
+     ]
+    ],
+    "tokens_per_item": [
+     10728.0,
+     [
+      9257.0,
+      12302.0
+     ]
+    ]
+   }
+  },
+  "Qwen-7B|AWQ-4": {
+   "fixed2": {
+    "coverage_pct": [
+     91.18,
+     [
+      89.08,
+      93.12
+     ]
+    ],
+    "risk_pct": [
+     1.05,
+     [
+      0.52,
+      1.73
+     ]
+    ],
+    "tokens_per_item": [
+     8531.0,
+     [
+      7814.0,
+      9378.0
+     ]
+    ]
+   },
+   "pair@3": {
+    "coverage_pct": [
+     95.98,
+     [
+      94.52,
+      97.3
+     ]
+    ],
+    "risk_pct": [
+     2.21,
+     [
+      1.23,
+      3.26
+     ]
+    ],
+    "tokens_per_item": [
+     9668.0,
+     [
+      8647.0,
+      10743.0
+     ]
+    ]
+   },
+   "pair@5": {
+    "coverage_pct": [
+     98.2,
+     [
+      97.0,
+      99.2
+     ]
+    ],
+    "risk_pct": [
+     2.95,
+     [
+      1.71,
+      4.41
+     ]
+    ],
+    "tokens_per_item": [
+     10767.0,
+     [
+      9303.0,
+      12521.0
+     ]
+    ]
+   },
+   "2-then-3of5": {
+    "coverage_pct": [
+     96.16,
+     [
+      94.42,
+      97.7
+     ]
+    ],
+    "risk_pct": [
+     1.77,
+     [
+      0.78,
+      2.93
+     ]
+    ],
+    "tokens_per_item": [
+     11944.0,
+     [
+      10248.0,
+      13874.0
+     ]
+    ]
+   }
+  },
+  "Qwen-7B|GPTQ-4": {
+   "fixed2": {
+    "coverage_pct": [
+     91.58,
+     [
+      89.48,
+      93.56
+     ]
+    ],
+    "risk_pct": [
+     0.87,
+     [
+      0.41,
+      1.48
+     ]
+    ],
+    "tokens_per_item": [
+     8574.0,
+     [
+      7845.0,
+      9388.0
+     ]
+    ]
+   },
+   "pair@3": {
+    "coverage_pct": [
+     96.06,
+     [
+      94.44,
+      97.5
+     ]
+    ],
+    "risk_pct": [
+     1.96,
+     [
+      1.0,
+      3.02
+     ]
+    ],
+    "tokens_per_item": [
+     9689.0,
+     [
+      8655.0,
+      10869.0
+     ]
+    ]
+   },
+   "pair@5": {
+    "coverage_pct": [
+     98.2,
+     [
+      97.0,
+      99.2
+     ]
+    ],
+    "risk_pct": [
+     2.81,
+     [
+      1.52,
+      4.21
+     ]
+    ],
+    "tokens_per_item": [
+     10903.0,
+     [
+      9388.0,
+      12598.0
+     ]
+    ]
+   },
+   "2-then-3of5": {
+    "coverage_pct": [
+     95.72,
+     [
+      93.96,
+      97.38
+     ]
+    ],
+    "risk_pct": [
+     1.65,
+     [
+      0.71,
+      2.86
+     ]
+    ],
+    "tokens_per_item": [
+     11917.0,
+     [
+      10191.0,
+      13746.0
+     ]
+    ]
+   }
+  },
+  "Llama-8B|BF16": {
+   "fixed2": {
+    "coverage_pct": [
+     85.84,
+     [
+      83.36,
+      88.06
+     ]
+    ],
+    "risk_pct": [
+     1.86,
+     [
+      1.15,
+      2.71
+     ]
+    ],
+    "tokens_per_item": [
+     9313.0,
+     [
+      8545.0,
+      10140.0
+     ]
+    ]
+   },
+   "pair@3": {
+    "coverage_pct": [
+     94.6,
+     [
+      92.82,
+      96.22
+     ]
+    ],
+    "risk_pct": [
+     3.85,
+     [
+      2.54,
+      5.21
+     ]
+    ],
+    "tokens_per_item": [
+     10885.0,
+     [
+      9781.0,
+      12054.0
+     ]
+    ]
+   },
+   "pair@5": {
+    "coverage_pct": [
+     98.0,
+     [
+      96.6,
+      99.0
+     ]
+    ],
+    "risk_pct": [
+     5.57,
+     [
+      3.87,
+      7.45
+     ]
+    ],
+    "tokens_per_item": [
+     12221.0,
+     [
+      10721.0,
+      13738.0
+     ]
+    ]
+   },
+   "2-then-3of5": {
+    "coverage_pct": [
+     94.52,
+     [
+      92.54,
+      96.3
+     ]
+    ],
+    "risk_pct": [
+     3.34,
+     [
+      1.98,
+      4.84
+     ]
+    ],
+    "tokens_per_item": [
+     14029.0,
+     [
+      12250.0,
+      15890.0
+     ]
+    ]
+   }
+  },
+  "Llama-8B|FP8": {
+   "fixed2": {
+    "coverage_pct": [
+     86.9,
+     [
+      84.48,
+      89.16
+     ]
+    ],
+    "risk_pct": [
+     1.91,
+     [
+      1.2,
+      2.73
+     ]
+    ],
+    "tokens_per_item": [
+     9102.0,
+     [
+      8324.0,
+      9921.0
+     ]
+    ]
+   },
+   "pair@3": {
+    "coverage_pct": [
+     94.94,
+     [
+      93.4,
+      96.42
+     ]
+    ],
+    "risk_pct": [
+     4.15,
+     [
+      2.78,
+      5.65
+     ]
+    ],
+    "tokens_per_item": [
+     10508.0,
+     [
+      9401.0,
+      11612.0
+     ]
+    ]
+   },
+   "pair@5": {
+    "coverage_pct": [
+     99.0,
+     [
+      98.0,
+      99.8
+     ]
+    ],
+    "risk_pct": [
+     6.42,
+     [
+      4.34,
+      8.52
+     ]
+    ],
+    "tokens_per_item": [
+     11579.0,
+     [
+      10166.0,
+      13040.0
+     ]
+    ]
+   },
+   "2-then-3of5": {
+    "coverage_pct": [
+     94.5,
+     [
+      92.52,
+      96.32
+     ]
+    ],
+    "risk_pct": [
+     3.47,
+     [
+      2.07,
+      5.12
+     ]
+    ],
+    "tokens_per_item": [
+     13321.0,
+     [
+      11647.0,
+      15076.0
+     ]
+    ]
+   }
+  },
+  "Llama-8B|AWQ-4": {
+   "fixed2": {
+    "coverage_pct": [
+     82.12,
+     [
+      79.46,
+      84.68
+     ]
+    ],
+    "risk_pct": [
+     2.36,
+     [
+      1.51,
+      3.33
+     ]
+    ],
+    "tokens_per_item": [
+     9473.0,
+     [
+      8686.0,
+      10308.0
+     ]
+    ]
+   },
+   "pair@3": {
+    "coverage_pct": [
+     92.72,
+     [
+      90.78,
+      94.52
+     ]
+    ],
+    "risk_pct": [
+     4.51,
+     [
+      3.04,
+      6.11
+     ]
+    ],
+    "tokens_per_item": [
+     11313.0,
+     [
+      10167.0,
+      12564.0
+     ]
+    ]
+   },
+   "pair@5": {
+    "coverage_pct": [
+     96.8,
+     [
+      95.0,
+      98.2
+     ]
+    ],
+    "risk_pct": [
+     5.79,
+     [
+      3.93,
+      7.81
+     ]
+    ],
+    "tokens_per_item": [
+     13129.0,
+     [
+      11470.0,
+      15024.0
+     ]
+    ]
+   },
+   "2-then-3of5": {
+    "coverage_pct": [
+     93.62,
+     [
+      91.54,
+      95.52
+     ]
+    ],
+    "risk_pct": [
+     4.06,
+     [
+      2.4,
+      5.85
+     ]
+    ],
+    "tokens_per_item": [
+     14992.0,
+     [
+      13128.0,
+      16887.0
+     ]
+    ]
+   }
+  },
+  "Llama-8B|GPTQ-4": {
+   "fixed2": {
+    "coverage_pct": [
+     85.1,
+     [
+      82.58,
+      87.5
+     ]
+    ],
+    "risk_pct": [
+     1.76,
+     [
+      1.07,
+      2.59
+     ]
+    ],
+    "tokens_per_item": [
+     9681.0,
+     [
+      8853.0,
+      10561.0
+     ]
+    ]
+   },
+   "pair@3": {
+    "coverage_pct": [
+     94.22,
+     [
+      92.52,
+      95.9
+     ]
+    ],
+    "risk_pct": [
+     3.71,
+     [
+      2.51,
+      5.04
+     ]
+    ],
+    "tokens_per_item": [
+     11352.0,
+     [
+      10215.0,
+      12591.0
+     ]
+    ]
+   },
+   "pair@5": {
+    "coverage_pct": [
+     97.8,
+     [
+      96.4,
+      99.0
+     ]
+    ],
+    "risk_pct": [
+     5.11,
+     [
+      3.48,
+      6.92
+     ]
+    ],
+    "tokens_per_item": [
+     12778.0,
+     [
+      11195.0,
+      14385.0
+     ]
+    ]
+   },
+   "2-then-3of5": {
+    "coverage_pct": [
+     94.36,
+     [
+      92.34,
+      96.18
+     ]
+    ],
+    "risk_pct": [
+     3.18,
+     [
+      1.81,
+      4.63
+     ]
+    ],
+    "tokens_per_item": [
+     14694.0,
+     [
+      12904.0,
+      16623.0
+     ]
+    ]
+   }
+  }
+ }
+}

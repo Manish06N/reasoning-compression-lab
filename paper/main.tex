@@ -191,6 +191,8 @@ Table~\ref{tab:headline_results} and Figure~\ref{fig:seed} show per-seed pass@1.
 
 Table~\ref{tab:pass1} is the test that matches RQ1. Llama AWQ-4 is the only MATH contrast whose interval excludes zero ($p<0.001$; Holm-significant among the six MATH contrasts). The other five MATH pass@1 contrasts are not significant, so a strict pass@1 order among the Qwen cells is not identified. An item bootstrap ($B=10{,}000$) puts Qwen FP8 first on pass@1 in $80.3\%$ of resamples and Llama FP8 first in $60.4\%$; Llama AWQ-4 is never first. No MATH contrast has its 90\% CI inside $[-1,+1]$\,pp. maj@5 accuracies are in Table~\ref{tab:headline_results}: Qwen $94.4$ / $95.0$ / $94.4$ / $94.0$ and Llama $91.2$ / $91.0$ / $89.8$ / $91.2$ for BF16 / FP8 / AWQ-4 / GPTQ-4. Under majority voting the Qwen AWQ-4 point gap is gone (both $472/500$, McNemar $p=1$) and the Llama AWQ-4 point gap is about half as large ($-2.76$ to $-1.4$\,pp). These are point-estimate changes: a paired item bootstrap of the change in the Llama gap (pass@1 minus maj@5) has an interval that includes zero, so a statistical reduction is not shown. It also swaps Qwen AWQ-4 and GPTQ-4 relative to pass@1. McNemar $p$-values on maj@5 are all $>0.29$.
 
+The TOST at $\pm 1$\,pp fails for every MATH-500 contrast, which does not say how close the evidence comes. Under a flat Dirichlet Bayesian bootstrap over the paired item deltas (Appendix Table~\ref{tab:rope}), the posterior probability that the contrast lies within $\pm 1$\,pp is $0.91$ and $0.87$ for Qwen and Llama FP8, $0.86$ and $0.84$ for GPTQ-4, and only $0.61$ for Qwen AWQ-4; for Llama AWQ-4 it is $0.006$. On GSM8K it is $0.96$ to $1.00$ for every contrast except Llama AWQ-4 ($0.13$). On GPQA-Diamond it never exceeds $0.35$, so those contrasts are uninformative about equivalence. These probabilities grade the evidence under the archived seeds; they are not a hypothesis test and do not license an equivalence claim.
+
 \begin{table}[t]
 \centering
 \caption{Primary: item-level bootstrap of MATH-500 pass@1 versus BF16 ($B=10{,}000$). Secondary: exact McNemar on maj@5. Holm at $\alpha=0.05$ over six contrasts (primary family). TOST $\pm 1$\,pp uses the 90\% CI. sig.: Holm-significant at $\alpha=0.05$; n.s.: not significant.}
@@ -395,6 +397,8 @@ The compact JSON and the stored completions let us classify every incorrect MATH
 
 Shorter completions are more often correct (Appendix Table~\ref{tab:auroc}): the pooled AUROC is $0.83$--$0.94$ across the eight cells. Most of that is item difficulty. Restricted to correct-versus-incorrect pairs within the same item, the AUROC is $0.62$--$0.76$. No quantized checkpoint differs detectably from its BF16 baseline on the stratified AUROC (differences $-0.05$ to $+0.04$, every interval includes zero; Llama AWQ-4 $-0.05$ $[-0.13,+0.03]$), so these data show no detectable loss of the length signal under quantization, but only $48$--$134$ items per cell have both outcomes and the intervals are wide. The one-sample length rule of Section~\ref{sec:modal} therefore works largely by separating easy items from hard ones.
 
+Keyword counts of reflection markers in the stored completions (Appendix Table~\ref{tab:reflection}; ``wait'', ``hmm'', ``alternatively'', and check or verify phrases) are higher in the longer 4-bit traces: $+0.69$ $[+0.09,+1.33]$ markers per 1{,}000 tokens for Qwen AWQ-4, $+1.52$ $[+0.53,+2.75]$ for Qwen GPTQ-4, and $+0.88$ $[+0.43,+1.35]$ for Llama GPTQ-4, which is $+4.7$, $+8.5$ and $+6.0$ markers per completion. Qwen FP8 is slightly lower ($-0.46$ $[-0.99,-0.04]$), and Llama FP8 and AWQ-4 do not differ detectably from BF16. The mean length increase of the 4-bit checkpoints therefore goes with more self-checking text, but the Llama AWQ-4 accuracy loss does not: its marker density is unchanged and its added errors are finished wrong answers. Incorrect finished traces carry more markers than correct ones in every cell (for example $9.2$ against $6.1$ per 1{,}000 tokens for Qwen BF16). These are keyword counts, not an analysis of reasoning quality.
+
 \subsection{Observable modal agreement on MATH-500}
 \label{sec:modal}
 Because MATH-500 was evaluated with five generations per item, we additionally examine whether observable answer agreement provides a useful gold-free abstention signal. Recovered answer strings make RQ3 measurable as observable multi-sample agreement, selective prediction, and abstention---not as model safety or softmax calibration, and not as G-Pass@$k$~\cite{liu2025gpass}. Table~\ref{tab:modal} reports coverage and selective risk at three discrete thresholds. On MATH-500, higher observable answer agreement is associated with lower selective error. At 5/5 consensus, observed selective error is at most $0.27\%$ across the evaluated configurations, but coverage ranges from $70.2\%$ (Llama AWQ-4) to $88.8\%$ (Qwen FP8). Several $0.00\%$ risk cells have bootstrap intervals $[0,0]$; Wilson 95\% upper bounds on those $0/n$ cells are 0.82\%--1.08\%. Zero observed errors is not zero true error.
@@ -404,6 +408,8 @@ Llama AWQ-4 5/5 coverage is $70.2\%$ versus $76.2\%$ for BF16 ($-6.0$\,pp, $95\%
 A one-sample length rule is also gold-free and costs one generation. For each seed we serve the shortest $k$ traces, with $k$ set to the published 5/5 coverage of that cell, and average the selective risk over the five seeds (Table~\ref{tab:length-abstain}). At that matched coverage the length rule's risk is $1.61$--$4.56\%$, against at most $0.27\%$ for 5/5 modal agreement. The five-sample rule still has the lower selective risk. It also spends about five times the tokens ($T_5$ below).
 
 Table~\ref{tab:kcurve} gives the cost curve between those two ends. Unanimity of only two samples serves $82.1$--$92.7\%$ of items at $0.69$--$2.36\%$ risk. The length rule at the same coverage has $2.16$--$5.84\%$ risk, so two samples cut risk by a factor of about $2.2$--$3.1$ for twice the tokens. Three samples reach $0.18$--$1.07\%$. Every $k$ beats the matched length rule in every cell. Most of the gain comes from the second sample, so a deployment that cannot afford five generations keeps most of the benefit at $k=2$ or $3$. These values come from the recovered answer strings, with equivalence recomputed by math-verify on the stored representations. The same code reproduces 23 of the 24 corresponding 5/5 coverage, 5/5 risk, and length-rule entries in Tables~\ref{tab:modal} and~\ref{tab:length-abstain} exactly. The exception is Qwen GPTQ-4 5/5 coverage, which is one item lower ($86.6$ vs.\ $86.8\%$) because equivalence is judged here on stored string representations rather than on the original parsed answers. The reconstruction is computed by \path{scripts/analysis/revision_sensitivities.py}. Replacing math-verify equivalence by exact equality of the extracted answer strings lowers $k$-sample coverage by at most $0.4$\,pp and changes selective risk by at most $0.11$\,pp, so every comparison with the length rule is unchanged.
+
+The fixed-$k$ rules above always pay for $k$ samples. An adaptive rule draws two samples, serves if they agree, and otherwise draws three more and serves the unique mode only if it has at least three of the five votes (Appendix Table~\ref{tab:adaptive}; all 120 orderings of the five stored seeds, realised token cost). It reaches nearly the operating point of the fixed $\ge 3/5$ rule, with coverage $0.2$ to $0.6$\,pp higher and selective risk $0.05$ to $0.41$\,pp higher, at $37$--$46\%$ fewer tokens ($10.7$--$15.0$k against $20.0$--$24.2$k per item). A first-pair rule that serves as soon as any two of up to five samples agree serves $97$--$99\%$ of items but at $2.2$--$6.4\%$ risk, so it is not a useful operating point. These are point estimates on the items and seeds used throughout, with no fitted parameter; intervals are in the released JSON.
 
 \begin{sidewaystable}
 \centering
@@ -720,7 +726,7 @@ Llama-8B & GPTQ-4 & 88.92 & 91.2 & 4{,}841 & 0.0407 & 0.0059 & 85.7 / 14.9 \\
     \item \textbf{Checkpoint provenance.} Both AWQ-4 checkpoints are \texttt{jakiAJK} uploads with unknown calibration. FP8 and GPTQ-4 are RedHatAI artifacts. Format, publisher, toolchain, activation dtype, AWQ kernel path, and chat template are collinear. No second AWQ artifact was quantized in this study.
     \item \textbf{Scope.} Two 7--8B DeepSeek-R1 distillations, English math/science, one pinned serving stack, one prompt. GSM8K/GPQA use three seeds.
     \item \textbf{Not evaluated.} This study does not evaluate AIME, LiveCodeBench, 32B models, Hopper native W8A8 FP8, energy measurements, production continuous batching, or probability calibration.
-    \item \textbf{Reproducibility surface.} Compact JSON, recovered MATH-500 answer strings, confirmation timing, and analysis reports are released. Full chain-of-thought traces are not. Compact JSON omits \texttt{finish\_reason} and output token IDs. Replay needs an A100-80GB, the listed weights, and \path{runtime_manifest.json}. The serving records log driver 550.54.14; the accuracy-campaign job logs did not archive the driver. New sensitivities are recomputed by \path{scripts/analysis/manuscript_sensitivities.py}; difficulty levels, the cap band, the chat-template audit, and GPQA prompt identity by \path{scripts/analysis/q1_revision_analyses.py}; the two-way bootstrap, minimum detectable effects, token-delta location estimators, and subset-draw simulation by \path{scripts/analysis/review_additions.py}; the failure-class taxonomy and length-AUROC analysis by \path{scripts/analysis/trace_failure_analysis.py}.
+    \item \textbf{Reproducibility surface.} Compact JSON, recovered MATH-500 answer strings, confirmation timing, and analysis reports are released. Full chain-of-thought traces are not. Compact JSON omits \texttt{finish\_reason} and output token IDs. Replay needs an A100-80GB, the listed weights, and \path{runtime_manifest.json}. The serving records log driver 550.54.14; the accuracy-campaign job logs did not archive the driver. New sensitivities are recomputed by \path{scripts/analysis/manuscript_sensitivities.py}; difficulty levels, the cap band, the chat-template audit, and GPQA prompt identity by \path{scripts/analysis/q1_revision_analyses.py}; the two-way bootstrap, minimum detectable effects, token-delta location estimators, and subset-draw simulation by \path{scripts/analysis/review_additions.py}; the failure-class taxonomy and length-AUROC analysis by \path{scripts/analysis/trace_failure_analysis.py}; graded equivalence, reflection markers, and adaptive agreement sampling by \path{scripts/analysis/adaptive_reflection_rope.py}.
     \item \textbf{Contamination.} MATH and GSM8K overlap public pretraining corpora. A paired within-item design reduces but does not eliminate contamination interaction with checkpoint.
     \item \textbf{Launcher record.} Effective flags, including \texttt{max\_model\_len=32768}, are reconstructed in \path{runtime_manifest.json} from the launcher. They are not per-job telemetry. The accuracy-campaign NVIDIA driver was not archived; the serving confirmation logs 550.54.14. Historical harness configs are not the campaign stack.
 \end{enumerate}
@@ -951,7 +957,7 @@ Hochlehnert et al.~\cite{hochlehnert2025sober} & reasoning LMs; N/A & deliberate
 
 \section{Additional sensitivities}
 \label{app:additions}
-These analyses were added after an independent review. They use only the released per-completion JSON and do not change any frozen result. Table~\ref{tab:twoway} checks whether the pass@1 contrasts depend on conditioning on the generation seeds that were run, and gives the minimum detectable difference. Table~\ref{tab:toklocation} shows how much of the mean token difference survives a median and a trimmed mean. Table~\ref{tab:subsetsim} sizes the Condition~A length-draw effect by simulation.
+These analyses were added after an independent review. They use only the released per-completion JSON and do not change any frozen result. Table~\ref{tab:twoway} checks whether the pass@1 contrasts depend on conditioning on the generation seeds that were run, and gives the minimum detectable difference. Table~\ref{tab:toklocation} shows how much of the mean token difference survives a median and a trimmed mean. Table~\ref{tab:subsetsim} sizes the Condition~A length-draw effect by simulation. Tables~\ref{tab:failure} and~\ref{tab:auroc} give the failure-class and length-AUROC analyses of Section~\ref{sec:failure}; Tables~\ref{tab:rope}, \ref{tab:reflection} and~\ref{tab:adaptive} give graded equivalence, reflection-marker counts, and adaptive agreement sampling.
 
 \begin{table}[t]
 \centering
@@ -1062,6 +1068,84 @@ Llama BF16 & $0.875$ $[0.84,0.91]$ & $0.675$ $[0.61,0.74]$ & --- & 107 \\
 Llama FP8 & $0.871$ $[0.82,0.91]$ & $0.664$ $[0.59,0.73]$ & $-0.011$ $[-0.10,+0.07]$ & 91 \\
 Llama AWQ-4 & $0.830$ $[0.79,0.87]$ & $0.624$ $[0.56,0.68]$ & $-0.051$ $[-0.13,+0.03]$ & 134 \\
 Llama GPTQ-4 & $0.901$ $[0.87,0.93]$ & $0.717$ $[0.65,0.78]$ & $+0.042$ $[-0.04,+0.12]$ & 110 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\centering
+\caption{Graded equivalence of the pass@1 contrasts: posterior probability that the contrast lies within $\pm 1$\,pp or $\pm 2$\,pp of zero, and that the drop exceeds $1$\,pp, under a flat Dirichlet Bayesian bootstrap over the paired item deltas ($B=10{,}000$). Conditional on the archived seeds. These grade the evidence; they are not a hypothesis test and do not replace the TOST of Tables~\ref{tab:pass1}--\ref{tab:gpqa-contrasts}. Exploratory; from \texttt{scripts/analysis/adaptive\_reflection\_rope.py}.}
+\label{tab:rope}
+\small
+\begin{tabular}{llcccc}
+\toprule
+\textbf{Bench.} & \textbf{Contrast} & $\Delta$ (pp) & $P(|\Delta|<1)$ & $P(|\Delta|<2)$ & $P(\Delta<-1)$ \\
+\midrule
+MATH-500 & Qwen FP8 & $+0.40$ & 0.912 & 1.000 & 0.002 \\
+MATH-500 & Qwen AWQ-4 & $-0.88$ & 0.608 & 0.985 & 0.392 \\
+MATH-500 & Qwen GPTQ-4 & $-0.52$ & 0.861 & 0.999 & 0.138 \\
+MATH-500 & Llama FP8 & $+0.28$ & 0.867 & 0.997 & 0.018 \\
+MATH-500 & Llama AWQ-4 & $-2.76$ & 0.006 & 0.133 & 0.994 \\
+MATH-500 & Llama GPTQ-4 & $-0.32$ & 0.844 & 0.995 & 0.139 \\
+\midrule
+GSM8K & Qwen FP8 & $+0.08$ & 0.996 & 1.000 & 0.001 \\
+GSM8K & Qwen AWQ-4 & $-0.20$ & 0.987 & 1.000 & 0.012 \\
+GSM8K & Qwen GPTQ-4 & $-0.13$ & 0.988 & 1.000 & 0.010 \\
+GSM8K & Llama FP8 & $+0.13$ & 0.979 & 1.000 & 0.004 \\
+GSM8K & Llama AWQ-4 & $-1.57$ & 0.126 & 0.806 & 0.875 \\
+GSM8K & Llama GPTQ-4 & $+0.28$ & 0.958 & 1.000 & 0.001 \\
+\midrule
+GPQA-D & Qwen FP8 & $-0.84$ & 0.351 & 0.642 & 0.469 \\
+GPQA-D & Qwen AWQ-4 & $-5.56$ & 0.012 & 0.042 & 0.987 \\
+GPQA-D & Qwen GPTQ-4 & $-2.36$ & 0.205 & 0.416 & 0.737 \\
+GPQA-D & Llama FP8 & $+1.68$ & 0.278 & 0.534 & 0.084 \\
+GPQA-D & Llama AWQ-4 & $+0.84$ & 0.324 & 0.604 & 0.203 \\
+GPQA-D & Llama GPTQ-4 & $-1.18$ & 0.315 & 0.582 & 0.531 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\centering
+\caption{Reflection-marker counts in the stored MATH-500 completions (regular expressions for ``wait'', ``hmm'', ``alternatively'', and check/verify phrases; keyword counts, not a semantic analysis). Columns: all markers per 1{,}000 tokens; the same for correct / incorrect finished (non-truncated) completions; and the quantized-minus-BF16 difference per 1{,}000 tokens and per completion with item-level 95\% CIs ($B=10{,}000$). Exploratory; from \texttt{scripts/analysis/adaptive\_reflection\_rope.py}.}
+\label{tab:reflection}
+\footnotesize
+\setlength{\tabcolsep}{2.5pt}
+\begin{tabular}{lccll}
+\toprule
+\textbf{Cell} & \textbf{All /1k} & \textbf{Correct / incorrect /1k} & \textbf{$-$ BF16, per 1k tokens} & \textbf{$-$ BF16, per completion} \\
+\midrule
+Qwen BF16 & 7.07 & 6.12 / 9.21 & --- & --- \\
+Qwen FP8 & 6.61 & 6.04 / 9.57 & $-0.46$ $[-0.99,-0.04]$ & $-1.9$ $[-4.5,+0.3]$ \\
+Qwen AWQ-4 & 7.76 & 6.91 / 9.51 & $+0.69$ $[+0.09,+1.33]$ & $+4.7$ $[+1.8,+7.9]$ \\
+Qwen GPTQ-4 & 8.60 & 7.80 / 10.80 & $+1.52$ $[+0.53,+2.75]$ & $+8.5$ $[+3.6,+14.5]$ \\
+\midrule
+Llama BF16 & 9.43 & 8.84 / 10.92 & --- & --- \\
+Llama FP8 & 9.44 & 8.84 / 11.30 & $+0.01$ $[-0.29,+0.30]$ & $-0.9$ $[-3.4,+1.4]$ \\
+Llama AWQ-4 & 9.36 & 8.96 / 10.55 & $-0.06$ $[-0.38,+0.24]$ & $+0.5$ $[-2.2,+3.0]$ \\
+Llama GPTQ-4 & 10.30 & 9.28 / 12.07 & $+0.88$ $[+0.43,+1.35]$ & $+6.0$ $[+2.9,+9.1]$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\centering
+\caption{Adaptive agreement sampling on MATH-500. Each entry is coverage (\%) / selective risk (\%) / mean tokens per item (thousands). Fixed $\ge 3/5$: the five-sample rule of Table~\ref{tab:modal}. Adaptive: draw two samples and serve if they agree; otherwise draw three more and serve the unique mode only if it has at least three of the five votes. Fixed $k{=}2$: unanimity of two samples (Table~\ref{tab:kcurve}). Adaptive and fixed $k{=}2$ are averaged over all 120 orderings of the five stored seeds, with the realised tokens of the samples drawn; item-level bootstrap intervals are in \texttt{results/reports/adaptive\_reflection\_rope.json}. No parameter was fitted to these data. From \texttt{scripts/analysis/adaptive\_reflection\_rope.py}.}
+\label{tab:adaptive}
+\small
+\begin{tabular}{llll}
+\toprule
+\textbf{Cell} & \textbf{Fixed $\ge 3/5$} & \textbf{Adaptive} & \textbf{Fixed $k{=}2$} \\
+\midrule
+Qwen BF16 & 96.0 / 1.67 / 20.1 & 96.3 / 1.72 / 10.9 & 92.5 / 0.89 / 8.0 \\
+Qwen FP8 & 96.6 / 1.66 / 20.0 & 96.8 / 1.71 / 10.7 & 92.7 / 0.69 / 8.0 \\
+Qwen AWQ-4 & 95.8 / 1.46 / 21.3 & 96.2 / 1.77 / 11.9 & 91.2 / 1.05 / 8.5 \\
+Qwen GPTQ-4 & 95.4 / 1.47 / 21.4 & 95.7 / 1.65 / 11.9 & 91.6 / 0.87 / 8.6 \\
+\midrule
+Llama BF16 & 94.0 / 2.98 / 23.3 & 94.5 / 3.34 / 14.0 & 85.8 / 1.86 / 9.3 \\
+Llama FP8 & 94.0 / 3.19 / 22.8 & 94.5 / 3.47 / 13.3 & 86.9 / 1.91 / 9.1 \\
+Llama AWQ-4 & 93.2 / 3.65 / 23.7 & 93.6 / 4.06 / 15.0 & 82.1 / 2.36 / 9.5 \\
+Llama GPTQ-4 & 93.8 / 2.77 / 24.2 & 94.4 / 3.18 / 14.7 & 85.1 / 1.76 / 9.7 \\
 \bottomrule
 \end{tabular}
 \end{table}
