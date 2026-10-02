@@ -1,7 +1,7 @@
 # Q1 revision — point-by-point response
 
 Branch `paper-q1-revision` (from `main@9204d62`). Source review: PhD repo
-`docs/reviews/PAPER1_PEER_REVIEW_2026-09-24.md`. No frozen result, raw output or
+`PAPER1_PEER_REVIEW_2026-09-24.md` (internal review document, kept in the author's PhD working repository, not in this one). No frozen result, raw output or
 existing analysis file was changed. New evidence comes from one new CPU script
 (`scripts/analysis/q1_revision_analyses.py` → `results/reports/q1_revision_analyses.json`)
 plus the previously untracked `think_prefix_audit` files. Every new number in the
@@ -59,7 +59,7 @@ Venue packages are not rebuilt; see "Venue status" below.
 ## Before submission: declarations
 
 The manuscript has no declaration sections. Add the statements the target journal
-requires before submitting (`docs/VENUE.md`: competing interests are confirmed on-screen;
+requires before submitting (`docs/archive/planning/VENUE.md`: competing interests are confirmed on-screen;
 the "Reproducibility and Artifact Availability" section covers data availability).
 
 ## Author questions
@@ -70,7 +70,7 @@ the "Reproducibility and Artifact Availability" section covers data availability
 | Q2 | Unconditional placebo | Exactly zero by construction when pooled over ordered seed pairs; stated in §3.5 as the reason it is the primary length estimand. |
 | Q3 | Equivalence-relation sensitivity of the k-curve | Exact-string equality moves coverage ≤0.4 pp and risk ≤0.11 pp; all comparisons with the length rule unchanged (§4.8). |
 
-## Venue status (from `docs/VENUE.md`)
+## Venue status (from `docs/archive/planning/VENUE.md`)
 
 Supervisors require **Clarivate JCR Q1**. **Closed:** JSS (desk reject 2026-09-09,
 out of scope) and FGCS (desk reject). **Parked:** TMLR (Scopus Q2). **Current:**

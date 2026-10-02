@@ -6,7 +6,7 @@ Single source of truth for Hugging Face IDs, local paths, env vars, and machine 
 
 **Stack boundary (2026-08-14):** historical main harness uses vLLM 0.8.5; QRM replication / the published 56k campaign uses vLLM 0.7.0 eager (`qrm-official`). Neither version may be silently mixed in a comparison. The campaign stack is frozen; GPU work is closed (2026-08-17).
 
-**Publication freeze:** [PUBLICATION_READINESS.md](PUBLICATION_READINESS.md)
+**Publication freeze:** [PUBLICATION_READINESS.md](archive/planning/PUBLICATION_READINESS.md)
 
 ## Machine roles
 

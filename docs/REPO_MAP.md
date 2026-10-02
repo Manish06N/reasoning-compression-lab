@@ -8,11 +8,11 @@ Quick navigation for `reasoning-compression-lab`. For the full high-level overvi
 
 | I want to… | Open |
 |------------|------|
-| See whether the result is publishable | [PUBLICATION_READINESS.md](PUBLICATION_READINESS.md) (2026-08-17 freeze) |
-| Read the historical recovery plan | [plans/2026-08-14-publication-recovery.md](plans/2026-08-14-publication-recovery.md) (not current execution) |
+| See whether the result is publishable | [PUBLICATION_READINESS.md](archive/planning/PUBLICATION_READINESS.md) (2026-08-17 freeze) |
+| Read the historical recovery plan | [plans/2026-08-14-publication-recovery.md](archive/planning/plans/2026-08-14-publication-recovery.md) (not current execution) |
 | Understand the whole codebase | [CODEBASE_OVERVIEW.md](CODEBASE_OVERVIEW.md) |
-| Run on HPC | [BEGINNER_HPC_GUIDE.md](BEGINNER_HPC_GUIDE.md) |
-| See current status | [PROGRESS.md](PROGRESS.md) |
+| Run on HPC | [BEGINNER_HPC_GUIDE.md](archive/hpc_misc/BEGINNER_HPC_GUIDE.md) |
+| See current status | [PROGRESS.md](archive/planning/PROGRESS.md) |
 | Avoid known traps | [KNOWN_ISSUES.md](KNOWN_ISSUES.md) |
 | QRM repro / stack parity | [QRM_STACK_PARITY_AUDIT.md](QRM_STACK_PARITY_AUDIT.md) |
 | QRM official env HPC debug log | [QRM_OFFICIAL_HPC_TROUBLESHOOTING.md](QRM_OFFICIAL_HPC_TROUBLESHOOTING.md) |
@@ -88,7 +88,7 @@ Publication archives use `outputs-hpc-2a100-main-YYYY-MM-DD/` instead of `runs/`
 
 ## External reference code (read-only)
 
-Sibling folder: `../external_repos/` — see [../external_repos/README.md](../../external_repos/README.md).
+The official QRM harness is cloned into `external/` by `scripts/hpc/qrm_parity/setup_official_qrm_repo.sh` (not vendored in this repository).
 
 Never develop experiments inside external repos.
 

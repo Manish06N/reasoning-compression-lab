@@ -33,7 +33,7 @@ Reason: 7B BF16 and 8B BF16 do not fit 16 GB for full MATH-500 at paper decoding
 - Controlled systems runs require warm-up, per-request latency, scheduler/preemption logs, peak VRAM, and explicit power/energy availability.
 - Zero or missing Slurm energy accounting means “unavailable,” not zero Joules.
 
-See [PUBLICATION_READINESS.md](PUBLICATION_READINESS.md) and [the recovery plan](plans/2026-08-14-publication-recovery.md).
+See [PUBLICATION_READINESS.md](archive/planning/PUBLICATION_READINESS.md) and [the recovery plan](archive/planning/plans/2026-08-14-publication-recovery.md).
 
 ---
 
@@ -79,4 +79,4 @@ HPC autopush commits **manifests, metadata, summaries, and logs only** — not r
 
 If any doc says “5080 retired” without qualification, read it as: **retired for J1 publication**, not retired for J3 local transfer.
 
-See also: [MODEL_SCOPE_DECISION.md](MODEL_SCOPE_DECISION.md), [HPC_2A100_PLAN.md](HPC_2A100_PLAN.md).
+See also: [MODEL_SCOPE_DECISION.md](MODEL_SCOPE_DECISION.md), [HPC_2A100_PLAN.md](archive/planning/HPC_2A100_PLAN.md).

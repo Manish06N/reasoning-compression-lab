@@ -31,7 +31,7 @@ Practitioners often choose a public quantized reasoning checkpoint from a single
 
 Contributions (C1–C4) answer RQ1–RQ4: one robust accuracy drop (Llama AWQ-4, concentrated at difficulty levels 3–5); a placebo-calibrated selection effect in the BF16-correct length estimator; a cost curve for gold-free agreement; subset serving cost as a length draw.
 
-**Venue:** see [`../docs/VENUE.md`](../docs/VENUE.md) (JCR Q1 required; JSS and FGCS closed). Q1 revision notes: [`REVISION_RESPONSE_Q1.md`](REVISION_RESPONSE_Q1.md).
+**Venue:** see [`../docs/VENUE.md`](../docs/archive/planning/VENUE.md) (JCR Q1 required; JSS and FGCS closed). Q1 revision notes: [`REVISION_RESPONSE_Q1.md`](REVISION_RESPONSE_Q1.md).
 
 ---
 
