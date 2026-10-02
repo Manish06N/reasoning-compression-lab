@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-10-03 — Final corrections after an independent audit and referee review (no GPU, no frozen result changed)
+
+Audit of commit `a5a1a16` (full recomputation of 1,366 reported numbers; 1,321 exact, 32 rounding/bootstrap-stream, 13 mismatches from nine root causes). New repo-traceable checks: `scripts/analysis/audit_checks.py` -> `results/reports/audit_checks.json` (frozen-tokenizer env).
+
+- **Llama prompt range corrected to 27-776** (AWQ-4 prompts 25-774; Qwen 29-811, AWQ-4 27-809), effective cap 31,957-32,743. The Q1 revision had replaced the correct range by 28-747, computed with transformers 5.x, whose LlamaTokenizer mis-tokenizes Llama text (completion counts ~220 tokens off). With the frozen tokenizers (4.47.1) every stored `completion_tokens` value is reproduced (56,408/56,408). Cap-band counts (155/139/16) are identical under both tokenizers. Exact-cap test: 147 of 155 MATH-500 cap-band rows (and all 57 near-cap GSM8K rows) have exactly `32768 - prompt` tokens.
+- `scripts/analysis/q1_revision_analyses.py` now refuses to run outside transformers 4.47.x; `REPRODUCE.md`: numpy pin needs Python >= 3.12, `check_tex_tables.py` lives in `scripts/`.
+- AWQ backend: AWQ-Marlin needs a runtime zero point; both `jakiAJK` configs set `zero_point=false`, so they are ineligible whatever the flag; resolved method is logged as `awq`.
+- Serving: Qwen FP8 vs GPTQ-4 Condition B depends on tok/s aggregation (9.82 s vs 9.39 s with total tokens / total time; GPTQ-4 first in ~97% of resamples); Llama FP8 Condition A subset length is longer than 99.9% of 20,000 resampled draws; abstract "decides" -> "can reorder"; CV rule disclosure (3.67% with sample SD).
+- Length: paired excess-over-placebo intervals added (Llama AWQ-4 +97 [-66,+267] is not distinguishable from zero); "close to the unconditional delta" qualified (Qwen GPTQ-4 +188 vs +276).
+- Wording/number fixes: maj@5 change-in-gap interval (+1.36 [-0.24,+3.00]); Lian et al. estimand (CoT-only, greedy); Kurtic et al. also evaluate R1-distill; "22 of 24" (one cause); paired-SE statement (Llama 0.60-0.70 pp); bootstrap-stream note and tolerance wording; GPQA answer-order mechanism (vLLM re-seeds Python's RNG at model init; order is constant across checkpoints and seeds); Table 5,444 and level L1 94.0; multitask/strata captions; ECE sentence and reviewer-facing sentence removed; AWQ provenance (`_name_or_path ./tmp_autoround_awq`, undocumented calibration) added; subset-file note; abstract qualifier "On MATH-500 and GSM8K".
+- Known and left: Llama FP8 >=3/5 string reconstruction differs by one item from the LightEval-parsed table values (94.0/3.19 vs 93.8/2.99); declarations (funding, competing interests, AI-use) still to be supplied by the authors.
+
 ## 2026-10-02 — Wording and number corrections after the second independent review (no GPU, no frozen result changed)
 
 Source: `~/paper1-review-2026-09-27/PEER_REVIEW.md` (findings 1-8, 10), checked against the repo before editing.

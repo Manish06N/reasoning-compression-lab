@@ -26,6 +26,15 @@ from pathlib import Path
 import numpy as np
 
 REPO = Path(__file__).resolve().parents[2]
+
+# Guard: prompt/cap token counts depend on the tokenizer implementation. The frozen campaign runtime used
+# transformers 4.47.1 / tokenizers 0.21.4 (LlamaTokenizerFast). Newer releases (transformers 5.x, LlamaTokenizer) tokenize
+# Llama text differently (prompt range 28-747 instead of 27-776; completion counts off by ~220 tokens), so refuse to run.
+def _assert_frozen_tokenizers() -> None:
+    import transformers
+    if not transformers.__version__.startswith("4.47."):
+        raise SystemExit(f"run under the frozen qrm-official env (transformers 4.47.x); found {transformers.__version__}")
+
 FAMILIES = {"Qwen-7B": "DeepSeek-R1-Distill-Qwen-7B", "Llama-8B": "DeepSeek-R1-Distill-Llama-8B"}
 FORMATS = ["BF16", "FP8", "AWQ-4", "GPTQ-4"]
 SEEDS = {"math500": [42, 43, 44, 45, 46], "gsm8k": [42, 43, 44], "gpqa": [42, 43, 44]}
@@ -78,6 +87,7 @@ def main() -> int:
     os.environ.setdefault("HF_DATASETS_OFFLINE", "1")
     from datasets import load_dataset
     from transformers import AutoTokenizer
+    _assert_frozen_tokenizers()
 
     ds = load_dataset("HuggingFaceH4/MATH-500", split="test", revision=MATH500_REVISION)
     by_q = {row["problem"].strip(): (i, int(row["level"])) for i, row in enumerate(ds)}

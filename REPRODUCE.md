@@ -22,7 +22,7 @@ The released artifact enables verification of reported analyses; reproducing the
 ## CPU environment (table checks)
 
 ```bash
-python3 --version   # 3.11 used in CI; 3.10+ is enough for stdlib scripts
+python3 --version   # stdlib-only --check scripts: 3.10+ is enough. The pinned numpy==2.5.0 below requires Python >= 3.12 (pip refuses it on 3.11); use Python 3.12+ for revision_sensitivities.py, or relax the pins (numpy 2.2.6, scipy 1.17.1, sympy 1.13.1, datasets 5.0.0 reproduce the check)
 ```
 
 No `pip install` is required for:
@@ -34,7 +34,7 @@ No `pip install` is required for:
 - `item_level_descriptive_analysis.py --check`
 - `validate_runtime_manifest.py --check`
 - `check_manuscript_numbers.py --check`
-- `check_tex_tables.py --check`
+- `scripts/check_tex_tables.py --check` (note: lives in `scripts/`, not `scripts/analysis/`)
 
 `revision_sensitivities.py --check` is the one CPU check that needs packages. It recomputes the seed placebo (Table 7), the $k$-sample cost curve (Table 12), the GPQA borderline rerun, the near-cap bands, and the item-order diagnostic, then compares them with `results/reports/revision_sensitivities.json`:
 
