@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-10-02 — Wording and number corrections after the second independent review (no GPU, no frozen result changed)
+
+Source: `~/paper1-review-2026-09-27/PEER_REVIEW.md` (findings 1-8, 10), checked against the repo before editing.
+
+- AWQ backend: the launcher passes no `quantization` override; engine logs record the resolved `quantization=awq`; both AWQ configs set `zero_point=false`, which fails the pinned AWQ-Marlin compatibility check. Table 2, Section 4.9, C1, Conclusion reworded (inference, not profiled). Serving prompts (with `<think>`) differ from AWQ accuracy prompts: disclosed.
+- Llama FP8 Condition A is 145,647/20 = 7,282.35 tokens per query (was 7,288, a product of rounded means); abstract, Section 4.9, CHANGELOG-era `main.md` corrected. Identity tok/s x s/query = tokens now stated per repeat only.
+- "Identical token sequences" replaced by identical aggregate counts (sequences were not retained).
+- Qwen serving savings: "upper bounds" replaced by "potentially confounded, bias direction unknown"; microbenchmark no longer called pure kernel speed.
+- maj@5: "halves/recovers" now a point-estimate statement; the paired interval for the change in the Llama gap includes zero.
+- Placebo: FP8 "fully reproduced" replaced by "no excess detected"; subtraction called a diagnostic contrast, not an unbiased correction.
+- Lian et al. CTIR no longer called the same estimand (CoT tokens, temperature zero vs whole completion, T=0.6). QRM v2 uses 3 seeds.
+- Near-cap vs cap-band: reported as heuristic agreement (139/140) and 16 further suspected truncations, not validated truncations.
+- Llama `<think>\n` is 2 tokens in the frozen runtime (1 in newer tokenizers). "Within about one point" -> "within 1.7 pp". Figure 3 Llama AWQ bar 4,736; Figure 1 caption corrected. Manuscript date updated.
+- Not changed: frozen results, raw outputs, analysis scripts, the mislabeled `selective_risk_clopper_pearson_ci_95` field (documented in the review), declarations (to be supplied by the authors).
+
 ## 2026-09-24 — Q1 revision after independent peer review (no GPU)
 
 Addresses every point in `paper/REVISION_RESPONSE_Q1.md`. No frozen campaign result changed.
