@@ -1,4 +1,4 @@
-# Pitfalls of Single-Metric Evaluation for Quantized Reasoning Checkpoints
+# Estimand Sensitivity in the Evaluation of Quantized Reasoning Checkpoints: Selection Bias, Seed Placebos, and Subset-Cost Instability
 
 **Manish Nandish**<sup>1,2</sup>, **Rajiv Misra**<sup>1</sup>, and **Midhunchakkaravarthy Janarthanan**<sup>2</sup>
 

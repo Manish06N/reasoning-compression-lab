@@ -5,7 +5,7 @@
 **GitHub:** [https://github.com/Manish06N/reasoning-compression-lab](https://github.com/Manish06N/reasoning-compression-lab)  
 **Last Updated:** 2026-09-23 (single-metric pitfalls title; science numbers frozen; GPU frozen)
 
-**Superseding scientific claims (use these, not the 2026-08-15 blocks below):** Title is *Pitfalls of Single-Metric Evaluation for Quantized Reasoning Checkpoints* (revised 2026-09-23). The robust accuracy drop is Llama AWQ-4. The BF16-correct length column is a selection effect; its quant-correct mirror flips sign in four of six contrasts. Subset serving cost is one length draw that timing repeats do not cover. Five-sample agreement beats a one-sample length rule on selective risk. GPQA prompts are byte-identical across checkpoints, so GPQA contrasts are paired (Q1 revision 2026-09-24). AWQ-4 used its own chat template (no `<think>\n` generation suffix; the model emits it), float16, and the configured GEMM `awq` path. The Llama AWQ-4 drop grows at difficulty levels 3–5. Do not cite ranking instability, architecture-dependent, statistically tied, unique cheapest, “true Pareto,” or first-run $+18.7\%$ / $-19.8\%$. Frozen tables: `results/reports/major_revision_tables.md`. Sensitivity script: `scripts/analysis/manuscript_sensitivities.py`. **Experimental GPU work is closed.** Live git branch is `main`. Do not rewrite frozen numbers.
+**Superseding scientific claims (use these, not the 2026-08-15 blocks below):** Title is *Estimand Sensitivity in the Evaluation of Quantized Reasoning Checkpoints: Selection Bias, Seed Placebos, and Subset-Cost Instability* (revised 2026-10-03; earlier title: *Pitfalls of Single-Metric Evaluation for Quantized Reasoning Checkpoints*, still used by the unsubmitted-venue packages). The robust accuracy drop is Llama AWQ-4. The BF16-correct length column is a selection effect; its quant-correct mirror flips sign in four of six contrasts. Subset serving cost is one length draw that timing repeats do not cover. Five-sample agreement beats a one-sample length rule on selective risk. GPQA prompts are byte-identical across checkpoints, so GPQA contrasts are paired (Q1 revision 2026-09-24). AWQ-4 used its own chat template (no `<think>\n` generation suffix; the model emits it), float16, and the configured GEMM `awq` path. The Llama AWQ-4 drop grows at difficulty levels 3–5. Do not cite ranking instability, architecture-dependent, statistically tied, unique cheapest, “true Pareto,” or first-run $+18.7\%$ / $-19.8\%$. Frozen tables: `results/reports/major_revision_tables.md`. Sensitivity script: `scripts/analysis/manuscript_sensitivities.py`. **Experimental GPU work is closed.** Live git branch is `main`. Do not rewrite frozen numbers.
 
 ---
 
@@ -31,7 +31,7 @@ graph TD
 
 | Output | Type | Title / Focus | Target Venues (Verify Q1) | Hardware / Stack | Status / Target Date |
 |---|---|---|---|---|---|
-| **J1** | Main Journal | *Pitfalls of Single-Metric Evaluation for Quantized Reasoning Checkpoints* | *JMLR* next (SCI Q1); TMLR parked; not JSS/FGCS | HPC 2× A100, `qrm-official` (vLLM 0.7.0 eager) | Frozen science on `main`; GPU closed |
+| **J1** | Main Journal | *Estimand Sensitivity in the Evaluation of Quantized Reasoning Checkpoints: Selection Bias, Seed Placebos, and Subset-Cost Instability* | *JMLR* next (SCI Q1); TMLR parked; not JSS/FGCS | HPC 2× A100, `qrm-official` (vLLM 0.7.0 eager) | Frozen science on `main`; GPU closed |
 | **C1** | Conference / Workshop | *Trace-Level Evaluation Metrology for Compressed Reasoning Models* | NeurIPS/ICLR/ACL Workshops (Eval4NLP, Efficient Natural Language, MLPerf) | HPC A100 | Submission Month 6–12 (Post-J1 pilot packaging) |
 | **J2** | Journal 2 | *Reasoning-Aware Speculative Decoding: Acceptance Dynamics and Serving Acceleration* | *JSS*, *Engineering Applications of AI (EAAI)*, *FGCS* | HPC 2× A100 | Year 2 (Methods & draft model training) |
 | **C2** | Conference / Workshop | *High-Throughput Speculative Serving of Compressed Reasoning LLMs* | MLSys / EuroSys / ACL Demo Track | HPC A100 | Year 2 |
@@ -83,7 +83,7 @@ ssh -L 8080:<NODE>:8080 -N manishn_iitp@paramrudra.iitp.ac.in -p 4422
 ## 3. Paper 1 (J1): Scientific Positioning & Breakthrough Results
 
 ### Provisional Title
-> **"Pitfalls of Single-Metric Evaluation for Quantized Reasoning Checkpoints"**
+> **"Estimand Sensitivity in the Evaluation of Quantized Reasoning Checkpoints: Selection Bias, Seed Placebos, and Subset-Cost Instability"**
 
 ### Novelty Positioning Against Prior Literature
 * **The Literature Gap:** Prior works (QRM 2025, A Sober Look 2025, Quantized LLMs Can Still Be Calibrated 2025, Cost-of-Pass 2025, Quantization Inflates Reasoning 2026, Reliability Scaling Laws 2026) studied accuracy, seed variance, or token count in isolation.

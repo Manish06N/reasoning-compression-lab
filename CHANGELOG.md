@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-10-03 — New title
+
+Title changed to *Estimand Sensitivity in the Evaluation of Quantized Reasoning Checkpoints: Selection Bias, Seed Placebos, and Subset-Cost Instability* (was *Pitfalls of Single-Metric Evaluation for Quantized Reasoning Checkpoints*). Updated `paper/main.tex`, `paper/main.md`, `README.md` (text and BibTeX), `AGENTS.md`; PDF and arXiv zip rebuilt. No scientific content changed. The separate venue packages (`one-stack-many-rankings-*`) were not touched and still use the old title; historical notes (`SCIENTIFIC_AUDIT.md`, `SUBMISSION_REVIEW.md`, `docs/VENUE.md`) keep it as a record.
+
 ## 2026-10-03 — Final corrections after an independent audit and referee review (no GPU, no frozen result changed)
 
 Audit of commit `a5a1a16` (full recomputation of 1,366 reported numbers; 1,321 exact, 32 rounding/bootstrap-stream, 13 mismatches from nine root causes). New repo-traceable checks: `scripts/analysis/audit_checks.py` -> `results/reports/audit_checks.json` (frozen-tokenizer env).
