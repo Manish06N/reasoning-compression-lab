@@ -48,7 +48,8 @@ def get_telegram_credentials():
         if m_tok and m_chat:
             return m_tok.group(1), m_chat.group(1)
 
-    return "8738869628:AAEtrsLVoqvDXeNz6CEa-ym5-AY7VJKScZ4", "638098622"
+    # No credentials configured: notifications are disabled (send_telegram() handles this).
+    return None, None
 
 
 TG_TOKEN, TG_CHAT_ID = get_telegram_credentials()

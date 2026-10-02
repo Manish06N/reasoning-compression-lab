@@ -19,6 +19,8 @@ Full details, limitations and threats to validity are in [`paper/main.pdf`](pape
 
 ## Verify the numbers yourself (about 5 minutes, CPU only, standard library)
 
+Requires Python 3.10 or newer (no packages needed for these checks).
+
 ```bash
 git clone https://github.com/Manish06N/reasoning-compression-lab && cd reasoning-compression-lab
 python3 scripts/analysis/revision_reanalysis.py --check               # pass@1, intervals, Holm, token strata
