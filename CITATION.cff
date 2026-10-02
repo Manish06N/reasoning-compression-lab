@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "If you use this repository or its results, please cite the paper below."
+title: "Estimand Sensitivity in the Evaluation of Quantized Reasoning Checkpoints: Selection Bias, Seed Placebos, and Subset-Cost Instability"
+type: software
+authors:
+  - family-names: Nandish
+    given-names: Manish
+    affiliation: "Department of Computer Science and Engineering, Indian Institute of Technology Patna"
+  - family-names: Misra
+    given-names: Rajiv
+    affiliation: "Department of Computer Science and Engineering, Indian Institute of Technology Patna"
+  - family-names: Janarthanan
+    given-names: Midhunchakkaravarthy
+    affiliation: "Lincoln University College, Malaysia"
+repository-code: "https://github.com/Manish06N/reasoning-compression-lab"
+license: MIT
+date-released: "2026-10-03"
+keywords:
+  - quantization
+  - reasoning language models
+  - evaluation
+  - selection bias
+  - selective prediction

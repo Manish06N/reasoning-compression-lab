@@ -1,59 +1,22 @@
 # Documentation index
 
-**Understand the system:** [CODEBASE_OVERVIEW.md](CODEBASE_OVERVIEW.md) — **canonical high-level map** of the entire repository (architecture, papers, modules, gates, status).
+Start with the top-level [`README.md`](../README.md), [`REPRODUCE.md`](../REPRODUCE.md) and the paper-to-code map [`PAPER_TO_CODE.md`](PAPER_TO_CODE.md).
 
-**Run experiments:** [BEGINNER_HPC_GUIDE.md](BEGINNER_HPC_GUIDE.md) — full HPC workflow on PARAM Rudra.
-
-**Live status:** [PROGRESS.md](PROGRESS.md) (short) · [../progress.md](../progress.md) (full history) · [../CHANGELOG.md](../CHANGELOG.md) (ops detail)
-
-**Scientific decision:** [PUBLICATION_READINESS.md](PUBLICATION_READINESS.md) (2026-08-17 freeze). The [2026-08-14 recovery plan](plans/2026-08-14-publication-recovery.md) is **historical** — GPU work is closed.
-
----
-
-## Essential (use these)
+## Method and protocol notes
 
 | Doc | Purpose |
-|-----|---------|
-| [PUBLICATION_READINESS.md](PUBLICATION_READINESS.md) | **Controlling 2026-08-17 freeze** — major revision at `d707e44`; visual PDF QA next; GPU closed |
-| [plans/2026-08-14-publication-recovery.md](plans/2026-08-14-publication-recovery.md) | **Historical** recovery plan (Phase 0 through matched grid). Not current execution authority. |
-| [CODEBASE_OVERVIEW.md](CODEBASE_OVERVIEW.md) | **High-level overview** — thesis alignment, architecture, modules, paper status |
-| [J1_VALIDATION_RUNBOOK.md](J1_VALIDATION_RUNBOOK.md) | Historical validation procedures; GPU work is closed |
-| [BEGINNER_HPC_GUIDE.md](BEGINNER_HPC_GUIDE.md) | HPC workflow step-by-step |
-| [HARDWARE_POLICY.md](HARDWARE_POLICY.md) | J1 HPC-only; RTX for J3 transfer |
-| [KNOWN_ISSUES.md](KNOWN_ISSUES.md) | **Critical** — resume trap, bad archive, limitations |
-| [QRM_STACK_PARITY_AUDIT.md](QRM_STACK_PARITY_AUDIT.md) | **QRM repro troubleshooting** — protocol vs stack gap, parity fixes |
-| [QRM_OFFICIAL_HPC_TROUBLESHOOTING.md](QRM_OFFICIAL_HPC_TROUBLESHOOTING.md) | **Experiment A env install** — job-by-job debug log (`qrm-official` vs `qreason`) |
-| [REPO_MAP.md](REPO_MAP.md) | Directory map and pipeline flow |
-| [PROGRESS.md](PROGRESS.md) | Live status + pre-rerun checklist |
-| [V8_2_ARCHITECTURE.md](V8_2_ARCHITECTURE.md) | V8.2 module layout (J1–J3) |
-| [plans/2026-07-01-v82-reengineering.md](plans/2026-07-01-v82-reengineering.md) | V8.2 implementation checklist |
-| [HPC_2A100_PLAN.md](HPC_2A100_PLAN.md) | Block grid b01–b09, SLURM timing |
-| [HPC_PARAM_RUDRA.md](HPC_PARAM_RUDRA.md) | Cluster cheat sheet (SSH, conda, SLURM) |
-| [RUNBOOK.md](RUNBOOK.md) | MacBook ↔ GitHub ↔ HPC sync |
-| [GPTQ4_PREP.md](GPTQ4_PREP.md) | b04 GPTQ-4 weight gate |
-| [GPQA_ACCESS.md](GPQA_ACCESS.md) | Hugging Face GPQA gate |
-| [MODEL_SCOPE_DECISION.md](MODEL_SCOPE_DECISION.md) | **Frozen** — in / out / gated model scope for J1 |
-| [MODEL_ROSTER.md](MODEL_ROSTER.md) | Canonical model paths / HF IDs |
-| [PAPER1_DESIGN.md](PAPER1_DESIGN.md) | Scope, metrics, claim |
-| [../configs/baselines/qrm_literature_targets.yaml](../configs/baselines/qrm_literature_targets.yaml) | QRM Table 1 sanity bands by task |
-| [GIT_CREDENTIALS.md](GIT_CREDENTIALS.md) | GitHub PAT / credentials |
+|---|---|
+| [ANSWER_NORMALIZATION.md](ANSWER_NORMALIZATION.md) | Answer extraction and equivalence used for scoring (LightEval 0.8.0 + math-verify) |
+| [MEASURED_SERVING_CONFIRMATION_PROTOCOL.md](MEASURED_SERVING_CONFIRMATION_PROTOCOL.md) | Controlled serving confirmation (Conditions A and B, repeats, CV rule) |
+| [MEASURED_SERVING_PROTOCOL.md](MEASURED_SERVING_PROTOCOL.md) | Earlier unconstrained serving timing (provenance only) |
+| [MODEL_ROSTER.md](MODEL_ROSTER.md), [MODEL_SCOPE_DECISION.md](MODEL_SCOPE_DECISION.md) | Which checkpoints are evaluated and why |
+| [GPQA_ACCESS.md](GPQA_ACCESS.md) | GPQA-Diamond access terms; item text is never stored in this repository |
+| [KNOWN_ISSUES.md](KNOWN_ISSUES.md) | Known limitations and pitfalls |
+| [EXPERIMENTAL_PARAMETERS_AND_OUTPUT_AUDIT.md](EXPERIMENTAL_PARAMETERS_AND_OUTPUT_AUDIT.md) | Decoding parameters and output audit |
+| [QRM_STACK_PARITY_AUDIT.md](QRM_STACK_PARITY_AUDIT.md), [QRM_OFFICIAL_HPC_TROUBLESHOOTING.md](QRM_OFFICIAL_HPC_TROUBLESHOOTING.md) | Parity with the official QRM harness and environment setup |
+| [HARDWARE_POLICY.md](HARDWARE_POLICY.md), [HPC_PARAM_RUDRA.md](HPC_PARAM_RUDRA.md), [PARAM_RUDRA_SLURM.md](PARAM_RUDRA_SLURM.md), [ENV_VARS.md](ENV_VARS.md), [GPTQ4_PREP.md](GPTQ4_PREP.md), [RUNBOOK.md](RUNBOOK.md) | Cluster and run-time details for the GPU campaign |
+| [PAPER1_DESIGN.md](PAPER1_DESIGN.md), [CODEBASE_OVERVIEW.md](CODEBASE_OVERVIEW.md), [REPO_MAP.md](REPO_MAP.md) | Design notes and the code layout (older notes; the top-level README is current) |
 
-## Reference (read when needed)
+## Archive
 
-| Doc | Purpose |
-|-----|---------|
-| [V8_2_ARCHITECTURE.md](V8_2_ARCHITECTURE.md) | **V8.2** complete codebase map (J1–J3) |
-| [plans/2026-07-01-v82-reengineering.md](plans/2026-07-01-v82-reengineering.md) | V8.2 implementation checklist (complete) |
-| [PHD_ROADMAP.md](PHD_ROADMAP.md) | Thesis spine (long; not daily ops) |
-| [literature/PAPER1_READING_MAP.md](literature/PAPER1_READING_MAP.md) | Paper reading list |
-| [reference_notes/COPY_ADAPT_CHECKLIST.md](reference_notes/COPY_ADAPT_CHECKLIST.md) | What we ported from external repos |
-| [reference_notes/LMEVAL_SANITY.md](reference_notes/LMEVAL_SANITY.md) | Optional lm-eval cross-check |
-| [EXPERIMENT_LOG.md](EXPERIMENT_LOG.md) | Per-cell run template (optional; master log is `progress.md`) |
-
-## External repos (read-only, MacBook)
-
-Not in this repo — see `../external_repos/README.md` and `../external_repos/EXTERNAL_REPOS_REFERENCE.md`.
-
-## Archived
-
-Superseded docs: [archive/README.md](archive/README.md)
+[`archive/`](archive/) holds historical material kept for provenance: project process notes and audit write-ups (`process_notes/`), planning and venue notes (`planning/`), cluster set-up guides (`hpc_misc/`), the original README, and the pre-2026-09-22 changelog. Nothing in the paper depends on it.
