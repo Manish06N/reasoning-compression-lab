@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main, paper-major-revision, paper-p0-reanalysis, paper-serving-confirmation]
+    branches: [main, paper-major-revision, paper-p0-reanalysis, paper-serving-confirmation, repo-cleanup]
   pull_request:
     branches: [main, paper-major-revision]
 
@@ -31,7 +31,7 @@ jobs:
         run: python scripts/analysis/validate_runtime_manifest.py --check
       - name: Revision sensitivities (placebo, k-curve, GPQA borderline)
         run: |
-          pip install numpy==2.5.0 scipy==1.18.0 sympy==1.14.0 math-verify==0.9.0 datasets==5.0.1
+          pip install numpy==2.2.6 scipy==1.17.1 sympy==1.13.1 math-verify==0.9.0 datasets==5.0.0
           python scripts/analysis/revision_sensitivities.py --check
       - name: Manuscript TeX tables vs frozen numbers
         run: python scripts/check_tex_tables.py --check
@@ -53,10 +53,13 @@ jobs:
               "paper/main.tex",
               "paper/references.bib",
               "REPRODUCE.md",
-              "FINAL_PUBLICATION_AUDIT.md",
-              "SUBMISSION_REVIEW.md",
+              "README.md",
+              "LICENSE",
+              "NOTICE.md",
+              "CITATION.cff",
+              "docs/PAPER_TO_CODE.md",
+              "paper/arxiv_source.zip",
               "configs/publication/INDEX.json",
-              "docs/VENUE.md",
           ]
           missing = [p for p in required if not Path(p).is_file()]
           if missing:
