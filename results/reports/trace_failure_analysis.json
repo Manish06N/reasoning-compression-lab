@@ -1,0 +1,764 @@
+{
+ "inputs": {
+  "B": 10000,
+  "rng_seed": 0,
+  "cap_tolerance_tokens": 16,
+  "classes": [
+   "correct",
+   "truncated",
+   "loop",
+   "no_box",
+   "wrong"
+  ]
+ },
+ "failure_taxonomy_pct_of_completions": {
+  "Qwen-7B|BF16": {
+   "correct": 94.0,
+   "truncated": 0.52,
+   "loop": 0.0,
+   "no_box": 0.0,
+   "wrong": 5.48
+  },
+  "Qwen-7B|FP8": {
+   "correct": 94.4,
+   "truncated": 0.6,
+   "loop": 0.0,
+   "no_box": 0.04,
+   "wrong": 4.96
+  },
+  "Qwen-7B|AWQ-4": {
+   "correct": 93.12,
+   "truncated": 1.04,
+   "loop": 0.0,
+   "no_box": 0.04,
+   "wrong": 5.8
+  },
+  "Qwen-7B|GPTQ-4": {
+   "correct": 93.48,
+   "truncated": 1.0,
+   "loop": 0.0,
+   "no_box": 0.0,
+   "wrong": 5.52
+  },
+  "Qwen-7B|FP8|minus_BF16_pp": {
+   "truncated": [
+    0.08,
+    [
+     -0.24,
+     0.4
+    ]
+   ],
+   "loop": [
+    0.0,
+    [
+     0.0,
+     0.0
+    ]
+   ],
+   "no_box": [
+    0.04,
+    [
+     0.0,
+     0.12
+    ]
+   ],
+   "wrong": [
+    -0.52,
+    [
+     -1.32,
+     0.28
+    ]
+   ],
+   "all_errors": [
+    -0.4,
+    [
+     -1.28,
+     0.48
+    ]
+   ]
+  },
+  "Qwen-7B|AWQ-4|minus_BF16_pp": {
+   "truncated": [
+    0.52,
+    [
+     0.08,
+     1.0
+    ]
+   ],
+   "loop": [
+    0.0,
+    [
+     0.0,
+     0.0
+    ]
+   ],
+   "no_box": [
+    0.04,
+    [
+     0.0,
+     0.12
+    ]
+   ],
+   "wrong": [
+    0.32,
+    [
+     -0.64,
+     1.28
+    ]
+   ],
+   "all_errors": [
+    0.88,
+    [
+     -0.04,
+     1.88
+    ]
+   ]
+  },
+  "Qwen-7B|GPTQ-4|minus_BF16_pp": {
+   "truncated": [
+    0.48,
+    [
+     0.04,
+     0.96
+    ]
+   ],
+   "loop": [
+    0.0,
+    [
+     0.0,
+     0.0
+    ]
+   ],
+   "no_box": [
+    0.0,
+    [
+     0.0,
+     0.0
+    ]
+   ],
+   "wrong": [
+    0.04,
+    [
+     -0.88,
+     0.96
+    ]
+   ],
+   "all_errors": [
+    0.52,
+    [
+     -0.36,
+     1.4
+    ]
+   ]
+  },
+  "Llama-8B|BF16": {
+   "correct": 89.24,
+   "truncated": 0.8,
+   "loop": 0.04,
+   "no_box": 0.0,
+   "wrong": 9.92
+  },
+  "Llama-8B|FP8": {
+   "correct": 89.52,
+   "truncated": 0.44,
+   "loop": 0.0,
+   "no_box": 0.0,
+   "wrong": 10.04
+  },
+  "Llama-8B|AWQ-4": {
+   "correct": 86.48,
+   "truncated": 0.56,
+   "loop": 0.0,
+   "no_box": 0.0,
+   "wrong": 12.96
+  },
+  "Llama-8B|GPTQ-4": {
+   "correct": 88.92,
+   "truncated": 0.92,
+   "loop": 0.0,
+   "no_box": 0.08,
+   "wrong": 10.08
+  },
+  "Llama-8B|FP8|minus_BF16_pp": {
+   "truncated": [
+    -0.36,
+    [
+     -0.8,
+     0.04
+    ]
+   ],
+   "loop": [
+    -0.04,
+    [
+     -0.12,
+     0.0
+    ]
+   ],
+   "no_box": [
+    0.0,
+    [
+     0.0,
+     0.0
+    ]
+   ],
+   "wrong": [
+    0.12,
+    [
+     -1.04,
+     1.28
+    ]
+   ],
+   "all_errors": [
+    -0.28,
+    [
+     -1.48,
+     0.88
+    ]
+   ]
+  },
+  "Llama-8B|AWQ-4|minus_BF16_pp": {
+   "truncated": [
+    -0.24,
+    [
+     -0.68,
+     0.16
+    ]
+   ],
+   "loop": [
+    -0.04,
+    [
+     -0.12,
+     0.0
+    ]
+   ],
+   "no_box": [
+    0.0,
+    [
+     0.0,
+     0.0
+    ]
+   ],
+   "wrong": [
+    3.04,
+    [
+     1.68,
+     4.4
+    ]
+   ],
+   "all_errors": [
+    2.76,
+    [
+     1.4,
+     4.12
+    ]
+   ]
+  },
+  "Llama-8B|GPTQ-4|minus_BF16_pp": {
+   "truncated": [
+    0.12,
+    [
+     -0.44,
+     0.64
+    ]
+   ],
+   "loop": [
+    -0.04,
+    [
+     -0.12,
+     0.0
+    ]
+   ],
+   "no_box": [
+    0.08,
+    [
+     0.0,
+     0.2
+    ]
+   ],
+   "wrong": [
+    0.16,
+    [
+     -1.08,
+     1.44
+    ]
+   ],
+   "all_errors": [
+    0.32,
+    [
+     -0.92,
+     1.56
+    ]
+   ]
+  }
+ },
+ "paired_class_transitions": {
+  "Qwen-7B|FP8": {
+   "rows": "BF16 class",
+   "cols": "quantized class",
+   "classes": [
+    "correct",
+    "truncated",
+    "loop",
+    "no_box",
+    "wrong"
+   ],
+   "counts": [
+    [
+     2297,
+     5,
+     0,
+     1,
+     47
+    ],
+    [
+     7,
+     2,
+     0,
+     0,
+     4
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     56,
+     8,
+     0,
+     0,
+     73
+    ]
+   ]
+  },
+  "Qwen-7B|AWQ-4": {
+   "rows": "BF16 class",
+   "cols": "quantized class",
+   "classes": [
+    "correct",
+    "truncated",
+    "loop",
+    "no_box",
+    "wrong"
+   ],
+   "counts": [
+    [
+     2272,
+     15,
+     0,
+     0,
+     63
+    ],
+    [
+     6,
+     2,
+     0,
+     1,
+     4
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     50,
+     9,
+     0,
+     0,
+     78
+    ]
+   ]
+  },
+  "Qwen-7B|GPTQ-4": {
+   "rows": "BF16 class",
+   "cols": "quantized class",
+   "classes": [
+    "correct",
+    "truncated",
+    "loop",
+    "no_box",
+    "wrong"
+   ],
+   "counts": [
+    [
+     2284,
+     8,
+     0,
+     0,
+     58
+    ],
+    [
+     6,
+     3,
+     0,
+     0,
+     4
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     47,
+     14,
+     0,
+     0,
+     76
+    ]
+   ]
+  },
+  "Llama-8B|FP8": {
+   "rows": "BF16 class",
+   "cols": "quantized class",
+   "classes": [
+    "correct",
+    "truncated",
+    "loop",
+    "no_box",
+    "wrong"
+   ],
+   "counts": [
+    [
+     2121,
+     4,
+     0,
+     0,
+     106
+    ],
+    [
+     8,
+     2,
+     0,
+     0,
+     10
+    ],
+    [
+     1,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     108,
+     5,
+     0,
+     0,
+     135
+    ]
+   ]
+  },
+  "Llama-8B|AWQ-4": {
+   "rows": "BF16 class",
+   "cols": "quantized class",
+   "classes": [
+    "correct",
+    "truncated",
+    "loop",
+    "no_box",
+    "wrong"
+   ],
+   "counts": [
+    [
+     2052,
+     5,
+     0,
+     0,
+     174
+    ],
+    [
+     9,
+     2,
+     0,
+     0,
+     9
+    ],
+    [
+     1,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     100,
+     7,
+     0,
+     0,
+     141
+    ]
+   ]
+  },
+  "Llama-8B|GPTQ-4": {
+   "rows": "BF16 class",
+   "cols": "quantized class",
+   "classes": [
+    "correct",
+    "truncated",
+    "loop",
+    "no_box",
+    "wrong"
+   ],
+   "counts": [
+    [
+     2097,
+     16,
+     0,
+     1,
+     117
+    ],
+    [
+     10,
+     1,
+     0,
+     0,
+     9
+    ],
+    [
+     1,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     115,
+     6,
+     0,
+     1,
+     126
+    ]
+   ]
+  }
+ },
+ "length_as_failure_predictor": {
+  "Qwen-7B|BF16": {
+   "pooled_auroc": [
+    0.936,
+    [
+     0.91,
+     0.96
+    ]
+   ],
+   "items_with_both_outcomes": 48,
+   "item_stratified_auroc": [
+    0.737,
+    [
+     0.63,
+     0.84
+    ]
+   ]
+  },
+  "Qwen-7B|FP8": {
+   "pooled_auroc": [
+    0.927,
+    [
+     0.89,
+     0.96
+    ]
+   ],
+   "items_with_both_outcomes": 48,
+   "item_stratified_auroc": [
+    0.714,
+    [
+     0.62,
+     0.81
+    ]
+   ],
+   "item_stratified_auroc_minus_BF16": [
+    -0.023,
+    [
+     -0.14,
+     0.09
+    ]
+   ]
+  },
+  "Qwen-7B|AWQ-4": {
+   "pooled_auroc": [
+    0.925,
+    [
+     0.9,
+     0.95
+    ]
+   ],
+   "items_with_both_outcomes": 59,
+   "item_stratified_auroc": [
+    0.697,
+    [
+     0.6,
+     0.78
+    ]
+   ],
+   "item_stratified_auroc_minus_BF16": [
+    -0.04,
+    [
+     -0.17,
+     0.08
+    ]
+   ]
+  },
+  "Qwen-7B|GPTQ-4": {
+   "pooled_auroc": [
+    0.93,
+    [
+     0.9,
+     0.96
+    ]
+   ],
+   "items_with_both_outcomes": 56,
+   "item_stratified_auroc": [
+    0.763,
+    [
+     0.68,
+     0.84
+    ]
+   ],
+   "item_stratified_auroc_minus_BF16": [
+    0.027,
+    [
+     -0.1,
+     0.16
+    ]
+   ]
+  },
+  "Llama-8B|BF16": {
+   "pooled_auroc": [
+    0.875,
+    [
+     0.84,
+     0.91
+    ]
+   ],
+   "items_with_both_outcomes": 107,
+   "item_stratified_auroc": [
+    0.675,
+    [
+     0.61,
+     0.74
+    ]
+   ]
+  },
+  "Llama-8B|FP8": {
+   "pooled_auroc": [
+    0.871,
+    [
+     0.82,
+     0.91
+    ]
+   ],
+   "items_with_both_outcomes": 91,
+   "item_stratified_auroc": [
+    0.664,
+    [
+     0.59,
+     0.73
+    ]
+   ],
+   "item_stratified_auroc_minus_BF16": [
+    -0.011,
+    [
+     -0.1,
+     0.07
+    ]
+   ]
+  },
+  "Llama-8B|AWQ-4": {
+   "pooled_auroc": [
+    0.83,
+    [
+     0.79,
+     0.87
+    ]
+   ],
+   "items_with_both_outcomes": 134,
+   "item_stratified_auroc": [
+    0.624,
+    [
+     0.56,
+     0.68
+    ]
+   ],
+   "item_stratified_auroc_minus_BF16": [
+    -0.051,
+    [
+     -0.13,
+     0.03
+    ]
+   ]
+  },
+  "Llama-8B|GPTQ-4": {
+   "pooled_auroc": [
+    0.901,
+    [
+     0.87,
+     0.93
+    ]
+   ],
+   "items_with_both_outcomes": 110,
+   "item_stratified_auroc": [
+    0.717,
+    [
+     0.65,
+     0.78
+    ]
+   ],
+   "item_stratified_auroc_minus_BF16": [
+    0.042,
+    [
+     -0.04,
+     0.12
+    ]
+   ]
+  }
+ }
+}

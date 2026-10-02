@@ -67,7 +67,7 @@ We ask four questions under that pin:
 \end{itemize}
 
 \noindent\textbf{Contributions.} Each contribution answers the research question with the same number.
-(C1)~\textbf{One robust accuracy drop.} Llama AWQ-4 is the only contrast that is Holm-significant on both MATH-500 and GSM8K; maj@5 lowers its point estimate by about half, a reduction that is not itself statistically established. AWQ results describe the tested \texttt{jakiAJK} artifacts, whose chat template, \texttt{float16} activations, and AWQ backend (resolved \texttt{quantization=awq}) are confounded with the format; none of these was isolated, so the results are not a statement about the AWQ method. The Llama AWQ-4 drop is not detectable at difficulty levels 1--2 and grows at levels 3--5.
+(C1)~\textbf{One robust accuracy drop.} Llama AWQ-4 is the only contrast that is Holm-significant on both MATH-500 and GSM8K; maj@5 lowers its point estimate by about half, a reduction that is not itself statistically established. AWQ results describe the tested \texttt{jakiAJK} artifacts, whose chat template, \texttt{float16} activations, and AWQ backend (resolved \texttt{quantization=awq}) are confounded with the format; none of these was isolated, so the results are not a statement about the AWQ method. The extra Llama AWQ-4 errors are finished wrong answers, not truncations or loops, whereas the Qwen 4-bit pass@1 gaps are driven by truncations (Section~\ref{sec:failure}). The Llama AWQ-4 drop is not detectable at difficulty levels 1--2 and grows at levels 3--5.
 (C2)~\textbf{A placebo-calibrated selection effect in the BF16-correct length estimator.} A BF16-versus-BF16 seed placebo reproduces a large part of the BF16-correct token increase without any quantization, and the mirrored quant-correct conditional flips sign in four of six contrasts.
 (C3)~\textbf{A cost curve for gold-free agreement.} Unanimity of $k=2$--$5$ samples has lower selective risk than a one-sample length rule at matched coverage at every $k$; two samples already capture most of the reduction at twice the token cost.
 (C4)~\textbf{Subset serving cost is a length draw.} Timing repeats share one sampling seed. Campaign-length seconds, using the same measured tok/s, put Llama FP8 first on both conditions in all $10{,}000$ item resamples; the 20-prompt Condition~A order does not.
@@ -388,6 +388,12 @@ Llama AWQ-4 $-$ BF16 & $-1.40$ & $+0.44$ & $-2.48$ & $-3.75$ & $-4.63$ \\
 
 \subsection{Item-level descriptive checks}
 CPU-only reanalysis of the released compact JSON (\path{results/reports/item_level_descriptive_report.md}) is descriptive, not causal. MATH-500 has no item that is BF16-correct and quantized-wrong on all five seeds for any tested format. Incorrect MATH traces are longer than correct traces in every cell (for example, Qwen BF16 mean tokens $3{,}256$ when correct vs.\ $15{,}843$ when incorrect). GPQA-Diamond Qwen AWQ flips remain distributed (75 of 198 items flip on at least one seed; 0 items flip on all three seeds). These counts do not identify a small set of items that would explain the GPQA contrast.
+
+\subsection{Failure modes and the length signal}
+\label{sec:failure}
+The compact JSON and the stored completions let us classify every incorrect MATH-500 completion as truncated, looping, unboxed, or a finished wrong answer (Appendix Table~\ref{tab:failure}). The Llama AWQ-4 increase in errors is entirely finished wrong answers: $+3.04$ $[+1.68,+4.40]$\,pp, against $-0.24$ $[-0.68,+0.16]$\,pp for truncations. The Qwen 4-bit pass@1 gaps have the opposite composition. Truncations rise by $+0.52$ $[+0.08,+1.00]$\,pp (AWQ-4) and $+0.48$ $[+0.04,+0.96]$\,pp (GPTQ-4), while the wrong-answer differences are $+0.32$ $[-0.64,+1.28]$ and $+0.04$ $[-0.88,+0.96]$\,pp. Apart from these, every class difference has an interval that includes zero or touches it at two decimals. In same-seed pairs, $179$ BF16-correct completions are AWQ-4-incorrect for Llama against $110$ in the other direction (net $69$, the $2.76$\,pp drop), and $174$ of those $179$ are finished wrong answers; because same-seed pairing is an arbitrary coupling (Section~\ref{sec:economics}), the marginal differences are the inferential quantity. The two 4-bit patterns therefore differ in kind: Llama AWQ-4 loses accuracy through reasoning errors in traces that finish, whereas the Qwen 4-bit losses come from a few more traces that run into the output cap, which is also why their mean token difference is much larger than their median.
+
+Shorter completions are more often correct (Appendix Table~\ref{tab:auroc}): the pooled AUROC is $0.83$--$0.94$ across the eight cells. Most of that is item difficulty. Restricted to correct-versus-incorrect pairs within the same item, the AUROC is $0.62$--$0.76$. No quantized checkpoint differs detectably from its BF16 baseline on the stratified AUROC (differences $-0.05$ to $+0.04$, every interval includes zero; Llama AWQ-4 $-0.05$ $[-0.13,+0.03]$), so these data show no detectable loss of the length signal under quantization, but only $48$--$134$ items per cell have both outcomes and the intervals are wide. The one-sample length rule of Section~\ref{sec:modal} therefore works largely by separating easy items from hard ones.
 
 \subsection{Observable modal agreement on MATH-500}
 \label{sec:modal}
@@ -714,7 +720,7 @@ Llama-8B & GPTQ-4 & 88.92 & 91.2 & 4{,}841 & 0.0407 & 0.0059 & 85.7 / 14.9 \\
     \item \textbf{Checkpoint provenance.} Both AWQ-4 checkpoints are \texttt{jakiAJK} uploads with unknown calibration. FP8 and GPTQ-4 are RedHatAI artifacts. Format, publisher, toolchain, activation dtype, AWQ kernel path, and chat template are collinear. No second AWQ artifact was quantized in this study.
     \item \textbf{Scope.} Two 7--8B DeepSeek-R1 distillations, English math/science, one pinned serving stack, one prompt. GSM8K/GPQA use three seeds.
     \item \textbf{Not evaluated.} This study does not evaluate AIME, LiveCodeBench, 32B models, Hopper native W8A8 FP8, energy measurements, production continuous batching, or probability calibration.
-    \item \textbf{Reproducibility surface.} Compact JSON, recovered MATH-500 answer strings, confirmation timing, and analysis reports are released. Full chain-of-thought traces are not. Compact JSON omits \texttt{finish\_reason} and output token IDs. Replay needs an A100-80GB, the listed weights, and \path{runtime_manifest.json}. The serving records log driver 550.54.14; the accuracy-campaign job logs did not archive the driver. New sensitivities are recomputed by \path{scripts/analysis/manuscript_sensitivities.py}; difficulty levels, the cap band, the chat-template audit, and GPQA prompt identity by \path{scripts/analysis/q1_revision_analyses.py}; the two-way bootstrap, minimum detectable effects, token-delta location estimators, and subset-draw simulation by \path{scripts/analysis/review_additions.py}.
+    \item \textbf{Reproducibility surface.} Compact JSON, recovered MATH-500 answer strings, confirmation timing, and analysis reports are released. Full chain-of-thought traces are not. Compact JSON omits \texttt{finish\_reason} and output token IDs. Replay needs an A100-80GB, the listed weights, and \path{runtime_manifest.json}. The serving records log driver 550.54.14; the accuracy-campaign job logs did not archive the driver. New sensitivities are recomputed by \path{scripts/analysis/manuscript_sensitivities.py}; difficulty levels, the cap band, the chat-template audit, and GPQA prompt identity by \path{scripts/analysis/q1_revision_analyses.py}; the two-way bootstrap, minimum detectable effects, token-delta location estimators, and subset-draw simulation by \path{scripts/analysis/review_additions.py}; the failure-class taxonomy and length-AUROC analysis by \path{scripts/analysis/trace_failure_analysis.py}.
     \item \textbf{Contamination.} MATH and GSM8K overlap public pretraining corpora. A paired within-item design reduces but does not eliminate contamination interaction with checkpoint.
     \item \textbf{Launcher record.} Effective flags, including \texttt{max\_model\_len=32768}, are reconstructed in \path{runtime_manifest.json} from the launcher. They are not per-job telemetry. The accuracy-campaign NVIDIA driver was not archived; the serving confirmation logs 550.54.14. Historical harness configs are not the campaign stack.
 \end{enumerate}
@@ -723,7 +729,7 @@ Llama-8B & GPTQ-4 & 88.92 & 91.2 & 4{,}841 & 0.0407 & 0.0059 & 85.7 / 14.9 \\
 Construct: pass@1, maj@5, token length, subset GPU-seconds, and campaign-length seconds are distinct estimands. The hybrid proxy is not Erol et al.'s per-problem Cost-of-Pass. Internal: Conditions~A and~B differ in subset and regime together; timing repeats do not resample length; Qwen and Llama used different hosts. External: two 7--8B families, one eager A100 stack, and three English benchmarks. Results do not transfer to CUDA-graph serving, Hopper W8A8, or a different publisher's AWQ artifact.
 
 \section{Conclusion}
-Under this pinned A100 / vLLM~0.7.0 eager stack, the defensible results are one robust accuracy drop, a placebo-sized selection effect in the BF16-correct length estimator, a gold-free agreement signal whose benefit arrives mostly with the second sample, and a subset serving cost that one length draw can reorder. Llama AWQ-4 falls $-2.76$\,pp on MATH-500; maj@5 lowers the point estimate to about $-1.4$\,pp (not a statistically established reduction), and the drop is concentrated at difficulty levels 3--5. A BF16-versus-BF16 placebo reproduces $+138$ to $+235$ tokens of the BF16-correct length increase, and the quant-correct mirror does not keep its sign. Two-sample unanimity has $0.7$--$2.4\%$ selective risk against $2.2$--$5.8\%$ for a matched one-sample length rule; 5/5 agreement reaches at most $0.27\%$. Llama FP8 is cheapest once campaign length replaces the 20-prompt draw. AWQ-4 results describe the tested \texttt{jakiAJK} artifacts, whose chat template, \texttt{float16} activations, and AWQ backend are confounded with the format. The GPQA AWQ-4 contrast is paired but remains borderline.
+Under this pinned A100 / vLLM~0.7.0 eager stack, the defensible results are one robust accuracy drop, a placebo-sized selection effect in the BF16-correct length estimator, a gold-free agreement signal whose benefit arrives mostly with the second sample, and a subset serving cost that one length draw can reorder. Llama AWQ-4 falls $-2.76$\,pp on MATH-500; maj@5 lowers the point estimate to about $-1.4$\,pp (not a statistically established reduction), and the drop is concentrated at difficulty levels 3--5 and consists of finished wrong answers rather than truncations, whereas the Qwen 4-bit gaps are truncation-driven. A BF16-versus-BF16 placebo reproduces $+138$ to $+235$ tokens of the BF16-correct length increase, and the quant-correct mirror does not keep its sign. Two-sample unanimity has $0.7$--$2.4\%$ selective risk against $2.2$--$5.8\%$ for a matched one-sample length rule; 5/5 agreement reaches at most $0.27\%$. Llama FP8 is cheapest once campaign length replaces the 20-prompt draw. AWQ-4 results describe the tested \texttt{jakiAJK} artifacts, whose chat template, \texttt{float16} activations, and AWQ backend are confounded with the format. The GPQA AWQ-4 contrast is paired but remains borderline.
 
 \section*{Reproducibility and Artifact Availability}
 The released artifact enables verification of reported analyses; reproducing the complete GPU campaign requires equivalent hardware and checkpoint availability.
@@ -1017,11 +1023,55 @@ Llama-8B & 0.243 & \textbf{0.616} & 0.104 & 0.037 & 0.206 \\
 \end{tabular}
 \end{table}
 
+\begin{table}[t]
+\centering
+\caption{Change in the incorrect-completion classes relative to BF16 on MATH-500 (percentage points of all completions, seed-averaged per item, item-level 95\% CI, $B=10{,}000$). Every incorrect completion has exactly one class, in priority order: \emph{truncated} (within 16 tokens of its per-item output cap), \emph{loop} (identical-word run $\ge 20$), \emph{no box} (finished, no \texttt{\textbackslash boxed}), \emph{wrong} (finished, boxed, wrong answer). The four classes sum to the all-errors column, which equals minus the pass@1 difference. The loop and no-box differences are omitted because they are near zero: at most 0.08\,pp in magnitude, with all intervals inside $[-0.12,+0.20]$ (full values in \texttt{results/reports/trace\_failure\_analysis.json}). Truncation is the cap-band heuristic of Section~\ref{sec:pathology}, not a native stop reason. Exploratory; from \texttt{scripts/analysis/trace\_failure\_analysis.py}.}
+\label{tab:failure}
+\small
+\begin{tabular}{lccc}
+\toprule
+\textbf{Contrast} & \textbf{Truncated} & \textbf{Wrong answer} & \textbf{All errors} \\
+\midrule
+Qwen FP8 & $+0.08$ $[-0.24,+0.40]$ & $-0.52$ $[-1.32,+0.28]$ & $-0.40$ $[-1.28,+0.48]$ \\
+Qwen AWQ-4 & $+0.52$ $[+0.08,+1.00]$ & $+0.32$ $[-0.64,+1.28]$ & $+0.88$ $[-0.04,+1.88]$ \\
+Qwen GPTQ-4 & $+0.48$ $[+0.04,+0.96]$ & $+0.04$ $[-0.88,+0.96]$ & $+0.52$ $[-0.36,+1.40]$ \\
+\midrule
+Llama FP8 & $-0.36$ $[-0.80,+0.04]$ & $+0.12$ $[-1.04,+1.28]$ & $-0.28$ $[-1.48,+0.88]$ \\
+Llama AWQ-4 & $-0.24$ $[-0.68,+0.16]$ & $+3.04$ $[+1.68,+4.40]$ & $+2.76$ $[+1.40,+4.12]$ \\
+Llama GPTQ-4 & $+0.12$ $[-0.44,+0.64]$ & $+0.16$ $[-1.08,+1.44]$ & $+0.32$ $[-0.92,+1.56]$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\centering
+\caption{Does a shorter completion predict a correct one (MATH-500, 5 seeds)? Pooled AUROC uses all 2{,}500 completions of a cell. Item-stratified AUROC uses only correct-versus-incorrect pairs within the same item, which removes item difficulty; its quantized-minus-BF16 difference uses shared item resamples. Item-level 95\% CIs. The last column counts items with at least one correct and one incorrect completion. Exploratory; from \texttt{scripts/analysis/trace\_failure\_analysis.py}.}
+\label{tab:auroc}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Cell} & \textbf{Pooled AUROC} & \textbf{Stratified AUROC} & \textbf{Stratified $-$ BF16} & \textbf{Items} \\
+\midrule
+Qwen BF16 & $0.936$ $[0.91,0.96]$ & $0.737$ $[0.63,0.84]$ & --- & 48 \\
+Qwen FP8 & $0.927$ $[0.89,0.96]$ & $0.714$ $[0.62,0.81]$ & $-0.023$ $[-0.14,+0.09]$ & 48 \\
+Qwen AWQ-4 & $0.925$ $[0.90,0.95]$ & $0.697$ $[0.60,0.78]$ & $-0.040$ $[-0.17,+0.08]$ & 59 \\
+Qwen GPTQ-4 & $0.930$ $[0.90,0.96]$ & $0.763$ $[0.68,0.84]$ & $+0.027$ $[-0.10,+0.16]$ & 56 \\
+\midrule
+Llama BF16 & $0.875$ $[0.84,0.91]$ & $0.675$ $[0.61,0.74]$ & --- & 107 \\
+Llama FP8 & $0.871$ $[0.82,0.91]$ & $0.664$ $[0.59,0.73]$ & $-0.011$ $[-0.10,+0.07]$ & 91 \\
+Llama AWQ-4 & $0.830$ $[0.79,0.87]$ & $0.624$ $[0.56,0.68]$ & $-0.051$ $[-0.13,+0.03]$ & 134 \\
+Llama GPTQ-4 & $0.901$ $[0.87,0.93]$ & $0.717$ $[0.65,0.78]$ & $+0.042$ $[-0.04,+0.12]$ & 110 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\FloatBarrier
 \section{Holm-18 sensitivity}
 \label{app:holm18}
 Primary multiplicity control is Holm--Bonferroni within each benchmark's six format contrasts. Table~\ref{tab:holm18} applies Holm jointly to all 18 contrasts as a stricter sensitivity. Llama MATH AWQ-4 and Llama GSM8K AWQ-4 remain significant. Qwen GPQA AWQ-4 does not (Holm-18 $p=0.130$, from the $B=10^6$ bootstrap $p=0.0081$); it is already borderline under Holm-6.
 
-\begin{table}[t]
+\begin{table}[!htbp]
 \centering
 \caption{Secondary Holm correction over all 18 pass@1 contrasts. Primary inference remains Holm-6 within each benchmark. sig.: Holm-significant at $\alpha=0.05$; border.: borderline (see Section~\ref{sec:metrics}); n.s.: not significant.}
 \label{tab:holm18}
