@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main, paper-major-revision, paper-p0-reanalysis, paper-serving-confirmation, repo-cleanup]
+    branches: [main, paper-major-revision, paper-p0-reanalysis, paper-serving-confirmation]
   pull_request:
     branches: [main, paper-major-revision]
 
