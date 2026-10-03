@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-03 — Revision after a fourth referee report (no GPU, no frozen result changed)
+
+- **FP8 serving discrepancy.** FP8 has the highest measured-to-campaign length ratio in all four family-by-condition groups (Qwen 1.35/1.07, Llama 1.49/1.09). The Llama FP8 example is removed from the abstract and "tail draw is the likeliest reason" is withdrawn: model files, backend, prefix caching, chunked prefill and KV dtype match; scheduling (single-stream vs batched), seed and the extra BOS token remain untested. A single-BOS multi-seed GPU rerun was not run.
+- **Accuracy-weighted change.** The plug-in estimate (biased upward) is replaced by a cross-fitted one (`followup_checks.py`, `estimand_check`); every estimate shrinks and Llama AWQ-4's interval now includes zero.
+- **Abstract.** "Finished wrong answers, not truncations" is scoped to MATH-500 (no GSM8K decomposition was run).
+- **Smaller fixes.** Agreement symbol renamed `g_i` (was `a_i`, which collided with BF16 accuracy); aggregate tok/s columns added to the campaign-length cost table; Condition B rank-1 shares given as 97.55%/2.45%; reproducibility pointer, engine-log and BOS wording, finished-only reflection caveat.
+- Not done: GPQA letter-position analysis, winsorized subset simulation, AI-assistance disclosure (venue decision).
+
 ## 2026-10-03 — Revision after a third referee report (no GPU, no frozen result changed)
 
 Every point of the report was checked against the data before editing (see `results/reports/followup_checks.json`, `audit_checks.json`).
