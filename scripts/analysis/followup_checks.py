@@ -239,6 +239,23 @@ def main() -> int:
                 "accuracy_weighted_delta": float((a * dI).sum() / a.sum()),
                 "accuracy_weighted_ci95": ci95(w),
             }
+            # cross-fit: weights from the other four BF16 seeds, delta from the held-out seed
+            k = Cb.shape[0]
+            cf = np.zeros((B, k))
+            pt = []
+            for j in range(k):
+                keep = [i for i in range(k) if i != j]
+                a_j = Cb[keep].mean(0)
+                d_j = T[(f, m)][j] - Tb[j]
+                cf[:, j] = (W @ (a_j * d_j)) / (W @ a_j)
+                pt.append(float((a_j * d_j).sum() / a_j.sum()))
+            cfw = cf.mean(1)
+            out["estimand_check"][f"{f}|{m}"].update(
+                {
+                    "crossfit_accuracy_weighted_delta": float(np.mean(pt)),
+                    "crossfit_accuracy_weighted_ci95": ci95(cfw),
+                }
+            )
 
     # ---- E. minimum detectable effects --------------------------------------------------------------------------------------
     z_unadj = 1.959964 + 0.841621

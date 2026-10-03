@@ -412,6 +412,11 @@
    "accuracy_weighted_ci95": [
     -28.52713020870653,
     190.922658185389
+   ],
+   "crossfit_accuracy_weighted_delta": 54.880304305369634,
+   "crossfit_accuracy_weighted_ci95": [
+    -57.493978894100444,
+    171.28054560701545
    ]
   },
   "Qwen|AWQ-4": {
@@ -420,6 +425,11 @@
    "accuracy_weighted_ci95": [
     151.8992251454403,
     390.2666292403701
+   ],
+   "crossfit_accuracy_weighted_delta": 235.6692150503399,
+   "crossfit_accuracy_weighted_ci95": [
+    118.40556063046617,
+    361.41707727539045
    ]
   },
   "Qwen|GPTQ-4": {
@@ -428,6 +438,11 @@
    "accuracy_weighted_ci95": [
     100.51036883267163,
     358.71438056363326
+   ],
+   "crossfit_accuracy_weighted_delta": 196.86133334026584,
+   "crossfit_accuracy_weighted_ci95": [
+    72.08560302603226,
+    332.3193182600455
    ]
   },
   "Llama|FP8": {
@@ -436,6 +451,11 @@
    "accuracy_weighted_ci95": [
     -138.73555380624265,
     135.54860101252433
+   ],
+   "crossfit_accuracy_weighted_delta": -40.93545975368984,
+   "crossfit_accuracy_weighted_ci95": [
+    -186.19502182931225,
+    100.28850776102162
    ]
   },
   "Llama|AWQ-4": {
@@ -444,6 +464,11 @@
    "accuracy_weighted_ci95": [
     6.4311146528896685,
     317.94726592450513
+   ],
+   "crossfit_accuracy_weighted_delta": 115.21705050814467,
+   "crossfit_accuracy_weighted_ci95": [
+    -44.44806227638555,
+    280.5979147928425
    ]
   },
   "Llama|GPTQ-4": {
@@ -452,6 +477,11 @@
    "accuracy_weighted_ci95": [
     67.67119880842394,
     358.2393612998812
+   ],
+   "crossfit_accuracy_weighted_delta": 159.63430137382653,
+   "crossfit_accuracy_weighted_ci95": [
+    9.811178598757424,
+    311.4540797240207
    ]
   }
  },

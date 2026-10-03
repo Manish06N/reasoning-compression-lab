@@ -2,7 +2,7 @@
 
 **Preprint source:** `paper/main.tex` + `paper/references.bib` (figures are TikZ/pgfplots in the tex)  
 **Compiled PDF:** `paper/main.pdf` (37 pages, pdflatex + bibtex)
-**ArXiv upload zip:** `paper/arxiv_source.zip` — rebuilt 2026-10-03 from current `main.tex` (129,738 B) + `references.bib` (7,894 B) + `main.bbl` (6,967 B). SHA256 `3a493859ec532b860d9d3044b0245f83ad073674512871634f8504742923ddd8`. Do not upload a zip from before this rebuild.
+**ArXiv upload zip:** `paper/arxiv_source.zip` — rebuilt 2026-10-03 (revision 4) from current `main.tex` (130521 B) + `references.bib` + `main.bbl`. SHA256 `b3be9c74d862edd4f338907bf6be4e6d63ec6067d58533c431f213c9431fdf88`. Do not upload a zip from before this rebuild.
 **Submission tag:** `paper-v1.0-submission` (immutable snapshot of the canonical manuscript and analysis artifacts).
 
 ## What to upload to arXiv
