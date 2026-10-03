@@ -24,7 +24,7 @@ Operational issues that can break paper results if ignored, plus known software 
 | **b01 July archive** | Gate failed on `qreason`; useful as BF16 deployment-stack evidence, not as QRM reproduction |
 | **Calibration/systems** | `--skip-calibration` supports diagnostic correctness/trace scoring only; no valid calibration or controlled cost/performance claim |
 
-See [PUBLICATION_READINESS.md](PUBLICATION_READINESS.md) · [recovery plan](plans/2026-08-14-publication-recovery.md) · [notes.md sections 31-37](../notes.md) · [QRM_STACK_PARITY_AUDIT.md](QRM_STACK_PARITY_AUDIT.md) · **[QRM_OFFICIAL_HPC_TROUBLESHOOTING.md](QRM_OFFICIAL_HPC_TROUBLESHOOTING.md)**.
+See [PUBLICATION_READINESS.md](archive/planning/PUBLICATION_READINESS.md) · [recovery plan](archive/planning/plans/2026-08-14-publication-recovery.md) · notes.md sections 31-37 (private working notes, not included in this repository) · [QRM_STACK_PARITY_AUDIT.md](QRM_STACK_PARITY_AUDIT.md) · **[QRM_OFFICIAL_HPC_TROUBLESHOOTING.md](QRM_OFFICIAL_HPC_TROUBLESHOOTING.md)**.
 
 ---
 
@@ -242,5 +242,5 @@ python scripts/hpc/07_preflight_publication.py   # HPC CPU gate
 | Log | Purpose |
 |-----|---------|
 | [CHANGELOG.md](../CHANGELOG.md) | Dated fixes and HPC ops |
-| [progress.md](../progress.md) | Full execution timeline |
-| [docs/PROGRESS.md](PROGRESS.md) | Short live status |
+| [docs/archive/process_notes/progress.md](archive/process_notes/progress.md) | Full execution timeline |
+| [docs/archive/planning/PROGRESS.md](archive/planning/PROGRESS.md) | Short live status |

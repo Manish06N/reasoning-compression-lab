@@ -4,11 +4,11 @@
 **Roadmap alignment:** PhD Roadmap V8.2 (Evidence-Based Execution Plan)  
 **Repository:** https://github.com/Manish06N/reasoning-compression-lab
 
-This document is the canonical high-level map of the entire codebase: what it does, how pieces connect, what is implemented today, and how the three-paper thesis plan maps onto directories and scripts. For day-to-day HPC operations, start with [BEGINNER_HPC_GUIDE.md](BEGINNER_HPC_GUIDE.md). For live execution status, see [PROGRESS.md](PROGRESS.md).
+This document is the canonical high-level map of the entire codebase: what it does, how pieces connect, what is implemented today, and how the three-paper thesis plan maps onto directories and scripts. For day-to-day HPC operations, start with [BEGINNER_HPC_GUIDE.md](archive/hpc_misc/BEGINNER_HPC_GUIDE.md). For live execution status, see [PROGRESS.md](archive/planning/PROGRESS.md).
 
 > **Freeze (2026-08-17):** J1 science is frozen on `paper-major-revision` (`d707e44`). Canonical paper: [`../paper/main.tex`](../paper/main.tex) / 21-page PDF. GPU work is closed. Do not merge to `main`. The 2026-08-14 “Needs revision” paragraph below is historical (FP8-only package before the matched 88-cell grid).
 
-**J1 status (2026-08-14 — historical):** exact-stack FP8 jobs 96100/96101 completed at 94.4% Qwen and 89.0% Llama. That [publication audit](PUBLICATION_READINESS.md) rated the then-current two-job package **Needs revision**. The recovery plan later completed; do not re-open it.
+**J1 status (2026-08-14 — historical):** exact-stack FP8 jobs 96100/96101 completed at 94.4% Qwen and 89.0% Llama. That [publication audit](archive/planning/PUBLICATION_READINESS.md) rated the then-current two-job package **Needs revision**. The recovery plan later completed; do not re-open it.
 
 ---
 
@@ -581,13 +581,13 @@ Every raw row should carry (V8.2 §11.1):
 
 | Audience | Start here |
 |----------|------------|
-| **New contributor — understand the system** | **This file** → [REPO_MAP.md](REPO_MAP.md) → [V8_2_ARCHITECTURE.md](V8_2_ARCHITECTURE.md) |
-| **Operator — run experiments on HPC** | [BEGINNER_HPC_GUIDE.md](BEGINNER_HPC_GUIDE.md) → [HPC_2A100_PLAN.md](HPC_2A100_PLAN.md) |
+| **New contributor — understand the system** | **This file** → [REPO_MAP.md](REPO_MAP.md) → [V8_2_ARCHITECTURE.md](archive/planning/V8_2_ARCHITECTURE.md) |
+| **Operator — run experiments on HPC** | [BEGINNER_HPC_GUIDE.md](archive/hpc_misc/BEGINNER_HPC_GUIDE.md) → [HPC_2A100_PLAN.md](archive/planning/HPC_2A100_PLAN.md) |
 | **Research — paper scope and claims** | [PAPER1_DESIGN.md](PAPER1_DESIGN.md) → [MODEL_SCOPE_DECISION.md](MODEL_SCOPE_DECISION.md) → `papers/j1/protocol.yaml` |
-| **Thesis — full 24-month plan** | PhD Roadmap V8.2 (external) + [PHD_ROADMAP.md](PHD_ROADMAP.md) (V5–V7, historical) |
-| **Live status** | [PROGRESS.md](PROGRESS.md) → [progress.md](../progress.md) → [CHANGELOG.md](../CHANGELOG.md) |
+| **Thesis — full 24-month plan** | PhD Roadmap V8.2 (external) + [PHD_ROADMAP.md](archive/planning/PHD_ROADMAP.md) (V5–V7, historical) |
+| **Live status** | [PROGRESS.md](archive/planning/PROGRESS.md) → [docs/archive/process_notes/progress.md](archive/process_notes/progress.md) → [CHANGELOG.md](../CHANGELOG.md) |
 | **Traps and bugs** | [KNOWN_ISSUES.md](KNOWN_ISSUES.md) |
-| **V8.2 implementation checklist** | [plans/2026-07-01-v82-reengineering.md](plans/2026-07-01-v82-reengineering.md) |
+| **V8.2 implementation checklist** | [plans/2026-07-01-v82-reengineering.md](archive/planning/plans/2026-07-01-v82-reengineering.md) |
 
 ---
 

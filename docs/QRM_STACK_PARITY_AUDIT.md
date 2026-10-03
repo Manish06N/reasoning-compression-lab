@@ -4,7 +4,7 @@
 
 **Paper 1 is not a QRM reproduction paper.** QRM (Liu et al., COLM 2025) is a **sanity baseline**. This audit documents an honest reproduction attempt and isolates the stack gap.
 
-**Final full-run decision:** jobs 96100/96101 completed at 94.4% Qwen and 89.0% Llama. These values validate the checkpoints/official path and reproduce existing FP8 references. They do not by themselves establish a quantization effect. The matched 88-cell grid later completed; see [PUBLICATION_READINESS.md](PUBLICATION_READINESS.md) (2026-08-17 freeze).
+**Final full-run decision:** jobs 96100/96101 completed at 94.4% Qwen and 89.0% Llama. These values validate the checkpoints/official path and reproduce existing FP8 references. They do not by themselves establish a quantization effect. The matched 88-cell grid later completed; see [PUBLICATION_READINESS.md](archive/planning/PUBLICATION_READINESS.md) (2026-08-17 freeze).
 
 ---
 
@@ -16,7 +16,7 @@ We launched Path C because July b01 failed the QRM hard gate (Llama 19.6% pass@1
 
 ## 2. What QRM paper §3.1 says
 
-From COLM 2025 (extract in `docs/literature/paper1/ALL_PAPERS_MERGED.md`):
+From COLM 2025 (extracted from the QRM paper; the merged-paper file is not distributed):
 
 - Harness: **Lighteval** with **vLLM** backend
 - Sampling: temperature **0.6**, top-p **0.95**
@@ -185,7 +185,7 @@ Output: `outputs-hpc-qrm-official-2026-07-06/`
 
 Path C (our strict QRM protocol, n=50) was **canceled** at n=20 — sufficient to justify A.
 
-Plain English: [notes.md sections 31-35](../notes.md)
+Plain English: notes.md sections 31-35 (private working notes, not included in this repository)
 
 ---
 
@@ -220,5 +220,5 @@ The old broad “beyond accuracy” statement is a motivation, not a completed c
 - `configs/baselines/qrm_literature_targets.yaml`
 - `notes.md` §18–19, §29–31
 - `CHANGELOG.md` 2026-07-05 parity entry
-- `progress.md` current snapshot
+- `docs/archive/process_notes/progress.md` current snapshot
 - External: `external/Quantized-Reasoning-Models/` (cloned via setup script)

@@ -1,0 +1,4 @@
+# Copy to .github-token (one line, no quotes). File is gitignored — never commit.
+# GitHub → Settings → Developer settings → Personal access tokens (classic or fine-grained)
+# Required scopes for this repo: repo, workflow (needed for .github/workflows/ci.yml)
+ghp_REPLACE_ME

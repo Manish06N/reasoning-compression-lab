@@ -8,7 +8,7 @@ Chronological record of every failed attempt, diagnosis, and fix while bringing 
 
 **Related docs:** [QRM_STACK_PARITY_AUDIT.md](QRM_STACK_PARITY_AUDIT.md) · [KNOWN_ISSUES.md](KNOWN_ISSUES.md) · [PARAM_RUDRA_SLURM.md](PARAM_RUDRA_SLURM.md) · [README.md](../README.md) § “One repo, two conda envs”
 
-**Publication boundary:** the environment produced the 96100/96101 replication and later the 88-cell campaign. Treat this document as troubleshooting history. Current scientific freeze: [PUBLICATION_READINESS.md](PUBLICATION_READINESS.md). Do not re-run Experiment A for Paper 1.
+**Publication boundary:** the environment produced the 96100/96101 replication and later the 88-cell campaign. Treat this document as troubleshooting history. Current scientific freeze: [PUBLICATION_READINESS.md](archive/planning/PUBLICATION_READINESS.md). Do not re-run Experiment A for Paper 1.
 
 ---
 

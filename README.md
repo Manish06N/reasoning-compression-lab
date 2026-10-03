@@ -1,132 +1,73 @@
-# Reasoning Compression Lab (`reasoning-compression-lab`)
+# Estimand Sensitivity in the Evaluation of Quantized Reasoning Checkpoints
 
-Evaluation harness and artifacts for **Paper 1**: quantized reasoning models under **one pinned serving stack**.
+[![CI](https://github.com/Manish06N/reasoning-compression-lab/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Manish06N/reasoning-compression-lab/actions/workflows/ci.yml)
+[![Code: MIT](https://img.shields.io/badge/code-MIT-blue.svg)](LICENSE)
+[![Paper and data: CC BY 4.0](https://img.shields.io/badge/paper%20%26%20data-CC%20BY%204.0-green.svg)](NOTICE.md)
 
-* **Authors:** Manish Nandish (IIT Patna; Lincoln University College), Rajiv Misra (IIT Patna), Midhunchakkaravarthy Janarthanan (Lincoln University College)
-* **Cluster:** PARAM Rudra HPC (C-DAC / NSM), NVIDIA A100-PCIE-80GB
-* **GitHub:** [https://github.com/Manish06N/reasoning-compression-lab](https://github.com/Manish06N/reasoning-compression-lab)
-* **Paper 1 (J1):** *Estimand Sensitivity in the Evaluation of Quantized Reasoning Checkpoints: Selection Bias, Seed Placebos, and Subset-Cost Instability*
-* **Venue:** See [`docs/VENUE.md`](docs/VENUE.md). JSS and FGCS were desk-rejected. Do not have two journals under review at once.
+Code, data and manuscript for *Estimand Sensitivity in the Evaluation of Quantized Reasoning Checkpoints: Selection Bias, Seed Placebos, and Subset-Cost Instability* (Nandish, Misra, Janarthanan; IIT Patna / Lincoln University College).
 
-Canonical manuscript: [`paper/main.tex`](paper/main.tex) → [`paper/main.pdf`](paper/main.pdf). Scoreboard: [`results/README.md`](results/README.md). Canonical numbers: [`results/reports/revision_reanalysis_report.json`](results/reports/revision_reanalysis_report.json). Frozen tables: [`results/reports/major_revision_tables.md`](results/reports/major_revision_tables.md). Modal agreement: [`results/reports/modal_agreement_report.json`](results/reports/modal_agreement_report.json). Serving confirmation: [`results/reports/measured_serving_confirmation/`](results/reports/measured_serving_confirmation/). ArXiv source: [`paper/arxiv_source.zip`](paper/arxiv_source.zip). Packaging: [`paper/ARTIFACT.md`](paper/ARTIFACT.md). Reproduce tables: [`REPRODUCE.md`](REPRODUCE.md). Publication-readiness report: [`SUBMISSION_REVIEW.md`](SUBMISSION_REVIEW.md). Scientific claim audit: [`SCIENTIFIC_AUDIT.md`](SCIENTIFIC_AUDIT.md). Live git branch for the frozen science is **`main`**. Branch `paper-major-revision` is historical and behind `main`. Immutable snapshot tag (when cut): `paper-v1.0-submission`.
+The study evaluates eight public DeepSeek-R1-Distill checkpoints (Qwen-7B and Llama-8B in BF16, FP8 run as Marlin W8A16, community AWQ-4, and RedHatAI GPTQ-4) on MATH-500, GSM8K and GPQA-Diamond. Everything runs on **one pinned stack** (vLLM 0.7.0, eager mode, one NVIDIA A100-80GB node type): 88 runs, 56,408 completions. The unit of analysis is *public checkpoint x pinned serving stack x evaluation target*; the paper makes no claim about quantization methods in general.
 
-**Superseded analyses are provenance only** (200-item length subset, unconstrained serving timing, vLLM 0.8.5 pathology autopsy, gold-hit $k/5$ “safety gate”). Do not mix them with the canonical 56,408-completion reports.
+## Main results
 
----
+1. **Accuracy.** Only Llama AWQ-4 shows a drop that survives item-level intervals and multiplicity control (MATH-500 -2.76 pp, GSM8K -1.57 pp). The tested AWQ uploads are confounded with chat template, activation dtype and backend, so this is a statement about those artifacts. Strict-majority voting over five samples lowers the point estimate to -1.4 pp, which is not itself a significant reduction.
+2. **Length.** The BF16-correct token-inflation contrast is biased by selection: comparing two BF16 seeds, with no quantization, already gives +138 (Qwen) and +235 (Llama) tokens.
+3. **Gold-free abstention.** Unanimity of two samples has 0.7-2.4% selective risk against 2.2-5.8% for a one-sample length rule at matched coverage (a one-sample rule costs one generation, unanimity of two costs two).
+4. **Serving cost.** On a 20-prompt subset a single length draw can reorder the cost ranking; repeats that share one sampling seed cannot expose it.
 
-## 1. What this repository claims (August 2026)
+Full details, limitations and threats to validity are in [`paper/main.pdf`](paper/main.pdf).
 
-The published campaign is a **stack-pinned measurement study**: **88 checkpoint×benchmark×seed runs / 56,408 completions** on DeepSeek-R1-Distill-Qwen-7B and DeepSeek-R1-Distill-Llama-8B in BF16, FP8, AWQ-4, and GPTQ-4. Rank order depends on checkpoint, task, evaluation target, estimand, and serving condition. The deployment ranking of a quantized reasoning checkpoint is **not** a property of bit-width alone.
+## Verify the numbers yourself (about 5 minutes, CPU only, standard library)
 
-| Benchmark | *n* | Seeds | Completions |
-|---|---|---|---|
-| MATH-500 | 500 | 42–46 | 20,000 |
-| GSM8K | 1,319 | 42–44 | 31,656 |
-| GPQA-Diamond | 198 | 42–44 | 4,752 |
-
-**Pinned stack (not a vLLM 0.7 vs 0.8.5 factorial):** `qrm-official`, vLLM **0.7.0** eager, A100-80GB, $T=0.6$, top-$p=0.95$, repetition penalty $1.0$, max new tokens $32{,}768$, `gpu_memory_utilization=0.75`. FP8 checkpoints run as Marlin **W8A16** on A100, not native W8A8. Environment lock: [`requirements-qrm-paper-vllm070.lock`](requirements-qrm-paper-vllm070.lock). Effective launch settings: [`results/reports/runtime_manifest.json`](results/reports/runtime_manifest.json).
-
-Files under `configs/models/` are **not** the campaign launcher (directory holds a warning README only). Historical harness JSON is in [`configs/legacy_models/`](configs/legacy_models/). Those files contain different `max_model_len` / KV-cache defaults and must not be read as the effective 56k stack.
-
-### MATH-500 pass@1 (seed-wise; clustered tests vs BF16 in the paper)
-
-| Model & Format | 42 | 43 | 44 | 45 | 46 | Mean ± Std |
-|---|---|---|---|---|---|---|
-| Qwen-7B BF16 | 94.4% | 94.0% | 93.8% | 94.6% | 93.2% | **94.00% ± 0.55%** |
-| Qwen-7B FP8 | 94.4% | 95.2% | 94.8% | 92.6% | 95.0% | **94.40% ± 1.05%** |
-| Qwen-7B AWQ-4 | 92.4% | 92.8% | 93.2% | 93.0% | 94.2% | **93.12% ± 0.67%** |
-| Qwen-7B GPTQ-4 | 93.8% | 92.6% | 93.4% | 94.6% | 93.0% | **93.48% ± 0.77%** |
-| Llama-8B BF16 | 89.0% | 88.4% | 90.2% | 89.8% | 88.8% | **89.24% ± 0.74%** |
-| Llama-8B FP8 | 89.0% | 89.6% | 88.6% | 89.2% | 91.2% | **89.52% ± 1.01%** |
-| Llama-8B AWQ-4 | 84.4% | 84.8% | 89.2% | 87.4% | 86.6% | **86.48% ± 1.96%** |
-| Llama-8B GPTQ-4 | 88.0% | 89.6% | 86.8% | 89.4% | 90.8% | **88.92% ± 1.55%** |
-
-### Canonical findings (use these; ignore older 0/0 / safety-gate text)
-
-1. **Pinned serving stack.** Weight format is the experimental factor. This paper does **not** claim a Serving-Stack Shift result.
-2. **Pathology (full 56,408-row grid).** **25** identical-word loop flags (threshold = 20 consecutive identical words). **0** exact $32{,}768$ cap hits after re-encoding. **209** near-cap generations (`completion_tokens >= 32{,}500`). `finish_reason` is not in the compact JSON.
-3. **Pass@1 (problem-clustered bootstrap vs BF16).** The tested Llama AWQ-4 artifact: **−2.76 pp** on MATH-500 (95% CI $[−4.16,−1.44]$, $p<0.001$) and **−1.57 pp** on GSM8K. The tested community Qwen AWQ-4 artifact: **−5.56 pp** on GPQA-Diamond (95% CI $[−9.60,−1.52]$, $p=0.007$). The Qwen AWQ GPQA result is significant within the primary Holm-6 family, but not under the Holm-18 joint sensitivity analysis. FP8–BF16 95% intervals include 0; MATH $\pm 1$ pp equivalence is **not** established. maj@5 McNemar is secondary and non-significant.
-4. **Completion length (full MATH-500 grid, all 5 seeds, ratio of means).** The tested Qwen AWQ-4 checkpoint showed **+6.33%** and the tested Qwen GPTQ-4 checkpoint **+6.88%** vs matched BF16 (paired token CIs exclude 0). Both-OK clustered CIs exclude 0 for those Qwen 4-bit cells. Mismatch-conditioned length estimates are strongly affected by long failure traces and are **not causal**. The old 200-item even-index mean-of-ratios subset is a superseded estimator.
-5. **Selective prediction.** Gold-free unique-mode abstention from recovered MATH-500 answer strings (secondary). Strict 5/5 consensus has observed selective error at most 0.27%; Wilson upper bounds on $0/n$ cells remain strictly positive. The tested Llama AWQ-4 artifact showed **6.0 pp** lower 5/5 coverage vs BF16. Not G-Pass@k. Not a safety property. Gold-hit $k/5$ tables (including the old 98.23% “operational safety gate”) are **not** in the manuscript.
-6. **Cost.** Aggregate hybrid Cost-of-Pass proxy $\widetilde{C}_{\mathrm{pass}}^{\mathrm{hyb}}$ uses confirmation GPU-seconds over campaign MATH-500 pass@1. Rankings **disagree** across the historical 65 tok/s token proxy, sequential Condition A, and batched Condition B (serving-condition sensitivity, not isolated batching). Qwen ranking: proxy → FP8 first; Condition A → AWQ-4 first; Condition B → GPTQ-4 first. Qwen GPTQ-4 Condition B is $-45.9\%$ vs BF16 ($95\%$ CI $[-46.4,-45.4]$). Qwen FP8 Condition B is five wall-clock repeats (slow ~351 / mid ~456 / fast ~545 tok/s), not a lone $-36.0\%$; the cause was not identified. Llama GPTQ-4 Condition B mean throughput is about $0.2\%$ lower than Llama BF16. Peak allocated VRAM (~54–56 GB) is the 0.75 engine pool. The 65 tok/s proxy is appendix-only.
-
-### Breadth means (sample std over seeds)
-
-* **GSM8K:** Qwen BF16 $91.26\% \pm 0.29\%$; FP8 $91.33\% \pm 0.16\%$; AWQ-4 $91.05\% \pm 1.14\%$; GPTQ-4 $91.13\% \pm 0.27\%$. Llama BF16 $88.68\% \pm 0.46\%$; FP8 $88.80\% \pm 0.62\%$; AWQ-4 $87.11\% \pm 0.23\%$; GPTQ-4 $88.96\% \pm 0.70\%$.
-* **GPQA-Diamond:** Qwen BF16 $50.34\% \pm 2.96\%$; FP8 $49.49\% \pm 1.52\%$; AWQ-4 $44.78\% \pm 3.04\%$; GPTQ-4 $47.98\% \pm 1.75\%$. Llama BF16 $46.13\% \pm 1.91\%$; FP8 $47.81\% \pm 0.29\%$; AWQ-4 $46.97\% \pm 2.02\%$; GPTQ-4 $44.95\% \pm 4.32\%$.
-
----
-
-## 2. Canonical analysis pipeline
-
-```text
-results/{math500,gsm8k,gpqa}/*.json     # released per-cell records
-        ↓
-scripts/analysis/revision_reanalysis.py # stdlib only; no scratch / HPC JSONL paths
-        ↓
-results/reports/revision_reanalysis_report.json
-        ↓
-paper/main.tex tables
-```
+Requires Python 3.10 or newer (no packages needed for these checks).
 
 ```bash
-python3 scripts/analysis/revision_reanalysis.py --check
-python3 scripts/analysis/modal_agreement_analysis.py --check-artifact
-python3 scripts/analysis/measured_serving_confirmation_analysis.py --check
-python3 scripts/hpc/qrm_parity/benchmark_serving_confirmation.py --check
-python3 scripts/analysis/emit_major_revision_tables.py --check
-python3 scripts/analysis/item_level_descriptive_analysis.py --check
-python3 scripts/analysis/validate_runtime_manifest.py --check
+git clone https://github.com/Manish06N/reasoning-compression-lab && cd reasoning-compression-lab
+python3 scripts/analysis/revision_reanalysis.py --check               # pass@1, intervals, Holm, token strata
+python3 scripts/analysis/emit_major_revision_tables.py --check        # generated tables vs frozen tables
+python3 scripts/analysis/measured_serving_confirmation_analysis.py --check   # serving tables from 60 raw timing files
+python3 scripts/analysis/modal_agreement_analysis.py --check-artifact # answer-agreement artifact
+python3 scripts/check_tex_tables.py --check                           # every manuscript table cell vs data
 python3 scripts/analysis/check_manuscript_numbers.py --check
-python3 scripts/hpc/qrm_parity/validate_measured_serving_confirmation.py
 ```
 
-Older scripts live in [`scripts/analysis/legacy/`](scripts/analysis/legacy/) and must not be used for paper numbers.
+Each command prints `OK`/`PASS`. [`REPRODUCE.md`](REPRODUCE.md) lists every check, the packages needed for the sensitivity analyses, and what can and cannot be reproduced without a GPU. [`docs/PAPER_TO_CODE.md`](docs/PAPER_TO_CODE.md) maps every table and figure of the paper to the script and output file that produce it.
 
-Answer-string recovery used the frozen policy in [`docs/ANSWER_NORMALIZATION.md`](docs/ANSWER_NORMALIZATION.md). Compact recovered answers: [`results/recovered/math500_modal_inputs.jsonl`](results/recovered/math500_modal_inputs.jsonl) (SHA256 `23e9ead021111959cf047323572889c95be0496e9475d6870b06c8b2c9a6149b`).
+## What is in this repository
 
----
-
-## 3. Repository structure
-
-```
-reasoning-compression-lab/
-├── configs/               # See configs/README.md: publication/ vs historical
-│   ├── publication/       # pointers to frozen campaign (not a launcher)
-│   ├── models/README.md   # warning only
-│   └── legacy_models/     # historical harness JSON
-├── docs/                  # Roadmap, literature, supervisor notes
-├── paper/                 # Canonical LaTeX (main.tex → main.pdf); arxiv_source.zip
-├── results/               # Per-cell JSON + canonical reports
-├── scripts/analysis/      # revision_reanalysis.py + emit_major_revision_tables.py
-│   └── legacy/            # Deprecated analysis (wrong keys / gold-hit gate)
-├── scripts/hpc/           # SLURM + qrm-official launchers
-├── requirements-qrm-paper-vllm070.lock   # 56k campaign environment
-├── requirements-hpc-legacy-vllm085.txt   # earlier qreason / vLLM 0.8.5 harness
-├── AGENTS.md
-└── CHANGELOG.md
+```text
+paper/        manuscript (main.tex, main.pdf, references.bib), arXiv source zip, artifact notes
+results/      released per-run records and analysis reports
+  math500/ gsm8k/ gpqa/            compact per-completion records (correctness, token count, flags)
+  recovered/                       recovered MATH-500 answer strings (for answer-agreement analyses)
+  measured_serving_confirmation/   raw timing JSON of the controlled serving confirmation
+  reports/                         canonical analysis outputs and the runtime manifest
+scripts/
+  analysis/    all analyses in the paper (CPU only)
+  hpc/         SLURM launchers and checks for the GPU campaign (A100, PARAM Rudra)
+  check_tex_tables.py              manuscript-vs-data consistency check
+src/ tests/    support library for the campaign and its unit tests
+configs/ slurm/ patches/           campaign configuration, job scripts, compatibility patches
+docs/          protocols and method notes; docs/archive/ holds historical project notes
 ```
 
----
+## Data availability and scope
 
-## 4. Hardware & SLURM
+* Released: per-completion compact records for all 88 runs, recovered MATH-500 answer strings, raw serving timing records, runtime manifest, and every analysis script.
+* Not released: full chain-of-thought traces (size and benchmark-access terms) and GPQA-Diamond item text (gated dataset; never stored here). Native stop reasons and output token IDs were not stored; the paper documents what that implies.
+* The GPU campaign is inspectable but not expected to be rerun: it needs an A100-80GB, vLLM 0.7.0, the listed checkpoints and the frozen environment (`requirements-qrm-paper-vllm070.lock`). Token counts and prompt lengths are reproducible only with the frozen tokenizer versions (transformers 4.47.x); `scripts/analysis/audit_checks.py` checks this.
 
-* **Partition:** `gpu`, NVIDIA A100-PCIE-80GB, `--gres=gpu:1`. Do not set `#SBATCH --mem`.
-* **QOS:** max 2 GPUs concurrent per user.
-* **Paper env:** conda env `qrm-official` (not `qreason`). See `scripts/hpc/qrm_parity/install_official_qrm_env.sh`.
-* **AWQ:** pass `--dtype float16`.
+## Citation and license
 
-Do **not** start a new 50k campaign, extra seeds, or a vLLM 0.7 vs 0.8.5 factorial. **Experimental GPU work is closed.** See [`REPRODUCE.md`](REPRODUCE.md) for expected `--check` PASS lines. Tables are reproducible from compact artifacts. Replaying the complete GPU campaign needs original A100 hardware, checkpoint weights, and dataset revisions; full traces are not publicly released.
-
----
-
-## 5. Citation
+Cite via [`CITATION.cff`](CITATION.cff) or:
 
 ```bibtex
-@article{nandish2026onestack,
-  title={Estimand Sensitivity in the Evaluation of Quantized Reasoning Checkpoints: Selection Bias, Seed Placebos, and Subset-Cost Instability},
-  author={Nandish, Manish and Misra, Rajiv and Janarthanan, Midhunchakkaravarthy},
-  journal={Working Draft},
-  year={2026}
+@misc{nandish2026estimand,
+  title  = {Estimand Sensitivity in the Evaluation of Quantized Reasoning Checkpoints: Selection Bias, Seed Placebos, and Subset-Cost Instability},
+  author = {Nandish, Manish and Misra, Rajiv and Janarthanan, Midhunchakkaravarthy},
+  year   = {2026},
+  url    = {https://github.com/Manish06N/reasoning-compression-lab}
 }
 ```
+
+Code is MIT-licensed ([`LICENSE`](LICENSE)); the paper, results and documentation are CC BY 4.0; third-party components and what is not redistributed are listed in [`NOTICE.md`](NOTICE.md). Change history: [`CHANGELOG.md`](CHANGELOG.md).

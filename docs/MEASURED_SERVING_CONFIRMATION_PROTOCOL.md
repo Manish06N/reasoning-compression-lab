@@ -46,7 +46,7 @@ The confirmation grid evaluates the identical 8 configurations from Paper 1:
 ## 3. Workload Protocol & Conditions
 
 ### 3.1 Condition A: Interactive Single-Stream ($C=1$)
-- **Dataset:** Frozen 20-item balanced subset ([`results/measured_serving_confirmation/condition_a_subset.json`](file:///scratch/manishn_iitp/reasoning-compression-lab/results/measured_serving_confirmation/condition_a_subset.json)).
+- **Dataset:** Frozen 20-item balanced subset ([`results/measured_serving_confirmation/condition_a_subset.json`](../results/measured_serving_confirmation/condition_a_subset.json)).
 - **Stratification:** Exactly **4 problems from Level 1, 4 from Level 2, 4 from Level 3, 4 from Level 4, and 4 from Level 5** selected deterministically via seed `20260817`.
 - **Execution:** Sequential single-request generation (`concurrency=1`).
 - **Metrics Captured:**
@@ -57,7 +57,7 @@ The confirmation grid evaluates the identical 8 configurations from Paper 1:
   - GPU-seconds per query
 
 ### 3.2 Condition B: Pinned Concurrency Batched Throughput ($C=8$)
-- **Dataset:** Frozen 100-item balanced subset ([`results/measured_serving_confirmation/condition_b_subset.json`](file:///scratch/manishn_iitp/reasoning-compression-lab/results/measured_serving_confirmation/condition_b_subset.json)), 20 items per Level (1–5).
+- **Dataset:** Frozen 100-item balanced subset ([`results/measured_serving_confirmation/condition_b_subset.json`](../results/measured_serving_confirmation/condition_b_subset.json)), 20 items per Level (1–5).
 - **Concurrency Pinning:** Engine initialized with `max_num_seqs = 8` explicitly passed into `LLM(..., max_num_seqs=8)`.
 - **Assertion:** Runtime verification that `llm.llm_engine.scheduler_config.max_num_seqs == 8`.
 - **Metrics Captured:**

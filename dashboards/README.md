@@ -2,7 +2,7 @@
 
 **Publication status (2026-08-17 freeze):** no dashboard is cited in the paper. Canonical numbers are JSON reports under `results/reports/`. Do not treat dashboards as publication artifacts.
 
-**Publication status (2026-08-14 — historical):** no current dashboard is publication-ready. A valid dashboard must distinguish replication from matched comparisons and show integrity status, quality warnings, seed coverage, confidence source, finish/cap/loop rates, latency distribution, peak VRAM, energy availability, and cost assumptions. See [the publication audit](../docs/PUBLICATION_READINESS.md). The recovery plan is historical.
+**Publication status (2026-08-14 — historical):** no current dashboard is publication-ready. A valid dashboard must distinguish replication from matched comparisons and show integrity status, quality warnings, seed coverage, confidence source, finish/cap/loop rates, latency distribution, peak VRAM, energy availability, and cost assumptions. See [the publication audit](../docs/archive/planning/PUBLICATION_READINESS.md). The recovery plan is historical.
 
 ```bash
 python scripts/build_dashboard.py \

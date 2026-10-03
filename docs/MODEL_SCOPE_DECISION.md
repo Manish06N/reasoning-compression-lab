@@ -4,7 +4,7 @@
 **Roadmap:** PhD V8.2 §6, scale gate §6.9  
 **Companion:** [MODEL_ROSTER.md](MODEL_ROSTER.md) (HF IDs, paths, env vars)
 
-**Current authority:** [PUBLICATION_READINESS.md](PUBLICATION_READINESS.md) (2026-08-17 freeze). The [2026-08-14 recovery plan](plans/2026-08-14-publication-recovery.md) is historical. The old seed-0 expansion order is superseded.
+**Current authority:** [PUBLICATION_READINESS.md](archive/planning/PUBLICATION_READINESS.md) (2026-08-17 freeze). The [2026-08-14 recovery plan](archive/planning/plans/2026-08-14-publication-recovery.md) is historical. The old seed-0 expansion order is superseded.
 
 This document records **what models are in scope, out of scope, and gated for later** for Paper 1. It exists to prevent scope creep from model-inventory research (6×5 quant matrices, Qwen3, base Llama, 70B BF16 grids, etc.).
 
@@ -131,7 +131,7 @@ External notes disagree on Ampere FP8 support. **This project uses:**
 
 - Checkpoints: `RedHatAI/*-FP8-dynamic`
 - vLLM: `quantization: compressed-tensors` (W8A16-style on Ampere)
-- Config: see `configs/models/deepseek_r1_qwen_7b_fp8.json`
+- Config: see `configs/legacy_models/deepseek_r1_qwen_7b_fp8.json`
 
 **Policy:** Keep FP8 in the grid (QRM-aligned). If A100 FP8 cells behave anomalously, report as a **stack/format finding** — do not swap in five new model families.
 

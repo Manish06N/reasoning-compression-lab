@@ -4,9 +4,9 @@
 
 **Status (2026-08-14 — historical): Needs revision; design was not frozen for submission.**
 
-**Evidence:** [PUBLICATION_READINESS.md](PUBLICATION_READINESS.md) · **Historical execution:** [plans/2026-08-14-publication-recovery.md](plans/2026-08-14-publication-recovery.md)
+**Evidence:** [PUBLICATION_READINESS.md](archive/planning/PUBLICATION_READINESS.md) · **Historical execution:** [plans/2026-08-14-publication-recovery.md](archive/planning/plans/2026-08-14-publication-recovery.md)
 
-**Full thesis roadmap:** [PHD_ROADMAP.md](PHD_ROADMAP.md)
+**Full thesis roadmap:** [PHD_ROADMAP.md](archive/planning/PHD_ROADMAP.md)
 
 ## Provisional title
 
