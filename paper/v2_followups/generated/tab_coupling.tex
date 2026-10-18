@@ -1,0 +1,18 @@
+\begin{table}[t]
+\centering
+\caption{Does seed matching couple the arms? The BF16-correct conditional $\Lambda_b$ on MATH-500 with seed-matched pairs (same seed in both checkpoints) and with cross-seed pairs (20 ordered pairs), and their difference with an item-level 95\% interval. Under the independence assumption of Proposition~\ref{prop:placebo} the two agree. The last column is the excess $\Lambda_b-\Pi_b$ computed with cross-seed pairs (bold: interval excludes zero); it excludes zero for exactly the same three checkpoints as the seed-matched excess of Table~\ref{tab:placebo}.}
+\label{tab:coupling}
+\small
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Contrast} & \textbf{Seed-matched} & \textbf{Cross-seed} & \textbf{Difference} & \textbf{Cross-seed excess} \\
+\midrule
+Qwen-7B FP8 & $+172$ & $+193$ & $-20$ $[-68,+22]$ & $+55$ $[-61,+173]$ \\
+Qwen-7B AWQ-4 & $+390$ & $+374$ & $+17$ $[-23,+57]$ & \textbf{$+236$ $[+118,+358]$} \\
+Qwen-7B GPTQ-4 & $+326$ & $+335$ & $-9$ $[-58,+40]$ & \textbf{$+197$ $[+71,+330]$} \\
+Llama-8B FP8 & $+166$ & $+194$ & $-29$ $[-74,+15]$ & $-41$ $[-191,+102]$ \\
+Llama-8B AWQ-4 & $+332$ & $+350$ & $-18$ $[-76,+35]$ & $+115$ $[-45,+277]$ \\
+Llama-8B GPTQ-4 & $+417$ & $+395$ & $+22$ $[-39,+85]$ & \textbf{$+159$ $[+14,+312]$} \\
+\bottomrule
+\end{tabular}
+\end{table}

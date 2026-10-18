@@ -1,0 +1,21 @@
+\begin{table}[t]
+\centering
+\caption{Simulation of Proposition~\ref{prop:placebo} with known truth (300 replications of 500 items and five seeds; item accuracy distribution, intermediate-item share and within-item failed/correct length ratio calibrated to the BF16 data of each family). Truth is the accuracy-weighted unconditional change $\Delta_a$. Bias: mean estimate minus truth (tokens) for the BF16-correct conditional $\Lambda_b$ and for $\Lambda_b-\Pi_b$. Coverage: percentage of replications in which the item-level 95\% interval contains the truth. In the last row the quantized run copies the same-seed BF16 run with probability $\rho$; cross-seed pairing is unaffected, whereas seed-matched $\Lambda_b-\Pi_b$ is biased by $-42$ (Qwen) and $-81$ (Llama) tokens.}
+\label{tab:sim}
+\scriptsize
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{lcccccccccc}
+\toprule
+ & \multicolumn{5}{c}{\textbf{Qwen-7B}} & \multicolumn{5}{c}{\textbf{Llama-8B}} \\
+\cmidrule(lr){2-6}\cmidrule(lr){7-11}
+\textbf{Scenario} & Truth & Bias $\Lambda_b$ & Bias $\Lambda_b{-}\Pi_b$ & Cov.\ $\Lambda_b{-}\Pi_b$ & Cov.\ $\Lambda_b$ & Truth & Bias $\Lambda_b$ & Bias $\Lambda_b{-}\Pi_b$ & Cov.\ $\Lambda_b{-}\Pi_b$ & Cov.\ $\Lambda_b$ \\
+\midrule
+No change & $+0$ & $+89$ & $+5$ & $92$ & $74$ & $+0$ & $+170$ & $+1$ & $95$ & $53$ \\
+Uniform $+5\%$ length & $+167$ & $+89$ & $+5$ & $93$ & $75$ & $+185$ & $+170$ & $+1$ & $95$ & $56$ \\
+$+10\%$ on hard items & $+36$ & $+90$ & $+5$ & $92$ & $76$ & $+86$ & $+171$ & $+1$ & $95$ & $56$ \\
+Accuracy drop, same lengths & $+31$ & $+90$ & $+5$ & $93$ & $77$ & $+67$ & $+172$ & $+2$ & $95$ & $55$ \\
+No change, coupled arms ($\rho=0.5$) & $+0$ & $+83$ & $-0$ & $95$ & $64$ & $+0$ & $+173$ & $+6$ & $93$ & $26$ \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}

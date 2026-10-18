@@ -1,0 +1,122 @@
+workspace git HEAD + status below; scripts/rev2, slurm/rev2_*, cells/*.tsv and the workspace vllm_model.py copy are UNTRACKED or locally modified, so sha256 is the identity.
+NOTE: run_cells.sh was edited 2026-10-18 (DIR_COLLISION guard); the jobs for E1-E3 and X1 ran an earlier version (sha256[:16] 6f28bff26430eb02 at 2026-10-13T05:38, later re-trimmed; per-cell MANIFEST.json holds code_tree_sha256_16).
+
+5383caeed0e1c6ed6192e71aa6b22e0e96933556
+ M scripts/hpc/qrm_parity/run_official_inference.sh
+?? cache/
+?? cells/
+?? envs/
+?? exports/
+?? models
+?? models_r2/
+?? results/revision2/
+?? results/revision3/
+?? scripts/rev2/
+?? slurm/rev2_cells.slurm
+?? slurm/rev2_e5a.slurm
+?? slurm/rev2_quantize_awq.slurm
+?? slurm/rev2_run_cell.slurm
+?? slurm/rev2_smokecheck.slurm
+--- git diff (tracked files)
+diff --git a/scripts/hpc/qrm_parity/run_official_inference.sh b/scripts/hpc/qrm_parity/run_official_inference.sh
+index 13d5096..5f9fe29 100755
+--- a/scripts/hpc/qrm_parity/run_official_inference.sh
++++ b/scripts/hpc/qrm_parity/run_official_inference.sh
+@@ -10,8 +10,8 @@ MODEL="${QRM_MODEL_PATH:-$QR/models/DeepSeek-R1-Distill-Qwen-7B}"
+ SEED="${QRM_SEED:-42}"
+ MAX_SAMPLES="${QRM_MAX_SAMPLES:-10}"
+ OUTPUT_ROOT="${QRM_OUTPUT_ROOT:-$QR/outputs-hpc-qrm-official-$(date +%Y-%m-%d)}"
+-OFFICIAL_RUN_DIR="$OUTPUT_ROOT/inference/$(basename "$MODEL")-seed${SEED}"
+-MODEL_NAME="$(basename "$MODEL")"
++MODEL_NAME="$(basename "$MODEL")${R2_TAG:-}"   # revision2: R2_TAG suffix (_fp16, _T0.8, ...) keeps new cells distinct from campaign cells
++OFFICIAL_RUN_DIR="$OUTPUT_ROOT/inference/${MODEL_NAME}-seed${SEED}"
+ 
+ CONDA_ROOT="${CONDA_ROOT:-/home/apps/MSCC/miniconda3}"
+ source "$CONDA_ROOT/etc/profile.d/conda.sh"
+@@ -33,62 +33,16 @@ export VLLM_WORKER_MULTIPROC_METHOD=spawn
+ export TORCH_COMPILE_DISABLE=1
+ export TORCHDYNAMO_DISABLE=1
+ 
+-QRM_MIN_FREE_GPU_MB="${QRM_MIN_FREE_GPU_MB:-62000}"
+-if command -v nvidia-smi >/dev/null 2>&1; then
+-  echo "=== GPU memory preflight (require >= ${QRM_MIN_FREE_GPU_MB} MiB free) ==="
+-  echo "CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-unset}"
+-  nvidia-smi --query-compute-apps=pid,process_name,used_memory --format=csv 2>/dev/null || true
+-
+-  GPU_QUERY_IDS="${CUDA_VISIBLE_DEVICES:-0}"
+-  IFS=',' read -r -a QRM_VISIBLE_GPUS <<<"$GPU_QUERY_IDS"
+-  FREE_GPU_MB=""
+-  for gpu_id in "${QRM_VISIBLE_GPUS[@]}"; do
+-    gpu_id="${gpu_id//[[:space:]]/}"
+-    [[ -z "$gpu_id" ]] && continue
+-    gpu_free="$(nvidia-smi -i "$gpu_id" --query-gpu=memory.free --format=csv,noheader,nounits 2>/dev/null | head -n 1 | tr -d ' ')"
+-    if [[ -n "$gpu_free" ]]; then
+-      echo "GPU ${gpu_id} free memory: ${gpu_free} MiB"
+-      if [[ -z "$FREE_GPU_MB" || "$gpu_free" -lt "$FREE_GPU_MB" ]]; then
+-        FREE_GPU_MB="$gpu_free"
+-      fi
+-    fi
+-  done
+-  if [[ -z "$FREE_GPU_MB" ]]; then
+-    FREE_GPU_MB="$(nvidia-smi --query-gpu=memory.free --format=csv,noheader,nounits | head -n 1 | tr -d ' ')"
+-    echo "GPU free memory fallback: ${FREE_GPU_MB:-unknown} MiB"
+-  fi
+-
+-  if [[ -n "$FREE_GPU_MB" && "$FREE_GPU_MB" -lt "$QRM_MIN_FREE_GPU_MB" ]]; then
+-    echo "ERROR: only ${FREE_GPU_MB} MiB GPU memory free; need ${QRM_MIN_FREE_GPU_MB} MiB before vLLM load." >&2
+-    if [[ -n "${SLURM_JOB_ID:-}" && "${QRM_REQUEUE_ON_DIRTY_GPU:-1}" == "1" ]]; then
+-      restarts="${SLURM_RESTART_COUNT:-0}"
+-      max_requeues="${QRM_MAX_DIRTY_GPU_REQUEUES:-3}"
+-      if [[ "$restarts" -lt "$max_requeues" ]]; then
+-        echo "Requeueing job ${SLURM_JOB_ID} instead of failing on a dirty GPU (restart ${restarts}/${max_requeues})." >&2
+-        if scontrol requeue "$SLURM_JOB_ID"; then
+-          if [[ -n "${SLURM_JOB_NODELIST:-}" ]]; then
+-            current_exc="$(scontrol show job "${SLURM_JOB_ID}" | grep -o 'ExcNodeList=[^ ]*' | cut -d= -f2 || true)"
+-            if [[ -n "$current_exc" && "$current_exc" != "(null)" ]]; then
+-              new_exc="${current_exc},${SLURM_JOB_NODELIST}"
+-            else
+-              new_exc="${SLURM_JOB_NODELIST}"
+-            fi
+-            echo "Excluding dirty node(s) ${new_exc} from future scheduling of job ${SLURM_JOB_ID}." >&2
+-            scontrol update job "${SLURM_JOB_ID}" ExcNodeList="${new_exc}" || echo "WARN: failed to update ExcNodeList" >&2
+-          fi
+-          exit 0
+-        fi
+-        echo "WARN: scontrol requeue failed; exiting with retryable code 75." >&2
+-      fi
+-    fi
+-    exit 75
+-  fi
+-fi
++# revision2: shared dirty-GPU preflight (requeue / requeuehold, never a FAILED state). exit 10 => requeued
++set +e; bash "$QR/scripts/rev2/gpu_preflight.sh"; pf=$?; set -e
++[[ $pf -eq 10 ]] && { echo "preflight: job requeued/held; exiting 0"; exit 0; }
++[[ $pf -ne 0 ]] && exit $pf
+ 
+ bash "$QR/scripts/hpc/qrm_parity/prepare_qrm_datasets.sh"
+ 
+ mkdir -p "$OUTPUT_ROOT"
+ mkdir -p "$OFFICIAL_RUN_DIR"
++export R2_SIDECAR="${R2_SIDECAR:-$OFFICIAL_RUN_DIR/sidecar.jsonl}"; rm -f "$R2_SIDECAR"   # revision2 per-row finish_reason log
+ cd "$QRM_DIR"
+ 
+ echo "Model: $MODEL"
+@@ -104,6 +58,8 @@ elif [[ "$MODEL" == *"AWQ"* || "$MODEL" == *"awq"* ]]; then
+ fi
+ 
+ DATASET="${QRM_DATASET:-MATH-500}"
++EXTRA_ARGS=()
++[[ -n "${R2_TEMP:-}" ]] && EXTRA_ARGS+=(--temperature "$R2_TEMP")   # revision2
+ 
+ python inference.py \
+   --model "$MODEL" \
+@@ -112,7 +68,7 @@ python inference.py \
+   --seed "$SEED" \
+   --output_dir "$OFFICIAL_RUN_DIR" \
+   --gpu_memory_utilization "$QRM_GPU_MEMORY_UTILIZATION" \
+-  "${DTYPE_ARGS[@]}" \
++  "${DTYPE_ARGS[@]}" "${EXTRA_ARGS[@]}" \
+   --overwrite
+ 
+ RESULT_JSON="$OFFICIAL_RUN_DIR/${DATASET}.jsonl"
+

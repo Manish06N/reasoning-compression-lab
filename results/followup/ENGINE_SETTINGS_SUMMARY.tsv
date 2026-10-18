@@ -1,0 +1,57 @@
+group	cell	source	dtype	quantization	max_num_seqs	enforce_eager	enable_prefix_caching	enable_chunked_prefill
+E1_awq	DeepSeek-R1-Distill-Llama-8B-selfawq_gsm8k_n1319_seed42	engine dump	torch.float16	awq_marlin	256	True	False	False
+E1_awq	DeepSeek-R1-Distill-Llama-8B-selfawq_gsm8k_n1319_seed43	engine dump	torch.float16	awq_marlin	256	True	False	False
+E1_awq	DeepSeek-R1-Distill-Llama-8B-selfawq_gsm8k_n1319_seed44	engine dump	torch.float16	awq_marlin	256	True	False	False
+E1_awq	DeepSeek-R1-Distill-Llama-8B-selfawq_math500_n500_seed42	NOT AVAILABLE: cell dir was overwritten by a later cell (E1a/E1b share a seed dir)						
+E1_awq	DeepSeek-R1-Distill-Llama-8B-selfawq_math500_n500_seed43	NOT AVAILABLE: cell dir was overwritten by a later cell (E1a/E1b share a seed dir)						
+E1_awq	DeepSeek-R1-Distill-Llama-8B-selfawq_math500_n500_seed44	NOT AVAILABLE: cell dir was overwritten by a later cell (E1a/E1b share a seed dir)						
+E1_awq	DeepSeek-R1-Distill-Llama-8B-selfawq_math500_n500_seed45	engine dump	torch.float16	awq_marlin	256	True	False	False
+E1_awq	DeepSeek-R1-Distill-Llama-8B-selfawq_math500_n500_seed46	engine dump	torch.float16	awq_marlin	256	True	False	False
+E2_fp16	DeepSeek-R1-Distill-Llama-8B_fp16_math500_n500_seed42	engine dump	torch.float16		256	True	False	False
+E2_fp16	DeepSeek-R1-Distill-Llama-8B_fp16_math500_n500_seed43	engine dump	torch.float16		256	True	False	False
+E2_fp16	DeepSeek-R1-Distill-Llama-8B_fp16_math500_n500_seed44	engine dump	torch.float16		256	True	False	False
+E2_fp16	DeepSeek-R1-Distill-Llama-8B_fp16_math500_n500_seed45	engine dump	torch.float16		256	True	False	False
+E2_fp16	DeepSeek-R1-Distill-Llama-8B_fp16_math500_n500_seed46	engine dump	torch.float16		256	True	False	False
+E2_fp16	DeepSeek-R1-Distill-Qwen-7B_fp16_math500_n500_seed42	engine dump	torch.float16		256	True	False	False
+E2_fp16	DeepSeek-R1-Distill-Qwen-7B_fp16_math500_n500_seed43	engine dump	torch.float16		256	True	False	False
+E2_fp16	DeepSeek-R1-Distill-Qwen-7B_fp16_math500_n500_seed44	engine dump	torch.float16		256	True	False	False
+E2_fp16	DeepSeek-R1-Distill-Qwen-7B_fp16_math500_n500_seed45	engine dump	torch.float16		256	True	False	False
+E2_fp16	DeepSeek-R1-Distill-Qwen-7B_fp16_math500_n500_seed46	engine dump	torch.float16		256	True	False	False
+E3_T08	DeepSeek-R1-Distill-Llama-8B_T0.8_math500_n500_seed42	engine dump	torch.bfloat16		256	True	False	False
+E3_T08	DeepSeek-R1-Distill-Llama-8B_T0.8_math500_n500_seed43	engine dump	torch.bfloat16		256	True	False	False
+E3_T08	DeepSeek-R1-Distill-Llama-8B_T0.8_math500_n500_seed44	engine dump	torch.bfloat16		256	True	False	False
+E3_T08	DeepSeek-R1-Distill-Llama-8B_T0.8_math500_n500_seed45	engine dump	torch.bfloat16		256	True	False	False
+E3_T08	DeepSeek-R1-Distill-Llama-8B_T0.8_math500_n500_seed46	engine dump	torch.bfloat16		256	True	False	False
+E3_T08	DeepSeek-R1-Distill-Qwen-7B_T0.8_math500_n500_seed42	engine dump	torch.bfloat16		256	True	False	False
+E3_T08	DeepSeek-R1-Distill-Qwen-7B_T0.8_math500_n500_seed43	engine dump	torch.bfloat16		256	True	False	False
+E3_T08	DeepSeek-R1-Distill-Qwen-7B_T0.8_math500_n500_seed44	engine dump	torch.bfloat16		256	True	False	False
+E3_T08	DeepSeek-R1-Distill-Qwen-7B_T0.8_math500_n500_seed45	engine dump	torch.bfloat16		256	True	False	False
+E3_T08	DeepSeek-R1-Distill-Qwen-7B_T0.8_math500_n500_seed46	engine dump	torch.bfloat16		256	True	False	False
+X1_heldout	DeepSeek-R1-Distill-Llama-8B_heldout_math500_n500_seed47	engine dump	torch.bfloat16		256	True	False	False
+X1_heldout	DeepSeek-R1-Distill-Llama-8B_heldout_math500_n500_seed48	engine dump	torch.bfloat16		256	True	False	False
+X1_heldout	DeepSeek-R1-Distill-Llama-8B_heldout_math500_n500_seed49	engine dump	torch.bfloat16		256	True	False	False
+X1_heldout	DeepSeek-R1-Distill-Llama-8B_heldout_math500_n500_seed50	engine dump	torch.bfloat16		256	True	False	False
+X1_heldout	DeepSeek-R1-Distill-Llama-8B_heldout_math500_n500_seed51	engine dump	torch.bfloat16		256	True	False	False
+X1_heldout	DeepSeek-R1-Distill-Qwen-7B_heldout_math500_n500_seed47	engine dump	torch.bfloat16		256	True	False	False
+X1_heldout	DeepSeek-R1-Distill-Qwen-7B_heldout_math500_n500_seed48	engine dump	torch.bfloat16		256	True	False	False
+X1_heldout	DeepSeek-R1-Distill-Qwen-7B_heldout_math500_n500_seed49	engine dump	torch.bfloat16		256	True	False	False
+X1_heldout	DeepSeek-R1-Distill-Qwen-7B_heldout_math500_n500_seed50	engine dump	torch.bfloat16		256	True	False	False
+X1_heldout	DeepSeek-R1-Distill-Qwen-7B_heldout_math500_n500_seed51	engine dump	torch.bfloat16		256	True	False	False
+p2_dtype_math500_108561	gptq4_cal0_fp16_seed42	resolved_config.model_config (REQUESTED; no effective max_num_seqs dump)	float16	gptq_marlin		True	False	False
+p2_dtype_math500_108561	gptq4_cal0_fp16_seed43	resolved_config.model_config (REQUESTED; no effective max_num_seqs dump)	float16	gptq_marlin		True	False	False
+p2_dtype_math500_108561	gptq4_cal0_fp16_seed44	resolved_config.model_config (REQUESTED; no effective max_num_seqs dump)	float16	gptq_marlin		True	False	False
+p2_dtype_math500_108561	gptq4_cal1_fp16_seed42	resolved_config.model_config (REQUESTED; no effective max_num_seqs dump)	float16	gptq_marlin		True	False	False
+p2_dtype_math500_108561	gptq4_cal1_fp16_seed43	resolved_config.model_config (REQUESTED; no effective max_num_seqs dump)	float16	gptq_marlin		True	False	False
+p2_dtype_math500_108561	gptq4_cal1_fp16_seed44	resolved_config.model_config (REQUESTED; no effective max_num_seqs dump)	float16	gptq_marlin		True	False	False
+p2_dtype_math500_108561	gptq4_cal2_fp16_seed42	resolved_config.model_config (REQUESTED; no effective max_num_seqs dump)	float16	gptq_marlin		True	False	False
+p2_dtype_math500_108561	gptq4_cal2_fp16_seed43	resolved_config.model_config (REQUESTED; no effective max_num_seqs dump)	float16	gptq_marlin		True	False	False
+p2_dtype_math500_108561	gptq4_cal2_fp16_seed44	resolved_config.model_config (REQUESTED; no effective max_num_seqs dump)	float16	gptq_marlin		True	False	False
+p2_dtype_gsm8k_108562	gptq4_cal0_fp16_seed42	resolved_config.model_config (REQUESTED; no effective max_num_seqs dump)	float16	gptq_marlin		True	False	False
+p2_dtype_gsm8k_108562	gptq4_cal0_fp16_seed43	resolved_config.model_config (REQUESTED; no effective max_num_seqs dump)	float16	gptq_marlin		True	False	False
+p2_dtype_gsm8k_108562	gptq4_cal0_fp16_seed44	resolved_config.model_config (REQUESTED; no effective max_num_seqs dump)	float16	gptq_marlin		True	False	False
+p2_dtype_gsm8k_108562	gptq4_cal1_fp16_seed42	resolved_config.model_config (REQUESTED; no effective max_num_seqs dump)	float16	gptq_marlin		True	False	False
+p2_dtype_gsm8k_108562	gptq4_cal1_fp16_seed43	resolved_config.model_config (REQUESTED; no effective max_num_seqs dump)	float16	gptq_marlin		True	False	False
+p2_dtype_gsm8k_108562	gptq4_cal1_fp16_seed44	resolved_config.model_config (REQUESTED; no effective max_num_seqs dump)	float16	gptq_marlin		True	False	False
+p2_dtype_gsm8k_108562	gptq4_cal2_fp16_seed42	resolved_config.model_config (REQUESTED; no effective max_num_seqs dump)	float16	gptq_marlin		True	False	False
+p2_dtype_gsm8k_108562	gptq4_cal2_fp16_seed43	resolved_config.model_config (REQUESTED; no effective max_num_seqs dump)	float16	gptq_marlin		True	False	False
+p2_dtype_gsm8k_108562	gptq4_cal2_fp16_seed44	resolved_config.model_config (REQUESTED; no effective max_num_seqs dump)	float16	gptq_marlin		True	False	False

@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-18 — Follow-up experiments and a restructured draft (branch `followup-experiments-2026-10`; frozen campaign results unchanged)
+
+- **New GPU runs, same stack.** E1 (a Llama AWQ-4 checkpoint quantized by the authors, MATH-500 and GSM8K), E2 (BF16 at `float16`), E3 (BF16 at T=0.8), X1 (five held-out BF16 seeds). 38 cells, 21,457 completions; per-item records, engine settings and incident log in `results/followup/`.
+- **Findings.** The seed placebo reappears when only the dtype changes (excess over the placebo +54 [-57,+170] Qwen, -64 [-204,+70] Llama); it is stable on held-out seeds (difference +61 [-24,+145], +7 [-97,+113]); the Llama AWQ-4 accuracy loss reproduces on the self-quantized checkpoint (-1.68 pp MATH-500, -1.57 pp GSM8K). T=0.8 separates from the placebo for Qwen but not Llama; the self-quantized checkpoint's length excess (+211 [+60,+362]) is exploratory and not yet separated from its kernel.
+- **Corrections.** The timer's extra BOS token is not a difference from the campaign (the campaign engine also received a doubled BOS); two campaign near-cap rows that ended on their own are noted.
+- **Code.** `scripts/analysis/followup/` (standalone `seed_placebo.py` with tests, the analysis and table scripts, and the earlier Proposition 1 and flip checks, all runnable from this layout).
+- **Draft.** `paper/v2_followups/` is the restructured manuscript (serving cost and gold-free abstention moved to an appendix). It still contains red `\pending` markers for runs not finished.
+- **Pre-registration.** `results/followup/PREREG_E1c_X3_X5.md` fixes the verdict rules for E1c, X3 and X5 before those cells ran.
+
 ## 2026-10-03 — Revision after a fourth referee report (no GPU, no frozen result changed)
 
 - **FP8 serving discrepancy.** FP8 has the highest measured-to-campaign length ratio in all four family-by-condition groups (Qwen 1.35/1.07, Llama 1.49/1.09). The Llama FP8 example is removed from the abstract and "tail draw is the likeliest reason" is withdrawn: model files, backend, prefix caching, chunked prefill and KV dtype match; scheduling (single-stream vs batched), seed and the extra BOS token remain untested. A single-BOS multi-seed GPU rerun was not run.

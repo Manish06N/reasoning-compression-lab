@@ -1,0 +1,5 @@
+effective engine config: {"dtype": "torch.float16", "quantization": null, "max_num_seqs": 256, "max_model_len": 32768, "enforce_eager": true, "seed": 1234, "enable_prefix_caching": false, "enable_chunked_prefill": false}
+engine quantization: None | dtype: float16
+engine max_num_seqs: 256
+numeric: rows=500 empty=0 degenerate=0 nan/inf-like=0 pass@1 new=94.80 campaign(same seed)=94.40
+VERIFY_OK

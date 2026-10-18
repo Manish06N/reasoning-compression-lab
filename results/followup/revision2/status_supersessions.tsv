@@ -1,0 +1,3 @@
+ORIGINAL ROW TEXT (status was CONFIG_MISMATCH; superseded by the verifier-bug fix; rerun cells are judged on their own rows)
+E2	DeepSeek-R1-Distill-Qwen-7B_fp16	MATH-500	42	CONFIG_MISMATCH	109458	ragpu004	2026-10-13T04:01:43+05:30	2026-10-13T04:33:03+05:30	1880	/scratch/manishn_iitp/PhD/revision2-workspace/results/revision2/E2_fp16
+E2	DeepSeek-R1-Distill-Llama-8B_fp16	MATH-500	42	CONFIG_MISMATCH	109459	ragpu004	2026-10-13T04:33:14+05:30	2026-10-13T05:30:55+05:30	3461	/scratch/manishn_iitp/PhD/revision2-workspace/results/revision2/E2_fp16

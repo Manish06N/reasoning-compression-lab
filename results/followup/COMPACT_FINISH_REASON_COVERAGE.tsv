@@ -1,0 +1,39 @@
+base	exp_dir	cell	finish_reason_attached
+revision2	E1_awq	DeepSeek-R1-Distill-Llama-8B-selfawq_gsm8k_n1319_seed42	1319/1319 rows; engine-minus-compact completion_tokens {1: 1311, 2: 7, 3: 1}  WARNING 1 rows outside 0..2
+revision2	E1_awq	DeepSeek-R1-Distill-Llama-8B-selfawq_gsm8k_n1319_seed43	1319/1319 rows; engine-minus-compact completion_tokens {0: 1, 1: 1312, 2: 3, 3: 2, 6: 1}  WARNING 3 rows outside 0..2
+revision2	E1_awq	DeepSeek-R1-Distill-Llama-8B-selfawq_gsm8k_n1319_seed44	1319/1319 rows; engine-minus-compact completion_tokens {0: 1, 1: 1309, 2: 6, 3: 3}  WARNING 3 rows outside 0..2
+revision2	E1_awq	DeepSeek-R1-Distill-Llama-8B-selfawq_math500_n500_seed42	none
+revision2	E1_awq	DeepSeek-R1-Distill-Llama-8B-selfawq_math500_n500_seed43	none
+revision2	E1_awq	DeepSeek-R1-Distill-Llama-8B-selfawq_math500_n500_seed44	none
+revision2	E1_awq	DeepSeek-R1-Distill-Llama-8B-selfawq_math500_n500_seed45	500/500 rows; engine-minus-compact completion_tokens {0: 4, 1: 490, 2: 6}
+revision2	E1_awq	DeepSeek-R1-Distill-Llama-8B-selfawq_math500_n500_seed46	500/500 rows; engine-minus-compact completion_tokens {0: 3, 1: 494, 2: 3}
+revision2	E2_fp16	DeepSeek-R1-Distill-Llama-8B_fp16_math500_n500_seed42	500/500 rows; engine-minus-compact completion_tokens {-2: 1, 0: 2, 1: 494, 2: 1, 3: 2}  WARNING 3 rows outside 0..2
+revision2	E2_fp16	DeepSeek-R1-Distill-Llama-8B_fp16_math500_n500_seed43	500/500 rows; engine-minus-compact completion_tokens {0: 1, 1: 497, 2: 1, 3: 1}  WARNING 1 rows outside 0..2
+revision2	E2_fp16	DeepSeek-R1-Distill-Llama-8B_fp16_math500_n500_seed44	500/500 rows; engine-minus-compact completion_tokens {0: 2, 1: 497, 2: 1}
+revision2	E2_fp16	DeepSeek-R1-Distill-Llama-8B_fp16_math500_n500_seed45	500/500 rows; engine-minus-compact completion_tokens {0: 3, 1: 496, 2: 1}
+revision2	E2_fp16	DeepSeek-R1-Distill-Llama-8B_fp16_math500_n500_seed46	500/500 rows; engine-minus-compact completion_tokens {0: 1, 1: 495, 2: 3, 5: 1}  WARNING 1 rows outside 0..2
+revision2	E2_fp16	DeepSeek-R1-Distill-Qwen-7B_fp16_math500_n500_seed42	500/500 rows; engine-minus-compact completion_tokens {0: 4, 1: 494, 2: 1, 12: 1}  WARNING 1 rows outside 0..2
+revision2	E2_fp16	DeepSeek-R1-Distill-Qwen-7B_fp16_math500_n500_seed43	500/500 rows; engine-minus-compact completion_tokens {0: 2, 1: 496, 2: 2}
+revision2	E2_fp16	DeepSeek-R1-Distill-Qwen-7B_fp16_math500_n500_seed44	500/500 rows; engine-minus-compact completion_tokens {0: 2, 1: 494, 2: 2, 3: 1, 7: 1}  WARNING 2 rows outside 0..2
+revision2	E2_fp16	DeepSeek-R1-Distill-Qwen-7B_fp16_math500_n500_seed45	500/500 rows; engine-minus-compact completion_tokens {0: 2, 1: 497, 3: 1}  WARNING 1 rows outside 0..2
+revision2	E2_fp16	DeepSeek-R1-Distill-Qwen-7B_fp16_math500_n500_seed46	500/500 rows; engine-minus-compact completion_tokens {0: 2, 1: 497, 2: 1}
+revision2	E3_T08	DeepSeek-R1-Distill-Llama-8B_T0.8_math500_n500_seed42	500/500 rows; engine-minus-compact completion_tokens {-1: 1, 0: 2, 1: 494, 2: 3}  WARNING 1 rows outside 0..2
+revision2	E3_T08	DeepSeek-R1-Distill-Llama-8B_T0.8_math500_n500_seed43	500/500 rows; engine-minus-compact completion_tokens {0: 2, 1: 497, 2: 1}
+revision2	E3_T08	DeepSeek-R1-Distill-Llama-8B_T0.8_math500_n500_seed44	500/500 rows; engine-minus-compact completion_tokens {1: 497, 2: 1, 3: 2}  WARNING 2 rows outside 0..2
+revision2	E3_T08	DeepSeek-R1-Distill-Llama-8B_T0.8_math500_n500_seed45	500/500 rows; engine-minus-compact completion_tokens {0: 1, 1: 496, 2: 3}
+revision2	E3_T08	DeepSeek-R1-Distill-Llama-8B_T0.8_math500_n500_seed46	500/500 rows; engine-minus-compact completion_tokens {0: 2, 1: 493, 2: 4, 3: 1}  WARNING 1 rows outside 0..2
+revision2	E3_T08	DeepSeek-R1-Distill-Qwen-7B_T0.8_math500_n500_seed42	500/500 rows; engine-minus-compact completion_tokens {-22: 1, 0: 2, 1: 496, 2: 1}  WARNING 1 rows outside 0..2
+revision2	E3_T08	DeepSeek-R1-Distill-Qwen-7B_T0.8_math500_n500_seed43	500/500 rows; engine-minus-compact completion_tokens {0: 3, 1: 493, 2: 3, 3: 1}  WARNING 1 rows outside 0..2
+revision2	E3_T08	DeepSeek-R1-Distill-Qwen-7B_T0.8_math500_n500_seed44	500/500 rows; engine-minus-compact completion_tokens {0: 2, 1: 492, 2: 3, 3: 2, 11: 1}  WARNING 3 rows outside 0..2
+revision2	E3_T08	DeepSeek-R1-Distill-Qwen-7B_T0.8_math500_n500_seed45	500/500 rows; engine-minus-compact completion_tokens {0: 1, 1: 495, 2: 2, 3: 1, 5: 1}  WARNING 2 rows outside 0..2
+revision2	E3_T08	DeepSeek-R1-Distill-Qwen-7B_T0.8_math500_n500_seed46	500/500 rows; engine-minus-compact completion_tokens {0: 1, 1: 499}
+revision3	X1_heldout	DeepSeek-R1-Distill-Llama-8B_heldout_math500_n500_seed47	500/500 rows; engine-minus-compact completion_tokens {0: 5, 1: 494, 2: 1}
+revision3	X1_heldout	DeepSeek-R1-Distill-Llama-8B_heldout_math500_n500_seed48	500/500 rows; engine-minus-compact completion_tokens {0: 2, 1: 495, 2: 1, 3: 1, 5: 1}  WARNING 2 rows outside 0..2
+revision3	X1_heldout	DeepSeek-R1-Distill-Llama-8B_heldout_math500_n500_seed49	500/500 rows; engine-minus-compact completion_tokens {0: 4, 1: 496}
+revision3	X1_heldout	DeepSeek-R1-Distill-Llama-8B_heldout_math500_n500_seed50	500/500 rows; engine-minus-compact completion_tokens {0: 2, 1: 495, 2: 2, 4: 1}  WARNING 1 rows outside 0..2
+revision3	X1_heldout	DeepSeek-R1-Distill-Llama-8B_heldout_math500_n500_seed51	500/500 rows; engine-minus-compact completion_tokens {0: 1, 1: 498, 3: 1}  WARNING 1 rows outside 0..2
+revision3	X1_heldout	DeepSeek-R1-Distill-Qwen-7B_heldout_math500_n500_seed47	500/500 rows; engine-minus-compact completion_tokens {0: 2, 1: 496, 2: 2}
+revision3	X1_heldout	DeepSeek-R1-Distill-Qwen-7B_heldout_math500_n500_seed48	500/500 rows; engine-minus-compact completion_tokens {0: 3, 1: 497}
+revision3	X1_heldout	DeepSeek-R1-Distill-Qwen-7B_heldout_math500_n500_seed49	500/500 rows; engine-minus-compact completion_tokens {0: 5, 1: 494, 2: 1}
+revision3	X1_heldout	DeepSeek-R1-Distill-Qwen-7B_heldout_math500_n500_seed50	500/500 rows; engine-minus-compact completion_tokens {0: 5, 1: 494, 2: 1}
+revision3	X1_heldout	DeepSeek-R1-Distill-Qwen-7B_heldout_math500_n500_seed51	500/500 rows; engine-minus-compact completion_tokens {0: 3, 1: 495, 2: 1, 7: 1}  WARNING 1 rows outside 0..2

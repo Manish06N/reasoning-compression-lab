@@ -1,0 +1,2 @@
+Campaign cap-band rows scanned (completion_tokens>=32500, BF16/FP8/GPTQ-4 x Qwen/Llama x seeds 42-46): 103; non-zero offsets listed. Source: results/math500/*.json (details) + results/revision2/campaign_prompt_tokens.json (frozen-tokenizer recount). Campaign cells have no finish_reason.
+engine_vs_compact rows: sidecar.jsonl completion_tokens minus compact details completion_tokens, outside 0..2. Compact count is the post-hoc recount; engine count is vLLM's.
