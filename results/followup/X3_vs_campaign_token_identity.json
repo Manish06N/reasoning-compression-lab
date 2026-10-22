@@ -1,0 +1,104 @@
+{
+ "pooled": {
+  "n_pairs": 2500,
+  "token_identical": 5,
+  "token_identical_share": 0.002,
+  "first_divergent_token_quantiles_0_10_25_50_75_90_100": [
+   0.0,
+   27.0,
+   66.0,
+   140.0,
+   258.0,
+   445.0,
+   1849.0
+  ],
+  "share_diverging_within_first_100_tokens": 0.3715430861723447
+ },
+ "seed42": {
+  "n_pairs": 500,
+  "token_identical": 2,
+  "token_identical_share": 0.004,
+  "first_divergent_token_quantiles_0_10_25_50_75_90_100": [
+   4.0,
+   40.0,
+   79.0,
+   152.0,
+   272.75,
+   472.60000000000014,
+   1574.0
+  ],
+  "share_diverging_within_first_100_tokens": 0.3192771084337349
+ },
+ "seed43": {
+  "n_pairs": 500,
+  "token_identical": 0,
+  "token_identical_share": 0.0,
+  "first_divergent_token_quantiles_0_10_25_50_75_90_100": [
+   0.0,
+   27.0,
+   64.0,
+   138.5,
+   256.75,
+   421.30000000000007,
+   1849.0
+  ],
+  "share_diverging_within_first_100_tokens": 0.392
+ },
+ "seed44": {
+  "n_pairs": 500,
+  "token_identical": 0,
+  "token_identical_share": 0.0,
+  "first_divergent_token_quantiles_0_10_25_50_75_90_100": [
+   0.0,
+   10.900000000000006,
+   57.75,
+   136.0,
+   275.5,
+   442.30000000000007,
+   1609.0
+  ],
+  "share_diverging_within_first_100_tokens": 0.392
+ },
+ "seed45": {
+  "n_pairs": 500,
+  "token_identical": 1,
+  "token_identical_share": 0.002,
+  "first_divergent_token_quantiles_0_10_25_50_75_90_100": [
+   0.0,
+   13.200000000000017,
+   63.5,
+   142.0,
+   246.5,
+   445.59999999999997,
+   1594.0
+  ],
+  "share_diverging_within_first_100_tokens": 0.3787575150300601
+ },
+ "seed46": {
+  "n_pairs": 500,
+  "token_identical": 2,
+  "token_identical_share": 0.004,
+  "first_divergent_token_quantiles_0_10_25_50_75_90_100": [
+   3.0,
+   30.0,
+   67.25,
+   133.5,
+   235.75,
+   388.50000000000006,
+   1273.0
+  ],
+  "share_diverging_within_first_100_tokens": 0.3755020080321285
+ },
+ "hist": {
+  "n_diverging": 2495,
+  "min": 0,
+  "<10": 154,
+  "<50": 449,
+  "<100": 927,
+  "<500": 2307,
+  "<1000": 2479,
+  ">=1000": 16,
+  ">=5000": 0,
+  "mean": 196.25170340681362
+ }
+}

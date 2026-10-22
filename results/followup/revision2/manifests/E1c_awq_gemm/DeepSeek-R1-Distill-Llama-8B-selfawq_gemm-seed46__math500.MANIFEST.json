@@ -1,0 +1,32 @@
+{
+ "exp": "E1c",
+ "cell": "DeepSeek-R1-Distill-Llama-8B-selfawq_gemm",
+ "dataset": "MATH-500",
+ "seed": 46,
+ "job_id": "110766",
+ "node": "ragpu006",
+ "gpu": "NVIDIA A100 80GB PCIe, 550.54.14, GPU-6a5102c3-d209-66c4-1bd2-2f4dd3412e2a\nNVIDIA A100 80GB PCIe, 550.54.14, GPU-b0cefda0-26d0-0479-f60a-fff2be65cdb0",
+ "date": "2026-10-21T02:40:37+05:30",
+ "workspace_git_sha": null,
+ "workspace_git_dirty": false,
+ "code_tree_sha256_16": "00ff9fe5b1d65b3b",
+ "env_vars": {
+  "R2_EXPECT_OFFSET": "1",
+  "QRM_REPO_DIR": "/scratch/manishn_iitp/PhD/revision2-workspace/external/Quantized-Reasoning-Models",
+  "QRM_SEED": "46",
+  "QRM_DTYPE": "float16",
+  "R2_TAG": "_gemm",
+  "QRM_OUTPUT_ROOT": "/scratch/manishn_iitp/PhD/revision2-workspace/results/revision2/E1c_awq_gemm",
+  "QRM_DATASET": "MATH-500",
+  "QRM_MODEL_PATH": "/scratch/manishn_iitp/PhD/revision2-workspace/models_r2/DeepSeek-R1-Distill-Llama-8B-selfawq",
+  "R2_QUANT": "awq",
+  "QRM_MAX_SAMPLES": "500"
+ },
+ "effective_engine_config_line": null,
+ "sampling_params_logged": [
+  "SamplingParams(n=1, presence_penalty=0.0, frequency_penalty=0.0, repetition_penalty=1.0, temperature=0.6, top_p=0.95, top_k=-1, min_p=0.0, seed=46, stop=['<\uff5cend\u2581of\u2581sentence\uff5c>'], stop_token_ids=[], bad_words=[], include_stop_str_in_output=False, ignore_eos=False, max_tokens=32768, min_tokens=0, logprobs=0, prompt_logprobs=None, skip_special_tokens=True, spaces_between_special_tokens=True, truncate_prompt_tokens=None, guided_decoding=None)"
+ ],
+ "env_freeze_file": "/scratch/manishn_iitp/PhD/revision2-workspace/results/revision2/env/qrm-official_freeze.txt",
+ "env_freeze_sha256_16": "d4a18ba858867040",
+ "versions_logged_in_job": []
+}

@@ -1,0 +1,4 @@
+campaign Qwen BF16 seed42 MATH-500 n=500 agree=500 (1.0000) mean_new=0.9440 mean_stored=0.9440 1s
+mismatch idx []
+E1b Llama selfawq seed43 GSM8K n=1319 agree=1319 (1.0000) mean_new=0.8734 mean_stored=0.8734 1s
+mismatch idx []

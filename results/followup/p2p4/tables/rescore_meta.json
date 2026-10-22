@@ -1,0 +1,9 @@
+{
+ "versions": {
+  "lighteval": "0.8.0",
+  "math-verify": null,
+  "math_verify": null,
+  "latex2sympy2_extended": "1.0.6"
+ },
+ "failures": []
+}

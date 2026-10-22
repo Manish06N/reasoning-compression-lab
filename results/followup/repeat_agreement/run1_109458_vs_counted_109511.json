@@ -1,0 +1,16 @@
+{
+ "n": 500,
+ "n_pairs": 500,
+ "token_identical": 500,
+ "token_identical_share": 1.0,
+ "first_divergent_token_quantiles_0_10_25_50_75_90_100": [],
+ "share_diverging_within_first_100_tokens": null,
+ "pass1_A_pp": 94.8,
+ "pass1_B_pp": 94.8,
+ "mean_tokens_A": 3989.932,
+ "mean_tokens_B": 3989.932,
+ "correctness_agreement": 1.0,
+ "A_correct_B_wrong": 0,
+ "A_wrong_B_correct": 0,
+ "mean_abs_token_diff": 0.0
+}

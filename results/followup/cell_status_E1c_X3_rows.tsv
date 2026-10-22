@@ -1,0 +1,10 @@
+E1c	DeepSeek-R1-Distill-Llama-8B-selfawq_gemm	MATH-500	42	OK	110766	ragpu006	2026-10-20T21:50:54+05:30	2026-10-20T22:54:45+05:30	3830	/scratch/manishn_iitp/PhD/revision2-workspace/results/revision2/E1c_awq_gemm
+E1c	DeepSeek-R1-Distill-Llama-8B-selfawq_gemm	MATH-500	43	OK	110766	ragpu006	2026-10-20T22:54:45+05:30	2026-10-20T23:57:27+05:30	3757	/scratch/manishn_iitp/PhD/revision2-workspace/results/revision2/E1c_awq_gemm
+E1c	DeepSeek-R1-Distill-Llama-8B-selfawq_gemm	MATH-500	44	OK	110766	ragpu006	2026-10-20T23:57:27+05:30	2026-10-21T00:55:44+05:30	3493	/scratch/manishn_iitp/PhD/revision2-workspace/results/revision2/E1c_awq_gemm
+E1c	DeepSeek-R1-Distill-Llama-8B-selfawq_gemm	MATH-500	45	OK	110766	ragpu006	2026-10-21T00:55:44+05:30	2026-10-21T01:47:20+05:30	3094	/scratch/manishn_iitp/PhD/revision2-workspace/results/revision2/E1c_awq_gemm
+E1c	DeepSeek-R1-Distill-Llama-8B-selfawq_gemm	MATH-500	46	OK	110766	ragpu006	2026-10-21T01:47:20+05:30	2026-10-21T02:40:37+05:30	3194	/scratch/manishn_iitp/PhD/revision2-workspace/results/revision2/E1c_awq_gemm
+X3	DeepSeek-R1-Distill-Qwen-7B_mns64	MATH-500	42	OK	110767	ragpu006	2026-10-21T15:20:42+05:30	2026-10-21T15:55:28+05:30	2081	/scratch/manishn_iitp/PhD/revision2-workspace/results/revision3/X3_batch
+X3	DeepSeek-R1-Distill-Qwen-7B_mns64	MATH-500	43	OK	110767	ragpu006	2026-10-21T15:55:28+05:30	2026-10-21T16:27:18+05:30	1905	/scratch/manishn_iitp/PhD/revision2-workspace/results/revision3/X3_batch
+X3	DeepSeek-R1-Distill-Qwen-7B_mns64	MATH-500	44	OK	110767	ragpu006	2026-10-21T16:27:18+05:30	2026-10-21T17:01:05+05:30	2021	/scratch/manishn_iitp/PhD/revision2-workspace/results/revision3/X3_batch
+X3	DeepSeek-R1-Distill-Qwen-7B_mns64	MATH-500	45	OK	110767	ragpu006	2026-10-21T17:01:05+05:30	2026-10-21T17:34:19+05:30	1989	/scratch/manishn_iitp/PhD/revision2-workspace/results/revision3/X3_batch
+X3	DeepSeek-R1-Distill-Qwen-7B_mns64	MATH-500	46	OK	110767	ragpu006	2026-10-21T17:34:19+05:30	2026-10-21T18:06:43+05:30	1939	/scratch/manishn_iitp/PhD/revision2-workspace/results/revision3/X3_batch

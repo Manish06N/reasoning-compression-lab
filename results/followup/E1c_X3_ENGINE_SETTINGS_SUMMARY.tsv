@@ -1,0 +1,11 @@
+group	cell	seed	dtype	quantization	max_num_seqs	enforce_eager	prefix_caching	chunked_prefill	pass1	mean_completion_tokens	VERIFY
+E1c_awq_gemm	DeepSeek-R1-Distill-Llama-8B-selfawq_gemm	42	torch.float16	awq	256	True	False	False	0.8480	4888.50	VERIFY_OK
+E1c_awq_gemm	DeepSeek-R1-Distill-Llama-8B-selfawq_gemm	43	torch.float16	awq	256	True	False	False	0.8620	5004.17	VERIFY_OK
+E1c_awq_gemm	DeepSeek-R1-Distill-Llama-8B-selfawq_gemm	44	torch.float16	awq	256	True	False	False	0.8660	4724.20	VERIFY_OK
+E1c_awq_gemm	DeepSeek-R1-Distill-Llama-8B-selfawq_gemm	45	torch.float16	awq	256	True	False	False	0.8940	4746.56	VERIFY_OK
+E1c_awq_gemm	DeepSeek-R1-Distill-Llama-8B-selfawq_gemm	46	torch.float16	awq	256	True	False	False	0.8880	4757.48	VERIFY_OK
+X3_batch	DeepSeek-R1-Distill-Qwen-7B_mns64	42	torch.bfloat16	None	64	True	False	False	0.9320	3884.06	VERIFY_OK
+X3_batch	DeepSeek-R1-Distill-Qwen-7B_mns64	43	torch.bfloat16	None	64	True	False	False	0.9420	4200.29	VERIFY_OK
+X3_batch	DeepSeek-R1-Distill-Qwen-7B_mns64	44	torch.bfloat16	None	64	True	False	False	0.9380	4099.25	VERIFY_OK
+X3_batch	DeepSeek-R1-Distill-Qwen-7B_mns64	45	torch.bfloat16	None	64	True	False	False	0.9340	4025.78	VERIFY_OK
+X3_batch	DeepSeek-R1-Distill-Qwen-7B_mns64	46	torch.bfloat16	None	64	True	False	False	0.9380	4171.13	VERIFY_OK
