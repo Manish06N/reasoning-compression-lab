@@ -1,0 +1,7 @@
+GSM8K item-order table (built 2026-10-22, read-only).
+Source dataset: openai/gsm8k main test, revision 740312add88f781978c0658806c59bc2815b9866 (hf_cache parquet), 1319 questions, no duplicate questions.
+dataset_index = 0-based line in that HF test file. item_id = what the P2 runner records (str of the same index).
+campaign_row = 1-based position in the Paper 1 campaign GSM8K raw outputs (outputs-hpc-breadth-gsm8k-2026-08-15, 24 cells), mapped by matching the question text inside raw full_prompt.
+p2_publication_row = 1-based position in the P2 publication GSM8K predictions (job 107151, 18 cells) = compact details[].row.
+IMPORTANT: the two orders are different. The campaign order is a permutation of the HF order (row_equal is True for only 2 of 1319 items), so campaign and P2 rows must be joined on dataset_index, never on row number.
+One-to-one checks and results: GSM8K_item_table_checks.json (all True; all 24 campaign cells share one order, all 18 P2 publication cells and all 9 dtype-control cells (108562) share the HF order, P2 problem text equals the HF question at its dataset_index on every row).

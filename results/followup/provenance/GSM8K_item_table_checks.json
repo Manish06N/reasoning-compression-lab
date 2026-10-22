@@ -1,0 +1,26 @@
+{
+ "hf_file": "hf_cache/hub/datasets--openai--gsm8k/snapshots/740312add88f781978c0658806c59bc2815b9866/main/test-00000-of-00001.parquet",
+ "hf_n": 1319,
+ "duplicate_questions_in_hf": 0,
+ "campaign_cells": 24,
+ "campaign_rows_per_cell": [
+  1319
+ ],
+ "campaign_unmatched_rows_any_cell": 0,
+ "campaign_cells_with_order_identical_to_first": 24,
+ "campaign_one_to_one": true,
+ "p2_pub_cells": 18,
+ "p2_pub_rows_per_cell": [
+  1319
+ ],
+ "p2_pub_cells_with_order_identical_to_first": 18,
+ "p2_pub_problem_text_equals_hf_at_dataset_index_all_rows": true,
+ "p2_pub_item_id_equals_dataset_index_all_rows": true,
+ "p2_pub_one_to_one": true,
+ "p2_dtype_control_cells": 9,
+ "p2_dtype_control_order_identical_to_p2_pub": 9,
+ "campaign_order_equals_p2_order_row_for_row": false,
+ "rows_where_campaign_hf_index_differs_from_p2_hf_index": 1317,
+ "campaign_row_is_identity_with_hf_index": 2,
+ "join_by_dataset_index_one_to_one": true
+}
