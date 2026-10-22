@@ -219,6 +219,75 @@ for fam, stem in FAMS.items():
         chk(f"excess10 {fam} {f}", lam - pi10, r["excess"], pct(b), r["ci"]); chk(f"pi10 {fam} {f}", pi10, r["pi10"])
 print("   excess vs 10-seed placebo done", flush=True)
 
+# --- noise floor of the single-run design and the placebo-free correct-run estimand (independent code, different seeds)
+NFJ = J("noise_floor_crd.json")
+rng_nf = np.random.default_rng(777)
+def rel(l1, l2, m):
+    return np.nan if m.sum() < 4 else (l2[m].mean() - l1[m].mean()) / l1[m].mean() * 100
+for fam in FAMS:
+    A_, T_ = BF[fam]
+    # n = 500: all 20 ordered seed pairs, deterministic
+    vals = {"all": [], "correct": [], "wrong": []}
+    for s in range(5):
+        for t in range(5):
+            if s == t: continue
+            a = A_[s]; vals["all"].append(rel(T_[s], T_[t], np.ones(500, bool))); vals["correct"].append(rel(T_[s], T_[t], a == 1)); vals["wrong"].append(rel(T_[s], T_[t], a == 0))
+    for sub, v in vals.items():
+        v = np.array(v); v = v[~np.isnan(v)]; ref = NFJ["noise_floor"][fam]["500"][sub]
+        chk(f"noise floor {fam} n=500 {sub} mean", float(v.mean()), ref["mean"]); chk(f"noise floor {fam} n=500 {sub} min", float(v.min()), ref["ci"][0]); chk(f"noise floor {fam} n=500 {sub} max", float(v.max()), ref["ci"][1])
+        chk(f"noise floor {fam} n=500 {sub} P>5", float(np.mean(v > 5) * 100), ref["p5"]); chk(f"noise floor {fam} n=500 {sub} P>10", float(np.mean(v > 10) * 100), ref["p10"])
+    # n = 100: Monte Carlo with a different seed and 40,000 draws; tolerances reflect Monte Carlo error
+    sims = {"all": [], "correct": [], "wrong": []}
+    for _ in range(40000):
+        s, t = rng_nf.choice(5, 2, replace=False); idx = rng_nf.choice(500, 100, replace=False); a = A_[s][idx]
+        sims["all"].append(rel(T_[s][idx], T_[t][idx], np.ones(100, bool))); sims["correct"].append(rel(T_[s][idx], T_[t][idx], a == 1)); sims["wrong"].append(rel(T_[s][idx], T_[t][idx], a == 0))
+    for sub, v in sims.items():
+        v = np.array(v); v = v[~np.isnan(v)]; ref = NFJ["noise_floor"][fam]["100"][sub]
+        tol_end = 2.5 if sub == "wrong" else 1.2        # the failed-run subset has about 6-11 questions per draw: its tail percentiles are much noisier
+        lo, hi = np.percentile(v, [2.5, 97.5]); ok = abs(v.mean() - ref["mean"]) < 0.35 and abs(lo - ref["ci"][0]) < tol_end and abs(hi - ref["ci"][1]) < tol_end and abs(np.mean(v > 5) * 100 - ref["p5"]) < 1.5 and abs(np.mean(v > 10) * 100 - ref["p10"]) < 1.5
+        (OK if ok else FAIL).append(f"noise floor {fam} n=100 {sub}" if ok else f"noise floor {fam} n=100 {sub}: mine mean {v.mean():+.2f} range [{lo:+.1f},{hi:+.1f}] P5 {np.mean(v>5)*100:.1f} P10 {np.mean(v>10)*100:.1f} vs saved {ref['mean']:+.2f} {ref['ci']} {ref['p5']:.1f} {ref['p10']:.1f}")
+print("   noise floor done", flush=True)
+# prose numbers of the noise-floor paragraph (typed in the text) against the saved results, rounded as in the text
+nf = NFJ["noise_floor"]
+for lbl, got, want, d in (
+        ("text: Qwen n=100 all mean +0.4", nf["Qwen-7B"]["100"]["all"]["mean"], 0.4, 1), ("text: Llama n=100 all mean +0.6", nf["Llama-8B"]["100"]["all"]["mean"], 0.6, 1),
+        ("text: Qwen all P>5 30%", nf["Qwen-7B"]["100"]["all"]["p5"], 30, 0), ("text: Llama all P>5 32%", nf["Llama-8B"]["100"]["all"]["p5"], 32, 0),
+        ("text: Qwen correct mean +4.4", nf["Qwen-7B"]["100"]["correct"]["mean"], 4.4, 1), ("text: Llama correct mean +7.1", nf["Llama-8B"]["100"]["correct"]["mean"], 7.1, 1),
+        ("text: Qwen correct P>5 45%", nf["Qwen-7B"]["100"]["correct"]["p5"], 45, 0), ("text: Llama correct P>5 55%", nf["Llama-8B"]["100"]["correct"]["p5"], 55, 0),
+        ("text: Qwen wrong mean -10.8", nf["Qwen-7B"]["100"]["wrong"]["mean"], -10.8, 1), ("text: Llama wrong mean -12.0", nf["Llama-8B"]["100"]["wrong"]["mean"], -12.0, 1),
+        ("text: Qwen n=500 correct mean +4.3", nf["Qwen-7B"]["500"]["correct"]["mean"], 4.3, 1), ("text: Llama n=500 correct mean +6.7", nf["Llama-8B"]["500"]["correct"]["mean"], 6.7, 1),
+        ("text: abstract +4% to +7% (correct subset means)", min(nf["Qwen-7B"]["100"]["correct"]["mean"], nf["Llama-8B"]["100"]["correct"]["mean"]), 4, 0),
+        ("text: abstract 11-12% deflation (wrong subset means, abs)", abs(nf["Qwen-7B"]["100"]["wrong"]["mean"]), 11, 0)):
+    (OK if round(got, d) == want else FAIL).append(lbl if round(got, d) == want else f"{lbl}: saved {got:.3f} rounds to {round(got, d)} not {want}")
+mags = [abs(nf[f]["100"]["all"]["ci"][j]) for f in ("Qwen-7B", "Llama-8B") for j in (0, 1)]       # |endpoints| of the all-question 95% ranges
+(OK if round(min(mags)) == 17 and round(max(mags)) == 22 else FAIL).append("text: all-question 95% range about +-17 to 22" if round(min(mags)) == 17 and round(max(mags)) == 22 else f"text range magnitudes {min(mags):.1f}..{max(mags):.1f}")
+
+def crd_loop(Ab, Tb, Aq, Tq):
+    N = Ab.shape[1]; d = np.zeros(N); use = np.zeros(N)
+    for i in range(N):                                                    # explicit loop on purpose
+        cb = [Tb[s][i] for s in range(Ab.shape[0]) if Ab[s][i] == 1]; cq = [Tq[s][i] for s in range(Aq.shape[0]) if Aq[s][i] == 1]
+        if cb and cq: d[i] = np.mean(cq) - np.mean(cb); use[i] = 1
+    ix = RNG.integers(0, N, (B, N))
+    return float(d.sum() / use.sum()), pct(d[ix].sum(1) / use[ix].sum(1)), int(use.sum())
+crd_arms = []
+for fam, stem in FAMS.items():
+    A_, T_ = BF[fam]
+    crd_arms.append((fam, "BF16, seeds 47--51 (null)", A_, T_, *stack([X1D / f"{stem}_heldout_math500_n500_seed{s}.json" for s in range(47, 52)]), False))
+    for f in ("FP8", "AWQ-4", "GPTQ-4"): crd_arms.append((fam, f, A_, T_, *camp("math500", fam, f, range(42, 47)), True))
+    crd_arms.append((fam, "BF16 at \\texttt{float16} (null)", A_, T_, *stack([EXP / "revision2/compact/E2_fp16" / f"{stem}_fp16_math500_n500_seed{s}.json" for s in range(42, 47)]), True))
+    crd_arms.append((fam, "BF16 at $T=0.8$", A_, T_, *stack([EXP / "revision2/compact/E3_T08" / f"{stem}_T0.8_math500_n500_seed{s}.json" for s in range(42, 47)]), True))
+    if fam == "Llama-8B":
+        crd_arms.append((fam, "Self-quantized AWQ-4, Marlin", A_, T_, *stack([EXP / "revision2/compact/E1_awq" / f"DeepSeek-R1-Distill-Llama-8B-selfawq_math500_n500_seed{s}.json" for s in range(42, 47)]), True))
+        crd_arms.append((fam, "Self-quantized AWQ-4, GEMM", A_, T_, *stack(sorted(glob.glob(str(V3 / "revision2/compact/E1c_awq_gemm/*seed4[2-6].json")))), True))
+    else:
+        crd_arms.append((fam, "BF16, batch limit 64 (null)", A_, T_, *stack(sorted(glob.glob(str(V3 / "revision3/compact/X3_batch/*seed4[2-6].json")))), True))
+for fam, name, A_, T_, Aq_, Tq_, with_ex in crd_arms:
+    ref = NFJ["crd"][f"{fam} | {name}"]; est, ci, n_it = crd_loop(A_, T_, Aq_, Tq_)
+    chk(f"CRD {fam} {name}", est, ref["crd"], ci, ref["crd_ci"]); chk(f"CRD {fam} {name} items", float(n_it), float(ref["items"]))
+    if with_ex:
+        m = arm(A_, T_, Aq_, Tq_, A_, T_, cross_pairs(5, 5)); chk(f"CRD-table excess {fam} {name}", m["excess"], ref["excess_cross"], m["excess_ci"], ref["excess_cross_ci"])
+print("   correct-run estimand done", flush=True)
+
 # --- P2 Qwen self-quantized (MATH-500, GSM8K), community reference, draw spread, dtype control
 for bench, J2, seeds_ref in (("math500", P2, range(42, 47)), ("gsm8k", P2G, range(42, 45))):
     Ab5, Tb5 = camp(bench, "Qwen-7B", "BF16", seeds_ref); Ab, Tb = Ab5[:3], Tb5[:3]; N = Ab.shape[1]
@@ -357,9 +426,9 @@ REF = []
 for f in OUTD.glob("*.json"):
     if f.name != "verify_new_numbers.json": walk(json.load(open(f, encoding="utf-8")), REF)
 def known(v, lo, hi, raw):
-    d = 2 if "." in raw[0] else 0
+    d = len(raw[0].split(".")[1]) if "." in raw[0] else 0
     return any(abs(round(a, d) - v) < 1e-9 and abs(round(b, d) - lo) < 1e-9 and abs(round(c, d) - hi) < 1e-9 for (a, b, c) in REF)
-OLDSET = {(v, lo, hi) for v, lo, hi, _ in triplets(open(ROOT / "paper" / "main.tex", encoding="utf-8").read())}
+OLDSET = {(v, lo, hi) for v, lo, hi, _ in triplets(open(ROOT / "paper" / "v2_followups" / "paper_revised.tex", encoding="utf-8").read())}
 tex = open(ROOT / "paper" / "v2_followups" / "paper_v2.tex", encoding="utf-8").read()
 for f in sorted((ROOT / "paper" / "v2_followups" / "generated").glob("tab_*.tex")): tex += "\n" + open(f, encoding="utf-8").read()
 tr = triplets(tex); matched = old = 0; bad = []
@@ -367,9 +436,7 @@ for v, lo, hi, raw in tr:
     if known(v, lo, hi, raw) or (v, lo, hi) in ADHOC_VERIFIED: matched += 1
     elif (v, lo, hi) in OLDSET: old += 1
     else: bad.append(raw)
-print(f"   {len(tr)} triplets in text/tables: {matched} match a saved result, {old} appear in paper/main.tex, {len(bad)} not matched")
-print("   (not matched = numbers of the earlier campaign analysis, e.g. Table 1 and the accuracy table, that this script does not re-derive;")
-print("    they are listed for review and do not affect the exit code. Exit code 1 means a Stage A recomputation disagrees.)")
-for r in bad[:80]: print("   NOT MATCHED:", r)
+print(f"   {len(tr)} triplets in text/tables: {matched} match a saved result, {old} are unchanged numbers from the earlier manuscript, {len(bad)} unmatched")
+for r in bad[:80]: print("   UNMATCHED:", r)
 (OUTD / "verify_new_numbers.json").write_text(json.dumps(dict(stageA_ok=len(OK), stageA_fail=FAIL, stageB_triplets=len(tr), stageB_matched=matched, stageB_old=old, stageB_unmatched=bad), indent=1))
-sys.exit(1 if FAIL else 0)
+sys.exit(1 if FAIL or bad else 0)

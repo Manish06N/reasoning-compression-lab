@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-23 - Two consequences for published inflation designs; overthinking proxies; pre-registered rules for the next runs (no frozen result changed)
+
+- **Noise floor.** Two runs of the same BF16 model on 100 random MATH-500 questions already give an apparent "inflation" of +4.4% (Qwen) and +7.1% (Llama) on the questions run 1 solved and -10.8% / -12.0% on those it failed; with all 500 questions it is still +4.3% / +6.7%. `scripts/analysis/followup/noise_floor_crd.py`. It is a simulation under sampling, not greedy decoding.
+- **Placebo-free estimand.** The item-matched difference in the length of correct runs (Proposition 2 in the draft's appendix) reads near zero on the null arms and away from zero for Qwen AWQ-4, GPTQ-4 and T=0.8, with less power than the placebo-corrected excess.
+- **C2 (overthinking proxies, CPU).** 16 arms, 85 cells, 3,552 incorrect finished completions; the pre-registered rule returns "not detected" for all 14 contrasts because the answer-based proxy P-a flags only 16 completions in total. Uninformative, not negative. `results/followup/c2/`.
+- **Pre-registration.** `PREREG_E5a.md` and `PREREG_G1_C2_D1.md` (verdict rules for E5a, G1, C2, D1) are committed before any E5a, G1 or D1 output exists; D1 is on hold (Step 0 notes in `results/followup/d1/`), the G1 cell list and expectations are in `results/followup/g1_prerun/`. `scripts/analysis/followup/e5a_results.py` applies the E5a rule.
+- **Verification.** `verify_new_numbers.py` now covers the noise floor and the correct-run estimand: 413 checks agree, 0 disagree; 515 numeric triplets in the draft, 0 unmatched. It compares against the earlier manuscript through `paper/v2_followups/paper_revised.tex`.
+- **Draft.** `paper/v2_followups/paper_v2.tex` (60 pages) has the new subsection, Proposition 2 and the C2 paragraph.
+
 ## 2026-10-18 — Follow-up experiments and a restructured draft (branch `followup-experiments-2026-10`; frozen campaign results unchanged)
 
 - **New GPU runs, same stack.** E1 (a Llama AWQ-4 checkpoint quantized by the authors, MATH-500 and GSM8K), E1c (the same weights on the forced GEMM kernel), E2 (BF16 at `float16`), E3 (BF16 at T=0.8), X1 (five held-out BF16 seeds), X3 (scheduler `max_num_seqs` 64 vs 256). 48 cells, 26,457 completions; per-item records, engine settings and incident log in `results/followup/`.

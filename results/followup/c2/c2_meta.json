@@ -1,0 +1,39 @@
+{
+ "skipped": [
+  [
+   "DeepSeek-R1-Distill-Llama-8B-selfawq",
+   42,
+   "no VERIFIED MATH-500 raw/validation"
+  ],
+  [
+   "DeepSeek-R1-Distill-Llama-8B-selfawq",
+   43,
+   "no VERIFIED MATH-500 raw/validation"
+  ],
+  [
+   "DeepSeek-R1-Distill-Llama-8B-selfawq",
+   44,
+   "no VERIFIED MATH-500 raw/validation"
+  ]
+ ],
+ "n_arms": 16,
+ "cells_per_arm": {
+  "camp_Qwen_BF16": 5,
+  "camp_Qwen_FP8": 5,
+  "camp_Qwen_AWQ-4": 5,
+  "camp_Qwen_GPTQ-4": 5,
+  "camp_Llama_BF16": 5,
+  "camp_Llama_FP8": 5,
+  "camp_Llama_AWQ-4": 5,
+  "camp_Llama_GPTQ-4": 5,
+  "e1_Llama_selfawq4": 2,
+  "e1c_Llama_selfawq4_gemm": 5,
+  "e2_Qwen_fp16": 5,
+  "e3_Qwen_T0.8": 5,
+  "e2_Llama_fp16": 5,
+  "e3_Llama_T0.8": 5,
+  "p2_Qwen_awq4_controlled_draws0-2_seeds42-44": 9,
+  "p2_Qwen_gptq4_controlled_draws0-2_seeds42-44": 9
+ },
+ "method": "see c2_notes.md"
+}
