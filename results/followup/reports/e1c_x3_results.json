@@ -42,7 +42,30 @@
    341.96261999999996
   ],
   "rule_accuracy": "kernel-robust (loss detected under GEMM)",
-  "rule_length": "inconclusive",
+  "rule_length": "kernel-robust (cross-seed excess excludes 0, positive)",
+  "cross_seed": {
+   "lam": 407.4220080681309,
+   "lam_ci": [
+    250.63034871362288,
+    567.4370415387582
+   ],
+   "excess": 171.9530479605558,
+   "excess_ci": [
+    22.558917243876305,
+    322.98807946060816
+   ],
+   "E1a_lam": 438.1944195428059,
+   "E1a_excess": 202.72545943523085,
+   "E1a_excess_ci": [
+    66.14818725781826,
+    340.77240926126336
+   ],
+   "excess_E1a_minus_E1c": 30.77241147467504,
+   "excess_diff_ci": [
+    -104.26513253397275,
+    164.46353876992737
+   ]
+  },
   "acc_by_seed": [
    84.8,
    86.2,

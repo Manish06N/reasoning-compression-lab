@@ -28,22 +28,30 @@ ex1, ex2 = b1 - bp, b2 - bp
 dA = lambda A: (A.mean(0) - Ab.mean(0)) * 100
 acc2 = dA(a2); acc1 = dA(a1); acc21 = (a2.mean(0) - a1.mean(0)) * 100
 dT2 = t2.mean(0) - Tb.mean(0)
-excess_diff = ex1 - ex2                                  # excess(E1a) - excess(E1c), shared item resamples
+excess_diff = ex1 - ex2                                  # excess(E1a) - excess(E1c), shared item resamples (seed-matched, descriptive)
+# The pre-registered estimators are CROSS-SEED pairs (PREREG_E1c_X3_X5.md, header): the rule is applied to those.
+pairs_c = [(r, o) for r in range(5) for o in range(5) if r != o]
+s1c, n1c = sp.item_sums(Ab, Tb, t1, pairs_c); s2c, n2c = sp.item_sums(Ab, Tb, t2, pairs_c)
+b1c = s1c[idx].sum(1) / n1c[idx].sum(1); b2c = s2c[idx].sum(1) / n2c[idx].sum(1)
+l1c, l2c = s1c.sum() / n1c.sum(), s2c.sum() / n2c.sum(); ex1c, ex2c = b1c - bp, b2c - bp; excess_diff_c = ex1c - ex2c
 rule_acc = "kernel-robust (loss detected under GEMM)" if pct(acc2[idx].mean(1))[1] < 0 else "not detected under GEMM"
-if pct(ex2)[0] > 0: rule_len = "kernel-robust (excess excludes 0, positive)"
-elif pct(ex2)[0] <= 0 <= pct(ex2)[1] and not (pct(excess_diff)[0] <= 0 <= pct(excess_diff)[1]): rule_len = "kernel-dependent"
+if pct(ex2c)[0] > 0: rule_len = "kernel-robust (cross-seed excess excludes 0, positive)"
+elif pct(ex2c)[0] <= 0 <= pct(ex2c)[1] and not (pct(excess_diff_c)[0] <= 0 <= pct(excess_diff_c)[1]): rule_len = "kernel-dependent"
 else: rule_len = "inconclusive"
+cross = dict(lam=float(l2c), lam_ci=pct(b2c), excess=float(l2c - pi), excess_ci=pct(ex2c), E1a_lam=float(l1c), E1a_excess=float(l1c - pi), E1a_excess_ci=pct(ex1c),
+             excess_E1a_minus_E1c=float(l1c - l2c), excess_diff_ci=pct(excess_diff_c))
 res["E1c"] = dict(acc_diff_pp=float(acc2.mean()), acc_diff_ci=pct(acc2[idx].mean(1)), acc_E1a_pp=float(acc1.mean()), acc_E1c_minus_E1a_pp=float(acc21.mean()),
                   acc_E1c_minus_E1a_ci=pct(acc21[idx].mean(1)), lam_m=float(l2), lam_m_ci=pct(b2), placebo=float(pi), placebo_ci=pct(bp), excess=float(l2 - pi), excess_ci=pct(ex2),
                   E1a_excess=float(l1 - pi), E1a_excess_ci=pct(ex1), excess_E1a_minus_E1c=float(l1 - l2), excess_diff_ci=pct(excess_diff),
-                  uncond_tokens=float(dT2.mean()), uncond_ci=pct(dT2[idx].mean(1)), rule_accuracy=rule_acc, rule_length=rule_len,
+                  uncond_tokens=float(dT2.mean()), uncond_ci=pct(dT2[idx].mean(1)), rule_accuracy=rule_acc, rule_length=rule_len, cross_seed=cross,
                   acc_by_seed=[float(a.mean() * 100) for a in a2], tokens_by_seed=[float(t.mean()) for t in t2])
 print("E1c vs BF16 (Llama, MATH-500, 5 seeds, seed-matched)")
 print("  accuracy diff pp", fmt(acc2.mean(), pct(acc2[idx].mean(1)), 2), "| E1a", f"{acc1.mean():+.2f}", "| E1c - E1a", fmt(acc21.mean(), pct(acc21[idx].mean(1)), 2))
 print("  Lambda_b", fmt(l2, pct(b2)), "placebo", fmt(pi, pct(bp)), "excess", fmt(l2 - pi, pct(ex2)))
 print("  E1a excess", fmt(l1 - pi, pct(ex1)), "| excess(E1a)-excess(E1c)", fmt(l1 - l2, pct(excess_diff)))
 print("  uncond tokens", fmt(dT2.mean(), pct(dT2[idx].mean(1))))
-print("  RULE accuracy:", rule_acc, "| RULE length:", rule_len)
+print("  PRE-REGISTERED (cross-seed) Lambda_b", fmt(l2c, pct(b2c)), "excess", fmt(l2c - pi, pct(ex2c)), "| E1a excess", fmt(l1c - pi, pct(ex1c)), "| E1a-E1c", fmt(l1c - l2c, pct(excess_diff_c)))
+print("  RULE accuracy:", rule_acc, "| RULE length (cross-seed, as pre-registered):", rule_len)
 
 # X3: Qwen BF16 at max_num_seqs=64 against the campaign BF16 reference
 Aq, Tq = rs.load_cell("math500", "Qwen-7B", "BF16")
