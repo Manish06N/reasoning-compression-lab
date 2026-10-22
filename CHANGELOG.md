@@ -9,6 +9,7 @@
 - **Corrections.** The timer's extra BOS token is not a difference from the campaign (the campaign engine also received a doubled BOS); two campaign near-cap rows that ended on their own are noted.
 - **Code.** `scripts/analysis/followup/` (standalone `seed_placebo.py` with tests, the analysis and table scripts, and the earlier Proposition 1 and flip checks, all runnable from this layout).
 - **Draft.** `paper/v2_followups/` is the restructured manuscript (serving cost and gold-free abstention moved to an appendix). The X5 (greedy), X2 (AIME) and E4 (third model size) runs are still queued and not part of the draft.
+- **Independent verification.** `scripts/analysis/followup/verify_new_numbers.py` re-derives every new number with a separate implementation (explicit loops, closed-form placebo, different bootstrap seed, twice the resamples): 319 checks agree. It caught one wrong interval in the draft (self-quantized AWQ-4 flip excess, now +0.81 [-0.40,+2.04]), corrected here.
 - **Pre-registration.** `results/followup/PREREG_E1c_X3_X5.md` fixes the verdict rules for E1c, X3 and X5 before any of those cells finished.
 
 ## 2026-10-03 — Revision after a fourth referee report (no GPU, no frozen result changed)

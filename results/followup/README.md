@@ -39,6 +39,7 @@ python scripts/analysis/followup/gen_p2p4_tables.py        # P2 and P4 tables
 python scripts/analysis/followup/gen_lenvar.py             # within-item length spread table
 python scripts/analysis/followup/gen_fig_placebo.py        # Figure 1
 python scripts/analysis/followup/test_seed_placebo.py      # tests of the standalone estimator
+python scripts/analysis/followup/verify_new_numbers.py     # independent re-derivation of every new number (separate code path, other seed)
 ```
 `scripts/analysis/followup/seed_placebo.py` is a standalone implementation of the placebo estimator; `prop1_checks.py` and `flips_and_intervals.py` are the earlier CPU checks of Proposition 1 and of the flip and interval analyses.
 
