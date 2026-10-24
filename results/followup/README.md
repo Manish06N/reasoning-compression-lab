@@ -41,7 +41,8 @@ python scripts/analysis/followup/gen_p2p4_tables.py        # P2 and P4 tables
 python scripts/analysis/followup/gen_lenvar.py             # within-item length spread table
 python scripts/analysis/followup/gen_fig_placebo.py        # Figure 1
 python scripts/analysis/followup/noise_floor_crd.py        # noise floor of single-run designs, correct-run estimand -> tab_noisefloor.tex, tab_crd.tex
-python scripts/analysis/followup/e5a_results.py --dir <E5a compact folder>   # E5a rule, once the cells exist
+python scripts/analysis/followup/e5a_results.py --dir results/followup/v6/E5a_bos/compact   # E5a rule (applied; see CHANGELOG)
+python scripts/analysis/followup/apply_rules.py g1|e4|d1lite|x2 ...     # the pre-registered rules of G1, E4, D1-lite and X2 once their cells exist (prints INCOMPLETE and no verdict if cells are missing)
 python scripts/analysis/followup/test_seed_placebo.py      # tests of the standalone estimator
 python scripts/analysis/followup/verify_new_numbers.py     # independent re-derivation of every new number (separate code path, other seed)
 ```

@@ -6,6 +6,7 @@
 - **X5 (greedy, `max_num_seqs` 256 vs 64, seed 42) cells added, descriptive only.** Descriptively, a scheduler change alone leaves 5.0% (Qwen) and 8.6% (Llama) of completions with the same length and flips correctness on 48 and 68 of 500 items, in both directions. The G1 rule needs the third setting (job pending), so no verdict is applied.
 - **X2 pilots** (AIME-2024/2025, seed 42, n=30 per cell) are pilot data only; the full X2 run (8 seeds per model) is queued behind G1, E4 and D1-lite.
 - **Verification.** `verify_new_numbers.py` now includes an independent E5a block: 423 checks agree, 0 disagree; 518 numeric triplets in the draft, 0 unmatched.
+- **Analysis script for the pending rules.** `scripts/analysis/followup/apply_rules.py` applies the pre-registered rules of G1 (greedy configuration placebo), E4 at 1.5B, D1-lite and X2 literally, and prints INCOMPLETE with no verdict when cells are missing. Regression-tested by feeding the E2 float16 cells through the E4/D1-lite path (reproduces the stored E2 results: excess matched +54 [-57,+170], correct-run difference +84 [-31,+196]); the G1 and X2 paths were dry-run only (X5 cells, a synthetic fixture). No new result is claimed.
 - **Draft** (60 pages) now reports E5a in the appendix, the artifact-section caveat and the limitations; cell counts updated to 53 cells and 28,957 completions.
 
 ## 2026-10-23 - Two consequences for published inflation designs; overthinking proxies; pre-registered rules for the next runs (no frozen result changed)
