@@ -1,0 +1,71 @@
+## job 111838
+JobID|JobName|State|ExitCode|Start|End|Elapsed|NodeList
+111838|r2x-E5a-bos|COMPLETED|0:0|2026-10-23T23:02:04|2026-10-24T01:12:25|02:10:21|ragpu008
+111838.batch|batch|COMPLETED|0:0|2026-10-23T23:02:04|2026-10-24T01:12:25|02:10:21|ragpu008
+
+host=ragpu008 job=111838 start=2026-10-23T23:02:50+05:30
+NVIDIA A100 80GB PCIe, 550.54.14, 20183 MiB
+NVIDIA A100 80GB PCIe, 550.54.14, 5 MiB
+=== RUN E5a DeepSeek-R1-Distill-Qwen-7B_bos1 MATH-500 n=500 seed=42 dtype=auto T=0.6 quant=none 2026-10-23T23:02:50+05:30 ===
+GPU 1 free memory: 81032 MiB
+PASS: official-QRM output gate
+=== RUN E5a DeepSeek-R1-Distill-Qwen-7B_bos1 MATH-500 n=500 seed=43 dtype=auto T=0.6 quant=none 2026-10-23T23:32:39+05:30 ===
+GPU 1 free memory: 81032 MiB
+PASS: official-QRM output gate
+=== RUN E5a DeepSeek-R1-Distill-Qwen-7B_bos1 MATH-500 n=500 seed=44 dtype=auto T=0.6 quant=none 2026-10-23T23:59:19+05:30 ===
+GPU 1 free memory: 81032 MiB
+PASS: official-QRM output gate
+=== RUN E5a DeepSeek-R1-Distill-Qwen-7B_bos1 MATH-500 n=500 seed=45 dtype=auto T=0.6 quant=none 2026-10-24T00:22:12+05:30 ===
+GPU 1 free memory: 81032 MiB
+PASS: official-QRM output gate
+=== RUN E5a DeepSeek-R1-Distill-Qwen-7B_bos1 MATH-500 n=500 seed=46 dtype=auto T=0.6 quant=none 2026-10-24T00:47:41+05:30 ===
+GPU 1 free memory: 81032 MiB
+PASS: official-QRM output gate
+ALL_DONE end=2026-10-24T01:12:25+05:30
+
+
+## job 110768
+JobID|JobName|State|ExitCode|Start|End|Elapsed|NodeList
+110768|r2x-X5-greedy|COMPLETED|0:0|2026-10-23T05:54:20|2026-10-23T12:22:21|06:28:01|ragpu008
+110768.batch|batch|COMPLETED|0:0|2026-10-23T05:54:20|2026-10-23T12:22:21|06:28:01|ragpu008
+
+host=ragpu008 job=110768 start=2026-10-23T05:54:21+05:30
+NVIDIA A100 80GB PCIe, 550.54.14, 18404 MiB
+NVIDIA A100 80GB PCIe, 550.54.14, 5 MiB
+=== RUN X5 DeepSeek-R1-Distill-Qwen-7B_greedy_mns256 MATH-500 n=500 seed=42 dtype=auto T=0 quant=none 2026-10-23T05:54:22+05:30 ===
+GPU 1 free memory: 81032 MiB
+PASS: official-QRM output gate
+=== RUN X5 DeepSeek-R1-Distill-Qwen-7B_greedy_mns64 MATH-500 n=500 seed=42 dtype=auto T=0 quant=none 2026-10-23T06:50:14+05:30 ===
+GPU 1 free memory: 81032 MiB
+PASS: official-QRM output gate
+=== RUN X5 DeepSeek-R1-Distill-Llama-8B_greedy_mns256 MATH-500 n=500 seed=42 dtype=auto T=0 quant=none 2026-10-23T07:49:14+05:30 ===
+GPU 1 free memory: 81032 MiB
+PASS: official-QRM output gate
+=== RUN X5 DeepSeek-R1-Distill-Llama-8B_greedy_mns64 MATH-500 n=500 seed=42 dtype=auto T=0 quant=none 2026-10-23T10:05:30+05:30 ===
+GPU 1 free memory: 81032 MiB
+PASS: official-QRM output gate
+ALL_DONE end=2026-10-23T12:22:21+05:30
+
+
+## job 110772
+JobID|JobName|State|ExitCode|Start|End|Elapsed|NodeList
+110772|r2x-X2-pilot|COMPLETED|0:0|2026-10-23T11:00:25|2026-10-23T12:11:21|01:10:56|ragpu004
+110772.batch|batch|COMPLETED|0:0|2026-10-23T11:00:25|2026-10-23T12:11:21|01:10:56|ragpu004
+
+host=ragpu004 job=110772 start=2026-10-23T11:00:25+05:30
+NVIDIA A100 80GB PCIe, 550.54.14, 79520 MiB
+NVIDIA A100 80GB PCIe, 550.54.14, 844 MiB
+=== RUN X2 DeepSeek-R1-Distill-Qwen-7B AIME-2024 n=30 seed=42 dtype=auto T=0.6 quant=none 2026-10-23T11:00:26+05:30 ===
+GPU 1 free memory: 80193 MiB
+PASS: official-QRM output gate
+=== RUN X2 DeepSeek-R1-Distill-Qwen-7B AIME-2025 n=30 seed=42 dtype=auto T=0.6 quant=none 2026-10-23T11:21:35+05:30 ===
+GPU 1 free memory: 80193 MiB
+PASS: official-QRM output gate
+=== RUN X2 DeepSeek-R1-Distill-Llama-8B AIME-2024 n=30 seed=42 dtype=auto T=0.6 quant=none 2026-10-23T11:34:18+05:30 ===
+GPU 1 free memory: 80193 MiB
+PASS: official-QRM output gate
+=== RUN X2 DeepSeek-R1-Distill-Llama-8B AIME-2025 n=30 seed=42 dtype=auto T=0.6 quant=none 2026-10-23T11:52:09+05:30 ===
+GPU 1 free memory: 80193 MiB
+PASS: official-QRM output gate
+ALL_DONE end=2026-10-23T12:11:21+05:30
+

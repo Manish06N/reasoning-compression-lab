@@ -197,6 +197,29 @@ chk("X3 Lambda matched", x_m["lam"], X["lam_matched"], x_m["lam_ci"], X["lam_mat
 chk("X3 accuracy diff", x_c["acc"], X["acc_diff_pp"], x_c["acc_ci"], X["acc_diff_ci"]); chk("X3 uncond", x_c["unc"], X["uncond_tokens"], x_c["unc_ci"], X["uncond_ci"])
 print("   E1c/X3 done", flush=True)
 
+# --- E5a (single beginning-of-sequence token, Qwen-7B BF16): independent recomputation, incl. flip rates with explicit loops
+E5D = ROOT / "results" / "followup" / "v6" / "E5a_bos" / "compact"
+e_a, e_t = stack(sorted(glob.glob(str(E5D / "*seed4[2-6].json"))))
+e5c = arm(Aq, Tq, e_a, e_t, Aq, Tq, cross_pairs(5, 5)); e5m = arm(Aq, Tq, e_a, e_t, Aq, Tq, matched_pairs(5)); E5 = J("e5a_results.json")
+chk("E5a accuracy diff", e5c["acc"], E5["acc_pp"], e5c["acc_ci"], E5["acc_ci"]); chk("E5a uncond length diff", e5c["unc"], E5["uncond"], e5c["unc_ci"], E5["uncond_ci"])
+chk("E5a Lambda cross", e5c["lam"], E5["lam_cross"], e5c["lam_ci"], E5["lam_cross_ci"]); chk("E5a excess cross (rule)", e5c["excess"], E5["excess_cross"], e5c["excess_ci"], E5["excess_cross_ci"])
+chk("E5a Lambda matched", e5m["lam"], E5["lam_matched"], e5m["lam_ci"], E5["lam_matched_ci"]); chk("E5a excess matched", e5m["excess"], E5["excess_matched"], e5m["excess_ci"], E5["excess_matched_ci"])
+chk("E5a placebo", e5c["pi"], E5["placebo"], e5c["pi_ci"], E5["placebo_ci"])
+def ndr_items(Aref, Aoth, pairs):
+    num, den = np.zeros(Aref.shape[1]), np.zeros(Aref.shape[1])
+    for r, o in pairs:
+        for i in range(Aref.shape[1]):
+            if Aref[r, i] == 1:
+                den[i] += 1
+                if Aoth[o, i] == 0: num[i] += 1
+    return num, den
+nb_, db_ = ndr_items(Aq, Aq, cross_pairs(5, 5)); ne_, de_ = ndr_items(Aq, e_a, matched_pairs(5)); ix_ = RNG.integers(0, 500, (B, 500))
+fb, fe = nb_.sum() / db_.sum() * 100, ne_.sum() / de_.sum() * 100
+chk("E5a flip baseline", fb, E5["flip_baseline"]); chk("E5a flip same-seed", fe, E5["flip_e5a"])
+chk("E5a flip excess", fe - fb, E5["flip_e5a"] - E5["flip_baseline"], pct((ne_[ix_].sum(1) / de_[ix_].sum(1) - nb_[ix_].sum(1) / db_[ix_].sum(1)) * 100), E5["flip_excess_ci"])
+if any(c[0] > 0 or c[1] < 0 for c in (e5c["acc_ci"], e5c["unc_ci"], e5c["excess_ci"])): FAIL.append("E5a: an interval excludes zero (verdict changes!)")
+print("   E5a done", flush=True)
+
 # --- X1 (held-out seeds): placebo old/new/pooled via the identity formula, paired difference
 for fam, stem in FAMS.items():
     A_, T_ = BF[fam]; An, Tn = stack([X1D / f"{stem}_heldout_math500_n500_seed{s}.json" for s in range(47, 52)])

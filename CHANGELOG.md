@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-24 - E5a result (single beginning-of-sequence token): no effect detected; X5 and X2-pilot cells added
+
+- **E5a (rule in `PREREG_E5a.md`, committed before the cells finished).** Qwen-7B BF16, MATH-500, seeds 42-46, one BOS instead of two, against the campaign BF16 cells: accuracy +0.32 pp [-0.68,+1.32], unconditional length -6 tokens [-152,+134], cross-seed excess over the placebo -15 [-123,+87], same-seed flip rate +0.04 pp [-0.61,+0.73]. Verdict: not detected at this sample size. Qwen only. Every prompt is exactly one token shorter than the campaign-pipeline prompt on all 500 rows, and the engine token ids equal the companion study's on 500/500 rows. `scripts/analysis/followup/e5a_results.py`; data in `results/followup/v6/E5a_bos/`.
+- **X5 (greedy, `max_num_seqs` 256 vs 64, seed 42) cells added, descriptive only.** Descriptively, a scheduler change alone leaves 5.0% (Qwen) and 8.6% (Llama) of completions with the same length and flips correctness on 48 and 68 of 500 items, in both directions. The G1 rule needs the third setting (job pending), so no verdict is applied.
+- **X2 pilots** (AIME-2024/2025, seed 42, n=30 per cell) are pilot data only; the full X2 run (8 seeds per model) is queued behind G1, E4 and D1-lite.
+- **Verification.** `verify_new_numbers.py` now includes an independent E5a block: 423 checks agree, 0 disagree; 518 numeric triplets in the draft, 0 unmatched.
+- **Draft** (60 pages) now reports E5a in the appendix, the artifact-section caveat and the limitations; cell counts updated to 53 cells and 28,957 completions.
+
 ## 2026-10-23 - Two consequences for published inflation designs; overthinking proxies; pre-registered rules for the next runs (no frozen result changed)
 
 - **Noise floor.** Two runs of the same BF16 model on 100 random MATH-500 questions already give an apparent "inflation" of +4.4% (Qwen) and +7.1% (Llama) on the questions run 1 solved and -10.8% / -12.0% on those it failed; with all 500 questions it is still +4.3% / +6.7%. `scripts/analysis/followup/noise_floor_crd.py`. It is a simulation under sampling, not greedy decoding.

@@ -1,0 +1,11 @@
+--- external/Quantized-Reasoning-Models/lighteval_custom/models/vllm/vllm_model.py	2026-10-13 05:36:23.000000000 +0530
++++ external/Quantized-Reasoning-Models_e5a/lighteval_custom/models/vllm/vllm_model.py	2026-10-22 21:16:04.000000000 +0530
+@@ -277,7 +277,7 @@
+             num_samples = dataset[0].num_samples
+ 
+             context = [c.context for c in dataset]
+-            tokenized = self.tokenizer(context, add_special_tokens=self.add_special_tokens)
++            tokenized = self.tokenizer(context, add_special_tokens=False if os.environ.get("R2_ADD_SPECIAL_TOKENS") == "0" else self.add_special_tokens)
+ 
+             # The main question for this step is the following:
+             # Would we rather truncate the prompt to allow generation to go to max_new_tokens, at the risk

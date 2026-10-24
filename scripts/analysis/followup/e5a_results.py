@@ -52,5 +52,5 @@ out = ROOT / "results" / "followup" / "reports"; out.mkdir(exist_ok=True)
 (out / "e5a_results.json").write_text(json.dumps(dict(seeds=seeds, acc_pp=float(dA.mean()), acc_ci=acc_ci, uncond=float(dT.mean()), uncond_ci=len_ci,
     lam_cross=float(sx.sum() / nx.sum()), lam_cross_ci=pct(bx), lam_matched=float(sm.sum() / nm.sum()), lam_matched_ci=pct(bm), placebo=float(pi), placebo_ci=pct(bp),
     excess_cross=float(ex_cross), excess_cross_ci=ex_ci, excess_matched=float(sm.sum() / nm.sum() - pi), excess_matched_ci=pct(bm - bp),
-    flip_baseline=float(flip_base), flip_e5a=float(flip_e5a), flip_excess_ci=flip_ci, verdict=verdict), indent=1))
+    flip_baseline=float(flip_base), flip_e5a=float(flip_e5a), flip_excess=float(flip_e5a - flip_base), flip_excess_ci=flip_ci, verdict=verdict), indent=1))
 print("wrote e5a_results.json")
