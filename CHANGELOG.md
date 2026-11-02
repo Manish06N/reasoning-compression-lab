@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-11-02 - Final consistency edit and new highlights (no new data, no result changed)
+
+- Draft (60 pages): the decoding-grid paragraph now points to the E5a test of the single-BOS prompts; highlights rewritten (noise-floor finding added; float16 range corrected to 171-192 tokens), all within 85 characters.
+- Cluster status: the greedy-placebo (G1), E4 at 1.5B, D1-lite and X2 full runs remain queued with their pre-registered rules (`results/followup/PREREG_*`); none had started by 2 Nov, so none is used in the draft. The first G1 attempt failed on node ragpu005 (another user's process held the GPU), not through a code error.
+- Verifier unchanged: 423 checks agree, 0 disagree; 518 numeric triplets, 0 unmatched.
+
 ## 2026-10-24 - E5a result (single beginning-of-sequence token): no effect detected; X5 and X2-pilot cells added
 
 - **E5a (rule in `PREREG_E5a.md`, committed before the cells finished).** Qwen-7B BF16, MATH-500, seeds 42-46, one BOS instead of two, against the campaign BF16 cells: accuracy +0.32 pp [-0.68,+1.32], unconditional length -6 tokens [-152,+134], cross-seed excess over the placebo -15 [-123,+87], same-seed flip rate +0.04 pp [-0.61,+0.73]. Verdict: not detected at this sample size. Qwen only. Every prompt is exactly one token shorter than the campaign-pipeline prompt on all 500 rows, and the engine token ids equal the companion study's on 500/500 rows. `scripts/analysis/followup/e5a_results.py`; data in `results/followup/v6/E5a_bos/`.

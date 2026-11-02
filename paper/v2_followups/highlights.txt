@@ -1,5 +1,5 @@
 Much of quantization "token inflation" is a selection effect of the estimator
 A seed placebo measures that selection term with no quantization involved
-Switching BF16 to float16 alone gives 170-190 tokens of apparent inflation
+Two runs of one BF16 model mimic 4-7% inflation in a 100-question, one-run design
+Switching BF16 to float16 alone gives 171-192 tokens of apparent inflation
 A self-quantized Llama AWQ-4 reproduces the accuracy loss of the public upload
-Placebo-first reporting checklist; open per-item records and a tested tool
